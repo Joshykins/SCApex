@@ -1,0 +1,2072 @@
+//=========================================================
+//		Apex Roleplaying Engine
+//		Copyright (c) 2017, Apex Group
+//=========================================================
+// This software is distributed under the MIT License:
+// <http://opensource.org/licenses/MIT>
+//=========================================================
+
+// libapx_command_kill
+// ====================
+// kills units in player unitgroup context
+void libapx_command_kill(int user, unitgroup u, string argv, int spawningCount, string bracketText) {
+	UnitGroupLoopBegin(u);
+	while(!UnitGroupLoopDone()) {
+		UnitKill( UnitGroupLoopCurrent() );
+		UnitGroupLoopStep();
+	}
+	UnitGroupLoopEnd();
+}
+
+
+// libapx_command_remove
+// ====================
+// removes units in player unitgroup context
+void libapx_command_remove(int user, unitgroup u, string argv, int spawningCount, string bracketText) {
+	UnitGroupLoopBegin(u);
+	while(!UnitGroupLoopDone()) {
+		UnitRemove(UnitGroupLoopCurrent());
+		UnitGroupLoopStep();
+	}
+	UnitGroupLoopEnd();
+}
+
+// libapx_command_unitvar
+// ============================
+// Swaps the unit of selected units.
+void libapx_command_unitvar(int user, unitgroup u, string argv, int spawningCount, string bracketText) {
+	string unitvarprefix = "unitvar_";
+	unitgroup newUG;
+	bool addTF = false;
+	if ((StringEqual(StringWord(argv,3), "-add", c_stringNoCase) || StringEqual(StringWord(argv,3), "+add", c_stringNoCase) )  ) {
+			addTF = true;
+	}
+	if (!(addTF)) {
+
+		if (StringWord(argv,2) != "") {
+			DataTableValueRemove(true, unitvarprefix + StringWord(argv, 2));
+			DataTableSetUnitGroup(true, unitvarprefix + StringWord(argv, 2) , u);
+		} else {
+			libapx_print_output(user, "Provide a name for the unitgroup");
+		}
+
+	}
+	else {
+		if (StringWord(argv,2) != "") {
+			newUG = DataTableGetUnitGroup(true, unitvarprefix + StringWord(argv, 2));
+			UnitGroupAddUnitGroup(u, newUG);
+			DataTableSetUnitGroup(true, unitvarprefix + StringWord(argv, 2) , u);
+		} else {
+			libapx_print_output(user, "Provide a name for the unitgroup");
+		}
+	}
+
+}
+
+
+	// libapx_command_context
+	// ============================
+	// Switches the context of this parsing thread.
+	void libapx_command_context(int user, unitgroup u, string argv, int spawningCount, string bracketText) {
+	string unitvarprefix = "unitvar_";
+	unitgroup target = DataTableGetUnitGroup(true, unitvarprefix + StringWord(argv,2));
+
+libapx_set_target(user, target, spawningCount);
+// libapx_set_target(int player, unitgroup target, int spawningCount)
+}
+
+
+
+
+// libapx_command_unitswap
+// ============================
+// Swaps the unit of selected units.
+void libapx_command_unitswap(int user, unitgroup u, string argv, int spawningCount, string bracketText) {
+	string targetUnit;
+	fixed x;
+	fixed y;
+	point pos;
+	fixed face;
+	fixed height;
+	unit g;
+	unitgroup NewUnitG;
+	if (StringWord(argv, 2) != "") {
+		targetUnit = StringWord(argv,2);
+
+		targetUnit = UnitTypeFromString(targetUnit);
+		//type = librtpr_catalog_get( c_gameCatalogUnit, type );
+		if (targetUnit == "" || !CatalogEntryIsValid(c_gameCatalogUnit, targetUnit) || UnitTypeTestFlag(targetUnit, c_unitFlagMissile) ) {
+			libapx_print_output(user, "Unit not found, defaulting to Beacon_Nova");
+			return;
+		}
+
+	}
+	else {
+		targetUnit = "Beacon_Nova";
+	}
+	libapx_player_parser[user][spawningCount].context = UnitGroupEmpty();
+	//Loops through unitgroup,
+	UnitGroupLoopBegin(u);
+	while(!UnitGroupLoopDone()) {
+		x = PointGetX(UnitGetPosition(UnitGroupLoopCurrent()));
+		y = PointGetY(UnitGetPosition(UnitGroupLoopCurrent()));
+		face = UnitGetFacing(UnitGroupLoopCurrent());
+		height = UnitGetHeight(UnitGroupLoopCurrent());
+		pos = Point(x,y);
+		UnitRemove(UnitGroupLoopCurrent());
+		UnitGroupAddUnitGroup(libapx_player_parser[user][spawningCount].context, libapx_unit_create(targetUnit, user, pos , face, spawningCount));
+		g = UnitLastCreated(); // store the unit, since spawned is a unit group
+		UnitSetHeight(g, height, 0);
+		UnitGroupAdd(NewUnitG, g);
+
+		// make spawned units
+
+
+
+
+		//libapx_unit_create(string type, int player, point p, fixed facing , int spawningCount)
+		UnitGroupLoopStep();
+	}
+
+	UnitGroupLoopEnd();
+
+
+}
+
+
+// libapx_command_position
+// =====================
+// sets the position of a unit
+
+void libapx_command_unitmimic (int user, unitgroup u, string argv, int spawningCount, string bracketText) {
+	string targetUnit;
+	fixed x;
+	fixed y;
+	point pos;
+	fixed face;
+	fixed height;
+	unit g;
+	unitgroup NewUnitG;
+
+
+	if (StringWord(argv, 2) != "") {
+		targetUnit = StringWord(argv,2);
+
+		targetUnit = UnitTypeFromString(targetUnit);
+		//type = librtpr_catalog_get( c_gameCatalogUnit, type );
+		if (targetUnit == "" || !CatalogEntryIsValid(c_gameCatalogUnit, targetUnit) || UnitTypeTestFlag(targetUnit, c_unitFlagMissile) ) {
+			libapx_print_output(user, "Unit not found, defaulting to Beacon_Nova");
+			return;
+		}
+
+	}
+	else {
+		targetUnit = "Beacon_Nova";
+	}
+	libapx_player_parser[user][spawningCount].context = UnitGroupEmpty();
+	//Loops through unitgroup,
+	UnitGroupLoopBegin(u);
+	while(!UnitGroupLoopDone()) {
+		x = PointGetX(UnitGetPosition(UnitGroupLoopCurrent()));
+		y = PointGetY(UnitGetPosition(UnitGroupLoopCurrent()));
+		face = UnitGetFacing(UnitGroupLoopCurrent());
+		height = UnitGetHeight(UnitGroupLoopCurrent());
+		pos = Point(x,y);
+		UnitGroupAddUnitGroup(libapx_player_parser[user][spawningCount].context, libapx_unit_create(targetUnit, user, pos , face, spawningCount));
+		g = UnitLastCreated(); // store the unit, since spawned is a unit group
+		UnitSetHeight(g, height, 0);
+		UnitGroupAdd(NewUnitG, g);
+		// make spawned units
+
+
+
+
+		//libapx_unit_create(string type, int player, point p, fixed facing , int spawningCount)
+		UnitGroupLoopStep();
+	}
+
+	UnitGroupLoopEnd();
+}
+
+
+
+
+
+
+// libapx_command_move
+// =====================
+// sets the position of a unit to mouse position
+void libapx_command_move (int user, unitgroup u, string argv, int spawningCount, string bracketText) {
+	unitgroup g = u;
+	int unitAmt = 0;
+	point[1000] old_points;
+	unit current;
+	int i;
+	point averagePt;
+	fixed averageX;
+	fixed averageY;
+	fixed distanceX;
+	fixed distanceY;
+	fixed temp;
+	point mp = libapx_player[user].mouse_position;
+
+	if (StringWord(argv, 2) == "-all") {
+		g = UnitGroup( null, user, RegionEntireMap(), UnitFilter(0, 0, 0, 0), 0 );
+	}
+
+	//Gather unit positions
+	UnitGroupLoopBegin(g);
+	while(!UnitGroupLoopDone()) {
+		current = UnitGroupLoopCurrent();
+		old_points[unitAmt] = UnitGetPosition(current);
+		unitAmt += 1;
+		UnitGroupLoopStep();
+	}
+	UnitGroupLoopEnd();
+
+
+	for (i = 0; i < unitAmt; i += 1) {
+		// TODO:
+		averageX += PointGetX(old_points[i]);
+		averageY += PointGetY(old_points[i]);
+	}
+	averageX = averageX / (unitAmt);
+	averageY = averageY / (unitAmt);
+
+	averagePt = Point(averageX, averageY);
+	distanceX = PointGetX(mp) -  PointGetX(averagePt);
+	distanceY = PointGetY(mp) -  PointGetY(averagePt);
+
+	unitAmt = 0;
+	//Set Unit Positions
+	UnitGroupLoopBegin(g);
+	while(!UnitGroupLoopDone()) {
+		
+		current = UnitGroupLoopCurrent();
+		UnitSetPosition(
+			current, 
+			Point(PointGetX(old_points[unitAmt]) + distanceX,PointGetY(old_points[unitAmt]) + distanceY), 
+			false
+		); 
+		unitAmt += 1;
+
+		libapx_print_output(user, FixedToString(WorldHeight(c_heightMapGround, UnitGetPosition(current)),4)+ "map ground");
+		libapx_print_output(user, FixedToString(WorldHeight(c_heightMapGlide, UnitGetPosition(current)),4)+ "map glide");
+		libapx_print_output(user, FixedToString(WorldHeight(c_heightMapAir, UnitGetPosition(current)),4)+ "map glide");
+		UnitGroupLoopStep();
+	}
+	UnitGroupLoopEnd();
+
+	
+
+	return;
+}
+
+
+
+// libapx_command_position
+// =====================
+// sets the position of a unit
+
+void libapx_command_position (int user, unitgroup u, string argv, int spawningCount, string bracketText) {
+	fixed x;
+	fixed y;
+	int shifterX = 1; // 0 is subtract, 2 is add.
+	int shifterY = 1;
+	int p = EventPlayer();
+	unitgroup g = u;
+	int i;
+	point UnitPos;
+	fixed uX;
+	fixed uY;
+	fixed x2;
+	fixed facing;
+	fixed y2;
+	bool relative = false;
+	fixed polarDistance;
+	fixed polarFacingX;
+	fixed polarFacingY;
+	fixed polarFacing;
+	fixed leg1;
+	fixed leg2;
+	if(StringWord( argv,2) == "-rel") {
+		relative = true;
+		argv = StringReplaceWord(argv, "-rel", "",1,c_stringNoCase);
+	}
+
+	if(StringWord( argv, 2) == "") { //display unit coords
+		UnitGroupLoopBegin(g);
+		while(!UnitGroupLoopDone())
+		{
+			libapx_print_output(p, UnitGetType(UnitGroupLoopCurrent()) + " (" + FixedToString(PointGetX(UnitGetPosition(UnitGroupLoopCurrent())),2) + "," + FixedToString(PointGetY(UnitGetPosition(UnitGroupLoopCurrent())),2)  + ")");
+			UnitGroupLoopStep();
+		}
+		UnitGroupLoopEnd();
+		return;
+	}
+
+	if(StringWord( argv, 3) == "") {
+		libapx_print_error(p,"@pos requires both an X and Y coordinate to move a unit to (X,Y)");
+		return;
+	}
+//:TODO Arithmatic in Position
+//Yebois
+
+
+
+
+		// x Stuff
+		// + or - found, isolating
+		if (StringFind(StringWord(argv, 2), "+", c_stringNoCase) != -1 ) {
+			//It's a +
+			shifterX = 2;
+			//Now remove the +
+			i = StringFind(StringWord(argv, 2), "+", c_stringNoCase);
+			x = StringToFixed(StringReplace(StringWord(argv, 2), "", i, i));
+		}
+		else if (StringFind(StringWord(argv, 2), "-", c_stringNoCase) != -1 ) {
+			//It's a -
+			shifterX = 0;
+			//Now remove the -
+			i = StringFind(StringWord(argv, 2), "-", c_stringNoCase);
+			x = StringToFixed(StringReplace(StringWord(argv, 2), "", i, i));
+		}
+		else {
+			shifterX= 1;
+			x = StringToFixed(StringWord(argv, 2));
+		}
+
+
+
+
+		// y Stuff
+		// + or - found, isolating
+		if (StringFind(StringWord(argv, 3), "+", c_stringNoCase) != -1 ) {
+			//It's a +
+			shifterY = 2;
+			//Now remove the +
+			i = StringFind(StringWord(argv, 3), "+", c_stringNoCase);
+			y = StringToFixed(StringReplace(StringWord(argv, 3), "", i, i));
+		}
+		else if (StringFind(StringWord(argv, 3), "-", c_stringNoCase) != -1 ) {
+			//It's a -
+			shifterY = 0;
+			//Now remove the -
+			i = StringFind(StringWord(argv, 3), "-", c_stringNoCase);
+			y = StringToFixed(StringReplace(StringWord(argv, 3), "", i, i));
+		}
+		else {
+			shifterY = 1;
+			y = StringToFixed(StringWord(argv, 3));y = StringToFixed(StringWord(argv, 3));
+		}
+
+
+	if(relative) {
+		UnitGroupLoopBegin(g);
+		while(!UnitGroupLoopDone())
+		{
+			UnitPos = UnitGetPosition(UnitGroupLoopCurrent());
+			uX = PointGetX(UnitPos);
+			uY = PointGetY(UnitPos);
+			facing = UnitGetFacing(UnitGroupLoopCurrent());
+			polarDistance = x;
+
+			if (shifterX == 2) {
+				polarFacingX = 90 + facing;
+			}
+			else if (shifterX == 0) {
+				polarFacingX = 270 + facing;
+			}
+			else {
+				polarFacingX =  facing;
+			}
+			
+			x2 = uX+(polarDistance*Cos(polarFacingX));
+			y2 = uY+(polarDistance*Sin(polarFacingX));
+			polarDistance = y;
+			
+			if (shifterY == 2) {
+				polarFacingY = facing;
+			}
+			else if (shifterY == 0) {
+				polarFacingY = 180 + facing;
+			}
+			else {
+				polarFacingY = facing;
+			}
+			x2 = x2+(polarDistance*Cos(polarFacingY));
+			y2 = y2+(polarDistance*Sin(polarFacingY));
+			
+
+			UnitSetPosition(UnitGroupLoopCurrent(), Point(x2,y2), false);
+			UnitGroupLoopStep();
+		}
+		UnitGroupLoopEnd();
+	}
+	else {
+		UnitGroupLoopBegin(g);
+		while(!UnitGroupLoopDone())
+		{
+			UnitPos = UnitGetPosition(UnitGroupLoopCurrent());
+			uX = PointGetX(UnitPos);
+			uY = PointGetY(UnitPos);
+	
+			if (shifterX == 2) {
+				x2 = uX + x;
+			}
+			else if (shifterX == 0) {
+				x2 = uX - x;
+			}
+			else {
+				x2 = x;
+			}
+			if (shifterY == 2) {
+				y2 = uY + y;
+			}
+			else if (shifterY == 0) {
+				y2 = uY - y;
+			}
+			else {
+				y2 = y;
+			}
+	
+	
+	
+			UnitSetPosition(UnitGroupLoopCurrent(), Point(x2,y2), false);
+			UnitGroupLoopStep();
+		}
+		UnitGroupLoopEnd();
+	}
+	
+}
+
+// libapx_command_removearea
+// =====================
+// removes unit in a radius around mouse position
+void libapx_command_removearea(int user, unitgroup u, string argv, int spawningCount, string bracketText) {
+	unitgroup g;
+	fixed radius = StringToFixed( StringWord( argv, 2 ));
+	if(radius == 0.0) {
+		radius = 5.0;
+	}
+
+	g = UnitGroup( null, c_playerAny, RegionCircle( libapx_player[user].mouse_position, radius), null, 0 );
+	g = libapx_enforce_unit_permissions(g, user);
+
+	UnitGroupLoopBegin(g);
+	while(!UnitGroupLoopDone()) {
+		UnitRemove( UnitGroupLoopCurrent() );
+		UnitGroupLoopStep();
+	}
+	UnitGroupLoopEnd();
+
+	libNtve_gf_RemoveDeathModelsinRegion( RegionCircle( libapx_player[user].mouse_position, radius) );
+}
+
+
+
+// libapx_command_selectarea
+// =====================
+// selects units in an area
+void libapx_command_selectarea(int user, unitgroup u, string argv, int spawningCount, string bracketText) {
+	unitgroup g;
+	fixed radius = StringToFixed( StringWord( argv, 2 ));
+	if(radius == 0.0) {
+		radius = 5.0;
+	}
+
+	g = UnitGroup( null, c_playerAny, RegionCircle( libapx_player[user].mouse_position, radius), null, 0 );
+	g = libapx_enforce_unit_permissions(g, user);
+
+
+
+	libapx_player_parser[user][spawningCount].context = g;
+	UnitGroupSelect(g, user, true);
+
+
+}
+
+
+
+// libapx_command_cache
+// ===================
+// displays unit command cache info or values
+void libapx_command_cache(int user, unitgroup u, string argv, int spawningCount, string bracketText) {
+	string cache;
+	string unit_caches;
+	unitgroup g = u;
+
+	cache = StringWord(argv, 2);
+
+	UnitGroupLoopBegin(g);
+	while(!UnitGroupLoopDone()) {
+		if(StringToInt(cache) == 0) { //display number of caches
+			if(UnitGetCustomValue(UnitGroupLoopCurrent(), libapx_UNIT_INDEX_CACHE_COUNT) == 1 && !DataTableValueExists(true, FixedToString(UnitGetCustomValue(UnitGroupLoopCurrent(), libapx_UNIT_INDEX_ID), 0) + ".1")) {
+				unit_caches = "0";
+			}
+			else {
+				unit_caches = FixedToString(UnitGetCustomValue(UnitGroupLoopCurrent(), libapx_UNIT_INDEX_CACHE_COUNT), 0);
+			}
+			libapx_print_output(user, "Unit " + UnitGetType(UnitGroupLoopCurrent()) + " has " + unit_caches + " command caches (type \"@cache #\" to view a cache)");
+		}
+		else {
+			if(DataTableValueExists(true, FixedToString(UnitGetCustomValue(UnitGroupLoopCurrent(), libapx_UNIT_INDEX_ID), 0) + "." + cache)) {
+				libapx_print_output(user, "Unit " + UnitGetType(UnitGroupLoopCurrent()) + " cache " + cache + ":<n/>" + DataTableGetString(true, FixedToString(UnitGetCustomValue(UnitGroupLoopCurrent(), libapx_UNIT_INDEX_ID), 0) + "." + cache));
+			}
+		}
+		UnitGroupLoopStep();
+	}
+	UnitGroupLoopEnd();
+	return;
+}
+
+
+
+// libapx_command_give
+// =================
+// gives another player units
+void libapx_command_give(int user, unitgroup u, string argv, int spawningCount, string bracketText) {
+	unitgroup g = u;
+	int new_owner = libapx_color_to_player( StringCase( StringWord(argv, 2), false ) );
+
+	if(new_owner == -1) { // invalid entry by user
+		return;
+	}
+
+
+	UnitGroupLoopBegin(g);
+	while(!UnitGroupLoopDone()) {
+		UnitSetOwner( UnitGroupLoopCurrent(), new_owner, true );
+		UnitGroupLoopStep();
+	}
+	UnitGroupLoopEnd();
+
+
+	return;
+}
+
+// libapx_command_renameall
+// ===================
+// renames all units (by replacing unit catalog name entry)
+void libapx_command_renameall(int user, unitgroup u, string argv, int spawningCount, string bracketText) {
+	string val;
+	unitgroup g = u;
+	int dialogname;
+	dialogname = DialogControlHookupStandard(c_triggerControlTypePanel, "GameUI/UIContainer/ConsoleUIContainer/InfoPaneUnit/FakeNameLabel");
+	DialogControlSetPropertyAsText(dialogname, c_triggerControlPropertyText, PlayerGroupAll() ,StringToText("BobPossIsGod"));
+
+	val = argv;
+	val = StringSub( val, StringFind(val, " ", c_stringCase)+1, StringLength(val)); // The remainder of the chat message.
+
+	UnitGroupLoopBegin(g);
+	while(!UnitGroupLoopDone()) {
+		CatalogFieldValueSet(c_gameCatalogUnit, UnitGetType(UnitGroupLoopCurrent()), "Name", UnitGetOwner(UnitGroupLoopCurrent()), val);
+		libapx_unit_cache_update(UnitGroupLoopCurrent(), "@renameall", argv);
+		UnitGroupLoopStep();
+	}
+	UnitGroupLoopEnd();
+	return;
+}
+
+// libapx_command_behaviors
+// ====================
+// prints a list of all unit behaviors and stack count (behaviors can stack)
+void libapx_command_behaviors(int user, unitgroup u, string argv, int spawningCount, string bracketText) {
+	int count;
+	string behavior;
+
+	UnitGroupLoopBegin(u);
+	while(!UnitGroupLoopDone()) {
+		// print unit name and ID
+		libapx_print_text(PlayerGroupSingle(user), StringToText("> Unit [ID: " + libapx_unit_id(UnitGroupLoopCurrent()) + "] ") + libapx_unit_get_name(UnitGroupLoopCurrent()) + StringToText(" behaviors:"));
+
+		count = UnitBehaviorCountAll(UnitGroupLoopCurrent());
+		if( count > 0 ) {
+			while( count > 0 ) {
+				behavior = UnitBehaviorGet(UnitGroupLoopCurrent(), count);
+				libapx_print_output(user, behavior + " (" + IntToString( UnitBehaviorCount(UnitGroupLoopCurrent(), behavior) ) + ")");
+				count -= 1;
+			}
+		}
+		else { // count == 0, no behaviors
+			libapx_print_output(user, "No behaviors");
+		}
+		UnitGroupLoopStep();
+	}
+	UnitGroupLoopEnd();
+
+	return;
+}
+
+// libapx_command_addbehavior
+// =====================
+// adds a behavior to units
+void libapx_command_addbehavior(int user, unitgroup u, string argv, int spawningCount, string bracketText) {
+	string val = StringWord( argv, 2 );
+
+	// get full behavior name from catalog
+	val = libapx_catalog_get(c_gameCatalogBehavior, val);
+	if(val == null) {
+		libapx_print_error(user, "<c val=\"ff0000\">Unable to add behavior</c>: No such behavior exists.");
+		return;
+	}
+
+	UnitGroupLoopBegin(u);
+	while(!UnitGroupLoopDone()) {
+		UnitBehaviorAdd( UnitGroupLoopCurrent(), val, UnitGroupLoopCurrent(), 1 );
+		libapx_unit_cache_update(UnitGroupLoopCurrent(), "@addbehavior", argv);
+		UnitGroupLoopStep();
+	}
+	UnitGroupLoopEnd();
+
+	return;
+}
+
+// libapx_command_removebehavior
+// =======================
+// removes a behavior from units
+void libapx_command_removebehavior(int user, unitgroup u, string argv, int spawningCount, string bracketText) {
+	string val = StringWord( argv, 2 );
+
+	// get catalog entry from user input
+	val = libapx_catalog_get(c_gameCatalogBehavior, val);
+	if(val == null) {
+		libapx_print_error(user, "<c val=\"ff0000\">Unable to remove behavior</c>: No such behavior exists.");
+		return;
+	}
+
+	UnitGroupLoopBegin(u);
+	while(!UnitGroupLoopDone()) {
+		UnitBehaviorRemove( UnitGroupLoopCurrent(), val, 1 );
+		libapx_unit_cache_update(UnitGroupLoopCurrent(), "@removebehavior", argv);
+		UnitGroupLoopStep();
+	}
+	UnitGroupLoopEnd();
+
+	return;
+}
+
+// libapx_command_weapons
+// =================
+// prints a list of the weapons a unit currently has
+void libapx_command_weapons(int user, unitgroup u, string argv, int spawningCount, string bracketText) {
+	int count;
+
+	UnitGroupLoopBegin(u);
+	while(!UnitGroupLoopDone()) {
+		// print unit name and ID
+		libapx_print_text(PlayerGroupSingle(user), StringToText("> Unit [ID: " + libapx_unit_id(UnitGroupLoopCurrent()) + "] ") + libapx_unit_get_name(UnitGroupLoopCurrent()) + StringToText(" weapons:"));
+
+		count = UnitWeaponCount(UnitGroupLoopCurrent());
+		if( count > 0 ) {
+			while( count > 0 ) {
+				libapx_print_output(user, UnitWeaponGet(UnitGroupLoopCurrent(), count));
+				count -= 1;
+			}
+		}
+		else { // count == 0, no behaviors
+			libapx_print_output(user, "No weapons");
+		}
+		UnitGroupLoopStep();
+	}
+	UnitGroupLoopEnd();
+	return;
+}
+
+// libapx_command_addweapon
+// ====================
+// adds a weapon to a given turret on a unit
+//  -> if turret specified does not exist, defaults to CTurret
+//     (default weapon turret)
+void libapx_command_addweapon(int user, unitgroup u, string argv, int spawningCount, string bracketText) {
+	string weapon = StringWord(argv, 2);
+	string turret = StringWord(argv, 3);
+
+	if( turret == "" ) {
+		turret = "CTurret";
+	}
+
+	weapon = libapx_catalog_get(c_gameCatalogWeapon, weapon);
+	if( weapon == null || CatalogEntryScope(c_gameCatalogWeapon, weapon) == weapon) {
+		libapx_print_error(user, "<c val=\"ff0000\">Unable to add weapon</c>: No such weapon exists.");
+		return;
+	}
+
+	// if turret is not default, use catalog get on turet
+	if( turret != "CTurret") {
+		turret = libapx_catalog_get(c_gameCatalogTurret, turret);
+		if( turret == null ) {
+			libapx_print_error(user, "<c val=\"ff0000\">Unable to add weapon</c>: No such turret exists.");
+			return;
+		}
+	}
+
+	UnitGroupLoopBegin(u);
+	while( !UnitGroupLoopDone() ) {
+		UnitWeaponAdd( UnitGroupLoopCurrent(), weapon, turret );
+		libapx_unit_cache_update(UnitGroupLoopCurrent(), "@addweapon", argv);
+		UnitGroupLoopStep();
+	}
+	UnitGroupLoopEnd();
+
+	return;
+}
+
+// libapx_command_removeweapon
+// ====================
+// removes a weapon from a unit
+void libapx_command_removeweapon(int user, unitgroup u, string argv, int spawningCount, string bracketText) {
+	string weapon = StringWord( argv, 2 );
+
+	// get catalog entry for weapon and make sure weapon is valid
+	weapon = libapx_catalog_get(c_gameCatalogWeapon, weapon);
+	if ( weapon == null || CatalogEntryScope(c_gameCatalogWeapon, weapon) == weapon) {
+		libapx_print_error(user, "<c val=\"ff0000\">Unable to remove weapon</c>: No such weapon exists.");
+		return;
+	}
+
+	UnitGroupLoopBegin(u);
+	while( !UnitGroupLoopDone() ) {
+		UnitWeaponRemove( UnitGroupLoopCurrent(), weapon );
+		libapx_unit_cache_update(UnitGroupLoopCurrent(), "@removeweapon", argv);
+		UnitGroupLoopStep();
+	}
+	UnitGroupLoopEnd();
+
+	return;
+}
+
+// libapx_command_life
+// libapx_command_shields
+// libapx_command_energy
+// ===================
+// sets units life, shields, or energy (absolute, adding, or percentage)
+// e.g. syntax: @life 10, @life 10%, @life +10, @life +10%
+void libapx_command_life(int user, unitgroup u, string argv, int spawningCount, string bracketText) {
+	string param;
+	fixed val;
+	bool percent = false;
+	unitgroup g = u;
+	bool absolute = true;
+
+	param = StringWord( argv, 2 );
+
+	if( StringContains(param, "%", c_stringEnd, c_stringCase) ) {
+		percent = true;
+		param = StringSub(param, 1, StringLength(param)-1);
+	}
+	if( StringContains(param, "+", c_stringBegin, c_stringCase) ) {
+		absolute = false;
+		param = StringSub(param, 2, StringLength(param));
+	}
+
+	val = StringToFixed(param);
+
+	UnitGroupLoopBegin(g);
+	while(!UnitGroupLoopDone()) {
+		if(!absolute) {
+			if(percent) {
+				UnitSetPropertyFixed( UnitGroupLoopCurrent(), c_unitPropLife, UnitGetPropertyFixed(UnitGroupLoopCurrent(), c_unitPropLife, c_unitPropCurrent) + (UnitGetPropertyFixed(UnitGroupLoopCurrent(), c_unitPropLifeMax, c_unitPropCurrent)*(val/100)) );
+			}
+			else {
+				UnitSetPropertyFixed( UnitGroupLoopCurrent(), c_unitPropLife, UnitGetPropertyFixed(UnitGroupLoopCurrent(), c_unitPropLife, c_unitPropCurrent) + val );
+			}
+		}
+		else {
+			if(percent) {
+				UnitSetPropertyFixed( UnitGroupLoopCurrent(), c_unitPropLifePercent, val );
+			}
+			else {
+				UnitSetPropertyFixed( UnitGroupLoopCurrent(), c_unitPropLife, val );
+			}
+		}
+		UnitGroupLoopStep();
+	}
+	UnitGroupLoopEnd();
+
+	return;
+}
+
+void libapx_command_shields(int user, unitgroup u, string argv, int spawningCount, string bracketText) {
+	string param;
+	fixed val;
+	bool percent = false;
+	unitgroup g = u;
+	bool absolute = true;
+
+	param = StringWord( argv, 2 );
+
+	if( StringContains(param, "%", c_stringEnd, c_stringCase) ) {
+		percent = true;
+		param = StringSub(param, 1, StringLength(param)-1);
+	}
+	if( StringContains(param, "+", c_stringBegin, c_stringCase) ) {
+		absolute = false;
+		param = StringSub(param, 2, StringLength(param));
+	}
+
+	val = StringToFixed(param);
+
+	UnitGroupLoopBegin(g);
+	while(!UnitGroupLoopDone()) {
+		if(!absolute) {
+			if(percent) {
+				UnitSetPropertyFixed( UnitGroupLoopCurrent(), c_unitPropShields, UnitGetPropertyFixed(UnitGroupLoopCurrent(), c_unitPropShields, c_unitPropCurrent) + (UnitGetPropertyFixed(UnitGroupLoopCurrent(), c_unitPropShieldsMax, c_unitPropCurrent)*(val/100)) );
+			}
+			else {
+				UnitSetPropertyFixed( UnitGroupLoopCurrent(), c_unitPropShields, UnitGetPropertyFixed(UnitGroupLoopCurrent(), c_unitPropShields, c_unitPropCurrent) + val );
+			}
+		}
+		else {
+			if(percent) {
+				UnitSetPropertyFixed( UnitGroupLoopCurrent(), c_unitPropShieldsPercent, val );
+			}
+			else {
+				UnitSetPropertyFixed( UnitGroupLoopCurrent(), c_unitPropShields, val );
+			}
+		}
+		UnitGroupLoopStep();
+	}
+	UnitGroupLoopEnd();
+
+	return;
+}
+
+void libapx_command_energy(int user, unitgroup u, string argv, int spawningCount, string bracketText) {
+	string param;
+	fixed val;
+	bool percent = false;
+	unitgroup g = u;
+	bool absolute = true;
+
+	param = StringWord( argv, 2 );
+
+	if( StringContains(param, "%", c_stringEnd, c_stringCase) ) {
+		percent = true;
+		param = StringSub(param, 1, StringLength(param)-1);
+	}
+	if( StringContains(param, "+", c_stringBegin, c_stringCase) ) {
+		absolute = false;
+		param = StringSub(param, 2, StringLength(param));
+	}
+
+	val = StringToFixed(param);
+
+	UnitGroupLoopBegin(g);
+	while(!UnitGroupLoopDone()) {
+		if(!absolute) {
+			if(percent) {
+				UnitSetPropertyFixed( UnitGroupLoopCurrent(), c_unitPropEnergy, UnitGetPropertyFixed(UnitGroupLoopCurrent(), c_unitPropEnergy, c_unitPropCurrent) + (UnitGetPropertyFixed(UnitGroupLoopCurrent(), c_unitPropEnergyMax, c_unitPropCurrent)*(val/100)) );
+			}
+			else {
+				UnitSetPropertyFixed( UnitGroupLoopCurrent(), c_unitPropEnergy, UnitGetPropertyFixed(UnitGroupLoopCurrent(), c_unitPropEnergy, c_unitPropCurrent) + val );
+			}
+		}
+		else {
+			if(percent) {
+				UnitSetPropertyFixed( UnitGroupLoopCurrent(), c_unitPropEnergyPercent, val );
+			}
+			else {
+				UnitSetPropertyFixed( UnitGroupLoopCurrent(), c_unitPropEnergy, val );
+			}
+		}
+		UnitGroupLoopStep();
+	}
+	UnitGroupLoopEnd();
+
+	return;
+}
+
+// libapx_command_maxlife
+// libapx_command_maxshields
+// libapx_command_maxenergy
+// =====================
+// sets a unit's maxlife, maxshields, or maxenergy
+// can specify as either absolute, percentage, or added value
+// e.g. syntax: @maxlife 10, @maxlife 10%, @maxlife +10%, @maxlife +10
+void libapx_command_maxlife(int user, unitgroup u, string argv, int spawningCount, string bracketText) {
+	string param;
+	fixed val;
+	bool percent = false;
+	unitgroup g = u;
+	bool absolute = true;
+
+	param = StringWord( argv, 2 );
+
+	if( StringContains(param, "%", c_stringEnd, c_stringCase) ) {
+		percent = true;
+		param = StringSub(param, 1, StringLength(param)-1);
+	}
+	if( StringContains(param, "+", c_stringBegin, c_stringCase) ) {
+		absolute = false;
+		param = StringSub(param, 2, StringLength(param));
+	}
+
+	val = StringToFixed(param);
+
+	if( val <= 0 && absolute) {
+		return;
+	}
+
+	UnitGroupLoopBegin(g);
+	while(!UnitGroupLoopDone()) {
+		if(!absolute) {
+			if(percent) {
+				val = UnitGetPropertyFixed(UnitGroupLoopCurrent(), c_unitPropLifeMax, c_unitPropCurrent) + (UnitGetPropertyFixed(UnitGroupLoopCurrent(), c_unitPropLifeMax, c_unitPropCurrent)*(val/100));
+			}
+			else {
+				val = UnitGetPropertyFixed(UnitGroupLoopCurrent(), c_unitPropLifeMax, c_unitPropCurrent) + val;
+			}
+		}
+		else if(percent) {
+			val = UnitGetPropertyFixed(UnitGroupLoopCurrent(), c_unitPropLifeMax, c_unitPropCurrent)*(val/100);
+		}
+		if(UnitGetPropertyFixed(UnitGroupLoopCurrent(), c_unitPropLifeMax, c_unitPropCurrent) + val < 0) {
+			val = 1;
+		}
+		UnitSetPropertyFixed( UnitGroupLoopCurrent(), c_unitPropLifeMax, val );
+		UnitGroupLoopStep();
+	}
+	UnitGroupLoopEnd();
+
+	return;
+}
+
+void libapx_command_maxshields(int user, unitgroup u, string argv, int spawningCount, string bracketText) {
+	string param;
+	fixed val;
+	bool percent = false;
+	unitgroup g = u;
+	bool absolute = true;
+
+	param = StringWord( argv, 2 );
+
+	if( StringContains(param, "%", c_stringEnd, c_stringCase) ) {
+		percent = true;
+		param = StringSub(param, 1, StringLength(param)-1);
+	}
+	if( StringContains(param, "+", c_stringBegin, c_stringCase) ) {
+		absolute = false;
+		param = StringSub(param, 2, StringLength(param));
+	}
+
+	val = StringToFixed(param);
+
+	if( val <= 0 && absolute) {
+		return;
+	}
+
+	UnitGroupLoopBegin(g);
+	while(!UnitGroupLoopDone()) {
+		if(!absolute) {
+			if(percent) {
+				val = UnitGetPropertyFixed(UnitGroupLoopCurrent(), c_unitPropShieldsMax, c_unitPropCurrent) + (UnitGetPropertyFixed(UnitGroupLoopCurrent(), c_unitPropShieldsMax, c_unitPropCurrent)*(val/100));
+			}
+			else {
+				val = UnitGetPropertyFixed(UnitGroupLoopCurrent(), c_unitPropShieldsMax, c_unitPropCurrent) + val;
+			}
+		}
+		else if(percent) {
+			val = UnitGetPropertyFixed(UnitGroupLoopCurrent(), c_unitPropShieldsMax, c_unitPropCurrent)*(val/100);
+		}
+		if(UnitGetPropertyFixed(UnitGroupLoopCurrent(), c_unitPropShieldsMax, c_unitPropCurrent) + val < 0) {
+			val = 1;
+		}
+		UnitSetPropertyFixed( UnitGroupLoopCurrent(), c_unitPropShieldsMax, val );
+		UnitGroupLoopStep();
+	}
+	UnitGroupLoopEnd();
+
+	return;
+}
+
+void libapx_command_maxenergy(int user, unitgroup u, string argv, int spawningCount, string bracketText) {
+	string param;
+	fixed val;
+	bool percent = false;
+	unitgroup g = u;
+	bool absolute = true;
+
+	param = StringWord( argv, 2 );
+
+	if( StringContains(param, "%", c_stringEnd, c_stringCase) ) {
+		percent = true;
+		param = StringSub(param, 1, StringLength(param)-1);
+	}
+	if( StringContains(param, "+", c_stringBegin, c_stringCase) ) {
+		absolute = false;
+		param = StringSub(param, 2, StringLength(param));
+	}
+
+	val = StringToFixed(param);
+
+	if( val <= 0 && absolute) {
+		return;
+	}
+
+	UnitGroupLoopBegin(g);
+	while(!UnitGroupLoopDone()) {
+		if(!absolute) {
+			if(percent) {
+				val = UnitGetPropertyFixed(UnitGroupLoopCurrent(), c_unitPropEnergyMax, c_unitPropCurrent) + (UnitGetPropertyFixed(UnitGroupLoopCurrent(), c_unitPropEnergyMax, c_unitPropCurrent)*(val/100));
+			}
+			else {
+				val = UnitGetPropertyFixed(UnitGroupLoopCurrent(), c_unitPropEnergyMax, c_unitPropCurrent) + val;
+			}
+		}
+		else if(percent) {
+			val = UnitGetPropertyFixed(UnitGroupLoopCurrent(), c_unitPropEnergyMax, c_unitPropCurrent)*(val/100);
+		}
+		if(UnitGetPropertyFixed(UnitGroupLoopCurrent(), c_unitPropEnergyMax, c_unitPropCurrent) + val < 0) {
+			val = 1;
+		}
+		UnitSetPropertyFixed( UnitGroupLoopCurrent(), c_unitPropEnergyMax, val );
+		UnitGroupLoopStep();
+	}
+	UnitGroupLoopEnd();
+
+	return;
+}
+
+// libapx_command_liferegen
+// libapx_command_shieldsregen
+// libapx_command_energyregen
+// =========================
+// changes units life, shields, or energy regeneration
+// can specify as absolute or as a percentage
+// e.g. syntax: @liferegen 2 or @liferegen 2%
+void libapx_command_liferegen(int user, unitgroup u, string argv, int spawningCount, string bracketText) {
+	string param = StringWord( argv, 2 );
+	fixed val = StringToFixed(param);
+	bool is_percent = false;
+	unitgroup g = u;
+
+	if( StringContains(param, "%", c_stringEnd, c_stringCase) ) {
+		param = StringSub(param, 1, StringLength(param)-1);
+		val = StringToFixed(param);
+		is_percent = true;
+	}
+
+	UnitGroupLoopBegin(g);
+	while(!UnitGroupLoopDone()) {
+		if(is_percent) {
+			UnitSetPropertyFixed( UnitGroupLoopCurrent(), c_unitPropLifeRegen,
+				val * UnitGetPropertyFixed(UnitGroupLoopCurrent(), c_unitPropLifeMax, false));
+		}
+		else {
+			UnitSetPropertyFixed( UnitGroupLoopCurrent(), c_unitPropLifeRegen, val );
+		}
+		UnitGroupLoopStep();
+	}
+	UnitGroupLoopEnd();
+
+	return;
+}
+
+void libapx_command_shieldsregen(int user, unitgroup u, string argv, int spawningCount, string bracketText) {
+	string param = StringWord( argv, 2 );
+	fixed val = StringToFixed(param);
+	bool is_percent = false;
+	unitgroup g = u;
+
+	if( StringContains(param, "%", c_stringEnd, c_stringCase) ) {
+		param = StringSub(param, 1, StringLength(param)-1);
+		val = StringToFixed(param);
+		is_percent = true;
+	}
+
+	UnitGroupLoopBegin(g);
+	while(!UnitGroupLoopDone()) {
+		if(is_percent) {
+			UnitSetPropertyFixed( UnitGroupLoopCurrent(), c_unitPropShieldsRegen,
+				val * UnitGetPropertyFixed(UnitGroupLoopCurrent(), c_unitPropShieldsMax, false));
+		}
+		else {
+			UnitSetPropertyFixed( UnitGroupLoopCurrent(), c_unitPropShieldsRegen, val );
+		}
+		UnitGroupLoopStep();
+	}
+	UnitGroupLoopEnd();
+
+	return;
+}
+
+void libapx_command_energyregen(int user, unitgroup u, string argv, int spawningCount, string bracketText) {
+	string param = StringWord( argv, 2 );
+	fixed val = StringToFixed(param);
+	bool is_percent = false;
+	unitgroup g = u;
+
+	if( StringContains(param, "%", c_stringEnd, c_stringCase) ) {
+		param = StringSub(param, 1, StringLength(param)-1);
+		val = StringToFixed(param);
+		is_percent = true;
+	}
+
+	UnitGroupLoopBegin(g);
+	while(!UnitGroupLoopDone()) {
+		if(is_percent) {
+			UnitSetPropertyFixed( UnitGroupLoopCurrent(), c_unitPropEnergyRegen,
+				val * UnitGetPropertyFixed(UnitGroupLoopCurrent(), c_unitPropEnergyMax, false));
+		}
+		else {
+			UnitSetPropertyFixed( UnitGroupLoopCurrent(), c_unitPropEnergyRegen, val );
+		}
+		UnitGroupLoopStep();
+	}
+	UnitGroupLoopEnd();
+
+	return;
+}
+
+// libapx_command_speed
+// ==================
+// sets a unit's speed (either for a single unit, or permanently for all)
+void libapx_command_speed(int user, unitgroup u, string argv, int spawningCount, string bracketText) {
+	string param = StringWord( argv, 2 );
+	fixed val;
+	bool is_permanent = false;
+	bool absolute = true;
+	unitgroup g = u;
+
+	is_permanent = StringContains(argv, "all", c_stringAnywhere, false) ||
+				  StringContains(argv, "permanent", c_stringAnywhere, false);
+
+	if( StringContains(param, "+", c_stringBegin, c_stringCase) ) {
+		absolute = false;
+		param = StringSub(param, 2, StringLength(param));
+	}
+
+	val = StringToFixed(param);
+
+	if( val < 0 && absolute) {
+		val = 0;
+	}
+
+	UnitGroupLoopBegin(g);
+	if(is_permanent) {
+		while(!UnitGroupLoopDone()) {
+			if(!absolute) {
+				val = UnitGetPropertyFixed(UnitGroupLoopCurrent(), c_unitPropMovementSpeed, c_unitPropCurrent) + val;
+				if(val < 0) {
+					val = 0.0;
+				}
+			}
+			CatalogFieldValueSet(c_gameCatalogUnit, UnitGetType(UnitGroupLoopCurrent()),
+				"Speed", UnitGetOwner(UnitGroupLoopCurrent()), FixedToString(val, 4));
+			UnitGroupLoopStep();
+		}
+	}
+	else {
+		while(!UnitGroupLoopDone()) {
+			if(!absolute) {
+				val = UnitGetPropertyFixed(UnitGroupLoopCurrent(), c_unitPropMovementSpeed, c_unitPropCurrent) + val;
+				if(val < 0) {
+					val = 0.0;
+				}
+			}
+			UnitSetPropertyFixed( UnitGroupLoopCurrent(), c_unitPropMovementSpeed, val );
+			UnitGroupLoopStep();
+		}
+	}
+	UnitGroupLoopEnd();
+
+	return;
+}
+
+// libapx_command_height
+// ====================
+// sets a unit's z height
+void libapx_command_height(int user, unitgroup u, string argv, int spawningCount, string bracketText) {
+	fixed height;
+	fixed time;
+	string param;
+	unitgroup g = u;
+	param = StringWord( argv, 2 );
+	height = StringToFixed( param );
+	param = StringWord( argv, 3 );
+	time = StringToFixed( param );
+
+
+	UnitGroupLoopBegin(g);
+	while( !UnitGroupLoopDone() ) {
+
+		if (height > 10) {
+			libapx_unit_flag_col_crashable(UnitGroupLoopCurrent());
+		}
+
+		libapx_unit_colossus_remove(UnitGroupLoopCurrent());
+
+		UnitSetHeight( UnitGroupLoopCurrent(), height, time );
+		libapx_unit_cache_update(UnitGroupLoopCurrent(), "@height", argv);
+		UnitGroupLoopStep();
+	}
+	UnitGroupLoopEnd();
+
+	return;
+}
+
+// libapx_command_color
+// ==================
+// changes the player color of a unit
+void libapx_command_color(int user, unitgroup u, string argv, int spawningCount, string bracketText) {
+	int new_color;
+	string param = StringWord( argv, 2 );
+	unitgroup g = u;
+
+	new_color = libapx_color_to_player_default(param);
+	if(new_color == -1) { // invalid entry by user
+		return;
+	}
+
+	UnitGroupLoopBegin(g);
+	while(!UnitGroupLoopDone()) {
+		UnitSetTeamColorIndex( UnitGroupLoopCurrent(), new_color );
+		libapx_unit_cache_update(UnitGroupLoopCurrent(), "@color", argv);
+		UnitGroupLoopStep();
+	}
+	UnitGroupLoopEnd();
+	return;
+}
+
+// libapx_command_invulnerable
+// libapx_command_vulnerable
+// ====================
+// Makes a unit invulnerable or vulnerable
+void libapx_command_invulnerable(int user, unitgroup u, string argv, int spawningCount, string bracketText) {
+	UnitGroupLoopBegin(u);
+	while(!UnitGroupLoopDone()) {
+		UnitSetState( UnitGroupLoopCurrent(), c_unitStateInvulnerable, true );
+		libapx_unit_cache_update(UnitGroupLoopCurrent(), "@invulnerable", argv);
+		UnitGroupLoopStep();
+	}
+	UnitGroupLoopEnd();
+	return;
+}
+void libapx_command_vulnerable(int user, unitgroup u, string argv, int spawningCount, string bracketText) {
+	UnitGroupLoopBegin(u);
+	while(!UnitGroupLoopDone()) {
+		UnitSetState( UnitGroupLoopCurrent(), c_unitStateInvulnerable, false );
+		libapx_unit_cache_update(UnitGroupLoopCurrent(), "@invulnerable", "");
+		UnitGroupLoopStep();
+	}
+	UnitGroupLoopEnd();
+	return;
+}
+
+// libapx_command_face
+// ===============
+// makes a unit face an angle. (modified from Cortex engine)
+// if no angle is specified, unit will face towards player's mouse cursor
+void libapx_command_face(int user, unitgroup u, string argv, int spawningCount, string bracketText) {
+	fixed angle;
+	string param;
+	bool absolute = true;
+
+	param = StringWord( argv, 2 );
+	if( param != "" ) {
+		if( StringContains(param, "+", c_stringBegin, c_stringCase) ) {
+			absolute = false;
+			param = StringSub(param, 2, StringLength(param));
+		}
+		angle = StringToFixed( param );
+	}
+
+	UnitGroupLoopBegin(u);
+	while(!UnitGroupLoopDone()) {
+		if( param == "" ) { // face mouse
+			libNtve_gf_MakeUnitFacePoint( UnitGroupLoopCurrent(), libapx_player[user].mouse_position, 0.0 );
+		}
+		else if(!absolute) {
+			UnitSetFacing(UnitGroupLoopCurrent(), UnitGetFacing(UnitGroupLoopCurrent()) + angle, 0.0);
+		}
+		else { // face angle
+			UnitSetFacing( UnitGroupLoopCurrent(), angle, 0.0 );
+		}
+		UnitGroupLoopStep();
+	}
+	UnitGroupLoopEnd();
+	return;
+}
+
+// libapx_command_damage
+// =================
+// deals with both adding or removing damage (modified from Cortex engine)
+// both @adddamage and @removedamage are directed here
+// max damage added or removed is currently set at 9999
+void libapx_command_damage(int user, unitgroup u, string argv, int spawningCount, string bracketText) {
+	string command = StringCase( StringWord( argv, 1 ), false );
+	string dmg_behavior_1;
+	string dmg_behavior_10;
+	string dmg_behavior_100;
+	string dmg_behavior_1000;
+	int amt;
+	int val = StringToInt(StringWord( argv, 2 ));
+	unitgroup g = u;
+
+	// since we are using the same command for both @adddamage and @removedamage,
+	// check which command it is, and set proper behaviors
+	if( (command == "@adddamage" && val > 0) || (command == "@removedamage" && val < 0) ) {
+		dmg_behavior_1 = libapx_BEHAVIOR_ADD_DAMAGE_1;
+		dmg_behavior_10 = libapx_BEHAVIOR_ADD_DAMAGE_10;
+		dmg_behavior_100 = libapx_BEHAVIOR_ADD_DAMAGE_100;
+		dmg_behavior_1000 = libapx_BEHAVIOR_ADD_DAMAGE_1000;
+	}
+	else { // we are using @removedamage
+		dmg_behavior_1 = libapx_BEHAVIOR_SUBTRACT_DAMAGE_1;
+		dmg_behavior_10 = libapx_BEHAVIOR_SUBTRACT_DAMAGE_10;
+		dmg_behavior_100 = libapx_BEHAVIOR_SUBTRACT_DAMAGE_100;
+		dmg_behavior_1000 = libapx_BEHAVIOR_SUBTRACT_DAMAGE_1000;
+	}
+
+	val = AbsI(val);
+	if(val > 9999) {
+	   val = 9999;
+	}
+
+	amt = val;
+
+	UnitGroupLoopBegin(g);
+	while(!UnitGroupLoopDone()) {
+		// First remove all damage bonuses and maluses, since we're now treating this as a "strictly positive setdamagebonus" command
+		UnitBehaviorRemove( UnitGroupLoopCurrent(), libapx_BEHAVIOR_ADD_DAMAGE_1, -1);
+		UnitBehaviorRemove( UnitGroupLoopCurrent(), libapx_BEHAVIOR_ADD_DAMAGE_10, -1);
+		UnitBehaviorRemove( UnitGroupLoopCurrent(), libapx_BEHAVIOR_ADD_DAMAGE_100, -1);
+		UnitBehaviorRemove( UnitGroupLoopCurrent(), libapx_BEHAVIOR_ADD_DAMAGE_1000, -1);
+		UnitBehaviorRemove( UnitGroupLoopCurrent(), libapx_BEHAVIOR_SUBTRACT_DAMAGE_1, -1);
+		UnitBehaviorRemove( UnitGroupLoopCurrent(), libapx_BEHAVIOR_SUBTRACT_DAMAGE_10, -1);
+		UnitBehaviorRemove( UnitGroupLoopCurrent(), libapx_BEHAVIOR_SUBTRACT_DAMAGE_100, -1);
+		UnitBehaviorRemove( UnitGroupLoopCurrent(), libapx_BEHAVIOR_SUBTRACT_DAMAGE_1000, -1);
+
+		val = amt;
+
+		// Add appropriate behaviors until they reach the desired total damage bonus
+		while(val >= 1000) {
+			UnitBehaviorAdd( UnitGroupLoopCurrent(), dmg_behavior_1000, UnitGroupLoopCurrent(), 1 );
+			val -= 1000;
+		}
+		while(val >= 100) {
+			UnitBehaviorAdd( UnitGroupLoopCurrent(), dmg_behavior_100, UnitGroupLoopCurrent(), 1 );
+			val -= 100;
+		}
+		while(val >= 10) {
+			UnitBehaviorAdd( UnitGroupLoopCurrent(), dmg_behavior_10, UnitGroupLoopCurrent(), 1 );
+			val -= 10;
+		}
+		UnitBehaviorAdd( UnitGroupLoopCurrent(), dmg_behavior_1, UnitGroupLoopCurrent(), val );
+
+		libapx_unit_cache_update(UnitGroupLoopCurrent(), "@adddamage", argv);
+		UnitGroupLoopStep();
+	}
+	UnitGroupLoopEnd();
+
+	return;
+}
+
+// libapx_command_range
+// =================
+// deals with both adding or removing weapon range (modified from Cortex engine)
+// both @addrange and @removerange are directed here
+// max range able to be added/removed is currently set as 100
+void libapx_command_range(int user, unitgroup u, string argv, int spawningCount, string bracketText) {
+	string command = StringCase( StringWord( argv, 1 ), false );
+	string range_behavior_1;
+	string range_behavior_10;
+	int range = StringToInt( StringWord( argv, 2 ) );
+	unitgroup g = u;
+
+	// since we are using the same command for both @addrange and @removerange,
+	// check which command it is, and set proper behaviors
+	if( (command == "@addrange" && range > 0) || (command == "@removerange" && range < 0) ) {
+		range_behavior_1 = libapx_BEHAVIOR_ADD_RANGE_1;
+		range_behavior_10 = libapx_BEHAVIOR_ADD_RANGE_10;
+	}
+	else { // are removing range
+		range_behavior_1 = libapx_BEHAVIOR_SUBTRACT_RANGE_1;
+		range_behavior_10 = libapx_BEHAVIOR_SUBTRACT_RANGE_10;
+	}
+
+	range = AbsI(range);
+	if(range > 100) {
+		range = 100;
+	}
+
+	UnitGroupLoopBegin(g);
+	while(!UnitGroupLoopDone()) {
+		UnitBehaviorRemove(UnitGroupLoopCurrent(), libapx_BEHAVIOR_ADD_RANGE_1, -1);
+		UnitBehaviorRemove(UnitGroupLoopCurrent(), libapx_BEHAVIOR_ADD_RANGE_10, -1);
+		UnitBehaviorRemove(UnitGroupLoopCurrent(), libapx_BEHAVIOR_SUBTRACT_RANGE_1, -1);
+		UnitBehaviorRemove(UnitGroupLoopCurrent(), libapx_BEHAVIOR_SUBTRACT_RANGE_10, -1);
+
+		UnitBehaviorAdd(UnitGroupLoopCurrent(), range_behavior_1, null, ModI(range, 10));
+		UnitBehaviorAdd(UnitGroupLoopCurrent(), range_behavior_10, null, range / 10);
+
+		libapx_unit_cache_update(UnitGroupLoopCurrent(), "@addrange", argv);
+		UnitGroupLoopStep();
+	}
+	UnitGroupLoopEnd();
+
+	return;
+}
+
+// libapx_command_armor
+// ===============
+// used for both @armor and @shieldsarmor
+// sets a unit's armor to the amount given via behaviors
+void libapx_command_armor(int user, unitgroup u, string argv, int spawningCount, string bracketText) {
+	fixed armor = StringToFixed( StringWord( argv, 2 ) );
+	fixed armor_curr = 0;
+	fixed armor_diff = 0;
+	string behav_armor_add_p1;
+	string behav_armor_add_1;
+	string behav_armor_add_10;
+	string behav_armor_subtract_p1;
+	string behav_armor_subtract_1;
+	string behav_armor_subtract_10;
+	unit current;
+	unitgroup g = u;
+
+	if( StringCase( StringWord( argv, 1 ), false ) == "@shieldsarmor" ) {
+		behav_armor_add_p1 = libapx_BEHAVIOR_ADD_SHIELDSARMOR_P1;
+		behav_armor_add_1 = libapx_BEHAVIOR_ADD_SHIELDSARMOR_1;
+		behav_armor_add_10 = libapx_BEHAVIOR_ADD_SHIELDSARMOR_10;
+		behav_armor_subtract_p1 = libapx_BEHAVIOR_SUBTRACT_SHIELDSARMOR_P1;
+		behav_armor_subtract_1 = libapx_BEHAVIOR_SUBTRACT_SHIELDSARMOR_1;
+		behav_armor_subtract_10 = libapx_BEHAVIOR_SUBTRACT_SHIELDSARMOR_10;
+	}
+	else { // using @armor
+		behav_armor_add_p1 = libapx_BEHAVIOR_ADD_LIFEARMOR_P1;
+		behav_armor_add_1 = libapx_BEHAVIOR_ADD_LIFEARMOR_1;
+		behav_armor_add_10 = libapx_BEHAVIOR_ADD_LIFEARMOR_10;
+		behav_armor_subtract_p1 = libapx_BEHAVIOR_SUBTRACT_LIFEARMOR_P1;
+		behav_armor_subtract_1 = libapx_BEHAVIOR_SUBTRACT_LIFEARMOR_1;
+		behav_armor_subtract_10 = libapx_BEHAVIOR_SUBTRACT_LIFEARMOR_10;
+	}
+
+	if(armor > 255) {
+		armor = 255;
+	}
+
+	UnitGroupLoopBegin(g);
+	while(!UnitGroupLoopDone()) {
+		current = UnitGroupLoopCurrent();
+		armor_curr = StringToFixed(CatalogFieldValueGet(c_gameCatalogUnit, UnitGetType(current), "LifeArmor", UnitGetOwner(current)));
+		armor_diff = armor - armor_curr;
+
+		// remove any existing armor behaviors
+		UnitBehaviorRemove(current, behav_armor_add_p1, -1);
+		UnitBehaviorRemove(current, behav_armor_add_1, -1);
+		UnitBehaviorRemove(current, behav_armor_add_10, -1);
+		UnitBehaviorRemove(current, behav_armor_subtract_p1, -1);
+		UnitBehaviorRemove(current, behav_armor_subtract_1, -1);
+		UnitBehaviorRemove(current, behav_armor_subtract_10, -1);
+
+		if(armor_diff > 0) {
+			while(armor_diff >= 10) {
+				UnitBehaviorAdd(current, behav_armor_add_10, null, 1);
+				armor_diff = armor_diff - 10;
+			}
+			while(armor_diff >= 1) {
+				UnitBehaviorAdd(current, behav_armor_add_1, null, 1);
+				armor_diff = armor_diff - 1;
+			}
+			while(armor_diff >= 0.1) {
+				UnitBehaviorAdd(current, behav_armor_add_p1, null, 1);
+				armor_diff = armor_diff - 0.1;
+			}
+		}
+		else {
+			while(armor_diff <= -10) {
+				UnitBehaviorAdd(current, behav_armor_subtract_10, null, 1);
+				armor_diff = armor_diff + 10;
+			}
+			while(armor_diff <= -1) {
+				UnitBehaviorAdd(current, behav_armor_subtract_1, null, 1);
+				armor_diff = armor_diff + 1;
+			}
+			while(armor_diff <= -0.1) {
+				UnitBehaviorAdd(current, behav_armor_subtract_p1, null, 1);
+				armor_diff = armor_diff + 0.1;
+			}
+		}
+
+		if( StringCase( StringWord( argv, 1 ), false ) == "@shieldsarmor" ) {
+			libapx_unit_cache_update(UnitGroupLoopCurrent(), "@shieldsarmor", argv);
+		}
+		else { // using @armor
+			libapx_unit_cache_update(UnitGroupLoopCurrent(), "@armor", argv);
+		}
+
+		UnitGroupLoopStep();
+	}
+	UnitGroupLoopEnd();
+
+	return;
+}
+
+// libapx_command_weaponspeed
+// =====================
+// Changes the weapon speed of a unit (local change)
+// Because behaviors can only apply a weapon speed multiplier,
+// to get target weapon speed we use formula
+// W : original weapon speed
+// Y : target weapon speed
+// X : behavior stack, each behavior .9 or 1.1 weapon speed multiplier
+// If Y > W : W(1.1)^X = Y
+// If Y < W : W(0.9)^X = Y
+// So we require stack X given by (floored to an int):
+// If Y > W : X = log(Y/W)/log(1.1)
+// If Y < W : X = log(Y/W)/log(0.9)
+void libapx_command_weaponspeed(int user, unitgroup u, string argv, int spawningCount, string bracketText) {
+	unitgroup g = u;
+	fixed speed = StringToFixed( StringWord( argv, 2 ) );
+	fixed ratio = 0;
+	int stack_required;
+	string weapon;
+	unit current;
+
+	if(speed > 15) {
+		speed = 15;
+	}
+	if(speed <= 0.1) {
+		speed = 0.1;
+	}
+
+	UnitGroupLoopBegin(g);
+	while(!UnitGroupLoopDone()) {
+		current = UnitGroupLoopCurrent();
+		weapon = UnitWeaponGet(current, 1);
+		if(weapon != "") {
+			ratio = StringToFixed(CatalogFieldValueGet(c_gameCatalogWeapon, weapon, "Period", UnitGetOwner(current))) / speed;
+		}
+		else {
+			ratio = speed;
+		}
+
+		UnitBehaviorRemove(current, libapx_BEHAVIOR_WEAPONSPEED_MULT_P9, -1);
+		UnitBehaviorRemove(current, libapx_BEHAVIOR_WEAPONSPEED_MULT_1P1, -1);
+
+		if(ratio > 1) { // apply 1.1 multiplier
+			stack_required = FixedToInt( Log2(ratio)/Log2(1.1) );
+			if( stack_required > 100 ) {
+				stack_required = 100;
+			}
+			UnitBehaviorAdd(current, libapx_BEHAVIOR_WEAPONSPEED_MULT_1P1, null, stack_required);
+		}
+		else if( ratio < 1) { // ratio < 1: apply .9 multiplier
+			stack_required = FixedToInt( Log2(ratio)/Log2(0.9) );
+			if( stack_required > 100 ) {
+				stack_required = 100;
+			}
+			UnitBehaviorAdd(current, libapx_BEHAVIOR_WEAPONSPEED_MULT_P9, null, stack_required);
+		}
+
+		libapx_unit_cache_update(UnitGroupLoopCurrent(), "@weaponspeed", argv);
+		UnitGroupLoopStep();
+	}
+	UnitGroupLoopEnd();
+
+	return;
+}
+
+// libapx_command_weaponspeedall
+// ====================
+// sets global weaponspeed for weapons on a unit
+// (by changing the catalog weaponspeed value)
+void libapx_command_weaponspeedall(int user, unitgroup u, string argv, int spawningCount, string bracketText) {
+	unitgroup g = u;
+	fixed speed = StringToFixed( StringWord( argv, 2 ) );
+	int index;
+	string weapon;
+	unit current;
+
+	if(speed > 15) {
+		speed = 15;
+	}
+	if(speed <= 0.1) {
+		speed = 0.1;
+	}
+
+	UnitGroupLoopBegin(g);
+	while(!UnitGroupLoopDone()) {
+		current = UnitGroupLoopCurrent();
+		index = UnitWeaponCount(current);
+		while(index != 0) {
+			weapon = UnitWeaponGet(current, 1);
+			CatalogFieldValueSet(c_gameCatalogWeapon, UnitWeaponGet(current, index),
+				"Period", UnitGetOwner(current), FixedToString(speed, -1));
+			index -= 1;
+		}
+
+		UnitBehaviorRemove(current, libapx_BEHAVIOR_WEAPONSPEED_MULT_P9, -1);
+		UnitBehaviorRemove(current, libapx_BEHAVIOR_WEAPONSPEED_MULT_1P1, -1);
+
+		libapx_unit_cache_update(UnitGroupLoopCurrent(), "@weaponspeedall", argv);
+		UnitGroupLoopStep();
+	}
+	UnitGroupLoopEnd();
+
+	return;
+}
+
+// libapx_command_subtitle
+// =================
+// sets a unit's subtitle (underneath a unit name)
+void libapx_command_subtitle(int user, unitgroup u, string argv, int spawningCount, string bracketText) {
+	string val = argv;
+	unitgroup g = u;
+	bool add = false;
+	val = StringSub( val, StringFind(val, " ", c_stringCase)+1, StringLength(val)); // The remainder of the chat message.
+
+	if (StringWord(argv, 2) == "+add" || StringWord(argv, 2) == "-add" ) {
+		val = StringSub( val, StringFind(val, " ", c_stringCase)+1, StringLength(val));
+		add = true;
+	}
+
+	UnitGroupLoopBegin(g);
+	while(!UnitGroupLoopDone()) {
+		if(!add) {
+			CatalogFieldValueSet(c_gameCatalogUnit, UnitGetType(UnitGroupLoopCurrent()), "Subtitle", UnitGetOwner(UnitGroupLoopCurrent()), val);
+			libapx_unit_cache_update(UnitGroupLoopCurrent(), "@subtitle", argv);
+		}
+		else {
+
+			val = CatalogFieldValueGet(c_gameCatalogUnit, UnitGetType(UnitGroupLoopCurrent()), "Subtitle", UnitGetOwner(UnitGroupLoopCurrent())) + " " + val;
+			CatalogFieldValueSet(c_gameCatalogUnit, UnitGetType(UnitGroupLoopCurrent()), "Subtitle", UnitGetOwner(UnitGroupLoopCurrent()), val);
+			libapx_unit_cache_update(UnitGroupLoopCurrent(), "@subtitle", argv);
+		}
+
+		UnitGroupLoopStep();
+	}
+	UnitGroupLoopEnd();
+	return;
+}
+
+// libapx_command_tooltip
+// =====================
+// sets a units tooltip, either the main tip or subtip
+// (note: this is only visible to OTHER players)
+void libapx_command_tooltip(int user, unitgroup u, string argv, int spawningCount, string bracketText) {
+	unitgroup g = u;
+	string description;
+	bool subtip = false;
+
+	if(StringWord( argv, 2) == "") {
+		return;
+	}
+
+	if(StringEqual(StringWord( argv, 2),"sub",c_stringNoCase)) {
+		description = StringSub( argv, StringLength(StringWord( argv, 1)) + 2, StringLength(argv));
+		description = StringSub( description, StringLength(StringWord( description, 1)) + 2, StringLength(description));
+
+		subtip = true;
+	}
+	else {
+		description = StringSub( argv, StringLength(StringWord( argv, 1)) + 2, StringLength(argv));
+	}
+
+	UnitGroupLoopBegin(g);
+	while(!UnitGroupLoopDone()) {
+		if(subtip) {
+			UnitSetInfoSubTip(UnitGroupLoopCurrent(), StringToText(description));
+		}
+		else {
+			UnitSetInfoTip(UnitGroupLoopCurrent(), StringToText(description));
+		}
+		libapx_unit_cache_update(UnitGroupLoopCurrent(), "@tooltip", argv);
+		UnitGroupLoopStep();
+	}
+	UnitGroupLoopEnd();
+
+	return;
+}
+
+//libapx_command_undo
+// ========================
+// Undos X amount of cache and remakes the unit.
+void libapx_command_undo(int user, unitgroup u, string argv, int spawningCount, string bracketText)
+{
+
+}
+
+
+// libapx_command_copy
+// ===============
+// copies selected units:
+// - stats, behaviors, orders, weapons
+// - visuals (by parsing commands from source cache)
+void libapx_command_copy(int user, unitgroup u, string argv, int spawningCount, string bracketText) {
+	unitgroup g = u;
+	unitgroup created = UnitGroupEmpty();
+	unit source;
+	unitgroup targets;
+	unit target;
+	int i;
+	int cache;
+	string source_unit_id;
+	string param = StringWord(argv, 2);
+
+
+
+	UnitGroupLoopBegin(g);
+	while(!UnitGroupLoopDone()) {
+		source = UnitGroupLoopCurrent();
+		targets = UnitCreate(1, UnitGetType(source), c_unitCreateIgnorePlacement, UnitGetOwner(source), libapx_player[user].mouse_position, UnitGetFacing(source));
+		target = UnitGroupUnit(targets, 1);
+
+
+
+		//set the unit's id on data table
+		libapx_unit_set_id(target);
+		UnitSetCustomValue(target, libapx_UNIT_INDEX_CACHE_COUNT, 1);
+
+		// add to created unit group
+		UnitGroupAdd(created, target);
+
+		UnitSetHeight(target, UnitGetHeight(source), 0);
+		UnitSetState(target, c_unitStateInvulnerable,
+			UnitTestState(source, c_unitStateInvulnerable));
+		UnitSetState(target, c_unitStatePaused,
+			UnitTestState(source, c_unitStatePaused));
+		UnitSetState(target, c_unitStateHidden,
+			UnitTestState(source, c_unitStateHidden));
+		UnitSetState(target, c_unitStateHighlightable,
+			UnitTestState(source, c_unitStateHighlightable));
+		UnitSetState(target, c_unitStateIgnoreTerrainZ,
+			UnitTestState(source, c_unitStateIgnoreTerrainZ));
+		UnitSetState(target, c_unitStateFidget,
+			UnitTestState(source, c_unitStateFidget));
+		UnitSetState(target, c_unitStateTargetable,
+			UnitTestState(source, c_unitStateTargetable));
+		UnitSetState(target, c_unitStateTooltipable,
+			UnitTestState(source, c_unitStateTooltipable));
+		UnitSetState(target, c_unitStateCursorable,
+			UnitTestState(source, c_unitStateCursorable));
+		UnitSetState(target, c_unitStateHighlighted,
+			UnitTestState(source, c_unitStateHighlighted));
+		UnitSetState(target, c_unitStateUsingSupply,
+			UnitTestState(source, c_unitStateUsingSupply));
+		UnitSetPropertyFixed(target, c_unitPropLifeMax,
+			UnitGetPropertyFixed(source, c_unitPropLifeMax, true));
+		UnitSetPropertyFixed(target, c_unitPropLife,
+			UnitGetPropertyFixed(source, c_unitPropLife, true));
+		UnitSetPropertyFixed(target, c_unitPropLifeRegen,
+			UnitGetPropertyFixed(source, c_unitPropLifeRegen, true));
+		UnitSetPropertyFixed(target, c_unitPropEnergyMax,
+			UnitGetPropertyFixed(source, c_unitPropEnergyMax, true));
+		UnitSetPropertyFixed(target, c_unitPropEnergy,
+			UnitGetPropertyFixed(source, c_unitPropEnergy, true));
+		UnitSetPropertyFixed(target, c_unitPropEnergyRegen,
+			UnitGetPropertyFixed(source, c_unitPropEnergyRegen, true));
+		UnitSetPropertyFixed(target, c_unitPropShieldsMax,
+			UnitGetPropertyFixed(source, c_unitPropShieldsMax, true));
+		UnitSetPropertyFixed(target, c_unitPropShields,
+			UnitGetPropertyFixed(source, c_unitPropShields, true));
+		UnitSetPropertyFixed(target, c_unitPropShieldsRegen,
+			UnitGetPropertyFixed(source, c_unitPropShieldsRegen, true));
+		UnitSetPropertyFixed(target, c_unitPropKills,
+			UnitGetPropertyFixed(source, c_unitPropKills, true));
+		UnitSetPropertyFixed(target, c_unitPropMovementSpeed,
+			UnitGetPropertyFixed(source, c_unitPropMovementSpeed, true));
+		UnitSetPropertyFixed(target, c_unitPropResources,
+			UnitGetPropertyFixed(source, c_unitPropResources, true));
+
+		// Skipping implementing ability commands and their charges.
+		// Skipping implementing the cargo contained in a unit
+		// Skipping implementing unit magazines
+		// Skipping implementing unit queues
+
+		i = UnitBehaviorCountAll(source);
+		while(i != 0) {
+			UnitBehaviorAdd(target, UnitBehaviorGet(source, i), null,
+				UnitBehaviorCount(source, UnitBehaviorGet(source, i)));
+			UnitBehaviorSetDuration(target, UnitBehaviorGet(source, i),
+				UnitBehaviorDuration(source, UnitBehaviorGet(source, i)));
+			i -= 1;
+		}
+
+		i = 1;
+		while(i <= UnitOrderCount(source)) {
+			UnitIssueOrder(target, UnitOrder(source, i), c_orderQueueAddToEnd);
+			i += 1;
+		}
+
+		i = UnitWeaponCount(target);
+		while(i != 0) {
+			UnitWeaponRemove(target, UnitWeaponGet(target, 1));
+			i -= 1;
+		}
+
+		i = UnitWeaponCount(source);
+		while(i != 0) {
+			// Does not copy turrets!
+			UnitWeaponAdd(target, UnitWeaponGet(source, i), null);
+			i -= 1;
+		}
+
+		// Skipping implementing setname duplications
+		// Copy the visuals via cache
+		if ( (StringEqual(param, "+visual", c_stringNoCase)) ) {
+			source_unit_id = FixedToString(UnitGetCustomValue(source, libapx_UNIT_INDEX_ID), 0);
+			cache = 1;
+			while( DataTableValueExists(true, source_unit_id + "." + IntToString(cache)) ) {
+				libapx_chat_parse(DataTableGetString(true, source_unit_id + "." + IntToString(cache)), user, targets, spawningCount);
+				spawningCount = spawningCount + 1;
+				cache += 1;
+
+			}
+		}
+
+		UnitGroupLoopStep();
+	}
+	UnitGroupLoopEnd();
+
+	u = created;
+
+	return;
+}
+
+// libapx_command_effect
+// ===============
+// creates an effect at target units or at a point
+void libapx_command_effect(int user, unitgroup u, string argv, int spawningCount, string bracketText) {
+	unitgroup g = u;
+	string effect = StringWord( argv, 2 );
+
+	effect = libapx_catalog_get(c_gameCatalogEffect, effect);
+	if(effect == null) {
+		libapx_print_error(user, "<c val=\"ff0000\">Unable to create effect</c>: No such effect exists.");
+		return;
+	}
+
+	if( UnitGroupCount(g, c_unitCountAll) != 0 ) {
+		UnitGroupLoopBegin(g);
+		while(!UnitGroupLoopDone()) {
+			if( libNtve_gf_PlayerCanCreateEffectOnUnit(user, effect, UnitGroupLoopCurrent()) ) {
+				PlayerCreateEffectUnit(user, effect, UnitGroupLoopCurrent());
+				libapx_unit_cache_update(UnitGroupLoopCurrent(), "@effect", argv);
+			}
+			else {
+				libapx_print_error(user, "<c val=\"ff0000\">Unable to create the effect.</c>");
+			}
+			UnitGroupLoopStep();
+		}
+		UnitGroupLoopEnd();
+	}
+	else {
+		if( libNtve_gf_PlayerCanCreateEffectAtPoint(user, StringWord(EventChatMessage(false), 2), libapx_player[user].mouse_position) ) {
+			PlayerCreateEffectPoint(user, effect, libapx_player[user].mouse_position);
+		}
+		else {
+			libapx_print_error(user, "<c val=\"ff0000\">Unable to create the effect.</c>");
+		}
+	}
+
+	return;
+}
+
+// libapx_command_kills
+// ==============
+// sets the number of kills on a unit
+// (only useful for changing unit kill rank)
+void libapx_command_kills(int user, unitgroup u, string argv, int spawningCount, string bracketText) {
+	unitgroup g = u;
+	fixed val = StringToFixed( StringWord( argv, 2 ) );
+
+	if( val <= 0 ) { // Bad input!
+		return;
+	}
+
+	UnitGroupLoopBegin(g);
+	while(!UnitGroupLoopDone()) {
+		UnitSetPropertyFixed( UnitGroupLoopCurrent(), c_unitPropKills, val );
+		UnitGroupLoopStep();
+	}
+	UnitGroupLoopEnd();
+	return;
+}
+
+// libapx_command_level
+// ===============
+// sets a unit's level (level range between 0 - 20)
+// (if a unit does not have veterancy behavior,
+// it is added before setting level)
+void libapx_command_level(int user, unitgroup u, string argv, int spawningCount, string bracketText) {
+	unitgroup g = u;
+	int val = StringToInt( StringWord( argv, 2 ) );
+
+	if( val <= 0 || val > 20 ) { // Bad input!
+		return;
+	}
+
+	UnitGroupLoopBegin(g);
+	while(!UnitGroupLoopDone()) {
+        // Give the level behavior to the unit so that it can level.
+        if( !UnitHasBehavior(UnitGroupLoopCurrent(), libapx_BEHAVIOR_LEVELS) ) {
+            UnitBehaviorAdd( UnitGroupLoopCurrent(), libapx_BEHAVIOR_LEVELS, UnitGroupLoopCurrent(), 1);
+        }
+
+        if( UnitLevel(UnitGroupLoopCurrent()) == val ) {
+            UnitGroupLoopStep();
+            continue;
+        }
+
+        UnitSetPropertyFixed(UnitGroupLoopCurrent(), c_unitPropLevel, val);
+		UnitGroupLoopStep();
+	}
+	UnitGroupLoopEnd();
+
+	return;
+}
+
+// libapx_command_label
+// =================
+// creates and attaches a text tag to unit
+// labels are destroyed when units removed/killed
+void libapx_command_label(int user, unitgroup u, string argv, int spawningCount, string bracketText) {
+	int tag_id;
+	bool remove_tag = false;
+	unitgroup g = u;
+	string label = argv;
+	label = StringSub( label, StringFind(label, " ", c_stringCase) + 1, StringLength(label)); // The remainder of the chat message.
+
+	if( StringLength(label) > 512 ) {
+		libapx_print_error(user, "Your label length is too long.");
+		return;
+	}
+
+	if( label == "" ) {
+		remove_tag = true;
+	}
+
+	UnitGroupLoopBegin(g);
+	while(!UnitGroupLoopDone()) {
+		if( remove_tag || UnitGetCustomValue(UnitGroupLoopCurrent(), libapx_UNIT_INDEX_TEXTTAG) != 0.0 ) {
+			tag_id = FixedToInt( UnitGetCustomValue(UnitGroupLoopCurrent(), libapx_UNIT_INDEX_TEXTTAG) );
+			TextTagDestroy(tag_id);
+			UnitSetCustomValue( UnitGroupLoopCurrent(), libapx_UNIT_INDEX_TEXTTAG, 0.0 );
+		}
+
+		if( !remove_tag ) {
+			tag_id = TextTagCreate( TextWithColor( StringToText(label), ColorFromIndex( PlayerGetColorIndex(user, false), c_teamColorDiffuse ) ),
+									40, UnitGetPosition(UnitGroupLoopCurrent()), 1.0, true, true, PlayerGroupAll() );
+			TextTagSetTextShadow(tag_id, true);
+			TextTagAttachToUnit(tag_id, UnitGroupLoopCurrent(), 1.0);
+
+			UnitSetCustomValue(UnitGroupLoopCurrent(), libapx_UNIT_INDEX_TEXTTAG, IntToFixed(tag_id));
+		}
+		UnitGroupLoopStep();
+	}
+	UnitGroupLoopEnd();
+
+	return;
+}
+
+// libapx_command_radius
+// ====================
+// adjusts a unit's collision radius
+void libapx_command_radius(int user, unitgroup u, string argv, int spawningCount, string bracketText) {
+	string val = StringWord( argv, 2 );
+	fixed radius;
+	unitgroup g = u;
+
+	if(val == "") {
+		libapx_print_error(user, "Usage: @radius collision_radius[%]");
+	}
+	else if(StringContains(val, "%", c_stringEnd, c_stringCase)) {
+		radius = StringToFixed(StringSub(val, 1, StringLength(val) - 1));
+		radius = radius / 100;
+
+		UnitGroupLoopBegin(g);
+		while(!UnitGroupLoopDone()) {
+			val = CatalogFieldValueGet(c_gameCatalogUnit, UnitGetType(UnitGroupLoopCurrent()), "Radius", UnitGetOwner(UnitGroupLoopCurrent()));
+			val = FixedToString(StringToFixed(val) * radius, 8);
+			CatalogFieldValueSet(c_gameCatalogUnit, UnitGetType(UnitGroupLoopCurrent()), "Radius", UnitGetOwner(UnitGroupLoopCurrent()), val);
+
+			val = CatalogFieldValueGet(c_gameCatalogUnit, UnitGetType(UnitGroupLoopCurrent()), "InnerRadius", UnitGetOwner(UnitGroupLoopCurrent()));
+			val = FixedToString(StringToFixed(val) * radius, 8);
+			CatalogFieldValueSet(c_gameCatalogUnit, UnitGetType(UnitGroupLoopCurrent()), "InnerRadius", UnitGetOwner(UnitGroupLoopCurrent()), val);
+			UnitGroupLoopStep();
+		}
+		UnitGroupLoopEnd();
+	}
+	else {
+		UnitGroupLoopBegin(g);
+		while(!UnitGroupLoopDone()) {
+			CatalogFieldValueSet(c_gameCatalogUnit, UnitGetType(UnitGroupLoopCurrent()), "Radius", UnitGetOwner(UnitGroupLoopCurrent()), val);
+			CatalogFieldValueSet(c_gameCatalogUnit, UnitGetType(UnitGroupLoopCurrent()), "InnerRadius", UnitGetOwner(UnitGroupLoopCurrent()), val);
+			UnitGroupLoopStep();
+		}
+		UnitGroupLoopEnd();
+	}
+
+	return;
+}
+
+// libapx_command_state
+// ====================
+// allows a user to adjust various default unit status settings:
+// these are settings built-in to the game unit type itself.
+// each setting can either be on (true) or off (false).
+//        syntax: @state [state-name] [on/off]
+// for [on/off], any input that isnt "on" is parsed as "off" (false)
+void libapx_command_state(int user, unitgroup u, string argv, int spawningCount, string bracketText) {
+	string param = StringCase( StringWord( argv, 2 ), false );
+	int state;
+	bool status = false;
+	unitgroup g = u;
+
+	// get 1st parameter as the state option
+	if( param == "fidget" ) {
+		state = c_unitStateFidget;
+	} else if( param == "highlightable" ) {
+		state = c_unitStateHighlightable;
+	} else if( param == "highlighted" ) {
+		state = c_unitStateHighlighted;
+	} else if( param == "ignoreterrainheight" ) {
+		state = c_unitStateIgnoreTerrainZ;
+	} else if( param == "invulnerable" ) {
+		state = c_unitStateInvulnerable;
+	} else if( param == "hidden" ) {
+		state = c_unitStateHidden;
+	} else if( param == "paused" ) {
+		state = c_unitStatePaused;
+	} else if( param == "selectable" ) {
+		state = c_unitStateSelectable;
+	} else if( param == "statusbar" ) {
+		state = c_unitStateStatusBar;
+	} else if( param == "targetable" ) {
+		state = c_unitStateTargetable;
+	} else if( param == "tooltips" ) {
+		state = c_unitStateTooltipable;
+	} else if( param == "cursor" ) {
+		state = c_unitStateCursorable;
+	} else if( param == "movable" ) {
+		state = c_unitStateMoveSuppressed;
+	} else if( param == "turnable" ) {
+		state = c_unitStateTurnSuppressed;
+	} else if( param == "usessupply" ) {
+		state = c_unitStateUsingSupply;
+	} else {
+		libapx_print_error(user, "Usage: @state [state] [on/off]\n" +
+							"States: fidget, highlightable, highlighted, ignoreterrainheight, invulnerable, hidden, paused, selectable, statusbar, targetable, tooltips, cursor, movable, turnable, usessupply");
+		return;
+	}
+
+	// status as 2nd parameter
+	if( StringCase( StringWord( argv, 3 ), false ) == "on" ) {
+		status = true;
+	}
+
+	libapx_print(PlayerGroupSingle(user), "Setting state " + param + ": " + libNtve_gf_ConvertBooleanToString(status));
+
+	UnitGroupLoopBegin(g);
+	while(!UnitGroupLoopDone()) {
+		UnitSetState( UnitGroupLoopCurrent(), state, status );
+		libapx_unit_cache_update(UnitGroupLoopCurrent(), "@state", argv);
+		UnitGroupLoopStep();
+	}
+	UnitGroupLoopEnd();
+
+	return;
+}

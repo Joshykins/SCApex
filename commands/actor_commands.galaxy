@@ -1,0 +1,1274 @@
+//=========================================================
+//		Apex Roleplaying Engine
+//		Copyright (c) 2017, Apex Group
+//=========================================================
+// This software is distributed under the MIT License:
+// <http://opensource.org/licenses/MIT>
+//=========================================================
+
+// Actor commands are implemented by actor messages and affect visuals
+// General format for every actor command is
+//      @cmd ->[target] [parameters ...]
+// The ->[target] (or __[target]) is an optional actor reference as the
+// target for an actor message send (defaults to ::Main which refers to the
+// main actor for a unit)
+//     ->[target] : local scope (confined to a single unit)
+//     __[target] : global scope, refers to generic actor reference name
+// The rest of the command is its unique parameter list
+
+// Main actor for unit (default actor reference target)
+static string libapx_ACTOR_REF_MAIN = "->::Main";
+
+// libapx_has_actor_ref
+// ===================
+// Helper function to check if a paramater is a proper actor reference
+// Syntax for reference and scope are:
+//      >  "__[target]" : global reference
+//      >  "->[target]" : local reference (single unit)
+static bool libapx_has_actor_ref(string ref) {
+	string scope;
+	if( ref != "" ) { // disregard if ref is invalid
+		scope = StringSub(ref, 1, 2);
+		if( scope == "__" || scope == "->" ) {
+			return true;
+		}
+	}
+
+	return false;
+}
+
+// libapx_apply_actormsg
+// ======================
+// Generic function to apply the internal actor msg to a group of units
+// -> normally group of units will be the player context (units selected)
+// Certain actor commands require special casing for the actor msgs applied,
+// in which case this block is special cased in the actor command
+// function (Galaxy highly limited in dealing with generic functions)
+static void libapx_apply_actormsg(unitgroup g, string target, string argv, string cmd, string amsg) {
+	if( StringSub(target, 1, 2) == "->" ) {
+		target = StringSub(target, 3, StringLength(target));
+		UnitGroupLoopBegin(g);
+		while(!UnitGroupLoopDone()) {
+			ActorSendTo(libNtve_gf_MainActorofUnit(UnitGroupLoopCurrent()), target, amsg);
+			libapx_unit_cache_update(UnitGroupLoopCurrent(), cmd, argv);
+			UnitGroupLoopStep();
+		}
+		UnitGroupLoopEnd();
+	}
+	else { // "__[ref]", target global
+		target = StringSub(target, 3, StringLength(target));
+		UnitGroupLoopBegin(g);
+		while(!UnitGroupLoopDone()) {
+			ActorSend(ActorFrom(target), amsg);
+			UnitGroupLoopStep();
+		}
+		UnitGroupLoopEnd();
+	}
+}
+
+// libapx_command_actormessage
+// =======================
+// Sends an ActorMessage to a unit (main or a actor reference) or to a global reference
+// Optional reference is either ->[reference] for local scope (within a unit scope)
+//							or	__[reference] for global scope (any actor on map)
+// Syntax: @actrmsg ->/__[reference] [msg]
+//
+// An issue that isn't easily dealt with is that actor messages are
+// case sensitive. Only way to allow case insensitive user inputs is to manually
+// match user input to actual actor messages (many elseif), which is shitty
+//
+// TODO: convert to new generalized amsg target system?
+void libapx_command_actormessage(int user, unitgroup u, string argv, int spawningCount, string bracketText) {
+
+
+	unitgroup g = u;
+	string target = StringWord( argv, 2);
+	bool target_scope_global = false;
+	string amsg;
+	int amsg_start_word_index = 1;
+	int amsg_start_index;
+
+
+
+
+	unitgroup p = u;
+	int colcheker = 1;
+	bool colFlag = false;
+	while (StringWord(argv, colcheker) != "") {
+		if(StringFind(StringWord(argv, colcheker), "colossus", c_stringNoCase) != -1 ) {
+				UnitGroupLoopBegin(p);
+				while(!UnitGroupLoopDone()) {
+					libapx_unit_flag_colossus(UnitGroupLoopCurrent());
+					UnitGroupLoopStep();
+				}
+				UnitGroupLoopEnd();
+		}
+		colcheker = colcheker + 1;
+	}
+
+
+
+
+
+
+
+
+
+
+
+
+	if(target == "") {
+		return;
+	}
+
+	// check the actor message target:
+	// target is specified by @actrmsg ->[Target] [msg] OR @actrmsg __[Target] [msg]
+	// e.g. @actrmsg ->_Unit SetTint 250,0,0 or @actrmsg ->::Main SetTint 250,0,0
+	// default will use target ::Main (the main actor for a unit)
+	// -> indicates local scope (unit actor) whereas __ indicates a global scope
+	else if( StringSub(target,1,2) == "__" ) {
+		target = StringSub(target, 3, StringLength(target));
+		amsg_start_word_index = 2;
+		target_scope_global = true;
+	}
+	else if( StringSub(target,1,2) == "->" ) {
+		target = StringSub(target, 3, StringLength(target));
+		amsg_start_word_index = 2;
+	}
+	else { // default target is ::Main (local unit scope)
+		target = "::Main";
+	}
+
+	// get the actor message string (remainder of line)
+	amsg_start_index = StringLength(StringWord( argv, 1)) + 2;
+	if( amsg_start_word_index == 2 ) {
+		amsg_start_index += StringLength(StringWord( argv, 2)) + 1;
+	}
+
+	amsg = StringSub( argv, amsg_start_index, StringLength(argv));
+
+	if (StringWord(amsg,1) == "SetScale" || StringWord(amsg,1) == "SetScaleAbsolute") {
+
+		amsg = StringWord(amsg,1) +  " " + libapx_scalerapply(StringWord(amsg,2), u, "scale") + " " + StringWord(amsg,3);
+	}
+	//libapx_scalerapply(offset)
+
+	UnitGroupLoopBegin(g);
+	while(!UnitGroupLoopDone()) {
+		if( target_scope_global ) {
+			ActorSend(ActorFrom(target), amsg);
+		}
+		else {
+			ActorSendTo(libNtve_gf_MainActorofUnit(UnitGroupLoopCurrent()), target, amsg);
+			libapx_unit_cache_update(UnitGroupLoopCurrent(), "@actrmsg", argv);
+		}
+		UnitGroupLoopStep();
+	}
+	UnitGroupLoopEnd();
+
+	return;
+}
+
+// libapx_command_actoralias
+// =======================
+// wrapper for the AliasAdd actor msg to add actor aliases to a unit's actors.
+// These can be referenced as actor references by other actor commands
+// using ->[ref]
+// syntax: @actoralias (->[ref]) [alias]
+void libapx_command_actoralias(int user, unitgroup u, string argv, int spawningCount, string bracketText) {
+	string actoralias;
+	int param_offset = 0;
+	string target = libapx_ACTOR_REF_MAIN;
+
+	// get actor reference target
+	if( libapx_has_actor_ref(StringWord(argv, 2)) ) {
+		target = StringWord(argv, 2);
+		param_offset = 1;
+	}
+
+	// get actor alias
+	actoralias = StringWord(argv, 2 + param_offset);
+	if( actoralias == "" ) {
+		libapx_print_error(user, "Actor alias cannot be blank");
+		return;
+	}
+
+	libapx_apply_actormsg(u, target, argv, "@target", "AliasAdd " + actoralias);
+	libapx_unit_cache_update(UnitGroupLoopCurrent(), "@target", argv);
+	return;
+}
+
+// libapx_command_scale
+// ====================
+// sets the scale of a unit's main actor for all units in context (modified from Cortex Engine)
+// Syntax: @scale (->[ref]) [x] [y] [z] [time-blend]
+void libapx_command_scale(int user, unitgroup u, string argv, int spawningCount, string bracketText) {
+	fixed x = 0;
+	fixed y = 0;
+	fixed z  = 0;
+	fixed time = 0;
+	string param_x;
+	string param_y;
+	string param_z;
+	string param_time;
+	string scale;
+	int param_offset = 0;
+	string target = libapx_ACTOR_REF_MAIN;
+
+	// get actor reference target
+	if( libapx_has_actor_ref(StringWord(argv, 2)) ) {
+		target = StringWord(argv, 2);
+		param_offset = 1;
+	}
+
+	// get scale params "x y z time"
+	param_x = StringWord(argv, 2 + param_offset);
+	param_y = StringWord(argv, 3 + param_offset);
+	param_z = StringWord(argv, 4 + param_offset);
+	param_time = StringWord(argv, 5 + param_offset);
+
+	x = StringToFixed(param_x);
+	y = StringToFixed(param_y);
+	z = StringToFixed(param_z);
+
+	if(y == 0.0) {
+		y = x;
+	}
+
+	if(z == 0.0) {
+		z = x;
+	}
+
+	// verify bounds.
+	x = MinF( libapx_settings.max_scale, x );
+	x = MaxF( libapx_settings.min_scale, x );
+
+	y = MinF( libapx_settings.max_scale, y );
+	y = MaxF( libapx_settings.min_scale, y );
+
+	z = MinF( libapx_settings.max_scale, z );
+	z = MaxF( libapx_settings.min_scale, z );
+
+	// get blend time
+	if( param_time != "" ) {
+		time = StringToFixed(param_time);
+	}
+	scale = FixedToString(x, 4) + "," + FixedToString(y, 4)  + "," + FixedToString(z, 4);
+	scale = libapx_scalerapply(scale, u, "scale"); //Applies scaler
+
+
+	libapx_apply_actormsg(u, target, argv, "@scale",
+						  "SetScale " + scale + " " + FixedToString(time, 3));
+	return;
+}
+
+// libapx_command_tint
+// =================
+// sets the tint of a unit's main actor for all units in context
+// Syntax: @tint (->[ref]) [R] [G] [B] [Opacity] [HDR] [time-blend]
+// (modified from Cortex Engine)
+void libapx_command_tint(int user, unitgroup u, string argv, int spawningCount, string bracketText) {
+	string paramR;
+	string paramG;
+	string paramB;
+	string paramAlpha;
+	string paramHDR;
+	string paramT;
+	// default parameters for @tint without any inputs are below
+	int red = 0;
+	int green = 0;
+	int blue = 0;
+	fixed alpha = 1.0;
+	fixed hdr = 1.0;
+	fixed duration = 0;
+
+	unitgroup g = u;
+	int param_offset = 0;
+	string target = libapx_ACTOR_REF_MAIN;
+
+	// get actor reference target
+	if( libapx_has_actor_ref(StringWord(argv, 2)) ) {
+		target = StringWord(argv, 2);
+		param_offset = 1;
+	}
+
+	paramR = StringWord(argv, 2 + param_offset);
+	paramG = StringWord(argv, 3 + param_offset);
+	paramB = StringWord(argv, 4 + param_offset);
+	paramAlpha = StringWord(argv, 5 + param_offset);
+	paramHDR = StringWord(argv, 6 + param_offset);
+	paramT = StringWord(argv, 7 + param_offset);
+
+	// get red input
+	if( paramR != "" ) {
+		if( StringContains(paramR, "%", c_stringEnd, false) ) {
+			paramR = StringSub(paramR, 1, StringLength(paramR)-1);
+			red = FixedToInt( 255.0 * StringToFixed(paramR)/100.0 );
+		} else {
+			red = StringToInt(paramR);
+		}
+	}
+
+	// get green input
+	if( paramG != "" ) {
+		if( StringContains(paramG, "%", c_stringEnd, false) ) {
+			paramG = StringSub(paramG, 1, StringLength(paramG)-1);
+			green = FixedToInt( 255.0 * StringToFixed(paramG)/100.0 );
+		} else {
+			green = StringToInt(paramG);
+		}
+	}
+
+	// get blue input
+	if( paramB != "" ) {
+		if( StringContains(paramB, "%", c_stringEnd, false) ) {
+			paramB = StringSub(paramB, 1, StringLength(paramB)-1);
+			blue = FixedToInt( 255.0 * StringToFixed(paramB)/100.0 );
+		} else {
+			blue = StringToInt(paramB);
+		}
+	}
+
+	// get alpha (opacity), from 0 to 1
+	if( paramAlpha != "" ) {
+		if( StringContains(paramAlpha, "%", c_stringEnd, false) ) {
+			paramAlpha = StringSub(paramAlpha, 1, StringLength(paramAlpha)-1);
+			alpha = StringToFixed(paramAlpha)/100.0;
+		} else {
+			alpha = StringToFixed(paramAlpha);
+		}
+	}
+	//reset to 255
+	if (red >= 255) {
+		red = 255;
+	}
+	if (blue >= 255) {
+		blue = 255;
+	}
+	if (green >= 255) {
+		green = 255;
+	}
+
+	// get HDR
+	if( paramHDR != "" ) {
+		hdr = StringToFixed(paramHDR);
+	}
+
+	// get blend time
+	if( paramT != "" ) {
+		duration = StringToFixed(paramT);
+	}
+
+	// apply tint actor msg to units
+	if( StringSub(target, 1, 2) == "->" ) {
+		target = StringSub(target, 3, StringLength(target));
+		UnitGroupLoopBegin(g);
+		while(!UnitGroupLoopDone()) {
+			ActorSendTo(libNtve_gf_MainActorofUnit(UnitGroupLoopCurrent()), target,
+						"SetTintColor {" + IntToString(red) + "," + IntToString(green) + "," + IntToString(blue) + " " +
+						FixedToString(hdr, c_fixedPrecisionAny) + "} {" + FixedToString(duration, c_fixedPrecisionAny) + "}");
+			ActorSendTo(libNtve_gf_MainActorofUnit(UnitGroupLoopCurrent()), target,
+						"SetOpacity {" + FixedToString(alpha, c_fixedPrecisionAny) + "} {" + FixedToString(duration, c_fixedPrecisionAny) + "}");
+			libapx_unit_cache_update(UnitGroupLoopCurrent(), "@tint", argv);
+			UnitGroupLoopStep();
+		}
+		UnitGroupLoopEnd();
+	}
+	else { // "__[ref]", target global
+		target = StringSub(target, 3, StringLength(target));
+		UnitGroupLoopBegin(g);
+		while(!UnitGroupLoopDone()) {
+			ActorSend(ActorFrom(target),
+						"SetTintColor {" + IntToString(red) + "," + IntToString(green) + "," + IntToString(blue) + " " +
+						FixedToString(hdr, c_fixedPrecisionAny) + "} {" + FixedToString(duration, c_fixedPrecisionAny) + "}");
+			ActorSend(ActorFrom(target),
+						"SetOpacity {" + FixedToString(alpha, c_fixedPrecisionAny) + "} {" + FixedToString(duration, c_fixedPrecisionAny) + "}");
+			UnitGroupLoopStep();
+		}
+		UnitGroupLoopEnd();
+	}
+
+	return;
+}
+// libapx_command_decal
+// ===================
+// Changes the model of the main actor of a unit (modified from ctx)
+// Syntax: @modelswap (->[ref]) [model] [variation]
+void libapx_command_decal(int user, unitgroup u, string argv, int spawningCount, string bracketText) {
+	string decal;
+	string amsg;
+	int param_offset = 0;
+	string target = libapx_ACTOR_REF_MAIN;
+
+
+	// get actor reference target
+	if( libapx_has_actor_ref(StringWord(argv, 2)) ) {
+		target = StringWord(argv, 2);
+		param_offset = 1;
+	}
+
+	decal = libapx_catalog_get(c_gameCatalogTexture, StringWord(argv, 2 + param_offset));
+	if(decal == null) {
+		libapx_print_output(user, "<c val=\"ff0000\">Unable to change decal</c>: No such decal exists.");
+		return;
+	}
+
+	amsg = "TextureSelectById {" + decal + "}";
+
+
+	libapx_apply_actormsg(u, target, argv, "@decal", amsg);
+
+	return;
+}
+
+
+// libapx_command_modelswap
+// ======================
+// Changes the model of the main actor of unit (modified from Cortex Engine)
+// Syntax: @modelswap (->[ref]) [model] [variation]
+void libapx_command_modelswap(int user, unitgroup u, string argv, int spawningCount, string bracketText) {
+	string model;
+	string variation;
+	string amsg;
+	int param_offset = 0;
+	string target = libapx_ACTOR_REF_MAIN;
+
+
+
+
+//colossus check
+  unitgroup p = u;
+	int colcheker = 1;
+	bool colFlag = false;
+	while (StringWord(argv, colcheker) != "") {
+		if(StringFind(StringWord(argv, colcheker), "colossus", c_stringNoCase) != -1 ) {
+				UnitGroupLoopBegin(p);
+				while(!UnitGroupLoopDone()) {
+					libapx_unit_flag_colossus(UnitGroupLoopCurrent());
+					UnitGroupLoopStep();
+				}
+				UnitGroupLoopEnd();
+		}
+		colcheker = colcheker + 1;
+	}
+
+
+
+
+
+	// get actor reference target
+	if( libapx_has_actor_ref(StringWord(argv, 2)) ) {
+		target = StringWord(argv, 2);
+		param_offset = 1;
+	}
+
+	model = libapx_catalog_get(c_gameCatalogModel, StringWord(argv, 2 + param_offset));
+	if(model == null) {
+		libapx_print_output(user, "<c val=\"ff0000\">Unable to swap model</c>: No such model exists.");
+		return;
+	}
+	amsg = "ModelSwap {" + model + "}";
+
+	variation = StringWord(argv, 3 + param_offset);
+	if( variation != "" && StringToInt(variation) >= 0 ) {
+		amsg += " {" + variation + "}";
+	}
+
+	libapx_apply_actormsg(u, target, argv, "@modelswap", amsg);
+
+	return;
+}
+
+// libapx_command_play
+// ================
+// makes the main actor play an animation by applying an animgroup
+// "@play reset" stops the animation
+void libapx_command_play(int user, unitgroup u, string argv, int spawningCount, string bracketText) {
+	unitgroup g = u;
+	string val;
+	string flags = "";
+	string animgroup;
+	int param_offset = 0;
+	string target = libapx_ACTOR_REF_MAIN;
+
+	// get actor reference target
+	if( libapx_has_actor_ref(StringWord(argv, 2)) ) {
+		target = StringWord(argv, 2);
+		param_offset = 1;
+	}
+
+	val = StringWord(argv, 2 + param_offset);
+	val = StringCase(StringSub(val, 1, 1), true) + StringSub(val, 2, StringLength(val));
+
+	// if @play [anim] [loop] , then set the flags for anim to PlayForever
+	if( StringEqual(StringWord( argv, 3 + param_offset), "loop", c_stringNoCase) ) {
+		flags = "PlayForever";
+		animgroup = StringWord(argv, 4 + param_offset);
+	}
+	else {
+		animgroup = StringWord(argv, 3 + param_offset);
+	}
+
+	animgroup = StringCase(StringSub(animgroup, 1, 1), true) + StringSub(animgroup, 2, StringLength(animgroup));
+
+	// apply animgroup actor msg to units
+	if( StringSub(target, 1, 2) == "->" ) {
+		target = StringSub(target, 3, StringLength(target));
+		UnitGroupLoopBegin(g);
+		while(!UnitGroupLoopDone()) {
+			if( StringEqual(val, "reset", c_stringNoCase) ) {
+				ActorSendTo(libNtve_gf_MainActorofUnit(UnitGroupLoopCurrent()), target, "AnimClear " + "libapx_command_play");
+			}
+			else {
+				ActorSendTo(libNtve_gf_MainActorofUnit(UnitGroupLoopCurrent()), target, "AnimPlay libapx_command_play " + val + " " + flags);
+				if(animgroup != "") {
+					ActorSendTo(libNtve_gf_MainActorofUnit(UnitGroupLoopCurrent()), target, "AnimGroupRemoveAll");
+					ActorSendTo(libNtve_gf_MainActorofUnit(UnitGroupLoopCurrent()), target, "AnimGroupApply {" + animgroup + "}");
+				}
+			}
+			libapx_unit_cache_update(UnitGroupLoopCurrent(), "@play", argv);
+			UnitGroupLoopStep();
+		}
+		UnitGroupLoopEnd();
+	}
+	else { // "__[ref]", target global
+		target = StringSub(target, 3, StringLength(target));
+		UnitGroupLoopBegin(g);
+		while(!UnitGroupLoopDone()) {
+			if( StringEqual(val, "reset", c_stringNoCase) ) {
+				ActorSend(ActorFrom(target), "AnimClear " + "libapx_command_play");
+			}
+			else {
+				ActorSendTo(libNtve_gf_MainActorofUnit(UnitGroupLoopCurrent()), target, "AnimPlay libapx_command_play " + val + " " + flags);
+				if(animgroup != "") {
+					ActorSend(ActorFrom(target), "AnimGroupRemoveAll");
+					ActorSend(ActorFrom(target), "AnimGroupApply {" + animgroup + "}");
+				}
+			}
+			UnitGroupLoopStep();
+		}
+		UnitGroupLoopEnd();
+	}
+	return;
+}
+
+// libapx_command_animspeed
+// ===================
+// changes the animation speed of any animations
+// a unit is playing (range is set as 0-10x default, 1)
+void libapx_command_animspeed(int user, unitgroup u, string argv, int spawningCount, string bracketText) {
+	string speed;
+	fixed anm_speed;
+	int param_offset = 0;
+	string target = libapx_ACTOR_REF_MAIN;
+
+	// get actor reference target
+	if( libapx_has_actor_ref(StringWord(argv, 2)) ) {
+		target = StringWord(argv, 2);
+		param_offset = 1;
+	}
+
+	// get animspeed time scale. if % at end, then apply a percent scale
+	speed = StringWord(argv, 2 + param_offset);
+	if( StringContains( speed, "%", c_stringEnd, c_stringCase ) ) {
+		anm_speed = StringToFixed( StringSub(speed, 1, StringLength(speed)-1) ) / 100;
+	} else {
+		anm_speed = StringToFixed( speed );
+	}
+
+	// apply bounds for animspeed between 0 and 10
+	if( anm_speed < 0 ) {
+		anm_speed = 0;
+	}
+	else if(anm_speed > 10) {
+		anm_speed = 10;
+	}
+
+	// apply the animspeed
+	libapx_apply_actormsg(u, target, argv, "@animspeed",
+						  libNtve_gf_AnimSetTimeScaleGlobal(anm_speed));
+
+	return;
+}
+
+// libapx_command_rotate
+// ==================
+// applies a rotation on a unit (modified from Cortex Engine)
+// (note: movement removes these rotations,
+// so only really useful for static props)
+void libapx_command_rotate(int user, unitgroup u, string argv, int spawningCount, string bracketText) {
+	fixed yaw;
+	fixed pitch;
+	fixed roll;
+	fixed forwardX;
+	fixed forwardY;
+	fixed forwardZ;
+	fixed upX;
+	fixed upY;
+	fixed upZ;
+	int param_offset = 0;
+	string target = libapx_ACTOR_REF_MAIN;
+
+	// get actor reference target
+	if( libapx_has_actor_ref(StringWord(argv, 2)) ) {
+		target = StringWord(argv, 2);
+		param_offset = 1;
+	}
+
+	// calculate rotation vector parameters
+	yaw = StringToFixed( StringWord(argv, 2 + param_offset) );
+	pitch = StringToFixed( StringWord(argv, 3 + param_offset) );
+	roll = StringToFixed( StringWord(argv, 4 + param_offset) );
+
+	forwardX = Sin(yaw);
+	forwardY = -Sin(pitch) * Cos(yaw);
+	forwardZ = Cos(pitch) * Cos(yaw);
+
+	upX = -Cos(yaw) * Sin(roll);
+	upY = -Sin(pitch) * Sin(yaw) * Sin(roll) + Cos(pitch) * Cos(roll);
+	upZ = Cos(pitch) * Sin(yaw) * Sin(roll) + Sin(pitch) * Cos(roll);
+
+	// apply the rotation actor msgs
+	libapx_apply_actormsg(u, target, argv, "@rotate",
+						  libNtve_gf_SetRotation(forwardX, forwardY, forwardZ, upX, upY, upZ));
+	return;
+}
+
+// libapx_command_statbars
+// ==================
+// sets a unit's statbars
+// by default, turns statbars off.
+// turns on if user specifies by "@statbars on"
+void libapx_command_statbars(int user, unitgroup u, string argv, int spawningCount, string bracketText) {
+	string state = "";
+	int param_offset = 0;
+	string target = libapx_ACTOR_REF_MAIN;
+
+	// get actor reference target
+	if( libapx_has_actor_ref(StringWord(argv, 2)) ) {
+		target = StringWord(argv, 2);
+		param_offset = 1;
+	}
+
+	// get statbars state ("on" -> turn on, anything else turns off)
+	if(StringEqual(StringWord(argv, 2 + param_offset), "on", false)) {
+		state = " 1"; // 1 == on
+	}
+
+	// apply the statbars actor msgs
+	libapx_apply_actormsg(u, target, argv, "@statbars",
+						  "SetShowStatusBar" + state);
+	return;
+}
+
+//libapx_command_setscaler
+//==========================
+//Sets the scale modifier for units, this intern is added in calcultions for
+//@attach translations and scales.
+void libapx_command_setscaler(int user, unitgroup u, string argv, int spawningCount, string bracketText) {
+	fixed scaler;
+	if (StringWord(argv,2) == "") {
+		libapx_print(PlayerGroupSingle(user),"Input something");
+	}
+	else if (StringWord(argv,3) != "") {
+		libapx_print(PlayerGroupSingle(user),"SetScaler only takes one value");
+	}
+	else if (libapx_is_fixed(StringWord(argv, 2)) == false) {
+		libapx_print(PlayerGroupSingle(user),"SetScaler takes numbers");
+	}
+	else {
+		libapx_print(PlayerGroupSingle(user),"Scaler set to "+StringWord(argv,2));
+		scaler = StringToFixed(StringWord(argv,2));
+		libapx_player[EventPlayer()].scaler = scaler;
+	}
+
+
+}
+
+
+//libapx_command_setdelay
+//==========================
+//Sets the default delay for attachments
+void libapx_command_setdelay(int user, unitgroup u, string argv, int spawningCount, string bracketText) {
+	fixed delay;
+	if (StringWord(argv,2) == "") {
+		libapx_print(PlayerGroupSingle(user),"Input something");
+	}
+	else if (StringWord(argv,3) != "") {
+		libapx_print(PlayerGroupSingle(user),"SetDelay only takes one value");
+	}
+	else if (libapx_is_fixed(StringWord(argv, 2)) == false) {
+		libapx_print(PlayerGroupSingle(user),"SetDelay takes numbers");
+	}
+	else {
+		libapx_print(PlayerGroupSingle(user),"Delay set to "+StringWord(argv,2));
+		delay = StringToFixed(StringWord(argv,2));
+		libapx_player[EventPlayer()].delay = delay;
+	}
+
+
+}
+
+//libapx_print_error(PlayerGroupSingle(user), "Scaler takes one arguement")
+
+// libapx_command_attach_minus
+// =====================
+// Replicated old attach of Cortex
+void libapx_command_attach_minus(int user, unitgroup u, string argv, int spawningCount, string bracketText) {
+
+	actor sactor;
+	string actr;
+	string scope;
+	string apoint;
+	unitgroup g = u;
+	int i;
+	bool loop = true;
+	string attachPoints = "Origin Center Damage Engine Hardpoint Head Hit Overhead RallyPoint StatusBar Left Right Target Turret TurretY TurretZ Upgrade Weapon WeaponLeft WeaponRight Left Right";
+
+
+
+//Colossus Check
+		unitgroup p = u;
+		int colcheker = 1;
+		while (StringWord(argv, colcheker) != "") {
+			if(StringFind(StringWord(argv, colcheker), "colossus", c_stringNoCase) != -1 ) {
+					UnitGroupLoopBegin(p);
+					while(!UnitGroupLoopDone()) {
+						libapx_unit_flag_colossus(UnitGroupLoopCurrent());
+						UnitGroupLoopStep();
+					}
+					UnitGroupLoopEnd();
+			}
+			colcheker = colcheker + 1;
+		}
+
+
+
+	libapx_waitDelay(user);
+
+	actr = StringWord(argv,2);
+	apoint = StringWord(argv,3);
+
+	//StringWord(argv,2); //1st , 2nd after ect
+	if (apoint == "") {
+		apoint = "Origin";
+	}
+
+	// Let's make sure that the apoint is a valid attachment point.
+
+	i = 1;
+	while( StringWord(attachPoints, i) != "" ) {
+		if( StringEqual(apoint, StringWord(attachPoints, i), false) ) {
+			apoint = StringWord(attachPoints, i);
+			i = -1;
+			break;
+		}
+		i = i + 1;
+	}
+
+	if( i != -1 ) {
+		apoint = "Origin";
+		libapx_print_output(EventPlayer(), "Attachpoint was invalid, defaulting to origin");
+	}
+
+ // do catalog check for actor
+	actr = libapx_catalog_get(c_gameCatalogActor, actr);
+	if(actr == null) {
+		libapx_print_output(user, "<c val=\"ff0000\">Unable to attach actor</c>: No such actor exists.");
+		return;
+	}
+	scope = CatalogEntryScope( c_gameCatalogActor, actr );
+	if( scope == "CActorEventMacro" || scope == "CActorSound" ) {
+		libapx_print_output(user, "<c val=\"ff0000\">Unable to attach actor</c>: Invalid actor.");
+		return;
+	}
+
+
+		UnitGroupLoopBegin(g);
+		while(!UnitGroupLoopDone())
+		{
+			// Attach the actor to the unit
+			libNtve_gf_AttachActorToUnit(UnitGroupLoopCurrent(), actr, apoint);
+			if(!StringContains(actr, "TalkIcon", c_stringAnywhere, c_stringNoCase)) {
+					libapx_unit_cache_update(UnitGroupLoopCurrent(), "@attach-", argv);
+			}
+			UnitGroupLoopStep();
+		}
+		UnitGroupLoopEnd();
+}
+
+
+
+// libapx_command_attach
+// =====================
+// Attaches an actor or a model to a unit (modified @attach+ from Cortex Forge)
+// Can optionally specify coordinate offsets, rotations, and site operations
+// syntax: @attach (->[ref]) (-m) [Actor/Model] [Point_#] [offX] [offY] [offZ] (-r [rotX] [rotY] [rotZ]) [SOp1] [SOp2] [SOp3]...
+void libapx_command_attach(int user, unitgroup u, string argv, int spawningCount, string bracketText) {
+	unitgroup g = u;
+	int parse_offset = 0;
+	int x;
+	string actr = "{}";
+	string model = "{}";
+	string scope;
+	string apoint;
+	string apoint_index = "";
+	string offset = null;
+	string rotation = null;
+	string SOp;
+	string siteops = "";
+	string actormsg;
+	string attachPoints = "Origin Center Damage Engine Hardpoint Head Hit Overhead RallyPoint StatusBar Left Right Target Turret TurretY TurretZ Upgrade Weapon WeaponLeft WeaponRight Left Right";
+	string target = libapx_ACTOR_REF_MAIN;
+
+
+//Colossus Check
+	unitgroup p = u;
+	int colcheker = 1;
+	while (StringWord(argv, colcheker) != "") {
+		if(StringFind(StringWord(argv, colcheker), "colossus", c_stringNoCase) != -1 ) {
+				UnitGroupLoopBegin(p);
+				while(!UnitGroupLoopDone()) {
+					libapx_unit_flag_colossus(UnitGroupLoopCurrent());
+					UnitGroupLoopStep();
+				}
+				UnitGroupLoopEnd();
+		}
+		colcheker = colcheker + 1;
+	}
+
+
+
+
+	libapx_waitDelay(user);
+
+
+	// get actor reference target
+	if( libapx_has_actor_ref(StringWord(argv, 2)) ) {
+		target = StringWord(argv, 2);
+		parse_offset = 1;
+	}
+
+	if(StringWord( argv, 2 + parse_offset) == "") {
+		return;
+	}
+	else if(StringWord( argv, 2 + parse_offset) == "-m") {
+		model = StringWord( argv, 3 + parse_offset);
+	}
+	else {
+		actr = StringWord( argv, 2 + parse_offset);
+	}
+
+	if( actr == "listpoints" || model =="listpoints" ) {
+		libapx_print(PlayerGroupSingle(user), "<c val=\"00ff00\">Available attach points</c>:<n/>" + attachPoints);
+		return;
+	}
+
+	// check actor or model is valid
+	if(StringWord( argv, 2 + parse_offset) == "-m") { //do catalog check for model
+		model = libapx_catalog_get(c_gameCatalogModel, model);
+		if(model == null) {
+			libapx_print_output(user, "<c val=\"ff0000\">Unable to attach actor model</c>: No such model exists.");
+			return;
+		}
+		parse_offset += 1; // increase parse offset since model "-m" flag being used
+	}
+	else { // do catalog check for actor
+		actr = libapx_catalog_get(c_gameCatalogActor, actr);
+		if(actr == null) {
+			libapx_print_output(user, "<c val=\"ff0000\">Unable to attach actor</c>: No such actor exists.");
+			return;
+		}
+		scope = CatalogEntryScope( c_gameCatalogActor, actr );
+		if( scope == "CActorEventMacro" || scope == "CActorSound" ) {
+			libapx_print_output(user, "<c val=\"ff0000\">Unable to attach actor</c>: Invalid actor.");
+			return;
+		}
+	}
+
+	//MODIFY ATTACH POINT STRING:
+	//get apoint (attachment point)
+	apoint = StringWord( argv, 3 + parse_offset);
+	if( apoint == "" ) {
+		apoint = "Origin";
+	}
+	if(StringContains(apoint, "_", c_stringAnywhere, c_stringNoCase)) {
+		x = StringLength(apoint);
+		while(StringSub(apoint, x, x) != "_") {
+			x -= 1;
+		}
+		apoint_index = " " + StringSub(apoint, x+1, StringLength(apoint));
+		apoint = StringSub(apoint, 1, x-1);
+	}
+	//check apoint is valid
+	x = 1;
+	while( StringWord(attachPoints, x) != "" ) {
+		if( StringEqual(apoint, StringWord(attachPoints, x), false) ) {
+			apoint = StringWord(attachPoints, x);
+			x = -1;
+			break;
+		}
+		x = x + 1;
+	}
+
+	if( x != -1 ) {
+		apoint = "Origin";
+		libapx_print_output(user, "<c val=\"ff0000\">Warning</c>: Invalid attachment point, defaulting to Origin.<n/>You can obtain a list of attachment points by typing <c val=\"00ff00\">@attach listpoints</c>.");
+	}
+
+	//remake the apoint string
+	apoint = "{" + apoint + apoint_index + "}";
+
+	//check for offset (if specified)
+	if(StringWord( argv, 4 + parse_offset) != ""
+		&& !StringContains(StringWord( argv, 4 + parse_offset), "SOp", c_stringAnywhere, c_stringNoCase)
+		&& StringWord( argv, 4 + parse_offset) != "-r") {
+		x = 0;
+		offset = "";
+		while(x < 3) {
+			if(StringWord( argv, 4 + parse_offset + x) != "") {
+				offset += "," + FixedToString(StringToFixed(StringWord( argv, 4 + parse_offset + x)), c_fixedPrecisionAny);
+			}
+			else {
+				offset += ",0";
+			}
+
+			x += 1;
+		}
+		offset = StringSub(offset, 2, StringLength(offset));
+		parse_offset += 3;
+	}
+
+	//check for local rotation (if specified)
+	if(StringWord( argv, 4 + parse_offset) == "-r") {
+		parse_offset += 1;
+		x = 0;
+		rotation = "";
+		if(offset == null) {
+			offset = "0,0,0";
+		}
+		while(x < 3) {
+			if(StringWord( argv, 4 + parse_offset + x) != "") {
+				rotation += "," + FixedToString(StringToFixed(StringWord( argv, 4 + parse_offset + x)), c_fixedPrecisionAny);
+			}
+			else {
+				rotation += ",0";
+			}
+
+			x += 1;
+		}
+		rotation = StringSub(rotation, 2, StringLength(rotation));
+		parse_offset += 3;
+	}
+
+	//keep checking for specified site ops until reached end of string
+	if(StringWord( argv, 4 + parse_offset) != "") {
+		x = 0;
+		while(StringWord( argv, 4 + parse_offset + x) != "") {
+			if(StringContains(StringWord( argv, 4 + parse_offset + x), "SOp", c_stringAnywhere, c_stringNoCase)) {
+				SOp = StringWord( argv, 4 + parse_offset + x);
+				SOp = libapx_catalog_get(c_gameCatalogActor, SOp);
+				if(SOp == null) {
+					libapx_print_output(user, "<c val=\"ff0000\">Warning: Encounted invalid or unknown Site Op: Skipping");
+				}
+				else {
+					siteops = siteops + " " + SOp;
+				}
+			}
+			x += 1;
+		}
+		if(siteops != "") {
+			if(offset == null) {
+				offset = "0,0,0";
+			}
+			if(rotation == null) {
+				rotation = "{}";
+			}
+			siteops = StringSub(siteops, 2, StringLength(siteops));
+			siteops = "{" + siteops + "}";
+		}
+	}
+
+	//FINALLY create the actor msg (before send)
+
+	actormsg = "AttachModelOffset " + actr + " " + model + " " + apoint;
+	if(offset != null) {
+
+		offset = libapx_scalerapply(offset, u, "");
+		actormsg = actormsg + " " + offset;
+	}
+	if(rotation != null) {
+		actormsg = actormsg + " " + rotation;
+	}
+	if(siteops != "") {
+		actormsg = actormsg + " " + siteops;
+	}
+
+	// apply attach actor msg to units
+	if( StringSub(target, 1, 2) == "->" ) {
+		target = StringSub(target, 3, StringLength(target));
+		UnitGroupLoopBegin(g);
+		while(!UnitGroupLoopDone()) {
+			ActorSendTo(libNtve_gf_MainActorofUnit(UnitGroupLoopCurrent()), target, actormsg);
+
+			// TODO: need to generalize actors that shouldnt update cache
+			if(!StringContains(actr, "TalkIcon", c_stringAnywhere, c_stringNoCase)) {
+				libapx_unit_cache_update(UnitGroupLoopCurrent(), "@attach", argv);
+			}
+			UnitGroupLoopStep();
+		}
+		UnitGroupLoopEnd();
+	}
+	else { // "__[ref]", target global
+		target = StringSub(target, 3, StringLength(target));
+		UnitGroupLoopBegin(g);
+		while(!UnitGroupLoopDone()) {
+			ActorSend(ActorFrom(target), actormsg);
+			UnitGroupLoopStep();
+		}
+		UnitGroupLoopEnd();
+	}
+	return;
+}
+
+
+// libapx_command_rotation
+// =====================
+//This command uses the "ApexRotator" model and actor with attachmodeloffset to achieve  x y and z rotations.
+// ex @rotation 90x 35z 25x
+// @rotation 32y
+// Modifiers
+// -ypr : switches from xyz to yaw/pitch/roll
+// -b  : switches actor to beacon scaled actor
+
+//Prototypes
+void attach_rotation_x(int degrees, bool abs_scale, unit u);
+void attach_rotation_y(int degrees, bool abs_scale, unit u);
+void attach_rotation_z(int degrees, bool abs_scale, unit u);
+
+void libapx_command_attach_rotation(int user, unitgroup u, string argv, int spawningCount, string bracketText) {
+	bool mod_ypr = false;
+	bool mod_b = false;
+	int i;
+	int j;
+	string temp;
+	//Remove, and check for, modifiers.
+	if( StringFind(argv, "-ypr", c_stringNoCase) != -1 ) {
+		mod_ypr = true;
+		argv = StringReplaceWord(argv, "-ypr",  "", 1, c_stringNoCase);
+	} 
+
+	if( StringFind(argv, "-b", c_stringNoCase) != -1 ) {
+		mod_b = true;
+		argv = StringReplaceWord(argv, "-b",  "", 1, c_stringNoCase);
+	} 
+
+	//Strings-words start at 1
+	//1 = command
+	//2 = starting syntx
+	i = 2;
+	while(StringWord(argv, i) != "") {
+		//We break apart
+		temp = StringWord(argv, i);
+		if(mod_ypr) {
+			if (StringFind(temp, "y", c_stringNoCase) != -1) {
+
+				temp = StringReplace(temp, "", StringFind(temp, "y", c_stringNoCase), StringFind(temp, "y", c_stringNoCase) );
+	
+				for (j = 1; j <= UnitGroupCount(u, c_unitCountAll); j += 1) {
+					 attach_rotation_z(StringToInt(temp), !mod_b, UnitGroupUnit(u, j));
+				}
+			}
+			if (StringFind(temp, "p", c_stringNoCase) != -1) {
+
+				temp = StringReplace(temp, "", StringFind(temp, "p", c_stringNoCase), StringFind(temp, "p", c_stringNoCase) );
+	
+				for (j = 1; j <= UnitGroupCount(u, c_unitCountAll); j += 1) {
+					attach_rotation_y(StringToInt(temp), !mod_b, UnitGroupUnit(u, j));
+			   }
+			}
+			if (StringFind(temp, "r", c_stringNoCase) != -1) {
+
+				temp = StringReplace(temp, "", StringFind(temp, "r", c_stringNoCase), StringFind(temp, "r", c_stringNoCase) );
+	
+				for (j = 1; j <= UnitGroupCount(u, c_unitCountAll); j += 1) {
+					attach_rotation_x(StringToInt(temp), !mod_b, UnitGroupUnit(u, j));
+			   }
+			}
+		}
+		else {
+			if (StringFind(temp, "x", c_stringNoCase) != -1) {
+
+				temp = StringReplace(temp, "", StringFind(temp, "x", c_stringNoCase), StringFind(temp, "x", c_stringNoCase) );
+	
+				for (j = 1; j <= UnitGroupCount(u, c_unitCountAll); j += 1) {
+					 attach_rotation_x(StringToInt(temp), !mod_b, UnitGroupUnit(u, j));
+				}
+				
+			}
+			if (StringFind(temp, "y", c_stringNoCase) != -1) {
+
+				temp = StringReplace(temp, "", StringFind(temp, "y", c_stringNoCase), StringFind(temp, "y", c_stringNoCase) );
+	
+				for (j = 1; j <= UnitGroupCount(u, c_unitCountAll); j += 1) {
+					attach_rotation_y(StringToInt(temp), !mod_b, UnitGroupUnit(u, j));
+			   }
+			}
+			if (StringFind(temp, "z", c_stringNoCase) != -1) {
+
+				temp = StringReplace(temp, "", StringFind(temp, "z", c_stringNoCase), StringFind(temp, "z", c_stringNoCase) );
+	
+				for (j = 1; j <= UnitGroupCount(u, c_unitCountAll); j += 1) {
+					attach_rotation_z(StringToInt(temp), !mod_b, UnitGroupUnit(u, j));
+			   }
+			}
+		}
+		
+
+
+		i += 1;
+	}
+
+
+
+}
+
+//Helper commands for rotation
+void attach_rotation_x(int degrees, bool abs_scale, unit u) {
+	int point_num;
+	string attach_point = "";
+	string rotation = "0,0,0";
+	//X is Target_01-08
+	//Y is Hit_01-08
+	//Z is Hardpoint_01-08
+	string actor_name = "Beacon_Terran";
+	int degreesAbs = AbsI(degrees);
+
+	while(degreesAbs > 360 || degreesAbs == 360) {
+		degreesAbs -= 360;
+	}
+
+	if(degrees < 0) {
+		degrees = 360-degreesAbs;
+	}
+	else {
+		degrees = degreesAbs;
+	}
+
+	//Generate Attach Point Based off of rotation amt
+	point_num = degrees/45 + 1;
+	attach_point = "{Target " + IntToString(point_num) + "}";
+
+
+	//point handles >45
+	while(degrees > 45 || degrees == 45) {
+		degrees -= 45;
+	}
+
+
+	//0 through 45 degree rotations are handled by attach model offset's rotation
+	if (degrees != 0) {
+		//Build rotation
+		rotation = "0,-1,-" + FixedToString(Tan(degrees),9);
+	}
+
+
+	ActorSendTo(libNtve_gf_MainActorofUnit(u),"::Main", "ModelSwap Apex_Rotator");
+	ActorSendTo(libNtve_gf_MainActorofUnit(u),"::Main", "SetScale 1");
+	//AttachModelOffset " +attachment + " {} " + attachPoint + " " + offset + " " + rotation + " " + siteops
+	ActorSendTo(libNtve_gf_MainActorofUnit(u),"::Main", "AttachModelOffset "+actor_name+" {} " + attach_point + " 0,0,0 " + rotation);
+	attach_rotation_z(270, abs_scale, u);
+}
+
+void attach_rotation_z(int degrees, bool abs_scale, unit u) {
+	int point_num;
+	string attach_point = "";
+	string rotation = "0,0,0";
+	//X is Target_01-08
+	//Y is Hit_01-08
+	//Z is Hardpoint_01-08
+	string actor_name = "Beacon_Terran";
+	int degreesAbs = AbsI(degrees);
+
+	while(degreesAbs > 360 || degreesAbs == 360) {
+		degreesAbs -= 360;
+	}
+
+	if(degrees < 0) {
+		degrees = 360-degreesAbs;
+	}
+	else {
+		degrees = degreesAbs;
+	}
+
+
+
+	//Generate Attach Point Based off of rotation amt
+	point_num = degrees/45;
+	attach_point = "{Hardpoint " + IntToString(point_num) + "}";
+
+
+	//point handles >45
+	while(degrees > 45 || degrees == 45) {
+		degrees -= 45;
+	}
+
+
+	//0 through 45 degree rotations are handled by attach model offset's rotation
+	if (degrees != 0) {
+		//Build rotation
+		rotation = "-1," + FixedToString(Tan(degrees+90),9) + ",0";
+	}
+
+
+	ActorSendTo(libNtve_gf_MainActorofUnit(u),"::Main", "ModelSwap Apex_Rotator");
+	ActorSendTo(libNtve_gf_MainActorofUnit(u),"::Main", "SetScale 1");
+	//AttachModelOffset " +attachment + " {} " + attachPoint + " " + offset + " " + rotation + " " + siteops
+	ActorSendTo(libNtve_gf_MainActorofUnit(u),"::Main", "AttachModelOffset "+actor_name+" {} " + attach_point + " 0,0,0 " + rotation);
+}
+void attach_rotation_y(int degrees, bool abs_scale, unit u) {
+	int point_num;
+	string attach_point = "";
+	string rotation = "0,0,0";
+	//X is Target_01-08
+	//Y is Hit_01-08
+	//Z is Hardpoint_01-08
+	string actor_name = "Beacon_Terran";
+	int degreesAbs = AbsI(degrees);
+
+	while(degreesAbs > 360 || degreesAbs == 360) {
+		degreesAbs -= 360;
+	}
+
+	if(degrees < 0) {
+		degrees = 360-degreesAbs;
+	}
+	else {
+		degrees = degreesAbs;
+	}
+
+
+
+	//Generate Attach Point Based off of rotation amt
+	point_num = degrees/45+1;
+	attach_point = "{Hit " + IntToString(point_num) + "}";
+
+
+	//point handles >45
+	while(degrees > 45 || degrees == 45) {
+		degrees -= 45;
+	}
+
+
+	//0 through 45 degree rotations are handled by attach model offset's rotation
+	if (degrees != 0) {
+		//Build rotation
+		rotation = "0,-1,-" + FixedToString(Tan(degrees),9);
+	}
+
+
+	ActorSendTo(libNtve_gf_MainActorofUnit(u),"::Main", "ModelSwap Apex_Rotator");
+	ActorSendTo(libNtve_gf_MainActorofUnit(u),"::Main", "SetScale 1");
+	//AttachModelOffset " +attachment + " {} " + attachPoint + " " + offset + " " + rotation + " " + siteops
+	ActorSendTo(libNtve_gf_MainActorofUnit(u),"::Main", "AttachModelOffset "+actor_name+" {} " + attach_point + " 0,0,0 " + rotation);
+}

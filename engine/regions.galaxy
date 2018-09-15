@@ -1,0 +1,165 @@
+//=========================================================
+//		Apex Roleplaying Engine
+//		Copyright (c) 2017, Apex Group
+//=========================================================
+// This software is distributed under the MIT License:
+// <http://opensource.org/licenses/MIT>
+//=========================================================
+
+// global data table region identifier prefixes
+const string libapx_REGION_DATA_TABLE_IDENTIFIER = "reg";
+const string libapx_REGION_ID_DATA_TABLE_IDENTIFIER = "reg";
+const string libapx_REGION_LINK_DATA_TABLE_IDENTIFIER = "reg_link";
+const string libapx_REGION_ANCHOR_DATA_TABLE_IDENTIFIER = "reg_unit"; // for #attach
+
+const string libapx_WAYGATE_DATA_TABLE_IDENTIFIER = "waygate";
+const string libapx_WAYGATE_DIALOG_DATA_TABLE_IDENTIFIER = "waygate_diag";
+const string libapx_WAYGATE_DIALOG_REG_DATA_TABLE_IDENTIFIER = "waygate_diag_reg"; //region from dialog
+const string libapx_WAYGATE_ANCHOR_DATA_TABLE_IDENTIFIER = "waygate_diag_unit";
+
+// the dummy unit type used to anchor the waygate dialog "ENTER" button
+// (actual declaration occurs in data.galaxy, due to include order issues)
+// const string libapx_WAYGATE_DIALOG_ANCHOR_UNIT = "Beacon_Zerg";
+
+// region teleport counter
+// (must start at one because unit custom val defaults to 0)
+int libapx_region_waygate_counter = 1;
+
+// libapx_region_get_name
+// ==================
+// Regions are stored in global data table as:
+// "reg [player number] [name]", e.g. "reg 1 R"
+string libapx_region_get_name(string name, int player) {
+	return (libapx_REGION_DATA_TABLE_IDENTIFIER + " " + IntToString(player) + " " + StringCase(name, false));
+}
+
+// libapx_region_get_public_name
+// ==================
+// Returns the public (user inputted) name for the region
+// (the third word in the region data table name)
+string libapx_region_get_public_name(string data_table_name) {
+	return StringWord(data_table_name, 3);
+}
+
+// libapx_region
+// ===============
+// Returns the region associated with the input PUBLIC NAME for a given
+// player. If the region does not exist, returns null.
+region libapx_region(string name, int player) {
+	region r = null;
+	string rgn_dtable_name = libapx_region_get_name(name, player);
+	if( DataTableValueExists(true, rgn_dtable_name) ) {
+		r = DataTableGetRegion(true, rgn_dtable_name);
+	}
+	return r;
+}
+
+// libapx_create_waygate_dialogs
+// =====================
+// creates a dummy unit to act as an anchor for the waygate dialog. the unit
+// is invisible to all players and simply acts as a reference actor for
+// attaching the "Enter" dialog button.
+void libapx_create_waygate_dialog(string rgn_name) {
+	point p = RegionGetCenter( DataTableGetRegion(true, rgn_name) );
+	int dialog = libapx_create_dialog(90, 44, 0, 0, 0); // create the waygate dialog
+	unit anchor;
+	int i = 1;
+	libapx_create_dialog_btn(dialog, 90, 44, c_anchorCenter, 0, 0, "Click to teleport these unit(s).", "Enter");
+	DataTableSetDialog(true, libapx_WAYGATE_DIALOG_DATA_TABLE_IDENTIFIER + " " + rgn_name, dialog);
+	DataTableSetString(true, libapx_WAYGATE_DIALOG_REG_DATA_TABLE_IDENTIFIER + " " + IntToString(dialog), rgn_name);
+
+	// anchor the waygate dialog onto the unit
+	// first check if a region is attached to a unit:
+	if( DataTableValueExists(true, libapx_REGION_ANCHOR_DATA_TABLE_IDENTIFIER + " " + rgn_name) ) {
+		anchor = DataTableGetUnit(true, libapx_REGION_ANCHOR_DATA_TABLE_IDENTIFIER + " " + rgn_name);
+		if( anchor != null && UnitIsAlive(anchor) ) { // attach waygate dialog to region's unit anchor
+			UnitSetCustomValue(anchor, libapx_UNIT_INDEX_WAYGATE_DIALOG, IntToFixed(dialog));
+			DialogSetPositionRelativeToUnit(dialog, anchor, "Ref_Origin", -60, 0);
+			DialogSetVisible(dialog, PlayerGroupAll(), true);
+			return;
+		}
+		else { // anchor == null, unit doesn't exist, e.g. unit has been killed/removed
+			DataTableValueRemove(true, libapx_REGION_ANCHOR_DATA_TABLE_IDENTIFIER + " " + rgn_name);
+		}
+	}
+	// else, create a static unit anchor on ground
+	UnitCreate(1, libapx_WAYGATE_DIALOG_ANCHOR_UNIT, c_unitCreateIgnorePlacement, 0, p, 270.0);
+	//ActorSend(libNtve_gf_MainActorofUnit(UnitLastCreated()), "SetOpacity {0.1}"); // set opacity to hide
+	// hide the beacons for all players
+	for( i = 1; i < libapx_MAX_PLAYERS; i += 1 ) {
+		ActorSend(libNtve_gf_MainActorofUnit(UnitLastCreated()), "SetFilterPlayers " + IntToString(i));
+	}
+	UnitSetCustomValue(UnitLastCreated(), libapx_UNIT_INDEX_WAYGATE_ANCHOR, 1.0);
+	DataTableSetUnit(true, libapx_WAYGATE_ANCHOR_DATA_TABLE_IDENTIFIER + " " + rgn_name, UnitLastCreated());
+
+	DialogSetPositionRelativeToUnit(dialog, UnitLastCreated(), "Ref_Overhead", -60, 0);
+	//DialogSetVisible(dialog, PlayerGroupAll(), true);
+}
+
+// libapx_link_regions
+// =================
+// region links involve 2 data table parameters:
+// -> [region_name_from_ID] (string) : links a waygate by ID to a region name (for quick region check via loop)
+// -> [name_to_linked_region_id] (int) : stores the [region_name_from_ID] (an integer ID) of the linked region
+// (presumes input region names already in proper format with libapx_region_get_name)
+void libapx_link_regions(string rgn_name_1, string rgn_name_2) {
+	// create a link from region_1 to region_2
+	DataTableSetString(true, libapx_WAYGATE_DATA_TABLE_IDENTIFIER + " " + IntToString(libapx_region_waygate_counter), rgn_name_1);
+	DataTableSetInt(true, libapx_REGION_LINK_DATA_TABLE_IDENTIFIER + " " + rgn_name_1, libapx_region_waygate_counter + 1);
+	libapx_region_waygate_counter += 1;
+
+	// create a link from region 2 to region 1
+	DataTableSetString(true, libapx_WAYGATE_DATA_TABLE_IDENTIFIER + " " + IntToString(libapx_region_waygate_counter), rgn_name_2);
+	DataTableSetInt(true, libapx_REGION_LINK_DATA_TABLE_IDENTIFIER + " " + rgn_name_2, libapx_region_waygate_counter - 1);
+	libapx_region_waygate_counter += 1;
+
+	libapx_create_waygate_dialog(rgn_name_1);
+	libapx_create_waygate_dialog(rgn_name_2);
+}
+
+// libapx_region_remove_links
+// =====================
+// checks if there are linked regions, from a region name,
+// and remove links if exist
+void libapx_region_remove_links(string rgn1_name, int player) {
+	string rgn2_name;
+	int rgn_2_id;
+	int reg1_dialog;
+	int reg2_dialog;
+
+	if( DataTableValueExists(true, libapx_REGION_LINK_DATA_TABLE_IDENTIFIER + " " + rgn1_name) ) {
+		rgn_2_id = DataTableGetInt(true, libapx_REGION_LINK_DATA_TABLE_IDENTIFIER + " " + rgn1_name);
+		rgn2_name = DataTableGetString(true, libapx_WAYGATE_DATA_TABLE_IDENTIFIER + " " + IntToString(rgn_2_id) );
+
+		// remove the region linking data
+		DataTableValueRemove(true, libapx_REGION_LINK_DATA_TABLE_IDENTIFIER + " " + rgn2_name);
+		DataTableValueRemove(true, libapx_WAYGATE_DATA_TABLE_IDENTIFIER + " " + IntToString(rgn_2_id));
+
+		DataTableValueRemove(true, libapx_REGION_LINK_DATA_TABLE_IDENTIFIER + " " + rgn1_name);
+		DataTableValueRemove(true, libapx_WAYGATE_DATA_TABLE_IDENTIFIER + " " + IntToString(rgn_2_id - 1));
+
+		// remove associated waygate dialogs and unit anchors
+		reg1_dialog = DataTableGetDialog(true, libapx_WAYGATE_DIALOG_DATA_TABLE_IDENTIFIER + " " + rgn1_name);
+		reg2_dialog = DataTableGetDialog(true, libapx_WAYGATE_DIALOG_DATA_TABLE_IDENTIFIER + " " + rgn2_name);
+		DialogDestroy(reg1_dialog);
+		DialogDestroy(reg2_dialog);
+		DataTableValueRemove(true, libapx_WAYGATE_DIALOG_REG_DATA_TABLE_IDENTIFIER + " " + IntToString(reg1_dialog));
+		DataTableValueRemove(true, libapx_WAYGATE_DIALOG_REG_DATA_TABLE_IDENTIFIER + " " + IntToString(reg2_dialog));
+
+		// remove waygate static anchor units
+		if( DataTableValueExists(true, libapx_WAYGATE_ANCHOR_DATA_TABLE_IDENTIFIER + " " + rgn1_name) ) {
+			UnitRemove(DataTableGetUnit(true, libapx_WAYGATE_ANCHOR_DATA_TABLE_IDENTIFIER + " " + rgn1_name));
+		}
+		if( DataTableValueExists(true, libapx_WAYGATE_ANCHOR_DATA_TABLE_IDENTIFIER + " " + rgn2_name) ) {
+			UnitRemove(DataTableGetUnit(true, libapx_WAYGATE_ANCHOR_DATA_TABLE_IDENTIFIER + " " + rgn2_name));
+		}
+
+		// reset custom value (for waygate dialog id) for units that had waygate attached
+		if( DataTableValueExists(true, libapx_REGION_ANCHOR_DATA_TABLE_IDENTIFIER + " " + rgn1_name) ) {
+			UnitSetCustomValue(DataTableGetUnit(true, libapx_REGION_ANCHOR_DATA_TABLE_IDENTIFIER + " " + rgn1_name), libapx_UNIT_INDEX_WAYGATE_DIALOG, 0);
+		}
+		if( DataTableValueExists(true, libapx_REGION_ANCHOR_DATA_TABLE_IDENTIFIER + " " + rgn2_name) ) {
+			UnitSetCustomValue(DataTableGetUnit(true, libapx_REGION_ANCHOR_DATA_TABLE_IDENTIFIER + " " + rgn2_name), libapx_UNIT_INDEX_WAYGATE_DIALOG, 0);
+		}
+	}
+}

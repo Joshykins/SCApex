@@ -1,0 +1,252 @@
+//=========================================================
+//		Apex Roleplaying Engine
+//		Copyright (c) 2017, Apex Group
+//=========================================================
+// This software is distributed under the MIT License:
+// <http://opensource.org/licenses/MIT>
+//=========================================================
+
+//const int libapx_unit_load_recursion_limit = 50;
+const string libapx_BANK_GAMESETUP_PREFIX = "GS_";
+
+// prototypes
+string libapx_gamesetup_alias_commands(string s);
+string libapx_gamesetup_alias_commands_unpack(string aliased);
+
+// Gamesetup bank architecture:
+// SECTION:
+// GS_[SETUP NAME]
+// KEYS:
+// GS_[SETUP NAME]_global : (TODO) stores regions, teleports, initialization commands, other special things
+// [UNIT_NUMBER].0 : (store unit stats in order) 1.unit_type 2.posX 3.posY 4. facing 5.hp 6.hp_max 7.hp_regen 8.shields 9.shields_max 10.shields_regen 11.energy 12.energy_max 13.energy_regen 14.speed 15.kills 16.level 17.experience
+// [UNIT_NUMBER].Z (int Z > 0 ) : stores units command cache number
+
+// libapx_gamesetup_remove
+// =====================
+// checks if a gamesetup section exists, removes if does
+bool libapx_gamesetup_remove(int player, string gamesetup_name) {
+	//check if gamesetup of the same name exists:
+	if( BankSectionExists(libapx_player[player].bank_storage, libapx_BANK_GAMESETUP_PREFIX + gamesetup_name ) ) {
+		BankSectionRemove(libapx_player[player].bank_storage, libapx_BANK_GAMESETUP_PREFIX + gamesetup_name);
+		BankSave(libapx_player[player].bank_storage);
+		return true;
+	}
+	return false;
+}
+
+// libapx_gamesetup_save
+// ==================
+// saves all units (in region rgn) and their command caches into a
+// gamesetup bank section of input name
+void libapx_gamesetup_save(int player, string gamesetup_name, region rgn) {
+	int i;
+	int unit_save_id = 1;
+	string unit_game_id;
+	string unit_properties;
+	string cache;
+	string gamesetup_section = libapx_BANK_GAMESETUP_PREFIX + gamesetup_name;
+	unitgroup g;
+
+	// remove previous instance of gamesetup of same name
+	libapx_gamesetup_remove(player, gamesetup_name);
+
+	//save units
+	g = UnitGroup(null, player, rgn, UnitFilter(0, 0, (1 << c_targetFilterMissile), (1 << (c_targetFilterDead - 32)) | (1 << (c_targetFilterHidden - 32))), 0);
+	UnitGroupRemove(g, libapx_player[player].spawn_splat); // remove spawn splat if it exists
+
+	UnitGroupLoopBegin(g);
+	while(!UnitGroupLoopDone()) {
+		unit_game_id = FixedToString(UnitGetCustomValue(UnitGroupLoopCurrent(), libapx_UNIT_INDEX_ID), 0);
+
+		//create the unit properties string
+		unit_properties = "";
+		//unit type
+		unit_properties += UnitGetType(UnitGroupLoopCurrent());
+		//position
+		unit_properties += " " + FixedToString(PointGetX(UnitGetPosition(UnitGroupLoopCurrent())), 4);
+		unit_properties += " " + FixedToString(PointGetY(UnitGetPosition(UnitGroupLoopCurrent())), 4);
+		unit_properties += " " + FixedToString(UnitGetFacing(UnitGroupLoopCurrent()), 2);
+		//hp, shields, energy
+		unit_properties += " " + FixedToString(UnitGetPropertyFixed(UnitGroupLoopCurrent(), c_unitPropLife, true), 0);
+		unit_properties += " " + FixedToString(UnitGetPropertyFixed(UnitGroupLoopCurrent(), c_unitPropLifeMax, true), 0);
+		unit_properties += " " + FixedToString(UnitGetPropertyFixed(UnitGroupLoopCurrent(), c_unitPropLifeRegen, true), 3);
+		unit_properties += " " + FixedToString(UnitGetPropertyFixed(UnitGroupLoopCurrent(), c_unitPropShields, true), 0);
+		unit_properties += " " + FixedToString(UnitGetPropertyFixed(UnitGroupLoopCurrent(), c_unitPropShieldsMax, true), 0);
+		unit_properties += " " + FixedToString(UnitGetPropertyFixed(UnitGroupLoopCurrent(), c_unitPropShieldsRegen, true), 3);
+		unit_properties += " " + FixedToString(UnitGetPropertyFixed(UnitGroupLoopCurrent(), c_unitPropEnergy, true), 0);
+		unit_properties += " " + FixedToString(UnitGetPropertyFixed(UnitGroupLoopCurrent(), c_unitPropEnergyMax, true), 0);
+		unit_properties += " " + FixedToString(UnitGetPropertyFixed(UnitGroupLoopCurrent(), c_unitPropEnergyRegen, true), 3);
+		//speed
+		unit_properties += " " + FixedToString(UnitGetPropertyFixed(UnitGroupLoopCurrent(), c_unitPropMovementSpeed, true), 3);
+		//kills
+		unit_properties += " " + FixedToString(UnitGetPropertyFixed(UnitGroupLoopCurrent(), c_unitPropKills, true), 0);
+		//level
+		unit_properties += " " + FixedToString(UnitGetPropertyFixed(UnitGroupLoopCurrent(), c_unitPropLevel, true), 0);
+		//experience
+		unit_properties += " " + FixedToString(UnitGetPropertyFixed(UnitGroupLoopCurrent(), c_unitPropXP, true), 3);
+
+		BankValueSetFromString(libapx_player[player].bank_storage, gamesetup_section, IntToString(unit_save_id) + ".0", unit_properties);
+
+		//create the unit caches
+		i = 1;
+		while(DataTableValueExists(true, unit_game_id + "." + IntToString(i))) {
+			cache = libapx_gamesetup_alias_commands( DataTableGetString(true, unit_game_id + "." + IntToString(i)) );
+			BankValueSetFromString(libapx_player[player].bank_storage, gamesetup_section, IntToString(unit_save_id) + "." + IntToString(i), cache);
+			i += 1;
+		}
+
+		unit_save_id += 1;
+		UnitGroupLoopStep();
+	}
+	UnitGroupLoopEnd();
+
+	//finally, save bank
+	BankSave(libapx_player[player].bank_storage);
+
+	libapx_print_success(player, "Game setup saved as \"" + gamesetup_name + "\"");
+}
+
+// libapx_gamesetup_load
+// ===================
+// loads in a gamesetup: for all units in the gamesetup bank section,
+// unpacks their command saves, then parses the command to create unit
+void libapx_gamesetup_load(int player, string gamesetup_name) {
+	int index;
+	string id = "1";
+	string gamesetup_section = libapx_BANK_GAMESETUP_PREFIX + gamesetup_name;
+	string unit_properties;
+	string commands;
+	unitgroup g;
+
+	//load units
+	while( BankKeyExists(libapx_player[player].bank_storage, gamesetup_section, id + ".0" ) ) {
+		unit_properties = BankValueGetAsString(libapx_player[player].bank_storage, gamesetup_section, id + ".0");
+
+		//create unit
+		UnitCreate(1, StringWord(unit_properties, 1), c_unitCreateIgnorePlacement, player, Point(StringToFixed(StringWord(unit_properties, 2)), StringToFixed(StringWord(unit_properties, 3))), 270.0);
+		UnitSetFacing(UnitLastCreated(), StringToFixed(StringWord(unit_properties, 4)), 0);
+
+		// must manually set unit data here
+		// (UnitCreatedEvent doesn't pick up created unit until already function finishes)
+		libapx_unit_set_id(UnitLastCreated());
+		UnitSetCustomValue(UnitLastCreated(), libapx_UNIT_INDEX_CACHE_COUNT, 1);
+
+		//set properties
+		index = 5;
+		UnitSetPropertyFixed(UnitLastCreated(), c_unitPropLife, StringToFixed(StringWord(unit_properties, index)));
+		index += 1;
+		UnitSetPropertyFixed(UnitLastCreated(), c_unitPropLifeMax, StringToFixed(StringWord(unit_properties, index)));
+		index += 1;
+		UnitSetPropertyFixed(UnitLastCreated(), c_unitPropLifeRegen, StringToFixed(StringWord(unit_properties, index)));
+		index += 1;
+		UnitSetPropertyFixed(UnitLastCreated(), c_unitPropShields, StringToFixed(StringWord(unit_properties, index)));
+		index += 1;
+		UnitSetPropertyFixed(UnitLastCreated(), c_unitPropShieldsMax, StringToFixed(StringWord(unit_properties, index)));
+		index += 1;
+		UnitSetPropertyFixed(UnitLastCreated(), c_unitPropShieldsRegen, StringToFixed(StringWord(unit_properties, index)));
+		index += 1;
+		UnitSetPropertyFixed(UnitLastCreated(), c_unitPropEnergy, StringToFixed(StringWord(unit_properties, index)));
+		index += 1;
+		UnitSetPropertyFixed(UnitLastCreated(), c_unitPropEnergyMax, StringToFixed(StringWord(unit_properties, index)));
+		index += 1;
+		UnitSetPropertyFixed(UnitLastCreated(), c_unitPropEnergyRegen, StringToFixed(StringWord(unit_properties, index)));
+		index += 1;
+		UnitSetPropertyFixed(UnitLastCreated(), c_unitPropMovementSpeed, StringToFixed(StringWord(unit_properties, index)));
+		index += 1;
+		UnitSetPropertyFixed(UnitLastCreated(), c_unitPropKills, StringToFixed(StringWord(unit_properties, index)));
+		index += 1;
+		UnitSetPropertyFixed(UnitLastCreated(), c_unitPropLevel, StringToFixed(StringWord(unit_properties, index)));
+		index += 1;
+		UnitSetPropertyFixed(UnitLastCreated(), c_unitPropXP, StringToFixed(StringWord(unit_properties, index)));
+
+		//now parse commands for unit
+		index = 1;
+		g = UnitGroupEmpty();
+		UnitGroupAdd(g, UnitLastCreated());
+		while(BankKeyExists(libapx_player[player].bank_storage, gamesetup_section, id + "." + IntToString(index))) {
+			commands = BankValueGetAsString(libapx_player[player].bank_storage, gamesetup_section, id + "." + IntToString(index));
+			libapx_chat_parse( libapx_gamesetup_alias_commands_unpack(commands), player, g, libapx_player[EventPlayer()].spawningCount);
+			index += 1;
+		}
+
+		id = IntToString( StringToInt(id) + 1 );
+
+		// wait 0.0s creates some delay and reducing lag during load
+		libapx_waitDelayGS(player);
+	}
+
+	//loading complete!
+	libapx_print_success(player, "Game setup loaded: \"" + gamesetup_name + "\"");
+}
+
+// libapx_gamesetup_alias_commands
+// ========================
+// creates aliases for saved commands (reduce space in bank)
+string libapx_gamesetup_alias_commands(string s) {
+	string aliased = s;
+	aliased = StringReplaceWord(aliased, "@attach", "@ac", c_stringReplaceAll, false);
+	aliased = StringReplaceWord(aliased, "@tint", "@tn", c_stringReplaceAll, false);
+	aliased = StringReplaceWord(aliased, "@scale", "@sc", c_stringReplaceAll, false);
+	aliased = StringReplaceWord(aliased, "@modelswap", "@ms", c_stringReplaceAll, false);
+	aliased = StringReplaceWord(aliased, "@animspeed", "@as", c_stringReplaceAll, false);
+	aliased = StringReplaceWord(aliased, "@play", "@pl", c_stringReplaceAll, false);
+	aliased = StringReplaceWord(aliased, "@subtitle", "@st", c_stringReplaceAll, false);
+	aliased = StringReplaceWord(aliased, "@statbars", "@sb", c_stringReplaceAll, false);
+	aliased = StringReplaceWord(aliased, "@actrmsg", "@amsg", c_stringReplaceAll, false);
+	aliased = StringReplaceWord(aliased, "@addbehavior", "@ab", c_stringReplaceAll, false);
+	aliased = StringReplaceWord(aliased, "@removebehavior", "@rb", c_stringReplaceAll, false);
+	aliased = StringReplaceWord(aliased, "@addweapon", "@aw", c_stringReplaceAll, false);
+	aliased = StringReplaceWord(aliased, "@removeweapon", "@rw", c_stringReplaceAll, false);
+	aliased = StringReplaceWord(aliased, "@effect", "@ef", c_stringReplaceAll, false);
+	aliased = StringReplaceWord(aliased, "@armor", "@rmr", c_stringReplaceAll, false);
+	aliased = StringReplaceWord(aliased, "@shieldsarmor", "@srmr", c_stringReplaceAll, false);
+	aliased = StringReplaceWord(aliased, "@adddamage", "@ad", c_stringReplaceAll, false);
+	aliased = StringReplaceWord(aliased, "@addrange", "@ar", c_stringReplaceAll, false);
+	aliased = StringReplaceWord(aliased, "@height", "@ht", c_stringReplaceAll, false);
+	aliased = StringReplaceWord(aliased, "@invulnerable", "@inv", c_stringReplaceAll, false);
+	aliased = StringReplaceWord(aliased, "@setname", "@snm", c_stringReplaceAll, false);
+	aliased = StringReplaceWord(aliased, "@setnamecolor", "@snc", c_stringReplaceAll, false);
+	aliased = StringReplaceWord(aliased, "@renameall", "@rn", c_stringReplaceAll, false);
+	aliased = StringReplaceWord(aliased, "@color", "@col", c_stringReplaceAll, false);
+	aliased = StringReplaceWord(aliased, "@tooltip", "@tt", c_stringReplaceAll, false);
+	aliased = StringReplaceWord(aliased, "@weaponspeedall", "@wpa", c_stringReplaceAll, false);
+	aliased = StringReplaceWord(aliased, "@weaponspeed", "@wp", c_stringReplaceAll, false);
+	aliased = StringReplaceWord(aliased, "@state", "@se", c_stringReplaceAll, false);
+	return aliased;
+}
+
+// libapx_gamesetup_alias_commands_unpack
+// ========================
+// unpacks command aliases into actual commands
+string libapx_gamesetup_alias_commands_unpack(string aliased) {
+	string unpacked = aliased;
+	unpacked = StringReplaceWord(unpacked, "@ac", "@attach", c_stringReplaceAll, false);
+	unpacked = StringReplaceWord(unpacked, "@tn", "@tint", c_stringReplaceAll, false);
+	unpacked = StringReplaceWord(unpacked, "@sc", "@scale", c_stringReplaceAll, false);
+	unpacked = StringReplaceWord(unpacked, "@ms", "@modelswap", c_stringReplaceAll, false);
+	unpacked = StringReplaceWord(unpacked, "@as", "@animspeed", c_stringReplaceAll, false);
+	unpacked = StringReplaceWord(unpacked, "@pl", "@play", c_stringReplaceAll, false);
+	unpacked = StringReplaceWord(unpacked, "@st", "@subtitle", c_stringReplaceAll, false);
+	unpacked = StringReplaceWord(unpacked, "@sb", "@statbars", c_stringReplaceAll, false);
+	unpacked = StringReplaceWord(unpacked, "@amsg", "@actrmsg", c_stringReplaceAll, false);
+	unpacked = StringReplaceWord(unpacked, "@ad", "@adddamage", c_stringReplaceAll, false);
+	unpacked = StringReplaceWord(unpacked, "@ar", "@addrange", c_stringReplaceAll, false);
+	unpacked = StringReplaceWord(unpacked, "@rmr", "@armor", c_stringReplaceAll, false);
+	unpacked = StringReplaceWord(unpacked, "@srmr", "@shieldsarmor", c_stringReplaceAll, false);
+	unpacked = StringReplaceWord(unpacked, "@ab", "@addbehavior", c_stringReplaceAll, false);
+	unpacked = StringReplaceWord(unpacked, "@rb", "@removebehavior", c_stringReplaceAll, false);
+	unpacked = StringReplaceWord(unpacked, "@aw", "@addweapon", c_stringReplaceAll, false);
+	unpacked = StringReplaceWord(unpacked, "@rw", "@removeweapon", c_stringReplaceAll, false);
+	unpacked = StringReplaceWord(unpacked, "@ef", "@effect", c_stringReplaceAll, false);
+	unpacked = StringReplaceWord(unpacked, "@ht", "@height", c_stringReplaceAll, false);
+	unpacked = StringReplaceWord(unpacked, "@inv", "@invulnerable", c_stringReplaceAll, false);
+	unpacked = StringReplaceWord(unpacked, "@snm", "@setname", c_stringReplaceAll, false);
+	unpacked = StringReplaceWord(unpacked, "@snc", "@setnamecolor", c_stringReplaceAll, false);
+	unpacked = StringReplaceWord(unpacked, "@rn", "@renameall", c_stringReplaceAll, false);
+	unpacked = StringReplaceWord(unpacked, "@col", "@color", c_stringReplaceAll, false);
+	unpacked = StringReplaceWord(unpacked, "@tt", "@tooltip", c_stringReplaceAll, false);
+	unpacked = StringReplaceWord(unpacked, "@wpa", "@weaponspeedall", c_stringReplaceAll, false);
+	unpacked = StringReplaceWord(unpacked, "@wp", "@weaponspeed", c_stringReplaceAll, false);
+	unpacked = StringReplaceWord(unpacked, "@se", "@state", c_stringReplaceAll, false);
+	return unpacked;
+}

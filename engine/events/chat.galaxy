@@ -1,0 +1,55 @@
+//=========================================================
+//		Apex Roleplaying Engine
+//		Copyright (c) 2017, Apex Group
+//=========================================================
+// This software is distributed under the MIT License:
+// <http://opensource.org/licenses/MIT>
+//=========================================================
+
+
+// libapx_process_chat_event
+// ============================
+// redirects processing as needed:
+// IF message begins with "<<" , directly output the message
+// ELSE, parse message
+
+
+bool libapx_process_chat_event(bool testConds, bool runActions) {
+
+
+	unitgroup target = UnitGroupEmpty();
+	libapx_player[EventPlayer()].chat_msg = libapx_string_trim(EventChatMessage(false)); //Where injection of chat occurs
+	// "<<" directly dumps message to OOC (if player not muted)
+	if ( StringWord( libapx_player[EventPlayer()].chat_msg, 1) == "<<" &&  !libapx_player[EventPlayer()].muted ) {
+		libapx_player[EventPlayer()].chat_msg = libapx_string_trim( StringSub(libapx_player[EventPlayer()].chat_msg, 3, StringLength(libapx_player[EventPlayer()].chat_msg)) );
+		libapx_chat_print_OOC(EventPlayer(), libapx_player[EventPlayer()].chat_msg);
+	}
+
+
+	else if( !libapx_player[EventPlayer()].disabled ) {
+
+
+		// if player is mouse-click spawning, set context to spawn splat
+		if( libapx_player[EventPlayer()].is_placing_unit ) {
+			UnitGroupAdd(target, libapx_player[EventPlayer()].spawn_splat);
+		}
+		else {
+			target = UnitGroupSelected(EventPlayer());
+			target = libapx_enforce_unit_permissions(target, EventPlayer());
+		}
+
+		libapx_chat_parse(libapx_player[EventPlayer()].chat_msg, EventPlayer(), target, libapx_player[EventPlayer()].spawningCount);
+
+
+
+
+
+	}
+	else if( !libapx_player[EventPlayer()].muted ){
+		libapx_chat_print_OOC(EventPlayer(), libapx_player[EventPlayer()].chat_msg);
+	}
+
+	// TODO: chat message logging
+
+	return false;
+}

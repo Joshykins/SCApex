@@ -1,0 +1,39 @@
+//=========================================================
+//		Apex Roleplaying Engine
+//		Copyright (c) 2017, Apex Group
+//=========================================================
+// This software is distributed under the MIT License:
+// <http://opensource.org/licenses/MIT>
+//=========================================================
+
+include "apex/engine/engine.galaxy"
+include "apex/commands/commands.galaxy"
+include "apex/ui/ui.galaxy"
+include "apex/toolkit/toolkit.galaxy"
+
+// welcome message
+const string libapx_SPLASH_MESSAGE = "Welcome to Apex Roleplay Engine. Type \"_commands\" to get started!";
+
+void libapx_initialize() {
+	
+	libapx_toolkit_initialize();
+	libapx_engine_initialize();
+	libapx_commands_initialize();
+	libapx_ui_initialize();
+
+
+
+
+
+
+	libapx_print(PlayerGroupAll(), "Welcome to <c val=\"ff0000\"> Apex Roleplaying</c> version Apex Engine v" + IntToString(libapx_BUILD_VERSION) + "." + IntToString(libapx_BUILD_SUB_VERSION) + libapx_BUILD_VERSION_MODIFIER + ".</n> Join the community on the reddit  <c val=\"3498db\">https://www.reddit.com/r/StarCraftRP/></c> or more preferably join us on the discord to discuss the engine, create private lobbies, and much more! <c val=\"3498db\">https://discord.gg/mPcjgX5></c> </n> Type <c val=\"3498db\"> _relink </c> to get the link again.");
+
+
+
+
+
+
+
+	//libapx_print(PlayerGroupAll(), "apex Engine: v" + IntToString(libapx_BUILD_VERSION) + "." + IntToString(libapx_BUILD_SUB_VERSION) + libapx_BUILD_VERSION_MODIFIER);
+	//libapx_print(PlayerGroupAll(), libapx_SPLASH_MESSAGE);
+}

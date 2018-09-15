@@ -1,0 +1,175 @@
+//=========================================================
+//		Apex Roleplaying Engine
+//		Copyright (c) 2017, Apex Group
+//=========================================================
+// This software is distributed under the MIT License:
+// <http://opensource.org/licenses/MIT>
+//=========================================================
+
+include "apex/commands/general_commands.galaxy"
+include "apex/commands/admin_commands.galaxy"
+include "apex/commands/spawn_commands.galaxy"
+include "apex/commands/unit_commands.galaxy"
+include "apex/commands/actor_commands.galaxy"
+include "apex/commands/chat_commands.galaxy"
+include "apex/commands/region_commands.galaxy"
+include "apex/commands/debug_commands.galaxy"
+
+void libapx_commands_initialize() {
+
+	// debug commands
+	// libapx_chat_command_create(">test", libapx_command_experiment);
+	// libapx_chat_command_create(">sort", libapx_command_sort);
+
+	// general commands - done in cmd guide
+	libapx_chat_command_create("_info", libapx_command_info);
+	libapx_chat_command_create("_commands", libapx_command_list_commands);
+	libapx_chat_command_create("_delay", libapx_command_delay);
+	libapx_chat_command_create("_players", libapx_command_players);
+	libapx_chat_command_create("_gamesetup", libapx_command_gamesetup);
+	libapx_chat_command_create("_control", libapx_command_control);
+	libapx_chat_command_create("_uncontrol", libapx_command_uncontrol);
+	libapx_chat_command_create("_ally", libapx_command_ally);
+	libapx_chat_command_create("_unally", libapx_command_unally);
+	libapx_chat_command_create("_search", libapx_command_search);
+	libapx_chat_command_create("_replace", libapx_command_replace);
+	libapx_chat_command_create("_minerals", libapx_command_minerals);
+	libapx_chat_command_create("_gas", libapx_command_gas);
+	libapx_chat_command_create("_terrazine", libapx_command_terrazine);
+	libapx_chat_command_create("_supply", libapx_command_supply);
+	libapx_chat_command_create("_zoom", libapx_command_zoom);
+	libapx_chat_command_create("_roll", libapx_command_roll);
+	libapx_chat_command_create("_doodads", libapx_command_doodads);
+	libapx_chat_command_create("_showterrain", libapx_command_showterrain);
+	libapx_chat_command_create("_camera", libapx_command_camera);
+	libapx_chat_command_create("_upgrade",libapx_command_upgrade);
+	libapx_chat_command_create("_handle",libpax_command_get_playerhandle);
+	libapx_chat_command_create("_relink",libpax_command_relink);
+	libapx_chat_command_create("_sound", libapx_command_sound);
+	libapx_chat_command_create("_camerapan", libapx_command_camerapan);
+
+
+	//Permissions - done in cmd guide
+	libapx_chat_command_create("_blacklist", libapx_command_blacklist);
+
+
+	// admin commands - done in cmd guide
+	libapx_chat_command_create("!light", libapx_command_light);
+	libapx_chat_command_create("!kick", libapx_command_ban);
+	libapx_chat_command_create("!disable", libapx_command_disable);
+	libapx_chat_command_create("!enable", libapx_command_enable);
+	libapx_chat_command_create("!mute", libapx_command_mute);
+	libapx_chat_command_create("!unmute", libapx_command_unmute);
+	libapx_chat_command_create("!promote", libapx_command_promote);
+	libapx_chat_command_create("!demote", libapx_command_demote);
+	libapx_chat_command_create("!remove", libapx_command_remove_player);
+	libapx_chat_command_create("!destroy", libapx_command_destroy);
+
+	// spawn command - done in cmd guide
+	libapx_chat_command_create("@spawn+", libapx_command_spawn_plus);
+	libapx_chat_command_create("@spawn", libapx_command_spawn);
+
+
+
+	// unit commands - done in cmd guide
+	libapx_chat_command_create("@unitswap", libapx_command_unitswap);
+	libapx_chat_command_create("@unitmimic", libapx_command_unitmimic);
+	libapx_chat_command_create("@unitvar", libapx_command_unitvar);
+	libapx_chat_command_create("@context", libapx_command_context);
+	libapx_chat_command_create("@kill", libapx_command_kill);
+	libapx_chat_command_create("@remove", libapx_command_remove);
+	libapx_chat_command_create("@selectarea", libapx_command_selectarea);
+	libapx_chat_command_create("@removearea", libapx_command_removearea);
+	libapx_chat_command_create("@cache", libapx_command_cache);
+	libapx_chat_command_create("@give", libapx_command_give);
+	libapx_chat_command_create("@renameall", libapx_command_renameall);
+	libapx_chat_command_create("@height", libapx_command_height);
+	libapx_chat_command_create("@color", libapx_command_color);
+	libapx_chat_command_create("@face", libapx_command_face);
+	libapx_chat_command_create("@subtitle", libapx_command_subtitle);
+	libapx_chat_command_create("@tooltip", libapx_command_tooltip);
+	libapx_chat_command_create("@copy", libapx_command_copy);
+	libapx_chat_command_create("@kills", libapx_command_kills);
+	libapx_chat_command_create("@level", libapx_command_level);
+	libapx_chat_command_create("@label", libapx_command_label);
+	libapx_chat_command_create("@radius", libapx_command_radius);
+	libapx_chat_command_create("@state", libapx_command_state);
+	libapx_chat_command_create("@pos", libapx_command_position);
+	libapx_chat_command_create("@position", libapx_command_position);
+	libapx_chat_command_create("@move", libapx_command_move);
+	//libapx_chat_command_create("@undo", libapx_command_undo);
+
+	//stats - done in commands guide
+	libapx_chat_command_create("@behaviors", libapx_command_behaviors);
+	libapx_chat_command_create("@addbehavior", libapx_command_addbehavior);
+	libapx_chat_command_create("@removebehavior", libapx_command_removebehavior);
+	libapx_chat_command_create("@weapons", libapx_command_weapons);
+	libapx_chat_command_create("@addweapon", libapx_command_addweapon);
+	libapx_chat_command_create("@removeweapon", libapx_command_removeweapon);
+	libapx_chat_command_create("@life", libapx_command_life);
+	libapx_chat_command_create("@shields", libapx_command_shields);
+	libapx_chat_command_create("@energy", libapx_command_energy);
+	libapx_chat_command_create("@maxlife", libapx_command_maxlife);
+	libapx_chat_command_create("@maxshields", libapx_command_maxshields);
+	libapx_chat_command_create("@maxenergy", libapx_command_maxenergy);
+	libapx_chat_command_create("@liferegen", libapx_command_liferegen);
+	libapx_chat_command_create("@shieldsregen", libapx_command_shieldsregen);
+	libapx_chat_command_create("@energyregen", libapx_command_energyregen);
+	libapx_chat_command_create("@speed", libapx_command_speed);
+	libapx_chat_command_create("@invulnerable", libapx_command_invulnerable);
+	libapx_chat_command_create("@vulnerable", libapx_command_vulnerable);
+	libapx_chat_command_create("@adddamage", libapx_command_damage);
+	libapx_chat_command_create("@removedamage", libapx_command_damage);
+	libapx_chat_command_create("@addrange", libapx_command_range);
+	libapx_chat_command_create("@removerange", libapx_command_range);
+	libapx_chat_command_create("@armor", libapx_command_armor);
+	libapx_chat_command_create("@shieldsarmor", libapx_command_armor);
+	libapx_chat_command_create("@weaponspeed", libapx_command_weaponspeed);
+	libapx_chat_command_create("@weaponspeedall", libapx_command_weaponspeedall);
+	libapx_chat_command_create("@effect", libapx_command_effect);
+
+	// unit visual (actor) commands - done in cmd guide
+	libapx_chat_command_create("@setdelay", libapx_command_setdelay);
+	libapx_chat_command_create("@decal", libapx_command_decal);
+	libapx_chat_command_create("@setscaler", libapx_command_setscaler);
+	libapx_chat_command_create("@actrmsg", libapx_command_actormessage);
+	libapx_chat_command_create("@target", libapx_command_actoralias);
+	libapx_chat_command_create("@scale", libapx_command_scale);
+	libapx_chat_command_create("@tint", libapx_command_tint);
+	libapx_chat_command_create("@modelswap", libapx_command_modelswap);
+	libapx_chat_command_create("@play", libapx_command_play);
+	libapx_chat_command_create("@animspeed", libapx_command_animspeed);
+	libapx_chat_command_create("@rotate", libapx_command_rotate);
+	libapx_chat_command_create("@statbars", libapx_command_statbars);
+	libapx_chat_command_create("@attach", libapx_command_attach);
+	libapx_chat_command_create("@attach-", libapx_command_attach_minus);
+	libapx_chat_command_create("@rotation", libapx_command_attach_rotation);
+
+	// chat commands
+	libapx_chat_command_create("@narrate", libapx_command_narrate);
+	libapx_chat_command_create("@say", libapx_command_say);
+	libapx_chat_command_create("@setname", libapx_command_setname);
+	libapx_chat_command_create("@setnamecolor", libapx_command_setnamecolor);
+
+	// region commands - Done in cmd guide
+	libapx_chat_command_create("#create", libapx_command_region_create);
+	libapx_chat_command_create("#remove", libapx_command_region_remove);
+	libapx_chat_command_create("#removeall", libapx_command_region_removeall);
+	libapx_chat_command_create("#list", libapx_command_region_list);
+	libapx_chat_command_create("#teleport", libapx_command_region_teleport);
+	libapx_chat_command_create("#attach", libapx_command_region_attach);
+
+	// Super Command, these commands parse in the entire lines from [ to ] and do a string filter on them. _repeat, _chance, etc.
+	// Then parse the return afterwards in replacement of cmd to be parsed.
+	libapx_chat_command_create(">repeat", libapx_command_repeat);
+	libapx_chat_command_create(">chance", libapx_command_chance);
+	libapx_chat_command_create(">random", libapx_command_random);
+	libapx_chat_command_create(">keypress", libapx_command_keypress);
+	libapx_chat_command_create(">moveto", libapx_command_moveto);
+
+
+	//seroCmds
+	libapx_chat_command_create(">super", libapx_command_super);
+
+
+}

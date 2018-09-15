@@ -1,0 +1,169 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<Desc>
+	<!-- Hide default Blizzard chat area, since we use it for commands -->
+	<Frame type="MessageDisplay" name="GameUI/UIContainer/FullscreenUpperContainer/ChatDisplay" file="GameUI">
+		<Visible val="false"/>
+	</Frame>
+
+	<!-- Hide replay chat area so that viewers don't have to see all the commands there -->
+	<Frame type="MessageDisplay" name="GameUI/UIContainer/FullscreenUpperContainer/ReplayChatDisplay" file="GameUI">
+		<Visible val="false"/>
+	</Frame>
+
+	<!-- Use DebugDisplay chat area as our new main chat area for Apex. We can output to this through triggers as needed. -->
+	<Frame type="MessageDisplay" name="GameUI/UIContainer/FullscreenUpperContainer/DebugDisplay" file="GameUI">
+        <AlternateTime val="true"/>
+        <MaxMessages val="64"/>
+        <MessageDuration val="25000"/>
+		<FadeDuration val="5000"/>
+		<Style val="ChatDisplay"/>
+        <AcceptsMouse val="false"/>
+		<BatchText val="true"/>
+				<Anchor side="Bottom" relative="$parent" pos="Max" offset="-335"/>
+				<Anchor side="Left" relative="$parent" pos="Mid" offset="0"/>
+				<Anchor side="Right" relative="$parent" pos="Mid" offset="0"/>
+				<Width val="720"/>
+				<Height val="700"/>
+    </Frame>
+
+	<!-- base UI frames (minimap, character info, and command panel backgrounds -->
+	<Frame type="Frame" name="GameUI/UIContainer/FullscreenLowerContainer" file="GameUI">
+		<Frame type="Frame" name="Left">
+			<Anchor side="Left" relative="$parent" pos="Min" offset="-4"/>
+			<Anchor side="Bottom" relative="$parent" pos="Max" offset="4"/>
+			
+			<Height val="340"/>
+			<Width val="370"/>
+
+
+			<Frame type="Image" name="Left">
+				<Alpha val="200"/>
+				<Anchor relative="$parent"/>
+				<ColorAdjustMode val="Fill"/>
+				<AdjustmentColor val="235,235,235"/>
+				<Texture val="Assets\Textures\white32.dds"/>
+			</Frame>
+
+		</Frame>
+		<Frame type="Frame" name="Right">
+			<Anchor side="Right" relative="$parent" pos="Max" offset="4"/>
+			<Anchor side="Bottom" relative="$parent" pos="Max" offset="4"/>
+			
+			<Height val="340"/>
+			<Width val="500"/>
+
+			<Frame type="Image" name="Right">
+				<Alpha val="255"/>
+				<Alpha val="200"/>
+				<Anchor relative="$parent"/>
+				<ColorAdjustMode val="Fill"/>
+				<AdjustmentColor val="235,235,235"/>
+				<Texture val="Assets\Textures\white32.dds"/>
+			</Frame>
+		</Frame>
+
+		<Frame type="Frame" name="UnitInfoDisplay">
+			<Anchor side="Left" relative="$parent" pos="Min" offset="420"/>
+			<Anchor side="Bottom" relative="$parent" pos="Max" offset="4"/>
+			
+			<Height val="250"/>
+			<Width val="600"/>
+
+			<RenderPriority val="0"/>
+			<Frame type="Image" name="Background">
+				<Alpha val="255"/>
+				<Anchor relative="$parent"/>
+				<ColorAdjustMode val="Fill"/>
+				<AdjustmentColor val="255,255,255"/>
+				<Texture val="Assets\Textures\white32.dds"/>
+			</Frame>
+		</Frame>
+
+		<Frame type="Frame" name="BobRossFrame">
+			<Anchor side="Left" relative="$parent" pos="Min" offset="366"/>
+			<Anchor side="Bottom" relative="$parent" pos="Max" offset="-268"/>
+			
+			<Height val="68"/>
+			<Width val="68"/>
+
+
+			<Frame type="Image" name="testframe2">
+				<Alpha val="255"/>
+				<Anchor relative="$parent"/>
+				<ColorAdjustMode val="Fill"/>
+				<AdjustmentColor val="155,0,0"/>
+				<Texture val="Assets\Textures\white32.dds"/>
+			</Frame>
+		</Frame>
+
+	</Frame>
+
+	<!--Info Panel Move-->
+	<Frame type="Frame" name="GameUI/UIContainer/ConsoleUIContainer" file="GameUI">
+		<Frame type="InfoPanel" name="InfoPanel">
+			<Anchor side="Left" relative="$parent" pos="Min" offset="420"/>
+			<Anchor side="Bottom" relative="$parent" pos="Max" offset="-30"/>
+			<ColorAdjustMode val="Colorize"/>
+			<AdjustmentColor val="0,0,0"/>
+			<Frame type="InfoPaneUnit" name="InfoPaneUnit">
+				<Anchor side="Left" relative="$parent" pos="Min" offset="550"/>
+				<Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+				<Anchor side="Right" relative="$parent" pos="Min" offset="0"/>
+				
+				<Frame type="Label" name="NameLabel">
+					<ColorAdjustMode val="Colorize"/>
+					<AdjustmentColor val="0,0,0"/>
+					<Anchor side="Right" relative="$parent" pos="Max" offset="255555"/>
+				</Frame>
+
+				<Frame type="Label" name="FakeNameLabel">
+					<Text val="BobRoss"/>
+					<ColorAdjustMode val="Colorize"/>
+					<AdjustmentColor val="0,0,0"/>
+					<Style val="CenterJustified"/>
+					<Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+					<Anchor side="Top" relative="$parent" pos="Min" offset="10"/>
+					<Anchor side="Bottom" relative="$parent" pos="Min" offset="0"/>
+					<Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
+
+				</Frame>
+				<Frame type="Label" name="SubtitleLabel">
+					<ColorAdjustMode val="Colorize"/>
+					<AdjustmentColor val="0,0,0"/>
+					<Style val="CenterJustified"/>
+
+				</Frame>				
+			</Frame>
+		</Frame>
+	</Frame>
+
+	<!--Game Timer Alterations-->
+    <Frame type="GameUI" name="GameUI" file="GameUI">
+        <Frame type="Frame" name="UIContainer">
+            <Frame type="Frame" name="ConsoleUIContainer">
+
+
+				<Frame type="MissionTimePanel" name="MissionTimePanel">
+					
+					<Anchor side="Left" relative="$parent" pos="Min" offset="135"/>
+					<Anchor side="Bottom" relative="$parent" pos="Max" offset="-300"/>
+
+					<Frame type="Image" name="BackgroundImage">
+						<Anchor relative="$parent"/>
+						<Texture val="Assets/Textures/blank.dds"/>
+						<TextureType val="Border" layer="0"/>
+					</Frame>
+					<Frame type="Label" name="TimeLabel">
+						<Style val="Arcade_GameInfo_Author"/>
+						<ColorAdjustMode val="Fill"/>
+						<AdjustmentColor val="0,0,0"/>
+						<GlowColor val="0,0,0"/>
+					</Frame>
+				</Frame>
+
+			</Frame>
+		</Frame>
+	</Frame>
+
+
+</Desc>

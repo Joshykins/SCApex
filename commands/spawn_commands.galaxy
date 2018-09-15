@@ -1,0 +1,302 @@
+//=========================================================
+//		Apex Roleplaying Engine
+//		Copyright (c) 2017, Apex Group
+//=========================================================
+// This software is distributed under the MIT License:
+// <http://opensource.org/licenses/MIT>
+//=========================================================
+
+
+// =======================
+// Deals with redirecting the @spawn command to a proper unit create command
+// all actual unit creation is handled in engine/unit.galaxy
+//libapx_command_spawn
+
+//void libapx_command_spawn_resetinstance()
+//{
+//	libapx_command_spawn_instances[EventPlayer()].unitType = "";
+//	libapx_command_spawn_instances[EventPlayer()].count = 1;
+//	libapx_command_spawn_instances[EventPlayer()].player = EventPlayer();
+//	libapx_command_spawn_instances[EventPlayer()].loc = null;
+//}
+
+void libapx_command_spawn(int user, unitgroup u, string argv, int spawningCount, string bracketText) {
+  point spawn_point = libapx_player[user].mouse_position;
+	int count = StringToInt( StringWord(argv, 2) );
+	string type = StringWord(argv, 3);
+	region location = null;
+	int player = user;
+	string parameter;
+
+
+  //colossus check
+
+
+   	// used for parsing a location or player parameter
+
+	// if no parameters specified, check last instance and try to repeat
+	if( StringWord(argv, 2) == "" ) {
+		if( libapx_player[user].spawn_instance_type != "" ) {
+			type = libapx_player[user].spawn_instance_type;
+			count = libapx_player[user].spawn_instance_count;
+			player = libapx_player[user].spawn_instance_player;
+			if( libapx_player[user].spawn_instance_location != null ) {
+				spawn_point = RegionGetCenter( libapx_player[user].spawn_instance_location );
+			}
+
+			libapx_player_parser[user][spawningCount].context = UnitGroupEmpty();
+			while (count > 0) {
+				libapx_unit_create(type, player, spawn_point, 270.0, spawningCount);
+				count -= 1;
+			}
+
+			return;
+		}
+		else {
+			libapx_print_error(user, "Invalid unit type, or no previous spawn instance");
+			return;
+		}
+	}
+
+	// if count is 0, try checking 3rd index, swap unit type to 2nd index
+	// (this allows either @spawn # unit or @spawn unit #)
+	if( count == 0 ) {
+		count = StringToInt( StringWord(argv, 3) );
+		type = StringWord(argv, 2);
+	}
+
+	// get unit type
+	if( type == "" ) {
+		libapx_print_error(user, "INVALID UNIT TYPE");
+		return;
+	}
+
+	else {
+		type = UnitTypeFromString(type);
+		//type = librtpr_catalog_get( c_gameCatalogUnit, type );
+		if (type == "" || !CatalogEntryIsValid(c_gameCatalogUnit, type) || UnitTypeTestFlag(type, c_unitFlagMissile) ) {
+			libapx_print_error(user, "INVALID UNIT TYPE");
+			return;
+		}
+	}
+
+
+	if( count <= 0 ) {
+		count = 1;
+	}
+
+	// otherwise spawn a number of units:
+
+	// check if a player or region is specified (4th and 5th index)
+	// -> region specified by "#[name]"
+	// -> player specified by "@[player-color]"
+	if( StringWord(argv, 4) != "" ) {
+		if( StringContains( StringWord(argv, 4), "#", c_stringBegin, c_stringNoCase) ) {
+			parameter = StringWord(argv, 4);
+			parameter = libapx_region_get_name( StringSub(parameter, 2, StringLength(parameter)), user );
+			if( DataTableValueExists(true, parameter) ) {
+				location = DataTableGetRegion(true, parameter);
+				spawn_point = RegionGetCenter(location);
+			}
+			else {
+				libapx_print_error(user, "No region by name \"" + parameter + "\" exists, defaulting to cursor");
+			}
+		}
+		else if( StringContains( StringWord(argv, 4), "@", c_stringBegin, c_stringNoCase) ) {
+			parameter = StringWord(argv, 4);
+			player = libapx_color_to_player( StringSub(parameter, 2, StringLength(parameter)) );
+			if( player == -1 ) {
+				player = user;
+				libapx_print_error(user, "Invalid player color, defaulting to self");
+			}
+		}
+	}
+	if( StringWord(argv, 5) != "" ) {
+		if( StringContains( StringWord(argv, 5), "#", c_stringBegin, c_stringNoCase) ) {
+			parameter = StringWord(argv, 5);
+			parameter = libapx_region_get_name( StringSub(parameter, 2, StringLength(parameter)), user );
+			if( DataTableValueExists(true, parameter) ) {
+				location = DataTableGetRegion(true, parameter);
+				spawn_point = RegionGetCenter(location);
+			}
+			else {
+				libapx_print_error(user, "No region by name \"" + parameter + "\" exists, defaulting to cursor");
+			}
+		}
+		else if( StringContains( StringWord(argv, 5), "@", c_stringBegin, c_stringNoCase) ) {
+			parameter = StringWord(argv, 5);
+			player = libapx_color_to_player( StringSub(parameter, 2, StringLength(parameter)) );
+			if( player == -1 ) {
+				player = user;
+				libapx_print_error(user, "Invalid player color, defaulting to self");
+			}
+		}
+	}
+
+	// ensure spawn instance count is less than max count in settings
+	// TEMPORARY: until better spawn throttling is implemented
+	if( count > libapx_settings.max_spawn_count ) {
+		count = libapx_settings.max_spawn_count;
+	}
+
+	// set player spawn instance (before spawning so count is preserved)
+	libapx_player[user].spawn_instance_type = type;
+	libapx_player[user].spawn_instance_count = count;
+	libapx_player[user].spawn_instance_player = player;
+	libapx_player[user].spawn_instance_location = location;
+
+	// make spawned units
+	libapx_player_parser[user][spawningCount].context = UnitGroupEmpty();
+	while (count > 0) {
+		UnitGroupAddUnitGroup(libapx_player_parser[user][spawningCount].context, libapx_unit_create(type, player, spawn_point, 270.0, spawningCount));
+		count -= 1;
+	}
+
+	return;
+}
+//libapx_command_spawn_plus
+void libapx_command_spawn_plus(int user, unitgroup u, string argv, int spawningCount, string bracketText) {
+	point spawn_point = libapx_player[user].mouse_position;
+	int count = StringToInt( StringWord(argv, 2) );
+	string type = StringWord(argv, 3);
+	region location = null;
+	int player = user;
+	string parameter;
+
+
+
+  	// used for parsing a location or player parameter
+
+	// if no parameters specified, check last instance and try to repeat
+	if( StringWord(argv, 2) == "" ) {
+		if( libapx_player[user].spawn_instance_type != "" ) {
+			type = libapx_player[user].spawn_instance_type;
+			count = libapx_player[user].spawn_instance_count;
+			player = libapx_player[user].spawn_instance_player;
+			if( libapx_player[user].spawn_instance_location != null ) {
+				spawn_point = RegionGetCenter( libapx_player[user].spawn_instance_location );
+			}
+
+			libapx_player_parser[user][spawningCount].context = UnitGroupEmpty();
+			while (count > 0) {
+				libapx_unit_create(type, player, spawn_point, 270.0, spawningCount);
+				count -= 1;
+			}
+
+			return;
+		}
+		else {
+			libapx_print_error(user, "Invalid unit type, or no previous spawn instance");
+			return;
+		}
+	}
+
+	// if count is 0, try checking 3rd index, swap unit type to 2nd index
+	// (this allows either @spawn # unit or @spawn unit #)
+	if( count == 0 ) {
+		count = StringToInt( StringWord(argv, 3) );
+		type = StringWord(argv, 2);
+	}
+
+	// get unit type
+	if( type == "" ) {
+		libapx_print_error(user, "INVALID UNIT TYPE");
+		return;
+	}
+
+	else {
+		type = UnitTypeFromString(type);
+		//type = librtpr_catalog_get( c_gameCatalogUnit, type );
+		if (type == "" || !CatalogEntryIsValid(c_gameCatalogUnit, type) || UnitTypeTestFlag(type, c_unitFlagMissile) ) {
+			libapx_print_error(user, "INVALID UNIT TYPE");
+			return;
+		}
+	}
+
+	// if count is <= 0, then turn on mouse-click spawning
+	if( count <= 0 ) {
+    if(StringFind(type, "colossus", c_stringNoCase) != -1 ) {
+  		libapx_print_output(EventPlayer(), "Spawn+ can't be used with colossus");
+      return;
+  	} else {
+      libapx_print_output(user, "SPAWNING: " + type + "\n(Press [Left Mouse] to place, [ESC] key to cancel.\n" +
+  							"Hold: [Ctrl] to rotate, [Shift] to scale, [Alt] to change height,\n" +
+  							"Hold: [Right Mouse] to lock position)");
+  		libapx_spawn_create_splat(type, user,  spawningCount);
+  		libapx_player[user].is_placing_unit = true;
+  		UISetSelectionTypeEnabled(PlayerGroupSingle(user), c_localSelectionTypeUnknown, false);
+  		UnitClearSelection(user);	// deselect player selected units
+  		return;
+    }
+
+	}
+
+	// otherwise spawn a number of units:
+
+	// check if a player or region is specified (4th and 5th index)
+	// -> region specified by "#[name]"
+	// -> player specified by "@[player-color]"
+	if( StringWord(argv, 4) != "" ) {
+		if( StringContains( StringWord(argv, 4), "#", c_stringBegin, c_stringNoCase) ) {
+			parameter = StringWord(argv, 4);
+			parameter = libapx_region_get_name( StringSub(parameter, 2, StringLength(parameter)), user );
+			if( DataTableValueExists(true, parameter) ) {
+				location = DataTableGetRegion(true, parameter);
+				spawn_point = RegionGetCenter(location);
+			}
+			else {
+				libapx_print_error(user, "No region by name \"" + parameter + "\" exists, defaulting to cursor");
+			}
+		}
+		else if( StringContains( StringWord(argv, 4), "@", c_stringBegin, c_stringNoCase) ) {
+			parameter = StringWord(argv, 4);
+			player = libapx_color_to_player( StringSub(parameter, 2, StringLength(parameter)) );
+			if( player == -1 ) {
+				player = user;
+				libapx_print_error(user, "Invalid player color, defaulting to self");
+			}
+		}
+	}
+	if( StringWord(argv, 5) != "" ) {
+		if( StringContains( StringWord(argv, 5), "#", c_stringBegin, c_stringNoCase) ) {
+			parameter = StringWord(argv, 5);
+			parameter = libapx_region_get_name( StringSub(parameter, 2, StringLength(parameter)), user );
+			if( DataTableValueExists(true, parameter) ) {
+				location = DataTableGetRegion(true, parameter);
+				spawn_point = RegionGetCenter(location);
+			}
+			else {
+				libapx_print_error(user, "No region by name \"" + parameter + "\" exists, defaulting to cursor");
+			}
+		}
+		else if( StringContains( StringWord(argv, 5), "@", c_stringBegin, c_stringNoCase) ) {
+			parameter = StringWord(argv, 5);
+			player = libapx_color_to_player( StringSub(parameter, 2, StringLength(parameter)) );
+			if( player == -1 ) {
+				player = user;
+				libapx_print_error(user, "Invalid player color, defaulting to self");
+			}
+		}
+	}
+
+	// ensure spawn instance count is less than max count in settings
+	// TEMPORARY: until better spawn throttling is implemented
+	if( count > libapx_settings.max_spawn_count ) {
+		count = libapx_settings.max_spawn_count;
+	}
+
+	// set player spawn instance (before spawning so count is preserved)
+	libapx_player[user].spawn_instance_type = type;
+	libapx_player[user].spawn_instance_count = count;
+	libapx_player[user].spawn_instance_player = player;
+	libapx_player[user].spawn_instance_location = location;
+
+	// make spawned units
+	libapx_player_parser[user][spawningCount].context = UnitGroupEmpty();
+	while (count > 0) {
+		UnitGroupAddUnitGroup(libapx_player_parser[user][spawningCount].context, libapx_unit_create(type, player, spawn_point, 270.0, spawningCount));
+		count -= 1;
+	}
+
+	return;
+}

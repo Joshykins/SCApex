@@ -1,0 +1,69 @@
+//=========================================================
+//		Apex Roleplaying Engine
+//		Copyright (c) 2017, Apex Group
+//=========================================================
+// This software is distributed under the MIT License:
+// <http://opensource.org/licenses/MIT>
+//=========================================================
+
+// libapx_mouse_moved
+// ==================
+// Updates player's mouse position when mouse moves.
+// If player is using mouse-click spawning, updates the spawn splat's
+// properties (position, facing, scale, height, etc...) based on player's
+// mouse movements.
+bool libapx_mouse_moved(bool testConds, bool runActions) {
+	// update mouse in world position
+	libapx_player[EventPlayer()].mouse_position = Point(EventMouseMovedPosXWorld(), EventMouseMovedPosYWorld());
+
+	// If player mouse-click spawning, perform splat updates:
+	// Y plane (mouse up/down) increases or decreases -> adjust splat properties
+	// note: Y = 0 is at TOP OF SCREEN, so moving mouse down is a Y increase
+	// therefore the scale increment is inverted compared to the Y values
+	if( libapx_player[EventPlayer()].is_placing_unit ) {
+		// update vertical movement splat properties (scale, height)
+		if( EventMouseMovedPosYUI() > PointGetY(libapx_player[EventPlayer()].mouse_position_ui) ) {
+			libapx_spawn_splat_update_props(EventPlayer(), false);
+		} else { // moving up, so scale up
+			libapx_spawn_splat_update_props(EventPlayer(), true);
+		}
+		// update position and facing angle
+		libapx_spawn_splat_update_pos();
+	}
+	// update mouse in UI position:
+	libapx_player[EventPlayer()].mouse_position_ui = Point(EventMouseMovedPosXUI(), EventMouseMovedPosYUI());
+
+	return true;
+}
+
+// librtpr_mouse_left_clicked_down
+// ========================
+// Sets mouse position when player presses left mouse button down.
+// If player is using mouse-click spawning, creates a copy of the spawn splat
+// at the location in the world that was clicked on
+bool librtpr_mouse_left_clicked_down(bool testConds, bool runActions) {
+	libapx_player[EventPlayer()].mouse_position = Point(EventMouseClickedPosXWorld(), EventMouseClickedPosYWorld());
+
+	if( libapx_player[EventPlayer()].is_placing_unit ) {
+		libapx_unit_create( UnitGetType(libapx_player[EventPlayer()].spawn_splat),
+							EventPlayer(),
+							UnitGetPosition(libapx_player[EventPlayer()].spawn_splat),
+							UnitGetFacing(libapx_player[EventPlayer()].spawn_splat),
+							libapx_player[EventPlayer()].spawningCount
+						  );
+	}
+
+	return true;
+}
+
+// librtpr_mouse_right_clicked_
+// =======================
+// toggles player right mouse button down/up flag
+bool librtpr_mouse_right_clicked_down(bool testConds, bool runActions) {
+	libapx_player[EventPlayer()].mouse_right = true;
+	return true;
+}
+bool librtpr_mouse_right_clicked_up(bool testConds, bool runActions) {
+	libapx_player[EventPlayer()].mouse_right = false;
+	return true;
+}

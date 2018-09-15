@@ -1,0 +1,50 @@
+//=========================================================
+//		Apex Roleplaying Engine
+//		Copyright (c) 2017, Apex Group
+//=========================================================
+// This software is distributed under the MIT License:
+// <http://opensource.org/licenses/MIT>
+//=========================================================
+
+include "apex/engine/events/mouse.galaxy"
+include "apex/engine/events/keypress.galaxy"
+include "apex/engine/events/chat.galaxy"
+include "apex/engine/events/player_leaves.galaxy"
+include "apex/engine/events/region_waygates.galaxy"
+include "apex/engine/events/unit_events.galaxy"
+include "apex/engine/events/custom.galaxy"
+
+// create the default Apex events
+void libapx_events_initialize() {
+	// player leaves event
+	TriggerAddEventPlayerLeft(TriggerCreate("libapx_player_leaves"), c_playerAny, c_gameResultUndecided);
+
+	// mouse related events
+	TriggerAddEventMouseMoved(TriggerCreate("libapx_mouse_moved"), c_playerAny );
+	TriggerAddEventMouseClicked(TriggerCreate("librtpr_mouse_left_clicked_down"), c_playerAny, c_mouseButtonLeft, true);
+	TriggerAddEventMouseClicked(TriggerCreate("librtpr_mouse_right_clicked_down"), c_playerAny, c_mouseButtonRight, true);
+	TriggerAddEventMouseClicked(TriggerCreate("librtpr_mouse_right_clicked_up"), c_playerAny, c_mouseButtonRight, false);
+
+	// key press (up and down) events
+	TriggerAddEventKeyPressed(TriggerCreate("libapx_key_pressed_down"), c_playerAny, c_keyNone, true, c_keyModifierStateIgnore, c_keyModifierStateIgnore, c_keyModifierStateIgnore);
+	TriggerAddEventKeyPressed(TriggerCreate("libapx_key_pressed_up"), c_playerAny, c_keyNone, false, c_keyModifierStateIgnore, c_keyModifierStateIgnore, c_keyModifierStateIgnore);
+
+	// unit initialization events (functions found in unit.galaxy)
+	TriggerAddEventUnitCreated(TriggerCreate("libapx_unit_initialize"), null, null, null);
+	TriggerAddEventUnitRemoved(TriggerCreate("libapx_unit_death_cleanup"), null);
+	TriggerAddEventUnitDied(TriggerCreate("libapx_unit_death_cleanup"), null);
+
+	// region waygate and waygate dialog events
+	TriggerAddEventTimePeriodic(TriggerCreate("libapx_waygate_dialog_manager"), 1.0, c_timeGame);
+	//TriggerAddEventDialogControl(TriggerCreate("libapx_waygate_dialog_clicked_old"), c_playerAny, c_invalidDialogControlId, c_triggerControlEventTypeClick );
+	TriggerAddEventDialogControl(TriggerCreate("libapx_waygate_dialog_clicked"), c_playerAny, c_invalidDialogControlId, c_triggerControlEventTypeClick);
+
+}
+
+// libapx_player_events_initialize
+// ==========================
+// events that need to be initialized individually for each player
+void libapx_player_events_initialize(int player) {
+	// initialize player chat and chat command events
+	TriggerAddEventChatMessage(TriggerCreate("libapx_process_chat_event") , player, "", false);
+}

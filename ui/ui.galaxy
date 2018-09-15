@@ -1,0 +1,170 @@
+//=========================================================
+//		Apex Roleplaying Engine
+//		Copyright (c) 2017, Apex Group
+//=========================================================
+// This software is distributed under the MIT License:
+// <http://opensource.org/licenses/MIT>
+//=========================================================
+
+include "apex/ui/modelpreviewer.galaxy"
+include "apex/ui/chatlog.galaxy"
+include "apex/ui/aliases.galaxy"
+include "apex/ui/commands.galaxy"
+// number of ui pa nels for the ui utility toolbar
+static const int libapx_UI_NPANELS = 3;
+
+// data table identifier prefix for linking a toolbar button to its panel
+// Data table name is "ui_panel_[btn ID]", where the [btn ID] is the integer
+// value for the dialog control button on the toolbar for the panel
+static const string libapx_UI_PANEL_DTABLE_PREFIX = "ui_panel_";
+
+// Type: libapx_ui_panel
+// ===============
+// information about each dialog panel to create toolbar buttons
+struct libapx_ui_panel {
+	int dialog;		// dialog panel
+	int btn;		// toolbar button dialog control
+	string name;	// name of the panel
+	string icon;	// string path for toolbar icon
+};
+// list of the dialog panels in the ui
+static libapx_ui_panel[libapx_UI_NPANELS] libapx_ui_panels;
+
+// visibility state of each ui panel (true - on, false - off)
+// must be tracked for each player
+static bool[libapx_UI_NPANELS][libapx_MAX_PLAYERS] libapx_ui_panel_state;
+
+// dialog toolbar on right side of the screen to access ui panels
+int libapx_ui_panel_toolbar;
+
+// prototypes:
+static void libapx_ui_toolbar_init();
+
+// libapx_ui_initialize_panels
+// ====================
+// Sets array list of each dialog panel info struct.
+// These must be manually declared for each panel.
+static void libapx_ui_initialize_panels() {
+	libapx_ui_panels[0].dialog = libapx_ui_commands;
+	libapx_ui_panels[0].name = "Commands Guide";
+	libapx_ui_panels[0].icon = "Assets\\Textures\\btn-techupgrade-terran-fusionwelder.dds";
+
+//	libapx_ui_panels[1].dialog = libapx_ui_modelpreviewer;
+//	libapx_ui_panels[1].name = "Model Previewer";
+//	libapx_ui_panels[1].icon = "Assets\\Textures\\btn-ability-protoss-phaseshift.dds";
+
+	libapx_ui_panels[1].dialog = libapx_ui_chatlog;
+	libapx_ui_panels[1].name = "Chat Log";
+	libapx_ui_panels[1].icon = "Assets\\Textures\\ui_cursor-interactive-talk_ingamehd.dds";
+
+	libapx_ui_panels[2].dialog = libapx_ui_aliases;
+	libapx_ui_panels[2].name = "Aliases";
+	libapx_ui_panels[2].icon = "Assets\\Textures\\btn-techupgrade-terran-automatedselfrepair.dds";
+
+}
+// libapx_ui_initialize
+// =====================
+// Initializes all ui panels and creates an array list of the panel info.
+// Creates the Apex UI toolbar that allows access to the ui panels through
+// dialog control buttons.
+// Adds event triggers for the UI toolbar buttons.
+void libapx_ui_initialize() {
+	int player;
+
+	UISetFrameVisible(PlayerGroupAll(), c_syncFrameTypeIdleWorkerButton, false);
+	UISetFrameVisible(PlayerGroupAll(), c_syncFrameTypeSupply, false);
+	UISetFrameVisible(PlayerGroupAll(), c_syncFrameTypeConsolePanel, false);
+	UISetFrameVisible(PlayerGroupAll(), c_syncFrameTypeArmyButton, false);
+	UISetFrameVisible(PlayerGroupAll(), c_syncFrameTypeControlGroupPanel, false);
+	UISetFrameVisible(PlayerGroupAll(), c_syncFrameTypeResourcePanel, false);
+	UISetFrameVisible(PlayerGroupAll(), c_syncFrameTypeAllianceButton, false);
+	UISetFrameVisible(PlayerGroupAll(), c_syncFrameTypeSupply, false);
+
+	// initialize panels
+//	libapx_ui_modelpreviewer_init();
+	libapx_ui_chatlog_init();
+	libapx_ui_aliases_init();
+	libapx_ui_commands_init();
+	// perform player unique panel initialization
+	for( player = 1; player < libapx_MAX_PLAYERS; player += 1 ) {
+		if( PlayerType(player) == c_playerTypeUser && PlayerStatus(player) == c_playerStatusActive ) {
+		//	libapx_ui_modelpreviewer_init_player(player);
+			libapx_ui_chatlog_init_player(player);
+			libapx_ui_aliases_init_player(player);
+			libapx_ui_commands_init_player(player);
+		}
+	}
+
+	// set the panels list
+	libapx_ui_initialize_panels();
+
+	// create the Apex ui toolbar
+	libapx_ui_toolbar_init();
+}
+
+// libapx_ui_toolbar_init
+// =================
+// Creates the Apex ui panel toolbar. This is a toolbar with buttons anchored
+// to right side of the screen that players can use to access each ui panel.
+static void libapx_ui_toolbar_init() {
+	int i;
+	int btn;
+
+	libapx_ui_panel_toolbar = libapx_create_dialog(80, 14 + 50*libapx_UI_NPANELS, c_anchorRight, -22, -140);
+	DialogSetVisible(libapx_ui_panel_toolbar, PlayerGroupAll(), true);
+
+	// initialize toolbar buttons
+	for( i = 0; i < libapx_UI_NPANELS; i += 1 ) {
+		// initialize the button: link its dialog control number of the button
+		// to the panel index in the libapx_ui_panel array list through
+		// the data table
+		btn = libapx_create_dialog_btn(libapx_ui_panel_toolbar, 54, 54, c_anchorTopLeft, 5, 4 + i*50, libapx_ui_panels[i].name, "");
+		libapx_ui_panels[i].btn = btn;
+		DataTableSetInt(true, libapx_UI_PANEL_DTABLE_PREFIX + IntToString(btn), i);
+
+		// create icon for the button
+		//libNtve_gf_CreateDialogItemImage(libapx_ui_panel_toolbar, 46, 46, c_anchorTopLeft, 9, 9 + i*50, StringToText(""), libapx_ui_panels[i].icon, c_triggerImageTypeNormal, false, Color(100, 100, 100), c_triggerBlendModeNormal);
+		libapx_create_dialog_btn_icon(libapx_ui_panel_toolbar, btn, 44, 44, libapx_ui_panels[i].icon);
+	}
+
+	// add event triggers for ui dialog controls
+	TriggerAddEventDialogControl(TriggerCreate("libapx_ui_panel_toggle"), c_playerAny, c_invalidDialogControlId, c_triggerControlEventTypeClick);
+
+}
+
+// libapx_ui_panel_toggle
+// =====================
+// Toggles a ui dialog panel visibility on/off from toolbar dialog control
+// buttons. Button is linked to a ui panel in the libapx_ui_panel array list
+// through a data table, so if data table entry exists, then toolbar button
+// was clicked.
+// (libapx_UI_PANEL_NONE is defined as -1 in player.galaxy)
+bool libapx_ui_panel_toggle(bool testConds, bool runActions) {
+	string panel_identifier = libapx_UI_PANEL_DTABLE_PREFIX + IntToString(EventDialogControl());
+	int panel;
+	int active_panel = libapx_player[EventPlayer()].active_ui_panel;
+
+	// toggle the ui panel if the dialog control button is linked to a panel
+	if( DataTableValueExists(true, panel_identifier) ) {
+		panel = DataTableGetInt(true, panel_identifier);
+
+		// turn off existing active panel (if any)
+		if( active_panel != libapx_UI_PANEL_NONE) {
+			DialogSetVisible(libapx_ui_panels[active_panel].dialog, PlayerGroupSingle(EventPlayer()), false);
+			// toggle off toolbar button
+			libNtve_gf_SetDialogItemToggled(libapx_ui_panels[active_panel].btn, false, PlayerGroupSingle(EventPlayer()));
+		}
+
+		// toggle ui panel visibility and set the active panel
+		if( panel != active_panel ) {
+			DialogSetVisible(libapx_ui_panels[panel].dialog, PlayerGroupSingle(EventPlayer()), true);
+			libapx_player[EventPlayer()].active_ui_panel = panel;
+			// toggle on toolbar button
+			libNtve_gf_SetDialogItemToggled(libapx_ui_panels[panel].btn, true, PlayerGroupSingle(EventPlayer()));
+		} else { // same dialog just turned off, so set active panel to none
+			libapx_player[EventPlayer()].active_ui_panel = libapx_UI_PANEL_NONE;
+		}
+	}
+
+	return true;
+}

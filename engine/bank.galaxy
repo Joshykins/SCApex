@@ -1,0 +1,58 @@
+//=========================================================
+//		Apex Roleplaying Engine
+//		Copyright (c) 2017, Apex Group
+//=========================================================
+// This software is distributed under the MIT License:
+// <http://opensource.org/licenses/MIT>
+//=========================================================
+
+// creates, removes key/values from a section in player bank
+// !!! BankSave required to ensure the changes persist
+void libapx_bank_create(string section, string key, string content, int player) {
+	BankValueSetFromString(libapx_player[player].bank_storage, section, key, content);
+	BankSave(libapx_player[player].bank_storage);
+}
+
+void libapx_bank_remove(string section, string key, int player) {
+	BankKeyRemove(libapx_player[player].bank_storage, section, key);
+	BankSave(libapx_player[player].bank_storage);
+}
+
+void libapx_bank_section_remove_all(string section, int player) {
+	BankSectionRemove(libapx_player[player].bank_storage, section);
+	BankSave(libapx_player[player].bank_storage);
+}
+
+// libapx_bank_key_content_dump
+// =================
+// prints out content of bank value
+void libapx_bank_key_content_dump(string section, string key, int player) {
+	if( BankKeyExists(libapx_player[player].bank_storage, section, key) ) {
+		libapx_print_output(player, StringCase(section, true) + ": " + key);
+		libapx_print_output(player, "CONTENT: " + BankValueGetAsString(libapx_player[player].bank_storage, section, key));
+	}
+	else {
+		libapx_print_error(player, StringCase(section, true) + " " + key + " DOES NOT EXIST");
+	}
+}
+
+// libapx_bank_section_dump
+// =================
+// lists all of a player's aliases/templates
+void libapx_bank_section_dump(string section, int player) {
+	int count = BankKeyCount(libapx_player[player].bank_storage, section);
+	string keys = "[";
+
+	if( count ) {
+		while(count) {
+			keys = keys + "\'" + BankKeyName(libapx_player[player].bank_storage, section, count - 1) + "\',";
+			count -= 1;
+		}
+		// remove extra ','
+		keys = StringSub(keys, 1, StringLength(keys) - 1) + "]";
+		libapx_print_output(player, StringCase(section, true) + ":\n" + keys);
+	}
+	else {
+		libapx_print_output(player, "You have no " + section);
+	}
+}

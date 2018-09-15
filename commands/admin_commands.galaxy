@@ -1,0 +1,250 @@
+//=========================================================
+//		Apex Roleplaying Engine
+//		Copyright (c) 2017, Apex Group
+//=========================================================
+// This software is distributed under the MIT License:
+// <http://opensource.org/licenses/MIT>
+//=========================================================
+
+//Destroys a region, (perma removes actors, useful for stain removal)
+// =======================
+void libapx_command_destroy(int user, unitgroup u, string argv, int spawningCount, string bracketText) {
+	string paramRadius = StringWord(argv, 2 );
+	fixed radius;
+	if( libapx_player[user].permission_level < libapx_PERMISSIONS_LEVEL_MOD ) {
+		libapx_print_error(user, "Only moderators and admins can use !destroy");
+		return;
+	}
+
+	if(paramRadius == "") {
+		radius = 5.0;
+	}
+
+
+	else {
+		radius = StringToFixed(paramRadius);
+		if(radius == 0.0) {
+			radius = 5.0;
+		}
+	}
+
+
+	libNtve_gf_SendActorMessageToGameRegion( (RegionCircle( libapx_player[user].mouse_position , radius)), "Destroy");
+
+
+}
+
+
+// libapx_command_ban
+// ====================
+// bans a player (removes all player's units from map too)
+void libapx_command_ban(int user, unitgroup u, string argv, int spawningCount, string bracketText) {
+	int target_player = libapx_color_to_player( StringWord(argv, 2) ); //GET PLAYER COLOR FROM STRING.
+	unitgroup g;
+
+	if(StringCase(StringWord(argv, 2), c_stringNoCase) == "me") {
+		libapx_print_text(PlayerGroupAll(), libapx_player_name_colored(target_player) + StringToText(" has been kicked by himself, what a genius!"));
+		GameOver( target_player, c_gameOverVictory, true, true );
+
+
+		// remove all of a player's units
+		g = UnitGroup( null, target_player, RegionEntireMap(), UnitFilter(0, 0, 0, 0), 0 );
+		UnitGroupLoopBegin(g);
+		while( !UnitGroupLoopDone() ) {
+			UnitRemove( UnitGroupLoopCurrent() );
+			UnitGroupLoopStep();
+		}
+		UnitGroupLoopEnd();
+		return;
+
+	}
+	// check if player is valid
+	if( target_player == -1 || PlayerType(target_player) != c_playerTypeUser ) {
+		libapx_print_error(user, "Invalid player");
+		return;
+	}
+
+	if( libapx_player[user].permission_level < libapx_PERMISSIONS_LEVEL_MOD ) {
+		libapx_print_error(user, "Only moderators and admins can use \\kick");
+		return;
+	}
+	if( libapx_player[user].permission_level <= libapx_player[target_player].permission_level ) {
+		libapx_print_error(user, "You cannot kick someone of equal or greater rank than you");
+		return;
+	}
+
+	GameOver( target_player, c_gameOverDefeat, false, true );
+
+
+	// remove all of a player's units
+	g = UnitGroup( null, target_player, RegionEntireMap(), UnitFilter(0, 0, 0, 0), 0 );
+	UnitGroupLoopBegin(g);
+	while( !UnitGroupLoopDone() ) {
+		UnitRemove( UnitGroupLoopCurrent() );
+		UnitGroupLoopStep();
+	}
+	UnitGroupLoopEnd();
+
+	libapx_print_text(PlayerGroupAll(), libapx_player_name_colored(target_player) + StringToText(" has been kicked by ") + libapx_player_name_colored(user));
+
+	return;
+}
+
+// libapx_command_disable
+// ====================
+// prevents player from using commands
+// all chat instead routed directly to OOC
+void libapx_command_disable(int user, unitgroup u, string argv, int spawningCount, string bracketText) {
+	int target_player = libapx_color_to_player( StringWord(argv, 2) ); //GET PLAYER COLOR FROM STRING.
+
+	// check if player is valid
+	if( target_player == -1 || PlayerType(target_player) != c_playerTypeUser ) {
+		libapx_print_error(user, "Invalid player");
+		return;
+	}
+
+	if( libapx_player[user].permission_level < libapx_PERMISSIONS_LEVEL_MOD ) {
+		libapx_print_error(user, "Only moderators and admins can use \\disable");
+		return;
+	}
+	if( libapx_player[user].permission_level <= libapx_player[target_player].permission_level ) {
+		libapx_print_error(user, "You cannot disable/enable someone of equal or greater rank than you");
+		return;
+	}
+
+	libapx_player[target_player].disabled = true;
+	libapx_print_text(PlayerGroupAll(), libapx_player_name_colored(target_player) + StringToText(" has been disabled by ") + libapx_player_name_colored(user));
+
+	return;
+}
+
+// libapx_command_enable
+// ====================
+// "enables" a player; allows commands to be used
+void libapx_command_enable(int user, unitgroup u, string argv, int spawningCount, string bracketText) {
+	int target_player = libapx_color_to_player( StringWord(argv, 2) ); //GET PLAYER COLOR FROM STRING.
+
+	// check if player is valid
+	if( target_player == -1 || PlayerType(target_player) != c_playerTypeUser ) {
+		libapx_print_error(user, "Invalid player");
+		return;
+	}
+
+	if( libapx_player[user].permission_level < libapx_PERMISSIONS_LEVEL_MOD ) {
+		libapx_print_error(user, "Only moderators and admins can use \\enable");
+		return;
+	}
+	if( libapx_player[user].permission_level <= libapx_player[target_player].permission_level ) {
+		libapx_print_error(user, "You cannot disable/enable someone of equal or greater rank than you");
+		return;
+	}
+
+	libapx_player[target_player].disabled = false;
+	libapx_print_text(PlayerGroupAll(), libapx_player_name_colored(target_player) + StringToText(" has been enabled by ") + libapx_player_name_colored(user));
+
+	return;
+}
+
+// libapx_command_mute
+// ====================
+// prevents player's messages appearing in chat
+void libapx_command_mute(int user, unitgroup u, string argv, int spawningCount, string bracketText) {
+	int target_player = libapx_color_to_player( StringWord(argv, 2) ); //GET PLAYER COLOR FROM STRING.
+
+	// check if player is valid
+	if( target_player == -1 || PlayerType(target_player) != c_playerTypeUser ) {
+		libapx_print_error(user, "Invalid player");
+		return;
+	}
+
+	if( libapx_player[user].permission_level < libapx_PERMISSIONS_LEVEL_MOD ) {
+		libapx_print_error(user, "Only moderators and admins can use \\mute");
+		return;
+	}
+	if( libapx_player[user].permission_level <= libapx_player[target_player].permission_level ) {
+		libapx_print_error(user, "You cannot mute/unmute someone of equal or greater rank than you");
+		return;
+	}
+
+	libapx_player[target_player].muted = true;
+	libapx_print_text(PlayerGroupAll(), libapx_player_name_colored(target_player) + StringToText(" has been muted by ") + libapx_player_name_colored(user));
+
+	return;
+}
+
+// libapx_command_unmute
+// ====================
+// unmutes a player (messages can appear in chat)
+void libapx_command_unmute(int user, unitgroup u, string argv, int spawningCount, string bracketText) {
+	int target_player = libapx_color_to_player( StringWord(argv, 2) ); //GET PLAYER COLOR FROM STRING.
+
+	// check if player is valid
+	if( target_player == -1 || PlayerType(target_player) != c_playerTypeUser ) {
+		libapx_print_error(user, "Invalid player");
+		return;
+	}
+
+	if( libapx_player[user].permission_level < libapx_PERMISSIONS_LEVEL_MOD ) {
+		libapx_print_error(user, "Only moderators and admins can use \\unmute");
+		return;
+	}
+	if( libapx_player[user].permission_level <= libapx_player[target_player].permission_level ) {
+		libapx_print_error(user, "You cannot mute/unmute someone of equal or greater rank than you");
+		return;
+	}
+
+	libapx_player[target_player].muted = false;
+	libapx_print_text(PlayerGroupAll(), libapx_player_name_colored(target_player) + StringToText(" has been unmuted by ") + libapx_player_name_colored(user));
+
+	return;
+}
+
+// libapx_command_promote
+// ================
+// promotes a player to moderator status
+void libapx_command_promote(int user, unitgroup u, string argv, int spawningCount, string bracketText) {
+	int target_player = libapx_color_to_player( StringWord(argv, 2) ); //GET PLAYER COLOR FROM STRING.
+
+	// check if player is valid
+	if( target_player == -1 || PlayerType(target_player) != c_playerTypeUser ||
+		target_player == user || libapx_player[target_player].permission_level == libapx_PERMISSIONS_LEVEL_ADMIN) {
+		libapx_print_error(user, "Invalid player");
+		return;
+	}
+
+	if( libapx_player[user].permission_level < libapx_PERMISSIONS_LEVEL_ADMIN ) {
+		libapx_print_error(user, "Only admins can promote/demote moderators");
+		return;
+	}
+
+	libapx_player[target_player].permission_level = libapx_PERMISSIONS_LEVEL_MOD;
+
+	libapx_print_text(PlayerGroupAll(), libapx_player_name_colored(target_player) + StringToText(" has been promoted to moderator by ") + libapx_player_name_colored(user));
+
+	return;
+}
+
+// libapx_command_demote
+// ================
+// sets a player to default status
+void libapx_command_demote(int user, unitgroup u, string argv, int spawningCount, string bracketText) {
+	int target_player = libapx_color_to_player( StringWord(argv, 2) ); //GET PLAYER COLOR FROM STRING.
+
+	// check if player is valid
+	if( target_player == -1 || PlayerType(target_player) != c_playerTypeUser ||
+		target_player == user || libapx_player[target_player].permission_level == libapx_PERMISSIONS_LEVEL_ADMIN) {
+		libapx_print_error(user, "Invalid player");
+		return;
+	}
+
+	if( libapx_player[user].permission_level < libapx_PERMISSIONS_LEVEL_ADMIN ) {
+		libapx_print_error(user, "Only admins can promote/demote moderators");
+		return;
+	}
+
+	libapx_player[target_player].permission_level = libapx_PERMISSIONS_LEVEL_DEFAULT;
+
+	libapx_print_text(PlayerGroupAll(), libapx_player_name_colored(target_player) + StringToText(" has been demoted by ") + libapx_player_name_colored(user));
+
+	return;
+}

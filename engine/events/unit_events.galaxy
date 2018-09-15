@@ -1,0 +1,43 @@
+//=========================================================
+//		Apex Roleplaying Engine
+//		Copyright (c) 2017, Apex Group
+//=========================================================
+// This software is distributed under the MIT License:
+// <http://opensource.org/licenses/MIT>
+//=========================================================
+
+// libapx_unit_death_cleanup
+// =======================
+// whenever unit is killed or is removed, must cleanup unit information:
+// -> clean data: must remove unit's cache from the data table
+//    (to conserve data table memory usage)
+//    along with custom name/name color
+// -> if unit has region waygate dialog attached, must anchor the waygate
+//    dialog to position where unit died
+bool libapx_unit_death_cleanup(bool testConds, bool runActions) {
+	int waygate_dialog = FixedToInt( UnitGetCustomValue(EventUnit(), libapx_UNIT_INDEX_WAYGATE_DIALOG) );
+	string rgn_name;
+	int i;
+
+	// remove data table data (see unit.galaxy)
+	libapx_unit_data_remove(EventUnit());
+
+	// if waygate dialog exists, anchor to position where unit died
+	if( waygate_dialog > 0 ) {
+		rgn_name = DataTableGetString(true, libapx_WAYGATE_DIALOG_REG_DATA_TABLE_IDENTIFIER + " " + IntToString(waygate_dialog));
+		// anchor dialog to position where unit died with a new unit
+		UnitCreate(1, libapx_WAYGATE_DIALOG_ANCHOR_UNIT, c_unitCreateIgnorePlacement, 0, UnitGetPosition(EventUnit()), 270.0);
+		DataTableSetUnit(true, libapx_WAYGATE_ANCHOR_DATA_TABLE_IDENTIFIER + " " + rgn_name, UnitLastCreated());
+
+		//ActorSend(libNtve_gf_MainActorofUnit(UnitLastCreated()), "SetOpacity {0.1}"); // set opacity to hide
+		// hide the beacons for all players
+		for( i = 1; i < libapx_MAX_PLAYERS; i += 1 ) {
+			ActorSend(libNtve_gf_MainActorofUnit(UnitLastCreated()), "SetFilterPlayers " + IntToString(i));
+		}
+		UnitSetCustomValue(UnitLastCreated(), libapx_UNIT_INDEX_WAYGATE_ANCHOR, 1.0);
+
+		DialogSetPositionRelativeToUnit(waygate_dialog, UnitLastCreated(), "Ref_Overhead", -60, 0);
+	}
+
+	return true;
+}

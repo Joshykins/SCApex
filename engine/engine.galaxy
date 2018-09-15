@@ -1,0 +1,158 @@
+//=========================================================
+//		Apex Roleplaying Engine
+//		Copyright (c) 2017, Apex Group
+//=========================================================
+// This software is distributed under the MIT License:
+// <http://opensource.org/licenses/MIT>
+//=========================================================
+
+// LOAD ENGINE DEPENDENCIES:
+// (dependency order matters)
+
+
+// ui_helper
+// =============
+// Contains various helper functions for creating ui dialogs:
+// use helper functions instead of Blizzard natives in order to unify
+// the theme for all dialogs
+include "apex/engine/ui_helper.galaxy"
+
+// data
+// =============
+// defines SCII data catalog constants used for certain commands,
+// and include data catalog search and catalog alias functions
+include "apex/engine/data/data.galaxy"
+
+// settings
+// =============
+// Contains ingame global settings
+// These are used as parameters in certain commands
+// Ideally most of these should be adjustable in game
+include "apex/engine/settings.galaxy"
+
+// player
+// =============
+// Contains any important player specific variables during
+// runtime of the engine (e.g. player mouse position, chat lines,...)
+// Contains string name for player bank
+include "apex/engine/player.galaxy"
+
+
+// output
+// =============
+// All functions for outputting text to the custom chat frame
+include "apex/engine/output.galaxy"
+
+// scripts
+// =============
+// Contains various utility functions used throughout engine
+include "apex/engine/utility/scripts.galaxy"
+
+
+// bank
+// =============
+// Contains custom functions for writing to player banks
+
+include "apex/engine/bank.galaxy"
+
+// log (chat)
+// =============
+// (chat) log deals with messages that should be logged and able to be accessed
+// elsewhere, specifically for a message log reading ui module (chatlog).
+// These messages logged should be those from a @say or >narrate type command,
+// e.g. commands that print messages pertaining to the roleplay's story.
+include "apex/engine/chat/log.galaxy"
+
+// parser
+// =============
+// Parser for player chat commands and built-in chat system functions:
+// Includes frameworks for variables, aliases, and templates parsing
+include "apex/engine/chat/parser.galaxy"
+
+// unit
+// =============
+// Unit spawn related functions, unit death/creation data management,
+// unit command caching functionality
+include "apex/engine/unit.galaxy"
+
+// scaler
+// =============
+// Contains various utility functions used throughout engine
+include "apex/engine/utility/scaler.galaxy"
+
+
+// permissions
+// =============
+// Contains functions for player permissions related functions
+// and unit permissions
+include "apex/engine/permissions.galaxy"
+
+// regions
+// =============
+// Contains helper functions for managing regions and linking
+// regions for waygate (teleport) functionality
+include "apex/engine/regions.galaxy"
+
+// gamesetups
+// =============
+// Saving/loading units and their command history into player banks
+// -> allows creation of "gamesetups" (act like game saves)
+include "apex/engine/gamesetups.galaxy"
+
+// events
+// =============
+// Events that require triggers to run and update things
+// e.g. player moves mouse, unit enters region
+include "apex/engine/events/events.galaxy"
+
+
+// blacklist
+// =============
+// contains functions for blacklist system
+// -> blacklist runs at start of game for host,
+//    disables any player on host's blacklist
+// player usage of blacklist handled by blacklist in general_commands
+include "apex/engine/blacklist.galaxy"
+
+
+// debug
+// =============
+// tools for debugging
+include "apex/engine/debug.galaxy"
+
+
+
+// engine version
+const int libapx_BUILD_VERSION = 1;
+const int libapx_BUILD_SUB_VERSION = 4;
+const string libapx_BUILD_VERSION_MODIFIER = "";
+
+void libapx_engine_initialize() {
+	int player = 1;
+	bool admin_set = false;
+
+	// intialize engine
+	libapx_scripts_init();				// scripts and dependencies
+	libapx_settings_initialize();		// initializes map settings
+	libapx_preplaced_unit_initialize();	// assigns unit IDs to preplaced units
+	libapx_events_initialize();			// creates global event triggers
+
+
+	// initialize players
+	while ( player < libapx_MAX_PLAYERS ) {
+		if( PlayerType(player) == c_playerTypeUser && PlayerStatus(player) == c_playerStatusActive ) {
+			libapx_player_initialize(player);			// player settings
+			libapx_player_events_initialize(player);	// player specific events
+
+			// give admin to first active player (assumes player 1 is lobby host and should be default admin)
+			// then run admin's blacklist
+			if( !admin_set ) {
+				libapx_player[player].permission_level = libapx_PERMISSIONS_LEVEL_ADMIN;
+				libapx_blacklist_run(player);
+				admin_set = true;
+			}
+		}
+		player += 1;
+	}
+
+}

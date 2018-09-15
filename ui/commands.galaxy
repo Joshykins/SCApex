@@ -1,0 +1,77 @@
+//=========================================================
+//		Apex Roleplaying Engine
+//		Copyright (c) 2017, Apex Group
+//=========================================================
+// This software is distributed under the MIT License:
+// <http://opensource.org/licenses/MIT>
+//=========================================================
+include "apex/ui/commandsstruct.galaxy"
+
+//fuk keepin that writin here sOME oTHER iNDIAN d O iT
+//Dialog for commands guide
+int libapx_ui_commands;
+
+//Dialog Items
+static int libapx_ui_commands_category;
+static int libapx_ui_commands_commands;
+static int libapx_ui_commands_output;
+
+void libapx_ui_commands_init() {
+  //Main Dialog init
+  libapx_ui_commands = libapx_create_dialog(600, 600, c_anchorRight, 60, -100);
+
+  //Title
+  libapx_create_dialog_label(libapx_ui_commands , 300, 40, c_anchorTop, 00, 4, "Commands Guide", libapx_UI_HEADER2);
+  libapx_create_dialog_label(libapx_ui_commands , 300, 40, c_anchorTop, -100, 40, "Category:", libapx_UI_HEADER3);
+  libapx_create_dialog_label(libapx_ui_commands , 300, 40, c_anchorTop,  100, 40, "Command:", libapx_UI_HEADER3);
+
+  //lists
+  libapx_ui_commands_category = libapx_create_dialog_list(libapx_ui_commands, 280, 300, c_anchorTopLeft, 10, 80);
+  libapx_ui_commands_commands = libapx_create_dialog_list(libapx_ui_commands, 280, 300, c_anchorTopLeft, 310, 80);
+  libapx_ui_commands_output = libapx_create_dialog_list(libapx_ui_commands, 580, 200, c_anchorTopLeft, 10, 390);
+
+  //Trigger for category selection
+  TriggerAddEventDialogControl(TriggerCreate("libapx_ui_category_select"), c_playerAny, libapx_ui_commands_category, c_triggerControlEventTypeSelectionChanged);
+  //Trigger for command selection
+  TriggerAddEventDialogControl(TriggerCreate("libapx_ui_commands_select"), c_playerAny, libapx_ui_commands_commands , c_triggerControlEventTypeSelectionChanged);
+
+  libapx_ui_commands_entries_init();
+
+}
+void libapx_ui_commands_init_player(int player) {
+  //Stringword not working on string?
+  int i = 1;
+  while(StringWord(libapx_ui_commands_str_categories, i) != "") {
+    DialogControlAddItem(libapx_ui_commands_category, PlayerGroupSingle(player), StringToText(StringWord(libapx_ui_commands_str_categories, i)));
+    i+=1;
+  }
+}
+bool libapx_ui_category_select(bool testConds, bool runActions) {
+  int player = EventPlayer();
+  int j = 1;
+  int i = 1;
+  DialogControlRemoveAllItems(libapx_ui_commands_commands, PlayerGroupSingle(player));
+  j=DialogControlGetSelectedItem(libapx_ui_commands_category, player);
+  while(libapx_ui_commands_entry[j][i].cmd != "") {
+    DialogControlAddItem(libapx_ui_commands_commands, PlayerGroupSingle(player), StringToText(libapx_ui_commands_entry[j][i].cmd));
+    i+=1;
+  }
+  return true;
+}
+bool libapx_ui_commands_select(bool testConds, bool runActions) {
+  int player = EventPlayer();
+  int j = 1;
+  int i = 1;
+  DialogControlRemoveAllItems(libapx_ui_commands_output, PlayerGroupSingle(player));
+  j=DialogControlGetSelectedItem(libapx_ui_commands_category, player); //Category #j
+  i=DialogControlGetSelectedItem(libapx_ui_commands_commands, player); //Iteration in category #i
+  DialogControlAddItem(libapx_ui_commands_output, PlayerGroupSingle(player), StringToText(libapx_ui_commands_entry[j][i].l1));
+  DialogControlAddItem(libapx_ui_commands_output, PlayerGroupSingle(player), StringToText(libapx_ui_commands_entry[j][i].l2));
+  DialogControlAddItem(libapx_ui_commands_output, PlayerGroupSingle(player), StringToText(libapx_ui_commands_entry[j][i].l3));
+  DialogControlAddItem(libapx_ui_commands_output, PlayerGroupSingle(player), StringToText(libapx_ui_commands_entry[j][i].l4));
+  DialogControlAddItem(libapx_ui_commands_output, PlayerGroupSingle(player), StringToText(libapx_ui_commands_entry[j][i].l5));
+  DialogControlAddItem(libapx_ui_commands_output, PlayerGroupSingle(player), StringToText(libapx_ui_commands_entry[j][i].l6));
+  DialogControlAddItem(libapx_ui_commands_output, PlayerGroupSingle(player), StringToText(libapx_ui_commands_entry[j][i].l7));
+  DialogControlAddItem(libapx_ui_commands_output, PlayerGroupSingle(player), StringToText(libapx_ui_commands_entry[j][i].l8));
+  return true;
+}

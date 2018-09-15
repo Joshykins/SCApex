@@ -1,0 +1,96 @@
+//=========================================================
+//		Apex Roleplaying Engine
+//		Copyright (c) 2017, Apex Group
+//=========================================================
+// This software is distributed under the MIT License:
+// <http://opensource.org/licenses/MIT>
+//=========================================================
+
+bool libapx_key_pressed_down(bool testConds, bool runActions) {
+	if( EventKeyPressed() == c_keyControl ) {
+		libapx_player[EventPlayer()].key_ctrl = true;
+	}
+	// [Esc] key used to cancel spawn placing (if occuring)
+	if( EventKeyPressed() == c_keyEscape ) {
+		if( libapx_player[EventPlayer()].is_placing_unit ) {
+			libapx_player[EventPlayer()].is_placing_unit = false;
+			UnitRemove(libapx_player[EventPlayer()].spawn_splat);
+			UISetSelectionTypeEnabled(PlayerGroupSingle(EventPlayer()), c_localSelectionTypeUnknown, true);
+		}
+	}
+	if( EventKeyPressed() == c_keyAlt ) {
+		libapx_player[EventPlayer()].key_alt = true;
+	}
+	if( EventKeyPressed() == c_keyShift ) {
+		libapx_player[EventPlayer()].key_shift = true;
+	}
+	if( EventKeyPressed() == c_keyX ) {
+		libapx_player[EventPlayer()].key_x = true;
+	}
+	if( EventKeyPressed() == c_keyQ ) {
+		libapx_player[EventPlayer()].key_q = true;
+		libapx_unit_keypress_check();
+	}
+	if( EventKeyPressed() == c_keyW ) {
+		libapx_player[EventPlayer()].key_w = true;
+		libapx_unit_keypress_check();
+	}
+	if( EventKeyPressed() == c_keyE ) {
+		libapx_player[EventPlayer()].key_e = true;
+		libapx_unit_keypress_check();
+	}
+	if( EventKeyPressed() == c_keyR ) {
+		libapx_player[EventPlayer()].key_r = true;
+		libapx_unit_keypress_check();
+	}
+	if( EventKeyPressed() == c_keyT ) {
+		libapx_player[EventPlayer()].key_t = true;
+		libapx_unit_keypress_check();
+	}
+	if( EventKeyPressed() == c_keyY ) {
+		libapx_player[EventPlayer()].key_y = true;
+	}
+	if( EventKeyPressed() == c_keyZ ) {
+		libapx_player[EventPlayer()].key_z = true;
+	}
+
+	return true;
+}
+
+bool libapx_key_pressed_up(bool testConds, bool runActions) {
+	if( EventKeyPressed() == c_keyControl ) {
+		libapx_player[EventPlayer()].key_ctrl = false;
+	}
+	if( EventKeyPressed() == c_keyAlt ) {
+		libapx_player[EventPlayer()].key_alt = false;
+	}
+	if( EventKeyPressed() == c_keyShift ) {
+		libapx_player[EventPlayer()].key_shift = false;
+	}
+	if( EventKeyPressed() == c_keyX ) {
+		libapx_player[EventPlayer()].key_x = false;
+	}
+	if( EventKeyPressed() == c_keyQ ) {
+		libapx_player[EventPlayer()].key_q = false;
+	}
+	if( EventKeyPressed() == c_keyW ) {
+		libapx_player[EventPlayer()].key_w = false;
+	}
+	if( EventKeyPressed() == c_keyE ) {
+		libapx_player[EventPlayer()].key_e = false;
+	}
+	if( EventKeyPressed() == c_keyR ) {
+		libapx_player[EventPlayer()].key_r = false;
+	}
+	if( EventKeyPressed() == c_keyT ) {
+		libapx_player[EventPlayer()].key_t = false;
+	}
+	if( EventKeyPressed() == c_keyY ) {
+		libapx_player[EventPlayer()].key_y = false;
+	}
+	if( EventKeyPressed() == c_keyZ ) {
+		libapx_player[EventPlayer()].key_z = false;
+	}
+
+	return true;
+}

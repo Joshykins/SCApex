@@ -1,0 +1,51 @@
+//=========================================================
+//		Apex Roleplaying Engine
+//		Copyright (c) 2017, Apex Group
+//=========================================================
+// This software is distributed under the MIT License:
+// <http://opensource.org/licenses/MIT>
+//=========================================================
+
+// libapx_player_leaves
+// ==================
+// print message "[Player] has left the game"
+// -> if player is admin, must promote a new admin
+bool libapx_player_leaves(bool testConds, bool runActions) {
+	int player = 1;
+	playergroup active_players = PlayerGroupActive();
+
+	libapx_print_text(PlayerGroupAll(), libapx_player_name_colored(EventPlayer()) + StringToText(" has left the game"));
+	
+	//Disable them
+	libapx_player[EventPlayer()].disabled = true;
+
+	// if admin leaves, make another player the admin
+	if( libapx_player[EventPlayer()].permission_level == libapx_PERMISSIONS_LEVEL_ADMIN ) {
+		// demote player that left
+		libapx_player[EventPlayer()].permission_level = libapx_PERMISSIONS_LEVEL_DEFAULT;
+
+		// promote first moderator detected
+		while( player < libapx_MAX_PLAYERS ) {
+			if ( libapx_player[player].permission_level == libapx_PERMISSIONS_LEVEL_MOD ) {
+				libapx_player[player].permission_level = libapx_PERMISSIONS_LEVEL_ADMIN;
+				libapx_print_text(PlayerGroupAll(), libapx_player_name_colored(player) + StringToText(" has been promoted to admin"));
+				return true;
+			}
+			player += 1;
+		}
+
+		// otherwise promote random player (if there are players left)
+		if( PlayerGroupCount(active_players) == 0 ) {
+			return true;
+		}
+		player = PlayerGroupPlayer( active_players, RandomInt(1, PlayerGroupCount(active_players)) );
+		libapx_player[player].permission_level = libapx_PERMISSIONS_LEVEL_ADMIN;
+		libapx_print_text(PlayerGroupAll(), libapx_player_name_colored(player) + StringToText(" has been promoted to admin"));
+	}
+	// also demote any moderators
+	else if( libapx_player[EventPlayer()].permission_level == libapx_PERMISSIONS_LEVEL_MOD ) {
+		libapx_player[EventPlayer()].permission_level = libapx_PERMISSIONS_LEVEL_DEFAULT;
+	}
+
+	return true;
+}

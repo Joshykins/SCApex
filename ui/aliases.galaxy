@@ -1,0 +1,265 @@
+//=========================================================
+//		Apex Roleplaying Engine
+//		Copyright (c) 2017, Apex Group
+//=========================================================
+// This software is distributed under the MIT License:
+// <http://opensource.org/licenses/MIT>
+//=========================================================
+
+//Dealing with aliases101, copied from aliases ;)
+static string libapx_alias_insert_in_list(string list, string alias) {
+	string curr = StringWord(list, 1);
+	int i = 1;
+	int index = 1; // index in string
+
+	while( curr != "" ) {
+		// insert before (if the string value less than curr) by replacing
+		// space separating strings in the alias list with the inserted alias
+		if( StringCompare(alias, curr, c_stringNoCase) <= 0 ) {
+			return StringReplace(list, " " + alias + " ", index, index);
+		}
+		index = index + StringLength(curr) + 1; // +1 to account for space
+		i += 1;
+		curr = StringWord(list, i);
+	}
+	// else, append to end
+	return StringReplace(list, " " + alias + " ", index, index);
+}
+
+//Dialog for aliases
+int libapx_ui_aliases;
+static string[libapx_MAX_PLAYERS]  searchQuery;
+
+//Dialog Control Items
+static int libapx_ui_aliases_list_key;
+static int libapx_ui_aliases_list_output;
+static int libapx_ui_aliases_search;
+static int libapx_ui_aliases_search_btn;
+static int libapx_ui_aliases_search_reset;
+
+static int libapx_ui_aliases_key;
+static int libapx_ui_aliases_key_btn;
+static int libapx_ui_aliases_key_btn_remove;
+static int libapx_ui_aliases_val;
+
+
+
+
+
+void libapx_ui_aliases_init() {
+
+
+  //Main Dialog init
+  libapx_ui_aliases = libapx_create_dialog(600, 600, c_anchorRight, 60, -100);
+
+  //Title
+	libapx_create_dialog_label(libapx_ui_aliases, 250, 40, c_anchorTop, -200, 4, "Alias List", libapx_UI_HEADER2);
+  //SearchTitle
+	libapx_create_dialog_label(libapx_ui_aliases, 250, 40, c_anchorTop, -200, 437, "Search", libapx_UI_HEADER2);
+  //Key Title
+	libapx_create_dialog_label(libapx_ui_aliases, 250, 40, c_anchorTop, -200, 485, "Key Value", libapx_UI_HEADER2);
+  //keyvalue
+  libapx_ui_aliases_key = libapx_create_dialog_editbox(libapx_ui_aliases, 270, 50, c_anchorTopLeft, 190, 480);
+  libapx_ui_aliases_key_btn = libapx_create_dialog_btn(libapx_ui_aliases, 50, 50, c_anchorTopLeft, 490, 480, "Set Alias", "" );
+  libapx_ui_aliases_key_btn_remove = libapx_create_dialog_btn(libapx_ui_aliases, 50, 50, c_anchorTopLeft, 540, 480, "Remove Alias", "" );
+	libapx_create_dialog_btn_icon(libapx_ui_aliases, libapx_ui_aliases_key_btn, 40, 40, libapx_UI_ICON_GO);
+	libapx_create_dialog_btn_icon(libapx_ui_aliases, libapx_ui_aliases_key_btn_remove, 40, 40, libapx_UI_ICON_X);
+  //value
+  libapx_ui_aliases_val = libapx_create_dialog_editbox(libapx_ui_aliases, 580, 50, c_anchorTopLeft, 10, 530);
+
+  //search
+  libapx_ui_aliases_search = libapx_create_dialog_editbox(libapx_ui_aliases, 270, 50, c_anchorTopLeft, 190, 430);
+  libapx_ui_aliases_search_reset = libapx_create_dialog_btn(libapx_ui_aliases, 50, 50, c_anchorTopLeft, 540, 430, "Reset List", "" );
+  libapx_ui_aliases_search_btn = libapx_create_dialog_btn(libapx_ui_aliases, 50, 50, c_anchorTopLeft, 490, 430, "Search Bank", "" );
+
+	libapx_create_dialog_btn_icon(libapx_ui_aliases, libapx_ui_aliases_search_btn, 40, 40, libapx_UI_ICON_SEARCH);
+	libapx_create_dialog_btn_icon(libapx_ui_aliases, libapx_ui_aliases_search_reset, 40, 40, libapx_UI_ICON_RESET);
+
+
+  //alias List Dialog(keyvalue)
+  libapx_ui_aliases_list_key = libapx_create_dialog_list(libapx_ui_aliases, 230, 400, c_anchorTopLeft, 10, 32);
+
+  //alias Output Dialog(pair)
+  libapx_ui_aliases_list_output = libapx_create_dialog_list(libapx_ui_aliases, 340, 400, c_anchorTopRight, 10, 32);
+
+  //Triggers for search
+	TriggerAddEventDialogControl(TriggerCreate("libapx_ui_aliases_filter"), c_playerAny, libapx_ui_aliases_search_btn, c_triggerControlEventTypeClick);
+  TriggerAddEventDialogControl(TriggerCreate("libapx_ui_aliases_list_reset"), c_playerAny, libapx_ui_aliases_search_reset, c_triggerControlEventTypeClick);
+  //Trigger for selection
+  TriggerAddEventDialogControl(TriggerCreate("libapx_ui_alias_select"), c_playerAny, libapx_ui_aliases_list_key, c_triggerControlEventTypeSelectionChanged);
+  //Trigger for setting alias
+  TriggerAddEventDialogControl(TriggerCreate("libapx_ui_alias_set"), c_playerAny, libapx_ui_aliases_key_btn, c_triggerControlEventTypeClick);
+  //Trigger for removing alias
+  TriggerAddEventDialogControl(TriggerCreate("libapx_ui_alias_remove"), c_playerAny, libapx_ui_aliases_key_btn_remove, c_triggerControlEventTypeClick);
+
+
+}
+static void libapx_ui_aliases_list_populate(int player) {
+
+    int count = 1;	// counter
+  	text msg;
+    string alias;
+    alias = libapx_string_trim(libapx_player[player].aliases);
+    searchQuery[player] = "";
+    DialogControlRemoveAllItems(libapx_ui_aliases_list_key, PlayerGroupSingle(player));
+    while(StringWord(alias,count) != "")
+    {
+      msg = StringToText(StringWord(alias, count));
+      DialogControlAddItem(libapx_ui_aliases_list_key, PlayerGroupSingle(player), msg);
+      //Search Query Addition
+      searchQuery[player]+=StringWord(alias,count) + " ";
+
+      count = count + 1;
+    }
+}
+
+
+void libapx_ui_aliases_init_player(int p) {
+  libapx_ui_aliases_list_populate(p);
+}
+
+bool libapx_ui_aliases_filter(bool testConds, bool runActions) {
+  int player = EventPlayer();
+	string filter = libNtve_gf_DialogItemEditValue(libapx_ui_aliases_search, player);
+	int i = 1;
+  int j = 0;
+  string alias;
+  text msg;
+  //Reset list
+  libapx_ui_aliases_list_populate(player);
+  //Nab alias list
+  alias = libapx_string_trim(libapx_player[player].aliases);
+
+
+ if( filter == "" ) {
+   return true;
+  }
+
+  searchQuery[player]="";
+  while(StringWord(alias,i) != "") {
+
+    if(!StringContains(  StringWord(alias, i), filter, c_stringAnywhere, c_stringNoCase)) {
+      DialogControlRemoveItem(libapx_ui_aliases_list_key, PlayerGroupSingle(EventPlayer()), i - j);
+      j+=1;
+    }
+    else {
+      //Search Query Addition
+      searchQuery[player]+=StringWord(alias,i) + " ";
+    }
+    i+=1;
+  }
+
+
+
+	return true;
+}
+
+bool libapx_ui_aliases_list_reset(bool testConds, bool runActions) {
+	libapx_ui_aliases_list_populate(EventPlayer());
+	return true;
+}
+
+//Event Trigger for when alias is selected :)
+bool libapx_ui_alias_select(bool testConds, bool runActions) {
+  int player = EventPlayer();
+  string aliases = libapx_string_trim(libapx_player[player].aliases);
+  string aliasval;
+	string currentVal;
+  string aliaskey;
+	int charPerLine = 35;
+	int j = 1;
+	int i;
+
+
+	i = DialogControlGetSelectedItem(libapx_ui_aliases_list_key, player);
+  aliasval = BankValueGetAsString(libapx_player[player].bank_storage, libapx_BANK_SECTION_ALIAS, StringWord(searchQuery[player], i));
+  aliaskey = StringWord(searchQuery[player], i);
+  DialogControlRemoveAllItems(libapx_ui_aliases_list_output, PlayerGroupSingle(player));
+
+	while ( StringSub(aliasval, j, j+charPerLine) != "" ) {
+		currentVal = StringSub(aliasval, j, j + charPerLine - 1);
+  	DialogControlAddItem(libapx_ui_aliases_list_output, PlayerGroupSingle(player), StringToText(currentVal));
+		j = j + charPerLine;
+	}
+
+
+
+
+  libNtve_gf_SetDialogItemEditorValue(libapx_ui_aliases_key, aliaskey,  PlayerGroupSingle(player));
+  libNtve_gf_SetDialogItemEditorValue(libapx_ui_aliases_val, aliasval,  PlayerGroupSingle(player));
+
+
+
+  return true;
+}
+
+//Event Trigger for when set alias occurs :)
+bool libapx_ui_alias_set(bool testConds, bool runActions) {
+  int player = EventPlayer();
+  string aliases = libapx_string_trim(libapx_player[player].aliases);
+  string aliasval;
+  string aliaskey;
+  bool samekey = true;
+  int i = 1;
+  aliasval = libNtve_gf_DialogItemEditValue(libapx_ui_aliases_val, player);
+  aliaskey = libNtve_gf_DialogItemEditValue(libapx_ui_aliases_key, player);
+  if ( aliasval == "" ) {
+    libapx_print_success(player, "Alias value cannon't be empty");
+    return true;
+  }
+  if ( aliaskey == "" ) {
+    libapx_print_success(player, "Alias key cannon't be empty");
+    return true;
+  }
+  while (StringWord(aliases, i) != "") {
+    if (StringWord(aliases, i)==aliaskey) {
+      samekey=false;
+    }
+    i += 1;
+  }
+  if (StringWord(aliaskey, 2) == "") {
+    if (samekey == true) {
+      libapx_print_success(player, "Alias key not found, creating new alias under \"" + aliaskey  + "\".");
+      libapx_bank_create(libapx_BANK_SECTION_ALIAS, aliaskey, aliasval, player);
+      libapx_player[player].aliases = libapx_alias_insert_in_list(libapx_player[player].aliases, aliaskey);
+    }
+    else {
+      libapx_print_success(player, "Writing over alias \"" + aliaskey  + "\" with new content.");
+      libapx_bank_remove(libapx_BANK_SECTION_ALIAS, aliaskey, player);
+      libapx_player[player].aliases = StringReplaceWord(libapx_player[player].aliases, " " + aliaskey + " ", " ", 1, c_stringCase);
+      libapx_bank_create(libapx_BANK_SECTION_ALIAS, aliaskey, aliasval, player);
+      libapx_player[player].aliases = libapx_alias_insert_in_list(libapx_player[player].aliases, aliaskey);
+    }
+  }
+  else {
+    libapx_print_error(player, "You're being dumb, keys can't have spaces.");
+  }
+  libapx_ui_aliases_list_populate(player);
+
+  return true;
+}
+//Event Trigger for when remove alias occurs :)
+bool libapx_ui_alias_remove(bool testConds, bool runActions) {
+  int player = EventPlayer();
+  string aliases = libapx_string_trim(libapx_player[player].aliases);
+  string aliaskey;
+  bool samekey = true;
+  int i = 1;
+  aliaskey = libNtve_gf_DialogItemEditValue(libapx_ui_aliases_key, player);
+  while (StringWord(aliases, i) != "") {
+    if (StringWord(aliases, i)==aliaskey) {
+      samekey=false;
+    }
+    i += 1;
+  }
+  if (samekey == true) {
+    libapx_print_error(player, "Unable to remove, no alias found.");
+  }
+  else {
+    libapx_print_success(player, "Removing alias \"" + aliaskey  + "\".");
+    libapx_bank_remove(libapx_BANK_SECTION_ALIAS, aliaskey, player);
+    libapx_player[player].aliases = StringReplaceWord(libapx_player[player].aliases, " " + aliaskey + " ", " ", 1, c_stringCase);
+  }
+  libapx_ui_aliases_list_populate(player);
+  return true;
+}

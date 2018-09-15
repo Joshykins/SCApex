@@ -1,0 +1,50 @@
+//=========================================================
+//		Apex Roleplaying Engine
+//		Copyright (c) 2017, Apex Group
+//=========================================================
+// This software is distributed under the MIT License:
+// <http://opensource.org/licenses/MIT>
+//=========================================================
+
+
+// libapx_settings_definition
+// ============================
+// contains a games parameters
+struct libapx_settings_definition {
+	int flags;
+
+	// map_revealed
+	// ========
+	// flag for whether the map is revealed
+	bool map_revealed;
+
+	// commands
+	// ========
+	// string containing all of the game's commands, separated by commas ", "
+	string commands;
+
+	// min_scale / max_scale
+	// ===============
+	// minimum and max scale of a unit that player can use from @scale
+	// (not actually that useful because @actrmsg will allow arbitrary scale)
+	fixed min_scale;
+	fixed max_scale;
+
+	// max_spawn_count
+	// =============
+	// max units a player can spawn in one instance
+	int max_spawn_count;
+};
+
+// create instance of settings:
+libapx_settings_definition libapx_settings;
+
+// initializes default settings
+void libapx_settings_initialize() {
+	libapx_settings.map_revealed = true;
+	libapx_settings.commands = "alias, macro, var";
+	libapx_settings.min_scale = 0.001;
+	libapx_settings.max_scale = 20.0;
+
+	libapx_settings.max_spawn_count = 20;
+}

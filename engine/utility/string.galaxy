@@ -1,0 +1,27 @@
+//=========================================================
+//		Apex Roleplaying Engine
+//		Copyright (c) 2017, Apex Group
+//=========================================================
+// This software is distributed under the MIT License:
+// <http://opensource.org/licenses/MIT>
+//=========================================================
+
+// libapx_string_trim
+// ====================
+// Removes front tail and end tail white space from a string
+string libapx_string_trim(string s) {
+	int front = 1;
+	int end = StringLength(s);
+	
+	// trim front
+	while( StringSub(s, front, front) == " " ) {
+		front = front + 1;
+	}
+
+	// trim back
+	while( StringSub(s, end, end) == " " ) {
+		end = end - 1;
+	}
+
+	return StringSub(s, front, end);
+}

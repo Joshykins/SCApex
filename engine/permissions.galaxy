@@ -1,0 +1,62 @@
+//=========================================================
+//		Apex Roleplaying Engine
+//		Copyright (c) 2017, Apex Group
+//=========================================================
+// This software is distributed under the MIT License:
+// <http://opensource.org/licenses/MIT>
+//=========================================================
+
+// libapx_PERMISSIONS_LEVEL_
+// ======================
+// Constants for permissions level of certain actions
+// Default player permissions level is 0
+const int libapx_PERMISSIONS_LEVEL_DEFAULT = 0;
+const int libapx_PERMISSIONS_LEVEL_MOD = 1;
+const int libapx_PERMISSIONS_LEVEL_ADMIN = 2;
+const int libapx_PERMISSIONS_LEVEL_SADMIN = 3;
+
+// libapx_SUPERADMIN
+// ======================
+// Contains player handles for those who have \debug access
+// delineated by space
+// (please don't remove my handle >:( -Xethyr)
+const string libapx_SUPERADMIN = "1-S2-1-698512 1-S2-1-938669 1-S2-1-3812708 1-S2-1-6083224 1-S2-1-841872";
+
+
+// libapx_enforce_unit_permissions
+// ====================
+// applies permissions on a unitgroup:
+// -> player can only apply commands on units whose
+//    owner is of lesser permissions level
+unitgroup libapx_enforce_unit_permissions(unitgroup g, int player) {
+	unit u;
+	int count = UnitGroupCount(g, c_unitCountAlive);
+
+	while(count) {
+        u = UnitGroupUnit(g, count);
+		if( (	// general permissions for unit owner:
+				// unit owner must be yourself, or someone with lesser
+				// status than you (e.g. admin > mod > user > computers)
+				UnitGetOwner(u) != player &&
+				PlayerType(UnitGetOwner(u)) != c_playerTypeNone &&
+				PlayerType(UnitGetOwner(u)) != c_playerTypeComputer &&
+				PlayerType(UnitGetOwner(u)) != c_playerTypeHostile &&
+				PlayerType(UnitGetOwner(u)) != c_playerTypeNeutral &&
+				libapx_player[player].permission_level <= libapx_player[UnitGetOwner(u)].permission_level
+			) ||
+			(	// remove player spawn splats
+				FixedToInt(UnitGetCustomValue(u, libapx_UNIT_INDEX_SPLAT_OWNER)) > 0
+			) ||
+			(	// remove the anchor unit used for the waygate dialog "Enter"
+				// buttons for region teleports
+				FixedToInt(UnitGetCustomValue(u, libapx_UNIT_INDEX_WAYGATE_ANCHOR)) > 0 &&
+				PlayerType(UnitGetOwner(u)) == c_playerTypeNeutral
+			)
+		) {
+			UnitGroupRemove(g, u);
+		}
+		count -= 1;
+	}
+
+	return g;
+}

@@ -1,0 +1,104 @@
+//=========================================================
+//		Apex Roleplaying Engine
+//		Copyright (c) 2017, Apex Group
+//=========================================================
+// This software is distributed under the MIT License:
+// <http://opensource.org/licenses/MIT>
+//=========================================================
+
+// BLACKLIST
+
+// Blacklists save a player's handle and their text name
+// in a player's bank. When blacklist is run, if any player
+// ingame matches a handle in the admin's list, that player
+// will be disabled.
+
+// Bank architecture as follows:
+// Key: (string) "[HANDLE]" | Value: (text) PlayerName
+// e.g. "1-S2-1-841872" : "SomeGuy"
+
+const string libapx_BANK_SECTION_BLACKLIST = "blacklist";
+
+// libapx_blacklist_add
+// =================
+// handles adding a blacklisted player to player bank
+// stored value is the text of the player's name
+void libapx_blacklist_add(int player, string blacklisted_handle, text blacklisted_name) {
+	BankValueSetFromText( libapx_player[player].bank_storage, libapx_BANK_SECTION_BLACKLIST, blacklisted_handle, blacklisted_name);
+	BankSave( libapx_player[player].bank_storage );
+}
+
+// libapx_blacklist_remove
+// ==================
+// bank functions, removes a blacklisted handle
+// from the player's bank.
+void libapx_blacklist_remove(int player, string blacklisted_handle) {
+	BankKeyRemove( libapx_player[player].bank_storage, libapx_BANK_SECTION_BLACKLIST, blacklisted_handle );
+	BankSave( libapx_player[player].bank_storage );
+}
+
+// libapx_blacklist_list
+// ===============
+// displays list of a player's blacklist in format
+// [ID] [handle] [player-name (text)]
+// where the ID is simply the bank section index of the entry
+void libapx_blacklist_list (int player) {
+	int index = 0;
+	string blist_handle;
+	text list = StringToText("Blacklisted Players:");
+
+	while( index < BankKeyCount(libapx_player[player].bank_storage, libapx_BANK_SECTION_BLACKLIST) ) {
+		blist_handle = BankKeyName(libapx_player[player].bank_storage, libapx_BANK_SECTION_BLACKLIST, index);
+		list = list + StringToText( "\n[ID: " + IntToString(index + 1) + "] " + blist_handle + " : " )
+					+ BankValueGetAsText(libapx_player[player].bank_storage, libapx_BANK_SECTION_BLACKLIST, blist_handle);
+
+		index += 1;
+	}
+
+	libapx_print_text(PlayerGroupSingle(player), list);
+}
+
+// libapx_blacklist_update
+// ==================
+// updates the blacklist of a specific player by checking a lobby
+// for players with matching handles. if a handle in the lobby
+// is on the player's blacklist, re-adds this handle with the
+// name of the handle's player (to deal with possible player name changes)
+void libapx_blacklist_update(int player) {
+	int p; 	// other players ingame
+	int count;
+	int updates = 0;
+
+	while( p < libapx_MAX_PLAYERS ) {
+		if( PlayerStatus(p) == c_playerStatusActive && BankKeyExists(libapx_player[player].bank_storage, libapx_BANK_SECTION_BLACKLIST, PlayerHandle(p)) ) {
+			libapx_blacklist_remove(player, PlayerHandle(p));
+			libapx_blacklist_add(player, PlayerHandle(p), StringToText("<d Player=\"" + IntToString(player) + "\" GameValue=\"PlayerClanTag\"/> ") + PlayerName(p));
+			updates += 1;
+		}
+		p += 1;
+	}
+
+	if (updates != 0) {
+		libapx_print_output(EventPlayer(), "Updated " + IntToString(updates) + " blacklist entries");
+	}
+}
+
+// libapx_blacklist_run
+// =================
+// runs the admin's blacklist (assumed running at initialization)
+// -> any players in game with handles on admins blacklist are disabled
+void libapx_blacklist_run(int admin) {
+	int player = 1;
+
+	if( BankKeyCount(libapx_player[admin].bank_storage, libapx_BANK_SECTION_BLACKLIST) == 0 ) {
+		return;
+	}
+
+	while( player < libapx_MAX_PLAYERS ) {
+		if( PlayerStatus(player) == c_playerStatusActive && BankKeyExists(libapx_player[admin].bank_storage, libapx_BANK_SECTION_BLACKLIST, PlayerHandle(player)) ) {
+			libapx_player[player].disabled = true;
+			libapx_print_text(PlayerGroupAll(), libapx_player_name_colored(player) + StringToText(" has been blacklisted and disabled by host ") + libapx_player_name_colored(admin));
+		}
+		player += 1;
+	}
+}

@@ -1,0 +1,160 @@
+//=========================================================
+//		Apex Roleplaying Engine
+//		Copyright (c) 2017, Apex Group
+//=========================================================
+// This software is distributed under the MIT License:
+// <http://opensource.org/licenses/MIT>
+//=========================================================
+
+// Log deals with messages that should be logged and able to be accessed
+// elsewhere, specifically for a message log reading ui module (chatlog).
+// The messages that are logged should be "ingame" messages, e.g. those
+// from @say or >narrate that pertain to the roleplay story.
+
+// number of messages to be logged
+const int libapx_NLOGGED_MSG = 512;
+
+// max number of chars in a chat log msg. This should be set so that chat log
+// messages can fit into a ui chatlog reader
+// (not including timestamp or a unit name)
+static const int libapx_LOG_MSG_LENGTH = 60;
+
+// guess for the size of a typical unit say msg header (timestamp + unitname)
+static const int libapx_LOG_MSG_HEADER_GUESS = 24;
+
+// event signal when a new chatlog message is added
+const string libapx_EVENT_CHATLOG = "libapx_EVENT_CHATLOG ";
+
+// Type: libapx_log_msg
+// ==============
+// Message information unit stored in chatlog array
+struct libapx_log_msg {
+	int author;		// player number of the creator of this msg
+	text timestamp;	// text formatted timestamp [H:M:S]
+	text msg;		// text formatted message
+	bool is_part_of_prev;	// flag for whether this message part of the previous
+							// useful for multi-line split messages
+};
+
+libapx_log_msg[libapx_NLOGGED_MSG] libapx_chatlog;
+
+// Counter for the current log index in the chatlog array.
+// The index of chatlog array must be cyclical: that is, after writing to
+// index libapx_NLOGGED_MSG-1, the index will cycle back to 0.
+int libapx_chatlog_counter = 0;
+
+// flag for whether the chatlog has cycled
+bool libapx_chatlog_cycled = false;
+
+// libapx_chatlog_add
+// ================
+// Adds a message to the chatlog at the current counter index
+// (stored in libapx_chatlog_counter). When a new chatlog message saved,
+// sends event signal [libapx_EVENT_CHATLOG + index]. This can be responded
+// to by any modules that utilize this chatlog. The reason for using events
+// rather than direct function calls is to decouple this module from any
+// clients, so there does not have to be any interlocking dependencies between
+// e.g. a chatlog ui and this engine chatlog system.
+// Though events introduces messiness.
+static void libapx_chatlog_add(int index, int author, text timestamp, text msg, bool part_prev) {
+	libapx_chatlog[index].author = author;
+	libapx_chatlog[index].timestamp = timestamp;
+	libapx_chatlog[index].msg = msg;
+	libapx_chatlog[index].is_part_of_prev = part_prev;
+
+	// if chat log hasn't cycled and will cycle, check flag for cycled
+	if( !libapx_chatlog_cycled && libapx_chatlog_counter == (libapx_NLOGGED_MSG - 1) ) {
+		libapx_chatlog_cycled = true;
+	}
+
+	// send event that this chatlog message has been updated
+	TriggerSendEvent(libapx_EVENT_CHATLOG + IntToString(libapx_chatlog_counter));
+
+	// increment counter and take modulus to ensure
+	libapx_chatlog_counter = (libapx_chatlog_counter + 1) % libapx_NLOGGED_MSG;
+}
+
+
+//libapx_string_space_sub
+//===========
+//Takes msg and target int then divides it by spacing to never reach goal length
+// STructured like StringSub(string s, int start, int end)
+string libapx_string_space_sub(string msg, int start, int end) {
+	int currentCount = start;
+	int estimatedCount = 0;
+	string tempMsg;
+	msg += " ";
+	//Each time it checks if count is viable
+	while(currentCount + estimatedCount < end) {
+
+		currentCount += estimatedCount; //Combines currentCount and next iteration, letter count is still viable
+
+		tempMsg = StringSub(msg, currentCount + 1, StringLength(msg));
+		if (StringFind(tempMsg, " ", c_stringCase) == -1) {
+
+			break;
+		}
+		estimatedCount = StringFind(tempMsg, " ", c_stringCase); //Tells iteration of next space
+	}
+
+	return 	StringSub(msg + "", start, currentCount);
+
+}
+
+//libapx_string_space_sub_i
+//=========== nabs index 2
+//Takes msg and target int then divides it by spacing to never reach goal length
+// STructured like StringSub(string s, int start, int end)
+int libapx_string_space_sub_i(string msg, int start, int end) {
+	int currentCount = start;
+	int estimatedCount = 0;
+	string tempMsg;
+
+	//Each time it checks if count is viable
+	while(currentCount + estimatedCount < end) {
+
+		currentCount += estimatedCount; //Combines currentCount and next iteration, letter count is still viable
+
+		tempMsg = StringSub(msg, currentCount + 1, StringLength(msg));
+		if (StringFind(tempMsg, " ", c_stringCase) == -1) {
+			break;
+		}
+		estimatedCount = StringFind(tempMsg, " ", c_stringCase); //Tells iteration of next space
+	}
+
+	return currentCount;
+
+}
+
+
+
+
+// libapx_log
+// ===============
+// Conditions an input message into chunks for saving into the chatlog.
+// Used by client to log messages.
+void libapx_log(int author, text unitname, string msg) {
+	int time = FixedToInt(GameGetMissionTime());
+	text timestamp = StringToText("[" + IntToString( time / 3600 ) + ":" + IntToString( ( time % 3600 ) / 60 ) + ":" + IntToString( time % 60 ) + "] ");
+	string chunk;
+	int idx;
+
+		libapx_chatlog_add(libapx_chatlog_counter, author, timestamp, unitname + StringToText(":"), false);
+
+		while( msg != "" ) {
+			if( StringLength(msg) > libapx_LOG_MSG_LENGTH ) {
+				chunk = libapx_string_space_sub(msg, 1, libapx_LOG_MSG_LENGTH);
+				idx = libapx_string_space_sub_i(msg, 1, libapx_LOG_MSG_LENGTH);
+				msg = libapx_string_space_sub(msg, idx, StringLength(msg) + 10);
+				libapx_chatlog_add(libapx_chatlog_counter, author, timestamp, StringToText(chunk), true);
+			} else {
+				libapx_chatlog_add(libapx_chatlog_counter, author, timestamp, StringToText(msg), true);
+				break;
+			}
+		}
+
+
+}
+
+
+//@say I hope you're doing quite well today, though I wouldn't be that upset if you were under the weather dog. You're not dog though, through and through you're definitely a fiesty wolf who drinks a lot of water for one of his minor stature. That's all.

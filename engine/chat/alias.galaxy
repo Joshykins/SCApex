@@ -1,0 +1,179 @@
+//=========================================================
+//		Apex Roleplaying Engine
+//		Copyright (c) 2017, Apex Group
+//=========================================================
+// This software is distributed under the MIT License:
+// <http://opensource.org/licenses/MIT>
+//=========================================================
+
+const int libapx_ALIAS_MAX_DEPTH = 10;	// max depth of recursive alias replacing (prevent infinite aliasing)
+const string libapx_BANK_SECTION_ALIAS = "aliases";
+
+// libapx_alias_insert_in_list
+// =====================
+// Inserts an alias string into the (player) alias list, list given by:
+//  " alias(1) alias(2) alias(3) ... alias(n) "
+// Each alias separated by a space. Note the spaces at each end of the string.
+// Alias is inserted in order by searching through list until find
+// the index k where: alias_inserted < alias(k).
+// Otherwise, if not less than any, alias appended to the end.
+static string libapx_alias_insert_in_list(string list, string alias) {
+	string curr = StringWord(list, 1);
+	int i = 1;
+	int index = 1; // index in string
+
+	while( curr != "" ) {
+		// insert before (if the string value less than curr) by replacing
+		// space separating strings in the alias list with the inserted alias
+		if( StringCompare(alias, curr, c_stringNoCase) <= 0 ) {
+			return StringReplace(list, " " + alias + " ", index, index);
+		}
+		index = index + StringLength(curr) + 1; // +1 to account for space
+		i += 1;
+		curr = StringWord(list, i);
+	}
+	// else, append to end
+	return StringReplace(list, " " + alias + " ", index, index);
+}
+
+// libapx_alias_command_redirect
+// ===================
+// gets "alias ..." command from parser, redirects to function
+bool libapx_alias_command_redirect(string command, int player) {
+	string subcommand = StringWord(command, 2);
+	string alias = "";
+	string content = "";
+	if( StringEqual(subcommand, "create", c_stringNoCase) ) {
+		alias = StringWord(command, 3);
+
+
+		// remove "_alias" and "create" and the alias from chat msg
+		content = StringReplaceWord(libapx_player[player].chat_msg, "_alias", "", 1, c_stringNoCase);
+		content = StringReplaceWord(libapx_player[player].chat_msg, "alias", "", 1, c_stringNoCase);
+		content = StringReplaceWord(content, "create", "", 1, c_stringNoCase);
+		content = libapx_string_trim( StringSub(content, StringFind(content, alias, c_stringNoCase) + StringLength(alias) + 1, StringLength(content)) );
+
+
+		// first check if alias already exists
+		if( BankKeyExists(libapx_player[player].bank_storage, libapx_BANK_SECTION_ALIAS, alias) ) {
+			libapx_print_error(player, "Alias already exists, rewriting");
+			libapx_bank_remove(libapx_BANK_SECTION_ALIAS, alias, player);
+			libapx_player[player].aliases = StringReplaceWord(libapx_player[player].aliases, " " + alias + " ", " ", 1, c_stringCase);
+			libapx_print_success(player, "ALIAS REMOVED: " + alias);
+
+			libapx_bank_create(libapx_BANK_SECTION_ALIAS, alias, content, player);
+			libapx_player[player].aliases = libapx_alias_insert_in_list(libapx_player[player].aliases, alias);
+			libapx_print_success(player, "ALIAS CREATED: " + alias + "\n" + "[\'" + content + "\']");
+
+			return true;
+		}
+
+		if( content != "" ) {
+			libapx_bank_create(libapx_BANK_SECTION_ALIAS, alias, content, player);
+			libapx_player[player].aliases = libapx_alias_insert_in_list(libapx_player[player].aliases, alias);
+			libapx_print_success(player, "ALIAS CREATED: " + alias + "\n" + "[\'" + content + "\']");
+		}
+		else {
+			libapx_print_error(player, "ALIAS CANNOT BE EMPTY");
+		}
+
+		return true;
+	}
+	else if( StringEqual(subcommand, "remove", c_stringNoCase) ) {
+		alias = StringWord(command, 3);
+		if( BankKeyExists(libapx_player[player].bank_storage, libapx_BANK_SECTION_ALIAS, alias) ) {
+			libapx_bank_remove(libapx_BANK_SECTION_ALIAS, alias, player);
+			libapx_player[player].aliases = StringReplaceWord(libapx_player[player].aliases, " " + alias + " ", " ", 1, c_stringCase);
+			libapx_print_success(player, "ALIAS REMOVED: " + alias);
+		}
+		else {
+			libapx_print_error(player, "ALIAS " + alias + " DOES NOT EXIST");
+		}
+	}
+	else if( StringEqual(subcommand, "removeall", c_stringNoCase) ) {
+		libapx_bank_section_remove_all(libapx_BANK_SECTION_ALIAS, player);
+		libapx_player[player].aliases = "";
+		libapx_print_success(player, "ALL ALIASES REMOVED");
+	}
+	else if( StringEqual(subcommand, "list", c_stringNoCase) ) {
+		//libapx_player[player].aliases = libapx_sort_aliases(player);
+		alias = libapx_string_trim(libapx_player[player].aliases);
+		alias = StringReplaceWord(alias, " ", ", ", c_stringReplaceAll, c_stringNoCase);
+		libapx_print_output(player, "ALIASES: ");
+		libapx_print(PlayerGroupSingle(player), alias);
+	}
+	else if( StringEqual(subcommand, "print", c_stringNoCase) ) {
+		libapx_bank_key_content_dump(libapx_BANK_SECTION_ALIAS, StringWord(command, 3), player);
+	}
+	else if( BankKeyExists(libapx_player[player].bank_storage, libapx_BANK_SECTION_ALIAS, subcommand) ) {
+		libapx_bank_key_content_dump(libapx_BANK_SECTION_ALIAS, subcommand, player);
+	}
+	else {
+		libapx_print_error(player, "INVALID ALIAS COMMAND");
+	}
+
+	return false;
+}
+
+// libapx_alias_sub
+// ===================
+// recursively find and replace aliases in a given string
+string libapx_alias_sub(string msg, int player, int recursion_depth) {
+	string alias = StringWord(msg, 1);
+	string subbed = "";
+	int i = 1;
+
+	if( recursion_depth > libapx_ALIAS_MAX_DEPTH ) {
+		return msg;
+	}
+
+	while( alias != "" ) {
+		if( BankKeyExists( libapx_player[player].bank_storage, libapx_BANK_SECTION_ALIAS, alias ) ) {
+			subbed = subbed + " " + libapx_alias_sub(BankValueGetAsString(libapx_player[player].bank_storage, libapx_BANK_SECTION_ALIAS, alias), player, recursion_depth + 1);
+		}
+		else {
+			subbed = subbed + " " + alias;
+		}
+
+		i += 1;
+		alias = StringWord(msg, i);
+	}
+
+	// remove extra front end " " for return
+	return StringSub(subbed, 2, StringLength(subbed));
+}
+
+// libapx_strcmp
+// =============
+// String comparison function for use with qsort
+static int libapx_strcmp(string k1, string k2) {
+	return StringCompare(DataTableGetString(true, k1), DataTableGetString(true, k2), c_stringCase);
+}
+
+// libapx_sort_aliases
+// ==================
+// Creates an alphabetized list of a player's alias strings where
+// each alias is separated by a space (e.g. "alias1 alias2 alias3 ...")
+string libapx_sort_aliases(int player) {
+	string var = libapx_BANK_SECTION_ALIAS + "_" + IntToString(player);
+	int count = BankKeyCount(libapx_player[player].bank_storage, libapx_BANK_SECTION_ALIAS);
+	int i;
+	string sorted = " ";
+
+	// gather aliases and set into a data table "array"
+	for( i = 0; i < count; i += 1 ) {
+		DataTableSetString(true, var + " " + IntToString(i), BankKeyName(libapx_player[player].bank_storage, libapx_BANK_SECTION_ALIAS, i));
+		//libapx_print_success(player, IntToString(i) + ":" + alias);
+	}
+
+	// sort alias "array" in data table
+	libx_qsort(var + " 0", count, c_dataTypeString, libapx_strcmp);
+
+	// recollect sorted aliases and set into player's alias string
+	for( i = 0; i < count; i += 1 ) {
+		sorted = sorted + DataTableGetString(true, var + " " + IntToString(i)) + " ";
+		DataTableValueRemove(true, var + " " + IntToString(i)); // free data table
+	}
+
+	return sorted;
+}

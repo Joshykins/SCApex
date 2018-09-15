@@ -1,0 +1,990 @@
+//=========================================================
+//		Apex Roleplaying Engine
+//		Copyright (c) 2017, Apex Group
+//=========================================================
+// This software is distributed under the MIT License:
+// <http://opensource.org/licenses/MIT>
+//=========================================================
+
+const string libapx_UNIT_NAME_DATA_TABLE_IDENTIFIER = ".NAME";
+const string libapx_UNIT_NAME_COLOR_DATA_TABLE_IDENTIFIER = ".NAME_COLOR";
+
+const int libapx_UNIT_CACHE_MAX_STRING_LENGTH = 500;
+const int libapx_UNIT_CACHE_OVERWRITE_CHECK_LIMIT = 10;
+const int libapx_UNIT_CACHE_LIMIT = -1;
+
+// Unit custom value indexes:
+const int libapx_UNIT_INDEX_ID = 0;				// index for ID
+const int libapx_UNIT_INDEX_CACHE_COUNT = 1;		// index for current cache number (num caches)
+const int libapx_UNIT_INDEX_FLAG_ATTACH = 2;		// flag for @attach has been used
+const int libapx_UNIT_INDEX_FLAG_TINT = 3;			// flag for @tint has been used
+const int libapx_UNIT_INDEX_FLAG_SCALE = 4;		// flag for @scale has been used
+const int libapx_UNIT_INDEX_FLAG_MS = 5;			// flag for @modelswap has been used
+const int libapx_UNIT_INDEX_FLAG_ANIMSPEED = 6;	// flag for @animspeed has been used
+const int libapx_UNIT_INDEX_FLAG_PLAY = 7;			// flag for @play has been used
+const int libapx_UNIT_INDEX_FLAG_STATBARS = 8;		// flag for @statbars has been used
+const int libapx_UNIT_INDEX_FLAG_ROTATE = 9;		// flag for @rotate has been used
+
+
+const int libapx_UNIT_INDEX_WAYGATE = 15;			// region ID for waygates
+const int libapx_UNIT_INDEX_WAYGATE_DIALOG = 16;	// attached waygate dialog ID
+const int libapx_UNIT_INDEX_WAYGATE_ANCHOR = 17;	// flag for unit is waygate anchor
+
+const int libapx_UNIT_INDEX_TEXTTAG = 20;		// flag for text tag set
+
+const int libapx_UNIT_INDEX_SPLAT_OWNER = 25;	   // Player number of spawn splat owner
+
+// Each unit given a unique id. Each time unit created, counter increments
+int libapx_unit_id_counter = 1;
+
+
+
+// increment rate used for adjusting the spawn splat unit's scale and height
+// when using mouse-click spawning
+static const fixed libapx_SPLAT_INCR_RATE = 0.01;
+
+// func prototypes:
+void libapx_unit_set_id(unit u);
+void libapx_unit_data_remove(unit u);
+void libapx_unit_cache_update(unit subject, string command, string user_command);
+
+// libapx_map_unit_init
+// ====================
+// - assigns unit IDs to any units preplaced on the map
+void libapx_preplaced_unit_initialize() {
+	unitgroup g = UnitGroup(null, c_playerAny, RegionEntireMap(), UnitFilter(0, 0, (1 << c_targetFilterMissile), (1 << (c_targetFilterDead - 32)) | (1 << (c_targetFilterHidden - 32))), 0);
+
+	UnitGroupLoopBegin(g);
+	while(!UnitGroupLoopDone()) {
+		libapx_unit_set_id(UnitGroupLoopCurrent());
+		UnitSetCustomValue(UnitGroupLoopCurrent(), libapx_UNIT_INDEX_CACHE_COUNT, 1); //set the unit cache value
+		UnitGroupLoopStep();
+	}
+	UnitGroupLoopEnd();
+
+	return;
+}
+
+// libapx_unit_set_id
+// =====================
+// sets the unit's id via the custom value stored for unit
+void libapx_unit_set_id(unit u) {
+	UnitSetCustomValue( u, libapx_UNIT_INDEX_ID, IntToFixed(libapx_unit_id_counter));
+	libapx_unit_id_counter += 1;
+}
+
+// libapx_unit_get_val
+// ===========================
+// Gets a custom value stored to the unit.
+string libapx_unit_get_val(unit u, string valuename) {
+	string unit_id;
+	string key;
+	unit_id = FixedToString(UnitGetCustomValue(u, libapx_UNIT_INDEX_ID), 0);
+	if (valuename == "key_q") {
+		key = unit_id + "_key_q";
+		return DataTableGetString(true, key);
+	}
+	if (valuename == "key_w") {
+		key = unit_id + "_key_w";
+		return DataTableGetString(true, key);
+	}
+	if (valuename == "key_e") {
+		key = unit_id + "_key_e";
+		return DataTableGetString(true, key);
+	}
+	if (valuename == "key_r") {
+		key = unit_id + "_key_r";
+		return DataTableGetString(true, key);
+	}
+	if (valuename == "key_t") {
+		key = unit_id + "_key_t";
+		return DataTableGetString(true, key);
+	}
+	//returns blank if nothing found :(
+	return "";
+}
+
+const string libapx_all_keys = "key_q key_w key_e key_r key_t";
+
+// libapx_unit_set_val
+// ===========================
+// Gets a custom value stored to the unit.
+void libapx_unit_set_val(unit u, string valuename, string value) {
+	string unit_id;
+	string key;
+	unit_id = FixedToString(UnitGetCustomValue(u, libapx_UNIT_INDEX_ID), 0);
+	if (valuename == "key_q") {
+		key = unit_id + "_key_q";
+	}
+	if (valuename == "key_w") {
+		key = unit_id + "_key_w";
+	}
+	if (valuename == "key_e") {
+		key = unit_id + "_key_e";
+	}
+	if (valuename == "key_r") {
+		key = unit_id + "_key_r";
+	}
+	if (valuename == "key_t") {
+		key = unit_id + "_key_t";
+	}
+	DataTableSetString(true, key, value);
+	return;
+}
+
+
+// libapx_unit_id
+// =====================
+// returns the unit's id as a string
+string libapx_unit_id(unit u) {
+	return FixedToString(UnitGetCustomValue(u, libapx_UNIT_INDEX_ID), 0);
+}
+
+// libapx_unit_initialize
+// ===================
+// runs when unit created (from UnitCreate or from unit abils)
+// sets the unit's id and sets command cache count to 1
+bool libapx_unit_initialize(bool testConds, bool runActions) {
+	// if unit already has data initialized -> skip
+	if( UnitGetCustomValue( EventUnitCreatedUnit(), libapx_UNIT_INDEX_ID ) > 0 ) {
+		return true;
+	}
+
+	libapx_unit_set_id(EventUnitCreatedUnit());
+	UnitSetCustomValue(EventUnitCreatedUnit(), libapx_UNIT_INDEX_CACHE_COUNT, 1);
+	return true;
+}
+
+// libapx_unit_create
+// =====================
+// function for creating units:
+// - Creates unit and initializes its ID.
+//    -> If player using mouse-click spawning, copies the commands on the
+//       spawn splat to the unit being created.
+unitgroup libapx_unit_create(string type, int player, point p, fixed facing, int spawningCount) {
+	unitgroup spawned;
+	unit u;
+	string splat_unit_id;
+	string cache;
+	int index = 1;
+	string key;
+	spawned = UnitCreate(1, type, c_unitCreateIgnorePlacement, player, p, facing);
+	u = UnitLastCreated(); // store the unit, since spawned is a unit group
+	UnitSetFacing( u, facing, 0.0 ); // since structures cant spawn with non default facing
+	UnitSetState( u, c_unitStateFidget, false);
+
+	// initialize the spawned unit ID and initial cache # to 1
+	// -> required because there is a delay until the other initializer event
+	//    trigger libapx_unit_initialize runs which causes issues with functions
+	//    executed immediately after spawning
+	libapx_unit_set_id(u);
+
+	if(StringFind(type, "colossus", c_stringNoCase) != -1 ) {
+		key = FixedToString(UnitGetCustomValue(u, libapx_UNIT_INDEX_ID), 0) + ".COLOSSUS";
+		DataTableSetString(true, key, "HASCOLOSSUS"); //Sets the flag
+		//libapx_print_output(EventPlayer(), "DEBUG: Unit flagged with colossus");
+	}
+
+
+	UnitSetCustomValue(u, libapx_UNIT_INDEX_CACHE_COUNT, 1);
+
+	if( libapx_player[player].is_placing_unit ) {
+		UnitSetHeight(u, UnitGetHeight(libapx_player[player].spawn_splat), 0);
+
+		// apply spawn splat cache onto spawned unit
+		splat_unit_id = FixedToString( UnitGetCustomValue( libapx_player[player].spawn_splat, libapx_UNIT_INDEX_ID), 0 );
+		while( DataTableValueExists(true, splat_unit_id + "." + IntToString(index)) ) {
+			cache = DataTableGetString(true, splat_unit_id + "." + IntToString(index));
+			libapx_chat_parse( cache, player, spawned, spawningCount );
+			index += 1;
+		}
+
+
+
+		// set player owner to the splat's player owner
+		UnitSetOwner(u, UnitGetOwner(libapx_player[player].spawn_splat), true);
+	}
+
+
+
+	return spawned;
+}
+
+// libapx_spawn_create_splat
+// =====================
+// creates the unit splat under the cursor when using mouse-click spawn
+// because we cannot get the actor type from a unit,
+// we use a unit as the splat
+void libapx_spawn_create_splat(string type, int player, int spawningCount) {
+	unitgroup splat = UnitGroupEmpty();
+
+	// remove any existing spawn splat
+	if(libapx_player[player].spawn_splat != null) {
+		// reset the custom value for owner to not trigger the data remove
+		// function to reset player mouse movement
+		UnitSetCustomValue(libapx_player[player].spawn_splat, libapx_UNIT_INDEX_SPLAT_OWNER, 0);
+		UnitRemove(libapx_player[player].spawn_splat);
+	}
+
+	// create splat and set player splat state variables
+	UnitCreate(1, type, 0, player, libapx_player[player].mouse_position, 270.0);
+	libapx_player[player].spawn_splat = UnitLastCreated();
+	libapx_player[player].spawn_splat_x = 1;
+	libapx_player[player].spawn_splat_y = 1;
+	libapx_player[player].spawn_splat_z = 1;
+
+	// initialize splat unit id/cache
+	// (unit init event does not occurr till function already finished)
+	libapx_unit_set_id(libapx_player[player].spawn_splat);
+	UnitSetCustomValue(libapx_player[player].spawn_splat, libapx_UNIT_INDEX_CACHE_COUNT, 1);
+
+	// set the splat's owner player as a stored custom value
+	UnitSetCustomValue(libapx_player[player].spawn_splat, libapx_UNIT_INDEX_SPLAT_OWNER, IntToFixed(player));
+
+	// set visuals
+	UnitSetState(libapx_player[player].spawn_splat, c_unitStateInvulnerable, true);
+	UnitSetState(libapx_player[player].spawn_splat, c_unitStatePaused, true);
+	UnitSetState(libapx_player[player].spawn_splat, c_unitStateSelectable, false);
+	UnitSetState(libapx_player[player].spawn_splat, c_unitStateTargetable, false);
+	UnitSetState(libapx_player[player].spawn_splat, c_unitStateMoveSuppressed, true);
+	UnitSetState(libapx_player[player].spawn_splat, c_unitStateRadarable, false);
+	ActorSend(libNtve_gf_MainActorofUnit(libapx_player[player].spawn_splat), "SetOpacity .5");
+	UnitBehaviorAdd(libapx_player[player].spawn_splat, libapx_BEHAVIOR_SUPPRESS_COLLISION, libapx_player[player].spawn_splat, 1);
+
+	// set context to spawn splat, so commands applied to it
+	UnitGroupAdd(splat, libapx_player[player].spawn_splat);
+	libapx_player_parser[player][spawningCount].context = splat;
+}
+
+// libapx_spawn_splat_update_pos
+// ========================
+// Updates the spawn splat's position and facing angle. Function is called by
+// the mouse event in order to update splat as player moves mouse during
+// mouse click spawning.
+void libapx_spawn_splat_update_pos() {
+	// if control held down, make spawn splat face cursor
+	if( libapx_player[EventPlayer()].key_ctrl ) {
+		libNtve_gf_MakeUnitFacePoint( libapx_player[EventPlayer()].spawn_splat, libapx_player[EventPlayer()].mouse_position, 0.0);
+	}
+	// else, update splat position if position not locked
+	else if ( !libapx_player[EventPlayer()].key_shift && 	// shift key (scale) lock
+			  !libapx_player[EventPlayer()].key_alt && 		// alt key (height) lock
+			  !libapx_player[EventPlayer()].mouse_right ) { // right mouse lock
+		UnitSetPosition(libapx_player[EventPlayer()].spawn_splat, libapx_player[EventPlayer()].mouse_position, false);
+	}
+}
+
+// libapx_spawn_splat_update_props
+// =====================
+// Event trigger for updating the mouse-click spawn splat scale and height
+// properties. This function responds to player mouse changes in the Y axis,
+// which is used uniquely for scale and height changing.
+//
+// TODO: allow shift + x, shift + y, shift + z to scale axis components
+void libapx_spawn_splat_update_props(int player, bool scale_incr)  {
+	// if shift held down, scale model with Y mouse movement
+	if( libapx_player[player].key_shift ) {
+		if( scale_incr ) { // increase size
+			libapx_player[player].spawn_splat_x += libapx_SPLAT_INCR_RATE;
+		} else { // decrease size
+			libapx_player[player].spawn_splat_x -= libapx_SPLAT_INCR_RATE;
+		}
+		ActorSendTo(libNtve_gf_MainActorofUnit(libapx_player[player].spawn_splat), "::Main", "SetScale " + FixedToString(libapx_player[player].spawn_splat_x, 2));
+		libapx_unit_cache_update(libapx_player[player].spawn_splat, "@scale", "@scale " + FixedToString(libapx_player[player].spawn_splat_x, 2));
+	}
+
+	// if alt held down, change unit height with Y mouse movement
+	if( libapx_player[player].key_alt ) {
+		if( scale_incr ) { // move up
+			UnitSetHeight(libapx_player[player].spawn_splat,
+						  UnitGetHeight(libapx_player[player].spawn_splat) + libapx_SPLAT_INCR_RATE, 0);
+		} else { // move down
+			UnitSetHeight(libapx_player[player].spawn_splat,
+						  UnitGetHeight(libapx_player[player].spawn_splat) - libapx_SPLAT_INCR_RATE, 0);
+		}
+	}
+
+
+}
+
+// libapx_unit_set_name
+// ===================
+// Sets a unit's custom name into the global data table with format
+// [unit_id]_NAME : [name]
+void libapx_unit_set_name(string name, unit u) {
+	string key = FixedToString(UnitGetCustomValue(u, libapx_UNIT_INDEX_ID), 0) + libapx_UNIT_NAME_DATA_TABLE_IDENTIFIER;
+	DataTableSetString(true, key, name);
+}
+
+
+
+
+
+//returns a boolean based on the unitgroup whether unit should be removed or not.
+void libapx_unit_colossus_remove(unit u) {
+	string colossus = DataTableGetString(true, FixedToString(UnitGetCustomValue(u, libapx_UNIT_INDEX_ID), 0) + ".COLOSSUS");
+	string colossusded = DataTableGetString(true, FixedToString(UnitGetCustomValue(u, libapx_UNIT_INDEX_ID), 0) + ".COLOSSUSDED");
+
+	if (colossus == "HASCOLOSSUS") {
+		if (colossusded == "HASCOLOSSUSDED") {
+			//kill
+			UnitRemove(UnitGroupLoopCurrent());
+			libapx_print_output(EventPlayer(), "Colossus with height and scale is a viable means to crash the game, removing unit.");
+		}
+	}
+	return;
+}
+
+// libapx_unit_flag_colossus
+// ===================
+// Flags a unit that has colossus
+
+void libapx_unit_flag_colossus(unit u) {
+	string key = FixedToString(UnitGetCustomValue(u, libapx_UNIT_INDEX_ID), 0) + ".COLOSSUS";
+	DataTableSetString(true, key, "HASCOLOSSUS"); //Sets the flag
+	//libapx_print_output(EventPlayer(), "DEBUG: Unit flagged with colossus");
+	libapx_unit_colossus_remove(u);
+}
+//Predone string to determine if it's a threat
+//ex
+//@height 123;@modelswap colossus
+//The height 123 would flag this before a colossus is even detected
+
+void libapx_unit_flag_col_crashable(unit u) {
+
+	string key = FixedToString(UnitGetCustomValue(u, libapx_UNIT_INDEX_ID), 0) + ".COLOSSUSDED";
+	DataTableSetString(true, key, "HASCOLOSSUSDED"); //Sets the flag
+	//libapx_print_output(EventPlayer(), "DEBUG: Unit flagged with colossus crash");
+	libapx_unit_colossus_remove(u);
+}
+
+
+// Index to use
+// -- To flag colossus call this --
+// libapx_unit_flag_colossus(UnitGroupLoopCurrent());
+//
+// -- To flag colossus death call this --
+//	libapx_unit_flag_col_crashable(UnitGroupLoopCurrent());
+//
+// --To return flag--
+// libapx_unit_flag_get_colossus(UnitGroupLoopCurrent());
+//
+//
+// Will return boolean whether to kill or not
+//
+// --To find colossus it--
+//
+//unitgroup p = u;
+//int colcheker = 1;
+//bool colFlag = false;
+//while (StringWord(argv, colcheker) != "") {
+//	if(StringFind(StringWord(argv, colcheker), "colossus", c_stringNoCase) != -1 ) {
+//			UnitGroupLoopBegin(p);
+//			while(!UnitGroupLoopDone()) {
+//				libapx_unit_flag_colossus(UnitGroupLoopCurrent());
+//				UnitGroupLoopStep();
+//			}
+//			UnitGroupLoopEnd();
+//	}
+//	colcheker = colcheker + 1;
+//}
+
+
+
+// libapx_unit_set_name_color
+// ===================
+// Sets a unit's name color into global data table
+// [unit_id]_NAME_COLOR : [name]
+void libapx_unit_set_name_color(color col, unit u) {
+	string key = FixedToString(UnitGetCustomValue(u, libapx_UNIT_INDEX_ID), 0) + libapx_UNIT_NAME_COLOR_DATA_TABLE_IDENTIFIER;
+	DataTableSetColor(true, key, col);
+}
+
+// libapx_unit_get_name
+// ==================
+// Gets a unit's custom name from the data table
+// if no custom name, default to catalog name
+text libapx_unit_get_name(unit u) {
+	text name = StringToText("");
+	string unit_id = FixedToString(UnitGetCustomValue(u, libapx_UNIT_INDEX_ID), 0);
+
+	// check if unit has custom name in data table
+	if( DataTableValueExists(true, unit_id + libapx_UNIT_NAME_DATA_TABLE_IDENTIFIER) ) {
+		name = StringToText( DataTableGetString(true, unit_id + libapx_UNIT_NAME_DATA_TABLE_IDENTIFIER) );
+	}
+	else { //get default catalog name
+		name = StringExternal(  CatalogFieldValueGet(c_gameCatalogUnit, UnitGetType(u), "Name", UnitGetOwner(u)) );
+	}
+
+	// check if unit name has a custom color in data table
+	if( DataTableValueExists(true, unit_id + libapx_UNIT_NAME_COLOR_DATA_TABLE_IDENTIFIER) ) {
+		name = TextWithColor(name, DataTableGetColor(true, unit_id + libapx_UNIT_NAME_COLOR_DATA_TABLE_IDENTIFIER));
+	}
+	else { // tint to player's color
+		name = TextWithColor(name, ColorFromIndex((PlayerGetColorIndex(UnitGetOwner(u), false)), c_teamColorDiffuse));
+	}
+
+	return name;
+}
+
+// libapx_unit_data_remove
+// ======================
+// iterates through the unit's caches in data table and removes them
+// -> if unit had a custom setname or setnamecolor, remove these as well
+// -> destroy any text tags (labels) associated with unit
+void libapx_unit_data_remove(unit u) {
+	string unit_id = FixedToString(UnitGetCustomValue(u, libapx_UNIT_INDEX_ID), 0);
+	int i = 1;
+	int owner;
+
+	// remove caches:
+	while(DataTableValueExists(true, unit_id + "." + IntToString(i))) {
+		DataTableValueRemove(true, unit_id + "." + IntToString(i));
+		i += 1;
+	}
+
+	// check and remove setname/setnamecolor
+	if( DataTableValueExists(true, unit_id + libapx_UNIT_NAME_DATA_TABLE_IDENTIFIER) ) {
+		DataTableValueRemove(true, unit_id + libapx_UNIT_NAME_DATA_TABLE_IDENTIFIER);
+	}
+	if( DataTableValueExists(true, unit_id + libapx_UNIT_NAME_COLOR_DATA_TABLE_IDENTIFIER) ) {
+		DataTableValueRemove(true, unit_id + libapx_UNIT_NAME_COLOR_DATA_TABLE_IDENTIFIER);
+	}
+
+	// destroy any associated text tags
+	if( UnitGetCustomValue(u, libapx_UNIT_INDEX_TEXTTAG) > 0.0 ) {
+		TextTagDestroy( FixedToInt( UnitGetCustomValue(u, libapx_UNIT_INDEX_TEXTTAG) ) );
+	}
+
+	// check if unit killed/removed was the player spawn splat
+	// if so, set player to no longer spawning
+	owner = FixedToInt(UnitGetCustomValue(u, libapx_UNIT_INDEX_SPLAT_OWNER));
+	if( owner > 0 ) {
+		libapx_player[owner].is_placing_unit = false;
+		UISetSelectionTypeEnabled(PlayerGroupSingle(owner), c_localSelectionTypeUnknown, true);
+	}
+
+}
+
+// UNIT COMMAND CACHE SYSTEM:
+// Caches are the command history of a unit stored in the data table
+// specific commands that affect unit visuals, naming, behaviors, weapons
+//
+// Data table architecture (cache numbers start at index 1):
+// [Key: UNIT_ID.CACHE_NUMBER] : [Value: Cached command string]
+//
+// To conserve space, certain commands will be overwritten for each actor
+// attached to a unit (e.g. @tint or @scale will overwrite the previous one)
+// When a new actor is attached, this overwrite works to the last instance of attach.
+// When commands are to be overwritten, a unit custom value flag is set (see consts).
+
+// libapx_unit_cache_update_add
+// =====================
+// directly appends a new command to a unit's data table command cache,
+// if there is still room in its current cache.
+// else, create add a new cache string and increment cache counter
+void libapx_unit_cache_update_add(unit subject, string unit_id, string user_command) {
+	string cache;
+
+	if(user_command == "") {
+		return;
+	}
+
+	if(DataTableValueExists(true, unit_id + "." + FixedToString(UnitGetCustomValue(subject, libapx_UNIT_INDEX_CACHE_COUNT), 0))) {
+		cache = DataTableGetString(true, unit_id + "." + FixedToString(UnitGetCustomValue(subject, libapx_UNIT_INDEX_CACHE_COUNT), 0));
+	}
+	else {
+		cache = "";
+	}
+
+	if(cache == "") {
+		cache = user_command;
+		DataTableSetString(true, unit_id + "." + FixedToString(UnitGetCustomValue(subject, libapx_UNIT_INDEX_CACHE_COUNT), 0), cache);
+		return;
+	}
+	else if(StringLength(cache + "; " + user_command) <= libapx_UNIT_CACHE_MAX_STRING_LENGTH) {
+		cache = cache + "; " + user_command;
+		DataTableSetString(true, unit_id + "." + FixedToString(UnitGetCustomValue(subject, libapx_UNIT_INDEX_CACHE_COUNT), 0), cache);
+		return;
+	}
+	else {
+		UnitSetCustomValue(subject, libapx_UNIT_INDEX_CACHE_COUNT, UnitGetCustomValue(subject, libapx_UNIT_INDEX_CACHE_COUNT) + 1);
+		DataTableSetString(true, unit_id + "." + FixedToString(UnitGetCustomValue(subject, libapx_UNIT_INDEX_CACHE_COUNT), 0), user_command);
+		return;
+	}
+
+}
+
+// libapx_unit_cache_update_overwrite
+// =======================
+// finds previous instance of command and removes it, then adds
+// new command (if there is space; see libapx_unit_cache_update_add)
+void libapx_unit_cache_update_overwrite(unit subject, string unit_id, string command, string user_command) {
+	bool cmd_found = false;
+	int unit_caches = FixedToInt(UnitGetCustomValue(subject, libapx_UNIT_INDEX_CACHE_COUNT));
+	string cache;
+	string cache_next;
+	string cmd_next;
+	int x;
+	int pos_start;
+	int pos_end;
+	int i = 0;
+
+	//narrow to a certain cache number
+	//overwrite check added because if check limit is too large, A LOT OF LAG
+	while(i < unit_caches && i < libapx_UNIT_CACHE_OVERWRITE_CHECK_LIMIT) {
+		if(StringContains(DataTableGetString(true, unit_id + "." + IntToString(unit_caches - i)), command, c_stringAnywhere, c_stringNoCase)) {
+			break;
+		}
+		i += 1;
+	}
+	if(i == libapx_UNIT_CACHE_OVERWRITE_CHECK_LIMIT || i == unit_caches) { //past overwrite limit or doesnt exist: simply add the command
+		libapx_unit_cache_update_add(subject, unit_id, user_command);
+		return;
+	}
+
+	//search through cache(s) to find previous command
+	while(!cmd_found && i < unit_caches) {
+		cache = DataTableGetString(true, unit_id + "." + IntToString(unit_caches - i));
+		pos_start = StringLength(cache);
+
+		// get number of words separated by spaces in the string
+		x = 1;
+		while(StringWord(cache, x + 1) != "") {
+			x += 1;
+		}
+
+		while(x > 0) {
+			if(StringContains(StringWord(cache, x), command, c_stringAnywhere, c_stringNoCase)) { //found match
+				cmd_found = true;
+
+				if(x != 1) { //if not first command, set position to ';'
+					pos_start = pos_start - StringLength(StringWord(cache, x)); //sets position to '@'
+					while(StringSub(cache, pos_start, pos_start) != ";") { //not first cmd: finds the ';'
+						pos_start -= 1;
+					}
+				}
+				else { //this is the first command
+					pos_start = 1;
+				}
+				break;
+			}
+			pos_start = pos_start - StringLength(StringWord(cache, x));
+			while(StringSub(cache, pos_start, pos_start) == " ") {
+				pos_start -= 1;
+			}
+			x -= 1;
+		}
+		if(cmd_found) {
+			break;
+		}
+		i += 1;
+	}
+
+	// find the end pos of the command; search till find the '@' of the next command
+	// assumption is that only unit commands prefixed with '@' will be cached
+	pos_end = pos_start;
+	if(pos_start == 1) {
+		while(pos_end < StringLength(cache)) {
+			if(StringSub(cache, pos_end + 1, pos_end + 1) == "@") {
+				break;
+			}
+			pos_end += 1;
+		}
+	}
+	else {
+		while(pos_end < StringLength(cache)) {
+			if(StringSub(cache, pos_end + 1, pos_end + 1) == ";") {
+				break;
+			}
+			pos_end += 1;
+		}
+	}
+
+	//remove the previous command
+	cache = StringReplace(cache, "", pos_start, pos_end);
+
+	if(i == 0) { //latest cache: only need to update this one
+		if(cache == "") { //if cache empty, delete
+			DataTableValueRemove(true, unit_id + "." + IntToString(unit_caches));
+		}
+		else { //otherwise update it!
+			DataTableSetString(true, unit_id + "." + IntToString(unit_caches), cache);
+		}
+	}
+
+	//otherwise update all proceeding caches to ensure they have max possible length < libapx_UNIT_CACHE_MAX_STRING_LENGTH
+	while(i > 0) {
+		cache_next = DataTableGetString(true, unit_id + "." + IntToString(unit_caches - i + 1));
+
+		pos_start = 1;
+		pos_end = 1;
+		while(pos_end < StringLength(cache_next)) {
+			if(StringSub(cache_next, pos_end, pos_end + 1) == "; ") {
+				pos_end += 1; //to include the space for removal
+				break;
+			}
+			pos_end += 1;
+		}
+
+		cmd_next = StringSub(cache_next, pos_start, pos_end);
+		if(StringLength(cache + "; " + cmd_next) <= libapx_UNIT_CACHE_MAX_STRING_LENGTH) { //remove comand from next cache, add to previous
+			cache = cache + "; " + cmd_next;
+			cache_next = StringReplace(cache_next, "", pos_start, pos_end);
+
+			DataTableSetString(true, unit_id + "." + IntToString(unit_caches - i), cache);
+			if(cache_next == "") { //the latest cache is now empty; update unit
+				DataTableValueRemove(true, unit_id + "." + IntToString(unit_caches - i + 1));
+				UnitSetCustomValue(subject, libapx_UNIT_INDEX_CACHE_COUNT, IntToFixed(unit_caches - 1));
+				unit_caches -= 1;
+				break;
+			}
+			else {
+				DataTableSetString(true, unit_id + "." + IntToString(unit_caches - i + 1), cache_next);
+			}
+
+			//now the check repeats
+		}
+		else {
+			//go to the next cache
+			i -= 1;
+			cache = DataTableGetString(true, unit_id + "." + IntToString(unit_caches - i));
+		}
+	}
+
+	//now add the new command to the caches
+	libapx_unit_cache_update_add(subject, unit_id, user_command);
+}
+
+// libapx_unit_cache_update
+// =====================
+// redirects to proper cache update function depending on command:
+// -> certain commands will overwrite previous (save space)
+// -> other commands always added because dont know whether its safe
+//    or not to rewrite previous instance
+void libapx_unit_cache_update(unit subject, string command, string user_command) {
+	string unit_id = FixedToString(UnitGetCustomValue(subject, libapx_UNIT_INDEX_ID), 0);
+
+	//if map has cache limit, checks for limit
+	if( libapx_UNIT_CACHE_LIMIT != -1 && FixedToInt(UnitGetCustomValue(subject, libapx_UNIT_INDEX_CACHE_COUNT)) > libapx_UNIT_CACHE_LIMIT ) {
+		return;
+	}
+
+	// VISUALS - attach, modelswap, tint, scale, animspeed, play
+	// only overwrite for specific instances of an actor (after attach)
+	if(command == "@attach") {
+		libapx_unit_cache_update_add(subject, unit_id, user_command);
+		UnitSetCustomValue(subject, libapx_UNIT_INDEX_FLAG_TINT, 0); //"reset" tint
+		UnitSetCustomValue(subject, libapx_UNIT_INDEX_FLAG_SCALE, 0); //"reset" scale
+		UnitSetCustomValue(subject, libapx_UNIT_INDEX_FLAG_MS, 0); //"reset" modelswap
+		UnitSetCustomValue(subject, libapx_UNIT_INDEX_FLAG_ANIMSPEED, 0); //"reset" animspeed
+		UnitSetCustomValue(subject, libapx_UNIT_INDEX_FLAG_PLAY, 0); //"reset" play
+		UnitSetCustomValue(subject, libapx_UNIT_INDEX_FLAG_STATBARS, 0); //"reset" statbars
+		UnitSetCustomValue(subject, libapx_UNIT_INDEX_FLAG_ROTATE, 0); //"reset" rotate
+		return;
+	}
+	else if(command == "@attach-") {
+		libapx_unit_cache_update_add(subject, unit_id, user_command);
+		UnitSetCustomValue(subject, libapx_UNIT_INDEX_FLAG_TINT, 0); //"reset" tint
+		UnitSetCustomValue(subject, libapx_UNIT_INDEX_FLAG_SCALE, 0); //"reset" scale
+		UnitSetCustomValue(subject, libapx_UNIT_INDEX_FLAG_MS, 0); //"reset" modelswap
+		UnitSetCustomValue(subject, libapx_UNIT_INDEX_FLAG_ANIMSPEED, 0); //"reset" animspeed
+		UnitSetCustomValue(subject, libapx_UNIT_INDEX_FLAG_PLAY, 0); //"reset" play
+		UnitSetCustomValue(subject, libapx_UNIT_INDEX_FLAG_STATBARS, 0); //"reset" statbars
+		UnitSetCustomValue(subject, libapx_UNIT_INDEX_FLAG_ROTATE, 0); //"reset" rotate
+		return;
+	}
+
+	else if(command == "@tint") {
+		if(UnitGetCustomValue(subject, libapx_UNIT_INDEX_FLAG_TINT) != 1) {
+			libapx_unit_cache_update_add(subject, unit_id, user_command);
+			UnitSetCustomValue(subject, libapx_UNIT_INDEX_FLAG_TINT, 1);
+			return;
+		}
+		else {
+			libapx_unit_cache_update_overwrite(subject, unit_id, command, user_command);
+			return;
+		}
+	}
+	else if(command == "@scale") {
+		if(UnitGetCustomValue(subject, libapx_UNIT_INDEX_FLAG_SCALE) != 1) {
+			libapx_unit_cache_update_add(subject, unit_id, user_command);
+			UnitSetCustomValue(subject, libapx_UNIT_INDEX_FLAG_SCALE, 1);
+			return;
+		}
+		else {
+			libapx_unit_cache_update_overwrite(subject, unit_id, command, user_command);
+			return;
+		}
+	}
+	else if(command == "@modelswap") { // special case: allow for 2 instances, needed for modelers
+		if(UnitGetCustomValue(subject, libapx_UNIT_INDEX_FLAG_MS) != 2) {
+			libapx_unit_cache_update_add(subject, unit_id, user_command);
+			UnitSetCustomValue(subject, libapx_UNIT_INDEX_FLAG_MS, UnitGetCustomValue(subject, libapx_UNIT_INDEX_FLAG_MS) + 1);
+			return;
+		}
+		else {
+			libapx_unit_cache_update_overwrite(subject, unit_id, command, user_command);
+			return;
+		}
+	}
+	else if(command == "@animspeed") {
+		if(UnitGetCustomValue(subject, libapx_UNIT_INDEX_FLAG_ANIMSPEED) != 1) {
+			libapx_unit_cache_update_add(subject, unit_id, user_command);
+			UnitSetCustomValue(subject, libapx_UNIT_INDEX_FLAG_ANIMSPEED, 1);
+			return;
+		}
+		else {
+			libapx_unit_cache_update_overwrite(subject, unit_id, command, user_command);
+			return;
+		}
+	}
+	else if(command == "@play") {
+		if(UnitGetCustomValue(subject, libapx_UNIT_INDEX_FLAG_PLAY) != 1) {
+			libapx_unit_cache_update_add(subject, unit_id, user_command);
+			UnitSetCustomValue(subject, libapx_UNIT_INDEX_FLAG_PLAY, 1);
+			return;
+		}
+		else {
+			libapx_unit_cache_update_overwrite(subject, unit_id, command, user_command);
+			return;
+		}
+	}
+	else if(command == "@statbars") {
+		if(UnitGetCustomValue(subject, libapx_UNIT_INDEX_FLAG_STATBARS) != 1) {
+			libapx_unit_cache_update_add(subject, unit_id, user_command);
+			UnitSetCustomValue(subject, libapx_UNIT_INDEX_FLAG_STATBARS, 1);
+			return;
+		}
+		else {
+			libapx_unit_cache_update_overwrite(subject, unit_id, command, user_command);
+			return;
+		}
+	}
+	else if(command == "@rotate") {
+		if(UnitGetCustomValue(subject, libapx_UNIT_INDEX_FLAG_ROTATE) != 1) {
+			libapx_unit_cache_update_add(subject, unit_id, user_command);
+			UnitSetCustomValue(subject, libapx_UNIT_INDEX_FLAG_ROTATE, 1);
+			return;
+		}
+		else {
+			libapx_unit_cache_update_overwrite(subject, unit_id, command, user_command);
+			return;
+		}
+	}
+	// Never overwrite these commands: always add a new command to cache
+	else if( command == "@actrmsg" ||
+			 command == "@addbehavior" ||
+			 command == "@removebehavior" ||
+			 command == "@addweapon" ||
+			 command == "@removeweapon" ||
+			 command == "@effect" ||
+			 command == "@state" ||
+			 command == "@target"
+			 ) {
+		libapx_unit_cache_update_add(subject, unit_id, user_command);
+		return;
+	}
+	// These commands always override previous when used, so always overwrite
+	else if( command == "@adddamage" ||
+			 command == "@addrange" ||
+			 command == "@height" ||
+			 command == "@invulnerable" ||
+			 command == "@setname" ||
+			 command == "@setnamecolor" ||
+			 command == "@subtitle" ||
+			 command == "@renameall" ||
+			 command == "@color" ||
+			 command == "@tooltip" ||
+			 command == "@weaponspeed" ||
+			 command == "@weaponspeedall" ||
+			 command == "@armor" ||
+			 command == "@shieldsarmor" ) {
+		libapx_unit_cache_update_overwrite(subject, unit_id, command, user_command);
+		return;
+	}
+
+}
+
+// libapx_unit_cache_undo
+// =====================
+// Undos previous commands (only those that were cached) by rebuilding
+// a unit using caches up to (-X commands), where X is undo depth specified by:
+// syntax: @undo X
+unit libapx_unit_cache_undo(unit subject_orig, int undo_iterations) {
+	int cache = 1;
+	int iterations = undo_iterations;
+	int pos_start;
+	string unit_cache_current;
+	string unit_id;
+	string unit_id_old = FixedToString(UnitGetCustomValue(subject_orig, libapx_UNIT_INDEX_ID), 0);
+	unit subject_undo;
+	unitgroup g;
+
+	//create new and remove old
+	UnitCreate(1, UnitGetType(subject_orig), c_unitCreateIgnorePlacement, UnitGetOwner(subject_orig),
+		UnitGetPosition(subject_orig), UnitGetFacing(subject_orig));
+
+	subject_undo = UnitLastCreated();
+	//set new undo unit cache
+	libapx_unit_set_id( subject_undo );
+	DataTableSetBool(true, unit_id + ".unit", true);
+	UnitSetCustomValue(subject_undo, libapx_UNIT_INDEX_CACHE_COUNT, 1); //set the unit cache value
+	UnitSetCustomValue(UnitLastCreated(), 16, 0); //set the modelswap flag to 0
+
+	//set undo units properties
+	UnitSetState(subject_undo, c_unitStateHidden,
+		UnitTestState(subject_orig, c_unitStateHidden));
+	UnitSetState(subject_undo, c_unitStateHighlightable,
+		UnitTestState(subject_orig, c_unitStateHighlightable));
+	UnitSetState(subject_undo, c_unitStateIgnoreTerrainZ,
+		UnitTestState(subject_orig, c_unitStateIgnoreTerrainZ));
+	UnitSetState(subject_undo, c_unitStateFidget,
+		UnitTestState(subject_orig, c_unitStateFidget));
+	UnitSetState(subject_undo, c_unitStateTargetable,
+		UnitTestState(subject_orig, c_unitStateTargetable));
+	UnitSetState(subject_undo, c_unitStateTooltipable,
+		UnitTestState(subject_orig, c_unitStateTooltipable));
+	UnitSetState(subject_undo, c_unitStateCursorable,
+		UnitTestState(subject_orig, c_unitStateCursorable));
+	UnitSetState(subject_undo, c_unitStateHighlighted,
+		UnitTestState(subject_orig, c_unitStateHighlighted));
+	UnitSetState(subject_undo, c_unitStateUsingSupply,
+		UnitTestState(subject_orig, c_unitStateUsingSupply));
+	UnitSetPropertyFixed(subject_undo, c_unitPropLifeMax,
+		UnitGetPropertyFixed(subject_orig, c_unitPropLifeMax, true));
+	UnitSetPropertyFixed(subject_undo, c_unitPropLife,
+		UnitGetPropertyFixed(subject_orig, c_unitPropLife, true));
+	UnitSetPropertyFixed(subject_undo, c_unitPropLifeRegen,
+		UnitGetPropertyFixed(subject_orig, c_unitPropLifeRegen, true));
+	UnitSetPropertyFixed(subject_undo, c_unitPropEnergyMax,
+		UnitGetPropertyFixed(subject_orig, c_unitPropEnergyMax, true));
+	UnitSetPropertyFixed(subject_undo, c_unitPropEnergy,
+		UnitGetPropertyFixed(subject_orig, c_unitPropEnergy, true));
+	UnitSetPropertyFixed(subject_undo, c_unitPropEnergyRegen,
+		UnitGetPropertyFixed(subject_orig, c_unitPropEnergyRegen, true));
+	UnitSetPropertyFixed(subject_undo, c_unitPropShieldsMax,
+		UnitGetPropertyFixed(subject_orig, c_unitPropShieldsMax, true));
+	UnitSetPropertyFixed(subject_undo, c_unitPropShields,
+		UnitGetPropertyFixed(subject_orig, c_unitPropShields, true));
+	UnitSetPropertyFixed(subject_undo, c_unitPropShieldsRegen,
+		UnitGetPropertyFixed(subject_orig, c_unitPropShieldsRegen, true));
+	UnitSetPropertyFixed(subject_undo, c_unitPropKills,
+		UnitGetPropertyFixed(subject_orig, c_unitPropKills, true));
+	UnitSetPropertyFixed(subject_undo, c_unitPropMovementSpeed,
+		UnitGetPropertyFixed(subject_orig, c_unitPropMovementSpeed, true));
+	UnitSetPropertyFixed(subject_undo, c_unitPropResources,
+		UnitGetPropertyFixed(subject_orig, c_unitPropResources, true));
+
+
+	//undo iterations listed in original units cache
+	cache = FixedToInt(UnitGetCustomValue(subject_orig, libapx_UNIT_INDEX_CACHE_COUNT));
+	while(iterations > 0 && cache > 0) {
+		if(DataTableValueExists(true, unit_id_old + "." + IntToString(cache))) {
+			unit_cache_current = DataTableGetString(true, unit_id_old + "." + IntToString(cache));
+			pos_start = StringLength(unit_cache_current);
+
+			while(pos_start > 0 && iterations > 0) {
+				if(StringSub(unit_cache_current, pos_start, pos_start) == ";") {
+					//command found: remove it
+					unit_cache_current = StringReplace(unit_cache_current, "", pos_start, StringLength(unit_cache_current));
+					iterations -= 1;
+				}
+				pos_start -= 1;
+			}
+			if(pos_start == 0) {
+				DataTableValueRemove(true, unit_id_old + "." + IntToString(cache));
+				iterations -= 1;
+			}
+			else {
+				DataTableSetString(true, unit_id_old + "." + IntToString(cache), unit_cache_current);
+			}
+		}
+		cache -= 1;
+	}
+
+	//remove the old unit
+	UnitRemove(subject_orig);
+
+	//now parse all the commands from original unit to the new unit
+	cache = 1;
+	g = UnitGroupEmpty();
+	UnitGroupAdd(g, subject_undo);
+
+	libapx_player_parser[UnitGetOwner(subject_undo)][libapx_player[EventPlayer()].spawningCount].context = g;
+	while(DataTableValueExists(true, unit_id_old + "." + IntToString(cache))) {
+		//libapx_chat_parsechat(UnitGetOwner(subject_undo), DataTableGetString(true, unit_id_old + "." + IntToString(cache)), libapx_chat_recursion_limit);
+		cache += 1;
+	}
+	//libapx_unit_cache_isCopying[UnitGetOwner(subject_undo)] = false;
+
+	//remove old unit's cache
+	libapx_unit_data_remove(subject_orig);
+
+	//finally, write how many commands undid and return the unit
+	libapx_print_success(EventPlayer(), "(Unit: " + UnitGetType(subject_undo) + ") " + "Undid " + IntToString(undo_iterations - iterations) + " commands");
+
+	return subject_undo;
+}
+
+void libapx_unit_keypress_check() {
+	int i;
+	unitgroup target;
+	unitgroup g;
+	unit u;
+	int player;
+	string input;
+	player = EventPlayer();
+
+
+	target = UnitGroupSelected(player);
+	//target = libapx_enforce_unit_permissions(target, player);
+
+
+	g = target;
+
+
+
+	UnitGroupLoopBegin(g);
+	while(!UnitGroupLoopDone()) {
+		i = i + 1;
+		u = UnitGroupLoopCurrent();
+
+
+		UnitGroupLoopStep();
+	}
+	UnitGroupLoopEnd();
+	if(i > 1) {
+		libapx_print_error( player, " Keypress can only be fired with one unit selected! " );
+		return;
+	}
+	if(	player != UnitGetOwner(u) ) {
+		libapx_print_output( player, "You must own the unit to use keypress on it. ");
+		return;
+	}
+	if(libapx_player[player].key_q == true ) {
+		input = libapx_unit_get_val(u, "key_q");
+		libapx_chat_parse(input, player, g, libapx_player[player].spawningCount);
+	}
+	if(libapx_player[player].key_w == true ) {
+		input = libapx_unit_get_val(u, "key_w");
+		libapx_chat_parse(input, player, g, libapx_player[player].spawningCount);
+	}
+	if(libapx_player[player].key_e == true ) {
+		input = libapx_unit_get_val(u, "key_e");
+		libapx_chat_parse(input, player, g, libapx_player[player].spawningCount);
+	}
+	if(libapx_player[player].key_r == true ) {
+		input = libapx_unit_get_val(u, "key_r");
+		libapx_chat_parse(input, player, g, libapx_player[player].spawningCount);
+	}
+	if(libapx_player[player].key_t == true ) {
+		input = libapx_unit_get_val(u, "key_t");
+		libapx_chat_parse(input, player, g, libapx_player[player].spawningCount);
+	}
+
+
+
+
+	return;
+}

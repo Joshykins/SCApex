@@ -1,0 +1,155 @@
+//=========================================================
+//	    Apex Roleplaying Engine
+//	    Copyright (c) 2017, Apex Group
+//=========================================================
+// This software is distributed under the MIT License:
+// <http://opensource.org/licenses/MIT>
+//=========================================================
+
+//=========================================================
+// This script is a part of LibX,
+// a collection of various Galaxy utils.
+// Copy and replicate this code freely!
+// --------------------------------------------------------
+// - by Xethyr.407 [NA] / @nmosfet
+// - MIT License <http://opensource.org/licenses/MIT>
+//=========================================================
+
+// General purpose implementation of qsort using a map's global data table
+// as the "stack." Pointers to array elements are simulated using the
+// data table string key addresses.
+
+// An "array" memory address simulated by the format of the string key:
+// [name] [#]
+
+// e.g. vals[2] <=> "vals 2"
+
+// Traversing the array is simply going through the keys with a counter:
+// "vals 1" -> "vals 2" -> ... -> "vals n"
+// This implementation of qsort assumes the client provides a properly
+// formatted key (as defined above) along with a proper size n.
+// Malformed keys or improper n will result in undefined behavior.
+
+// libx_arr_offset
+// ============
+// Returns the string key of the "array" element using the data table
+// with a given offset from the base index
+static string libx_arr_offset(string base, int offset) {
+	string var = StringWord(base, 1);
+	int index = StringToInt(StringWord(base, 2));
+
+	return var + " " + IntToString(index + offset);
+}
+
+// function signature for a data table element swap
+// the strings k1 and k2 refer to the data table keys of the element
+void libx_swap_signature(string k1, string k2);
+
+// funcref type for data table swap element func
+typedef funcref<libx_swap_signature> libx_swap_type;
+
+// array of data table element swap funcs
+//   -> because there is strong typing of data table values and no concept
+//   of general memory (void*), we must have a separate swap function
+//   for each variable type (e.g. int, string, float)
+// This array supports 43 swap funcs because there are 43 listed
+// variable types in the Blizzard natives (starting from 0)
+// By default, libx supports int and string swapping.
+static libx_swap_type[42] libx_swap;
+
+// libx_swap_int
+// ==============
+// swap two data table ints
+static void libx_swap_int(string k1, string k2) {
+	int temp;
+	temp = DataTableGetInt(true, k1);
+	DataTableSetInt(true, k1, DataTableGetInt(true, k2));
+	DataTableSetInt(true, k2, temp);
+}
+
+// libx_swap_string
+// ==============
+// swap two data table ints
+static void libx_swap_string(string k1, string k2) {
+	string temp;
+	temp = DataTableGetString(true, k1);
+	DataTableSetString(true, k1, DataTableGetString(true, k2));
+	DataTableSetString(true, k2, temp);
+}
+
+// function signature for comparison between two data table element
+// integer returned should indicate the following:
+//    > 0 : val(k1) > val(k2)
+//   == 0 : val(k1) == val(k2)
+//    < 0 : val(k1) < val(k2)
+// the client will provide this cmp function
+int libx_cmp_signature(string k1, string k2);
+
+// funcref type for data table cmp func
+typedef funcref<libx_cmp_signature> libx_cmp_type;
+
+// libx_sort
+// ==============
+// func inputs:
+//      string base  : string key of the
+//         int type  : constant definition for the variable type
+// libx_cmp_type cmp : comparison func
+//         int begin : starting index
+//         int end   : end index
+// qsort algorithm implementation taken from
+// <https://en.wikibooks.org/wiki/Algorithm_Implementation/Sorting/Quicksort#C>
+static void libx_sort(string base, int type, libx_cmp_type cmp, int begin, int end) {
+	libx_swap_type swap = libx_swap[type];
+	string pivot;
+	int l;
+	int r;
+	string base_off_r;
+	string base_off_l;
+
+	if( end > begin ) {
+		pivot = libx_arr_offset(base, begin);
+		l = begin + 1;
+		r = end;
+		while( l < r ) {
+			base_off_l = libx_arr_offset(base, l);
+			if( cmp(base_off_l, pivot) <= 0 ) {
+				l += 1;
+			} else {
+				r -= 1;
+				base_off_r = libx_arr_offset(base, r);
+				while( l < r && cmp(base_off_r, pivot) >= 0 ) {
+					r -= 1;
+					base_off_r = libx_arr_offset(base, r);
+				}
+				swap(libx_arr_offset(base, l), libx_arr_offset(base, r));
+			}
+		}
+		l -= 1;
+		swap(libx_arr_offset(base, begin), libx_arr_offset(base, l));
+		libx_sort(base, type, cmp, begin, l);
+		libx_sort(base, type, cmp, r, end);
+	}
+}
+
+// libx_qsort
+// ==============
+// Client wrapper function for qsort algorithm. Client must provide the cmp
+// function used to compare elements along with the variable type.
+// func inputs:
+//        string base    : string key of the starting element in data table
+//           int nitems  : number of elements in the "array"
+//           int type    : constant definition for the variable type
+// libx_cmp_type cmp     : comparison func
+void libx_qsort(string base, int nitems, int type, libx_cmp_type cmp) {
+	libx_sort(base, type, cmp, 0, nitems);
+}
+
+// libx_qsort_init
+// ===============
+// Initialization for qsort scripts.
+// MUST BE RUN FOR THIS QSORT IMPLEMENTATION TO WORK
+void libx_qsort_init() {
+	libx_swap[c_dataTypeInt] = libx_swap_int;
+	libx_swap[c_dataTypeString] = libx_swap_string;
+	// initialize all other data table swap functions here...
+}

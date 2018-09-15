@@ -1,0 +1,15 @@
+//=========================================================
+//		Apex Roleplaying Engine
+//		Copyright (c) 2017, Apex Group
+//=========================================================
+// This software is distributed under the MIT License:
+// <http://opensource.org/licenses/MIT>
+//=========================================================
+
+include "apex/engine/utility/string.galaxy"
+include "apex/engine/utility/qsort.galaxy"
+include "apex/engine/utility/apexUtil.galaxy"
+
+void libapx_scripts_init() {
+	libx_qsort_init();
+}

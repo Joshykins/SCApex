@@ -1,0 +1,87 @@
+
+string libapx_scalerapply(string s, unitgroup g, string category) {
+
+	string moddedOffSet = s;
+	fixed x;
+	fixed y;
+	fixed z;
+	string x2;
+	string y2;
+	string z2;
+	s = StringReplaceWord(s, ",", " ", 200, false);
+	x = StringToFixed(StringWord(s, 1));
+	if (StringWord(s, 3) == "") {
+		z = x;
+	}
+	if (StringWord(s, 2) == "") {
+		y = x;
+	}
+	else {
+		y = StringToFixed(StringWord(s, 2));
+		z = StringToFixed(StringWord(s, 3));
+	}
+
+		x = x*libapx_player[EventPlayer()].scaler;
+		y = y*libapx_player[EventPlayer()].scaler;
+		z = z*libapx_player[EventPlayer()].scaler;
+
+if (category == "scale") {
+	if (x<0.0006 && x > -0.0006) {
+		x = 0.0005;
+	}
+
+	if (y < 0.0006  && y > -0.0006) {
+		y = 0.0005;
+	}
+
+	if (z < 0.0006  && z > -0.0006) {
+		z = 0.0005;
+	}
+} else {
+	if (x<0.0006 && x > -0.0006) {
+		x = 0;
+	}
+
+	if (y < 0.0006  && y > -0.0006) {
+		y = 0;
+	}
+
+	if (z < 0.0006  && z > -0.0006) {
+		z = 0;
+	}
+}
+
+
+
+
+	UnitGroupLoopBegin(g);
+	while( !UnitGroupLoopDone() ) {
+
+		if (x > 8.0) {
+			libapx_unit_flag_col_crashable(UnitGroupLoopCurrent());
+		}
+
+		if (y > 8.0) {
+			libapx_unit_flag_col_crashable(UnitGroupLoopCurrent());
+		}
+
+		if (z > 8.0) {
+			libapx_unit_flag_col_crashable(UnitGroupLoopCurrent());
+		}
+		UnitGroupLoopStep();
+	}
+	UnitGroupLoopEnd();
+
+
+
+	x2 = FixedToString(x, 4);
+	y2 = FixedToString(y, 4);
+	z2 = FixedToString(z, 4);
+
+//	libapx_print_output(EventPlayer(), x2 + " " + y2 + " " + z2);
+	moddedOffSet = x2+","+y2+","+z2;
+
+	return moddedOffSet;
+
+}
+///Don't need anymore

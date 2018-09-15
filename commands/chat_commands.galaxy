@@ -1,0 +1,331 @@
+//=========================================================
+//		Apex Roleplaying Engine
+//		Copyright (c) 2017, Apex Group
+//=========================================================
+// This software is distributed under the MIT License:
+// <http://opensource.org/licenses/MIT>
+//=========================================================
+
+
+// libapx_command_narrate
+// ====================
+// just prints out a line of text to everyone
+void libapx_command_narrate(int user, unitgroup u, string argv, int spawningCount, string bracketText) {
+	string msg = argv;
+	msg = StringSub( msg, StringFind(msg, " ", c_stringCase) + 1, StringLength(msg) ); // remainder of chat message
+
+	libapx_print(PlayerGroupAll(), libapx_string_trim(msg));
+
+	// log msg in chatlog
+	libapx_log(user, StringToText(""), msg);
+
+	return;
+}
+
+// libapx_command_say
+// ==================
+// prints [unit name]: msg to chat
+// (actor talk icon and sound are defined in data.galaxy)
+void libapx_command_say(int user, unitgroup u, string argv, int spawningCount, string bracketText) {
+	text unit_name;
+	text unit_msg;
+	string cmd_msg = argv;
+	cmd_msg = " " + libapx_string_trim(StringSub( cmd_msg, StringFind(cmd_msg, " ", c_stringCase) + 1, StringLength(cmd_msg) )); // remainder of chat message
+
+	unit_msg = StringToText(cmd_msg);
+
+
+	if (UnitGroupCount(u, c_unitCountAlive) > 1) {
+		libapx_print_error(user, "Command can only be used on one unit.");
+		return;
+	}
+
+	UnitGroupLoopBegin(u);
+	while(!UnitGroupLoopDone()) {
+		unit_name = libapx_unit_get_name( UnitGroupLoopCurrent() );
+
+		// @say unit visuals (flash circle, make a talk icon appear overhead)
+		UnitFlashSelection(UnitGroupLoopCurrent(), 2.0);
+		ActorSend(libNtve_gf_MainActorofUnit(UnitGroupLoopCurrent()), "AttachModel " + libapx_TALK_ICON_ACTOR + "{} Overhead");
+
+		libapx_print_text(PlayerGroupAll(), unit_name + unit_msg);
+
+		// log msg in chatlog
+		libapx_log(user, unit_name, cmd_msg);
+
+		UnitGroupLoopStep();
+	}
+	UnitGroupLoopEnd();
+
+	return;
+}
+
+// libapx_command_setname
+// ==================
+// gives a unit a custom name by storing in data table
+void libapx_command_setname(int user, unitgroup u, string argv, int spawningCount, string bracketText) {
+	string name = argv;
+	name = StringSub( name, StringFind(name, " ", c_stringCase) + 1, StringLength(name) ); // remainder of chat message
+
+	UnitGroupLoopBegin(u);
+	while(!UnitGroupLoopDone()) {
+
+
+		libapx_unit_set_name(name, UnitGroupLoopCurrent());
+		libapx_print_output(user, "Unit [ID: " + libapx_unit_id(UnitGroupLoopCurrent()) + "] name set to: " + name);
+		libapx_unit_cache_update(UnitGroupLoopCurrent(), "@setname", argv);
+		UnitGroupLoopStep();
+	}
+	UnitGroupLoopEnd();
+
+	return;
+}
+
+// libapx_command_setnamecolor
+// ==================
+// sets a units name to a specific color, where
+// @setnamecolor [red] [green] [blue]
+// input RGB between 0-256 (by convention), but Color() takes fixed between 0-100,
+// so must normalize RGB to 0-100
+void libapx_command_setnamecolor(int user, unitgroup u, string argv, int spawningCount, string bracketText) {
+	fixed r = StringToFixed( StringWord(argv, 2 ) );
+	fixed g = StringToFixed( StringWord(argv, 3 ) );
+	fixed b = StringToFixed( StringWord(argv, 4 ) );
+	color col = Color( r*100/256 , g*100/256 , b*100/256 ); // normalize to 100
+
+	UnitGroupLoopBegin(u);
+	while(!UnitGroupLoopDone()) {
+		libapx_unit_set_name_color(col, UnitGroupLoopCurrent());
+		libapx_print_text(PlayerGroupSingle(user), StringToText("> Unit [ID: " + libapx_unit_id(UnitGroupLoopCurrent()) + "] name set to: ") + libapx_unit_get_name(UnitGroupLoopCurrent()));
+		libapx_unit_cache_update(UnitGroupLoopCurrent(), "@setnamecolor", argv);
+		UnitGroupLoopStep();
+	}
+	UnitGroupLoopEnd();
+
+	return;
+}
+
+// libapx_command_repeat
+// =======================
+// Repeats a strings
+// >repeat 25 [@spawn marine;@modelswap marauder]
+
+void libapx_command_repeat(int user, unitgroup u, string argv, int spawningCount, string bracketText) {
+	int iterations = StringToInt(StringWord(argv, 2));
+	int i;
+	for(i = 0; i < iterations; i += 1) {
+		libapx_chat_parse(bracketTextGrab(bracketText, 1), user, u, spawningCount);
+	}
+
+
+
+	return;
+}
+
+// libapx_command_keypres
+// =======================
+// Assigns a string to a certain key for the selected unit
+// When that key and that unit(only that unit) are selected, the string parses.
+// :)
+void libapx_command_keypress(int user, unitgroup u, string argv, int spawningCount, string bracketText) {
+	string keypress_string;
+	int i = 1;
+	bool is_key = false;
+	keypress_string = bracketTextGrab(bracketText, 1);
+
+
+	if (StringCase(StringWord(argv, 2), c_stringNoCase) == "help") {
+		libapx_print_output(user, "The current keys able to be used are \" <c val=\"00ff00\">" + libapx_all_keys + " \"</c> </n> The format for the command is >keypress key [commandshere] ");
+		return;
+	}
+	while(StringWord(libapx_all_keys, i) != "") {
+
+		if (StringWord(argv, 2) == StringWord(libapx_all_keys, i)) {
+			is_key = true;
+			break;
+		}
+
+		i = i + 1;
+	}
+	if(is_key) {
+		UnitGroupLoopBegin(u);
+		while(!UnitGroupLoopDone()) {
+
+			libapx_unit_set_val(UnitGroupLoopCurrent(), StringWord(argv, 2), keypress_string);
+
+			libapx_print_output(user, "Set keypress key " + StringWord(argv, 2) + " On unit to string.");
+			UnitGroupLoopStep();
+		}
+		UnitGroupLoopEnd();
+	}
+	else {
+		libapx_print_error(user, "Invalid key inputted, type </c>\" >keypress help \"<c val=\"ff0000\"> to list all assignable keys.");
+	}
+
+
+
+
+
+
+	return;
+}
+
+// libapx_command_chance
+// =======================
+// Gives a chance to display one of two input strings
+// chance percentage is determined by division 
+//ex. >chance 2/3 [hi] [bye]
+// 66% chance to say hi, 33% chance to say bye
+
+void libapx_command_chance(int user, unitgroup u, string argv, int spawningCount, string bracketText) {
+	string temp = StringReplace(StringWord(argv, 2), " ", StringFind(StringWord(argv, 2), "/", c_stringNoCase), StringFind(StringWord(argv, 2), "/", c_stringNoCase));
+	fixed percentage = StringToFixed(StringWord(temp, 1))/StringToFixed(StringWord(temp, 2));
+	bool chance = RandomFixed(0, 1) <= percentage;
+	if(chance) {
+		libapx_chat_parse(bracketTextGrab(bracketText, 1), user, u, spawningCount);
+	}
+	else {
+		libapx_chat_parse(bracketTextGrab(bracketText, 2), user, u, spawningCount);
+	}
+
+
+
+	return;
+}
+// libapx_command_random
+// =======================
+// spits out a random entered string
+
+
+void libapx_command_random(int user, unitgroup u, string argv, int spawningCount, string bracketText) {
+	int pickedEntry;
+	int i = 1;
+	int safe = 50;
+	while(bracketTextGrab(bracketText, i) != " ") {
+		i = i + 1;
+		if (i>50) {
+			return;
+			break;
+		}
+	} 
+	pickedEntry = RandomInt(1,i);
+
+	libapx_chat_parse(bracketTextGrab(bracketText, pickedEntry), user, u, spawningCount);
+	return;
+}
+
+// libapx_command_moveto
+// =======================
+// moves a unit to a location, then fires the string inputted once it arrives.
+// >moveto cannon/mouse -modifier [textToBeFired]
+
+
+
+void libapx_command_moveto(int user, unitgroup u, string argv, int spawningCount, string bracketText) {
+	string abil;
+	unit target;
+	point pt = libapx_player[user].mouse_position;
+	int mode = c_orderQueueReplace;
+	order o;
+	fixed moveSpeed;
+	fixed distance;
+	int i = 0;
+	//linear
+	bool modHeight = false;
+	fixed desiredHeight = 4;
+	//Parabolic
+	bool modArc = false;
+	fixed desiredPeak;
+	fixed slopeOfTangentLine;
+	fixed slopeOfTangentLinePerp;
+	point center;
+	point endPoint;
+	point startPoint;
+	point graphPoint;
+	int indexJumper;
+	fixed radius;
+	fixed x;
+	int percision;
+	fixed y;
+	//Otherstuff
+	fixed timeUnitlFinished;
+	abil = libapx_catalog_get(c_gameCatalogAbil, "move");
+
+	
+
+	if (UnitGroupCount(u, c_unitCountAlive) > 1) {
+		libapx_print_error(user, "Command can only be used on one unit.");
+		return;
+	}
+
+	if (StringWord(argv, 2) == "-height") {
+		modHeight = true;
+		desiredHeight = StringToFixed(StringWord(argv, 3));
+	}
+	if (StringWord(argv, 2) == "-arc") {
+		modArc = true;
+		if(StringWord(argv, 3) == "" ) {
+			desiredPeak=4;
+		} else {
+			desiredPeak = StringToFixed(StringWord(argv, 3));
+		}
+
+		
+		if (desiredPeak <= 0) {
+			desiredPeak = .1;
+		}
+	}
+	target =	UnitGroupUnit(u, 1);
+	o = OrderTargetingPoint(AbilityCommand(abil, 0), pt);
+	UnitIssueOrder(target, o, mode);
+	 AnimLengthQueryWait();
+	 distance = DistanceBetweenPoints(pt, UnitGetPosition(target));
+	 moveSpeed = UnitGetPropertyFixed(target, c_unitPropMovementSpeed, c_unitPropCurrent);
+	 timeUnitlFinished = distance/moveSpeed;
+	 if (modHeight) {
+		 UnitSetHeight(target,desiredHeight,timeUnitlFinished);
+		 Wait(timeUnitlFinished,c_timeGame);
+		 libapx_chat_parse(bracketTextGrab(bracketText, 1),user, u, spawningCount );
+	 }
+	else if (modArc) {
+		//config
+		percision = 8; 
+
+		//Getting points
+		startPoint = Point(-distance/2, 0 );
+		endPoint = Point(distance/2, 0 );
+		graphPoint = Point ( 0, desiredPeak );
+
+
+
+		for(i = 0; i < percision; i = i + 1 ) {
+			x = ((distance/percision)*(i+1))-distance/2;
+			y = util_parabolaCalc(graphPoint, startPoint, x);
+
+			UnitSetHeight(target, y, timeUnitlFinished/percision);
+			Wait(timeUnitlFinished/percision,c_timeGame);
+
+		};
+
+		libapx_chat_parse(bracketTextGrab(bracketText, 1),user, u, spawningCount );
+
+
+		//UnitSetHeight(target,heightOfArc,timeUnitlFinished/2);
+		//Wait(timeUnitlFinished/2,c_timeGame);
+		//UnitSetHeight(target,0,timeUnitlFinished/2);
+		//Wait(timeUnitlFinished/2,c_timeGame);
+		//libapx_chat_parse(bracketTextGrab(bracketText, 1),user, u, spawningCount );
+
+
+	 }
+	 else {
+		Wait(timeUnitlFinished,c_timeGame);
+		libapx_chat_parse(bracketTextGrab(bracketText, 1),user, u, spawningCount );
+	 }
+
+
+	 
+	 
+
+	return;
+}

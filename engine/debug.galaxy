@@ -1,0 +1,15 @@
+//=========================================================
+//		Apex Roleplaying Engine
+//		Copyright (c) 2017, Apex Group
+//=========================================================
+// This software is distributed under the MIT License:
+// <http://opensource.org/licenses/MIT>
+//=========================================================
+
+
+// libapx_player_struct_dump
+// ==============================
+// dump values of struct
+void libapx_player_struct_dump(int player) {
+
+}
