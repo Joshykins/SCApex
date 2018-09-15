@@ -7,8 +7,6 @@ efficiently creating and saving scenery and characters, along with tools for
 storytelling. Apex provides full control over the map, so it can also be used
 as a flexible general purpose testing environment.  
 
-For a list of features, visit the [wiki](github.com/Joshykins/Apex-rp/wiki).
-
 # Installation
 To use Apex on a StarCraft II map first requires access to the
 StarCraft II Editor (SC2Editor). Apex uses data, Galaxy scripts,
@@ -47,9 +45,9 @@ in the action list which will say
 Run Trigger (Check Conditions, Don't Wait until it finishes)
 ```
 Select the **Trigger** and a window will appear with multiple triggers. Select
-**Apex_init** and hit OK. The action should now say
+**apex_trig** and hit OK. The action should now say
 ```
-Run Apex_init (Check Conditions, Don't Wait until it finishes)
+Run apex_trig (Check Conditions, Don't Wait until it finishes)
 ```
 
 You are now good to go! Run the map and see if the Apex engine works!
@@ -102,12 +100,10 @@ Now test the map and see if the Apex engine works!
 
 
 # Contact
-**Github repo:** https://github.com/nmosfet/Apex-rp  
-**Lead developer:** @Joshykins / SeroBliss (serogame2@gmail.com)  
+**Github repo:** https://github.com/Joshykins/SCApex
+**Lead developer:** @Joshykins / Serobliss (serobliss2@gmail.com)  
 **SC2 Handle:** Serobliss  
-** Developers:** @GPhazon / GPhazon (gphazon@gmail.com) ;
-@octosnake / Snivs (?)
-@LunarSama / Lunar (?)
+** Developers:** @GPhazon / GPhazon (gphazon@gmail.com) 
 
 
 # Acknowledgements
@@ -118,4 +114,5 @@ inherited from this engine (though there have been many divergences).
 Thus I would like to give a huge personal thanks to Ponce and the rest of the
 original Cortex team for their early work on making a roleplaying environment
 for StarCraft II.
-Also, a big thank you to Xethyr for all of the work that he did making the Wyvern Engine which this engine is ~~copy-pasted~~ based off of.
+
+Also, a big thank you to Xethyr for all of the work that he did making the Wyvern Engine.
