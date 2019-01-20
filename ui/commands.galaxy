@@ -1,6 +1,6 @@
 //=========================================================
 //		Apex Roleplaying Engine
-//		Copyright (c) 2017, Apex Group
+//		Copyright (c) 2019, Apex Group
 //=========================================================
 // This software is distributed under the MIT License:
 // <http://opensource.org/licenses/MIT>
@@ -40,38 +40,49 @@ void libapx_ui_commands_init() {
 }
 void libapx_ui_commands_init_player(int player) {
   //Stringword not working on string?
-  int i = 1;
-  while(StringWord(libapx_ui_commands_str_categories, i) != "") {
-    DialogControlAddItem(libapx_ui_commands_category, PlayerGroupSingle(player), StringToText(StringWord(libapx_ui_commands_str_categories, i)));
+  int i = 0;
+  while(commands_guide_get_entry(i) != "") {
+    DialogControlAddItem(libapx_ui_commands_category, PlayerGroupSingle(player), StringToText(commands_guide_get_entry(i)));
     i+=1;
   }
 }
 bool libapx_ui_category_select(bool testConds, bool runActions) {
   int player = EventPlayer();
-  int j = 1;
-  int i = 1;
+  int desiredType;
+  int i = 0;
   DialogControlRemoveAllItems(libapx_ui_commands_commands, PlayerGroupSingle(player));
-  j=DialogControlGetSelectedItem(libapx_ui_commands_category, player);
-  while(libapx_ui_commands_entry[j][i].cmd != "") {
-    DialogControlAddItem(libapx_ui_commands_commands, PlayerGroupSingle(player), StringToText(libapx_ui_commands_entry[j][i].cmd));
+  desiredType=DialogControlGetSelectedItem(libapx_ui_commands_category, player)-1;
+  while(g_commands_guide_entries[i].name != "") {
+    if(g_commands_guide_entries[i].type == desiredType) {
+      DialogControlAddItem(libapx_ui_commands_commands, PlayerGroupSingle(player), StringToText(g_commands_guide_entries[i].name));
+    }
     i+=1;
   }
   return true;
 }
 bool libapx_ui_commands_select(bool testConds, bool runActions) {
   int player = EventPlayer();
-  int j = 1;
-  int i = 1;
+  int desiredType = 1;
+  int desiredCommand = 1;
+  int commandIndex;
+  int i;
+  int currentCommand = 0;
   DialogControlRemoveAllItems(libapx_ui_commands_output, PlayerGroupSingle(player));
-  j=DialogControlGetSelectedItem(libapx_ui_commands_category, player); //Category #j
-  i=DialogControlGetSelectedItem(libapx_ui_commands_commands, player); //Iteration in category #i
-  DialogControlAddItem(libapx_ui_commands_output, PlayerGroupSingle(player), StringToText(libapx_ui_commands_entry[j][i].l1));
-  DialogControlAddItem(libapx_ui_commands_output, PlayerGroupSingle(player), StringToText(libapx_ui_commands_entry[j][i].l2));
-  DialogControlAddItem(libapx_ui_commands_output, PlayerGroupSingle(player), StringToText(libapx_ui_commands_entry[j][i].l3));
-  DialogControlAddItem(libapx_ui_commands_output, PlayerGroupSingle(player), StringToText(libapx_ui_commands_entry[j][i].l4));
-  DialogControlAddItem(libapx_ui_commands_output, PlayerGroupSingle(player), StringToText(libapx_ui_commands_entry[j][i].l5));
-  DialogControlAddItem(libapx_ui_commands_output, PlayerGroupSingle(player), StringToText(libapx_ui_commands_entry[j][i].l6));
-  DialogControlAddItem(libapx_ui_commands_output, PlayerGroupSingle(player), StringToText(libapx_ui_commands_entry[j][i].l7));
-  DialogControlAddItem(libapx_ui_commands_output, PlayerGroupSingle(player), StringToText(libapx_ui_commands_entry[j][i].l8));
+  desiredType=DialogControlGetSelectedItem(libapx_ui_commands_category, player)-1;
+  desiredCommand=DialogControlGetSelectedItem(libapx_ui_commands_commands, player)-1;
+  
+  i = 0;
+  //Source
+  while(g_commands_guide_entries[i].name != "") {
+    if(g_commands_guide_entries[i].type == desiredType) {
+
+      if(currentCommand == desiredCommand) {
+        command_guide_format_description(libapx_ui_commands_output, PlayerGroupSingle(player),g_commands_guide_entries[i].description);
+        return true;
+      }
+      currentCommand += 1;
+    }
+    i+=1;
+  }
   return true;
 }

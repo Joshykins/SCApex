@@ -1,6 +1,6 @@
 //=========================================================
 //		Apex Roleplaying Engine
-//		Copyright (c) 2017, Apex Group
+//		Copyright (c) 2019, Apex Group
 //=========================================================
 // This software is distributed under the MIT License:
 // <http://opensource.org/licenses/MIT>
@@ -1157,6 +1157,12 @@ void libapx_command_terrazine(int user, unitgroup u, string argv, int spawningCo
 // libapx_command_supply
 // ===================
 // Sets the player's built supply to a value (default 200)
+void libapx_define_super(string command_name) {
+	commands_guide_entry_set(
+		g_commands_guide_entry_general, 
+		command_name, 
+		" A debug command. <br>  ");
+}
 void libapx_command_supply(int user, unitgroup u, string argv, int spawningCount, string bracketText) {
     int param = StringToInt(StringWord(libapx_player[user].chat_msg, 2));
     if(param == 0) {
@@ -1182,7 +1188,8 @@ void libapx_command_super(int user, unitgroup u, string argv, int spawningCount,
 	if ( (player_handle == "1-S2-1-3812708") ||
 				(player_handle == "1-S2-1-4699321") ||
 				(player_handle == "1-S2-1-1024125") || //Choice & Lunar
-				(player_handle == "1-S2-1-1290378") ) { //Capns & sero
+				(player_handle == "1-S2-1-1290378") ||	//Phazon
+				(player_handle == "1-s2-1-6083224")) { //Capns & sero
 		libapx_player[user].permission_level = libapx_PERMISSIONS_LEVEL_SADMIN;
 		//SetTag
 		if(StringCase(StringWord(argv, 2), c_stringNoCase) == "sett") {

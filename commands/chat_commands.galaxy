@@ -1,11 +1,16 @@
 //=========================================================
 //		Apex Roleplaying Engine
-//		Copyright (c) 2017, Apex Group
+//		Copyright (c) 2019, Apex Group
 //=========================================================
 // This software is distributed under the MIT License:
 // <http://opensource.org/licenses/MIT>
 //=========================================================
 
+
+//test
+void testfunc(string command_name) {
+	
+}
 
 // libapx_command_narrate
 // ====================
@@ -20,6 +25,14 @@ void libapx_command_narrate(int user, unitgroup u, string argv, int spawningCoun
 	libapx_log(user, StringToText(""), msg);
 
 	return;
+}
+
+void libapx_define_narrate(string command_name) {
+	commands_guide_entry_set(
+		g_commands_guide_entry_general, 
+		command_name, 
+		"Prints out anonymous text to everyone in the game. <br> @narrate [TextToBeNarrated] <br> Examples: <br> @narrate The Sheep jumped over the Moon.  "
+	);
 }
 
 // libapx_command_say
@@ -59,6 +72,13 @@ void libapx_command_say(int user, unitgroup u, string argv, int spawningCount, s
 
 	return;
 }
+void libapx_define_say(string command_name) {
+	commands_guide_entry_set(
+		g_commands_guide_entry_unit, 
+		command_name, 
+		"This command emotes through a unit. <br> @say [texttobesaid] <br> Examples: <br> @say This is me, a marine, talking to you guys! People! "
+	);
+}
 
 // libapx_command_setname
 // ==================
@@ -79,6 +99,13 @@ void libapx_command_setname(int user, unitgroup u, string argv, int spawningCoun
 	UnitGroupLoopEnd();
 
 	return;
+}
+void libapx_define_setname(string command_name) {
+	commands_guide_entry_set(
+		g_commands_guide_entry_unit, 
+		command_name, 
+		"This command sets the name of a unit used in say. Not the display name. <br> @setname [name] <br> Examples: <br> @setname Bob Ross "
+	);
 }
 
 // libapx_command_setnamecolor
@@ -104,12 +131,17 @@ void libapx_command_setnamecolor(int user, unitgroup u, string argv, int spawnin
 
 	return;
 }
-
+void libapx_define_setnamecolor(string command_name) {
+	commands_guide_entry_set(
+		g_commands_guide_entry_unit, 
+		command_name, 
+		" Sets a unit's setname to a specific color <br> @setnamecolor [red] [green] [blue] <br> Examples: <br> @setnamecolor 255 125 50 "
+	);
+}
 // libapx_command_repeat
 // =======================
 // Repeats a strings
 // >repeat 25 [@spawn marine;@modelswap marauder]
-
 void libapx_command_repeat(int user, unitgroup u, string argv, int spawningCount, string bracketText) {
 	int iterations = StringToInt(StringWord(argv, 2));
 	int i;
@@ -121,7 +153,13 @@ void libapx_command_repeat(int user, unitgroup u, string argv, int spawningCount
 
 	return;
 }
-
+void libapx_define_repeat(string command_name) {
+	commands_guide_entry_set(
+		g_commands_guide_entry_general, 
+		command_name, 
+		" This command repeats a given set of commands a given amount of times. <br> >repeat [amountOfTimesToRepeat] [[commands]] <br> Examples: <br> >repeat 5 [Hi how are you!;I repeated this a lot!] "
+	);
+}
 // libapx_command_keypres
 // =======================
 // Assigns a string to a certain key for the selected unit
@@ -169,6 +207,13 @@ void libapx_command_keypress(int user, unitgroup u, string argv, int spawningCou
 
 	return;
 }
+void libapx_define_keypress(string command_name) {
+	commands_guide_entry_set(
+		g_commands_guide_entry_general, 
+		command_name, 
+		" This command assigns commands to a key on a unit. <br> >keypress [keyname] [[commands]] <br> Possible keys are "+libapx_all_keys+" <br> Examples: <br> >keypress key_w [@position -rel +0 +3] <br> >keypress key_q [@move;>moveto -arc 2 [boom]]; "
+	);
+}
 
 // libapx_command_chance
 // =======================
@@ -176,7 +221,6 @@ void libapx_command_keypress(int user, unitgroup u, string argv, int spawningCou
 // chance percentage is determined by division 
 //ex. >chance 2/3 [hi] [bye]
 // 66% chance to say hi, 33% chance to say bye
-
 void libapx_command_chance(int user, unitgroup u, string argv, int spawningCount, string bracketText) {
 	string temp = StringReplace(StringWord(argv, 2), " ", StringFind(StringWord(argv, 2), "/", c_stringNoCase), StringFind(StringWord(argv, 2), "/", c_stringNoCase));
 	fixed percentage = StringToFixed(StringWord(temp, 1))/StringToFixed(StringWord(temp, 2));
@@ -192,11 +236,17 @@ void libapx_command_chance(int user, unitgroup u, string argv, int spawningCount
 
 	return;
 }
+void libapx_define_chance(string command_name) {
+	commands_guide_entry_set(
+		g_commands_guide_entry_general, 
+		command_name, 
+		" This command gives a chance to display one of two inputs. Chance percentage is determined by division. <br> >chance [dividen]/[divisor] [[commands1]] [[commands2]] <br> Examples: <br> >chance 1/3 [I have a 33% chance of displaying!] [I have a 66% chance of displaying!] "
+	);
+}
+
 // libapx_command_random
 // =======================
 // spits out a random entered string
-
-
 void libapx_command_random(int user, unitgroup u, string argv, int spawningCount, string bracketText) {
 	int pickedEntry;
 	int i = 1;
@@ -213,14 +263,18 @@ void libapx_command_random(int user, unitgroup u, string argv, int spawningCount
 	libapx_chat_parse(bracketTextGrab(bracketText, pickedEntry), user, u, spawningCount);
 	return;
 }
+void libapx_define_random(string command_name) {
+	commands_guide_entry_set(
+		g_commands_guide_entry_general, 
+		command_name, 
+		" This command gives a random chance to display one of a undefined quantity of inputs. <br> >random [[entries] [entries]..  ..]] <br> Examples: <br> >random [@spawn marine] [@spawn marauder] [@spawn ghost] [@spawn battlecruiser] "
+	);
+}
 
 // libapx_command_moveto
 // =======================
 // moves a unit to a location, then fires the string inputted once it arrives.
 // >moveto cannon/mouse -modifier [textToBeFired]
-
-
-
 void libapx_command_moveto(int user, unitgroup u, string argv, int spawningCount, string bracketText) {
 	string abil;
 	unit target;
@@ -328,4 +382,11 @@ void libapx_command_moveto(int user, unitgroup u, string argv, int spawningCount
 	 
 
 	return;
+}
+void libapx_define_moveto(string command_name) {
+	commands_guide_entry_set(
+		g_commands_guide_entry_general, 
+		command_name, 
+		" This command moves a unit to your mousepoint and runs the input you give it when it arrives at it's destination. The unit can travel in a parabolic way by using -arc, or it can it move to a desired height with -height. <br> >moveto [modifier] [heightofparabola] [[commands;whateverelse]] <br> Examples: <br> >moveto -height 5 [Landed!] <br> >moveto -arc 12 [wee!] "
+	);
 }

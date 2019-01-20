@@ -1,6 +1,6 @@
 //=========================================================
 //		Apex Roleplaying Engine
-//		Copyright (c) 2017, Apex Group
+//		Copyright (c) 2019, Apex Group
 //=========================================================
 // This software is distributed under the MIT License:
 // <http://opensource.org/licenses/MIT>
@@ -18,6 +18,9 @@
 
 // Main actor for unit (default actor reference target)
 static string libapx_ACTOR_REF_MAIN = "->::Main";
+
+
+
 
 // libapx_has_actor_ref
 // ===================
@@ -65,7 +68,6 @@ static void libapx_apply_actormsg(unitgroup g, string target, string argv, strin
 		UnitGroupLoopEnd();
 	}
 }
-
 // libapx_command_actormessage
 // =======================
 // Sends an ActorMessage to a unit (main or a actor reference) or to a global reference
@@ -168,6 +170,13 @@ void libapx_command_actormessage(int user, unitgroup u, string argv, int spawnin
 
 	return;
 }
+void libapx_define_actormessage(string command_name) {
+	commands_guide_entry_set(
+		g_commands_guide_entry_actor, 
+		command_name, 
+		" Sends an ActorMessage to an actor, a target can be used with this command. <br> @actrmsg ->target actormessage <br> Examples: <br> @actrmsg SetTeamColor {255,0,0 3} {3,5,255 5} <br> @actrmsg SetScaleAbsolute 4 "
+	);
+}
 
 // libapx_command_actoralias
 // =======================
@@ -197,6 +206,15 @@ void libapx_command_actoralias(int user, unitgroup u, string argv, int spawningC
 	libapx_unit_cache_update(UnitGroupLoopCurrent(), "@target", argv);
 	return;
 }
+void libapx_define_target(string command_name) {
+	commands_guide_entry_set(
+		g_commands_guide_entry_actor, 
+		command_name, 
+		" Gives an actor a target or name to be used to point to this actor with another command, a target can also be used with this command. <br> @target ->target targetname <br> Examples: <br> @target 123;@attach marine origin 0 0 3;@scale ->123 3 3 3 <br> @target ->b 123 <br> <br> Extra Info: <br> You can remove a target by doing <br> @actrmsg ->targetyouwanttoremove AliasRemove ->targetyouwanttoremove "
+	);
+}
+
+
 
 // libapx_command_scale
 // ====================
@@ -261,6 +279,14 @@ void libapx_command_scale(int user, unitgroup u, string argv, int spawningCount,
 						  "SetScale " + scale + " " + FixedToString(time, 3));
 	return;
 }
+void libapx_define_scale(string command_name) {
+	commands_guide_entry_set(
+		g_commands_guide_entry_actor, 
+		command_name, 
+		" Changes the scale of an actor. It can be used with target. <br> @scale ->target x y z timescale <br> Examples: <br> @scale 3 2 1 4 <br> @scale 3 <br> @target a;@attach marine head;@scale ->a 5 5 1 3  "
+	);
+}
+
 
 // libapx_command_tint
 // =================
@@ -390,10 +416,19 @@ void libapx_command_tint(int user, unitgroup u, string argv, int spawningCount, 
 
 	return;
 }
+void libapx_define_tint(string command_name) {
+	commands_guide_entry_set(
+		g_commands_guide_entry_actor, 
+		command_name, 
+		" This command changes the tint of an actor. It can be used with target. <br> @scale ->[target] [r] [g] [b] [Opacity] [HDR] [timescale] <br> Examples: <br> @tint 255 0 0 <br> @tint 0 255 255 1 3 <br> @tint 255 255 255 .3 <br> @tint 255 255 255 1 15 5  "
+	);
+}
+
+
 // libapx_command_decal
 // ===================
-// Changes the model of the main actor of a unit (modified from ctx)
-// Syntax: @modelswap (->[ref]) [model] [variation]
+// Changes the decal of an actor using TextureByID
+// Syntax: @decal [decalname]
 void libapx_command_decal(int user, unitgroup u, string argv, int spawningCount, string bracketText) {
 	string decal;
 	string amsg;
@@ -420,6 +455,13 @@ void libapx_command_decal(int user, unitgroup u, string argv, int spawningCount,
 
 	return;
 }
+void libapx_define_decal(string command_name) {
+	commands_guide_entry_set(
+		g_commands_guide_entry_actor, 
+		command_name, 
+		" Changes the decal of an actor, can be used with target. <br> @decal ->[target] [image] <br> Examples: <br> @decal decal_none <br> @target a;@attach marine weapon;@decal ->a  "
+	);
+}
 
 
 // libapx_command_modelswap
@@ -436,8 +478,8 @@ void libapx_command_modelswap(int user, unitgroup u, string argv, int spawningCo
 
 
 
-//colossus check
-  unitgroup p = u;
+	//colossus check
+  	unitgroup p = u;
 	int colcheker = 1;
 	bool colFlag = false;
 	while (StringWord(argv, colcheker) != "") {
@@ -478,6 +520,15 @@ void libapx_command_modelswap(int user, unitgroup u, string argv, int spawningCo
 
 	return;
 }
+void libapx_define_modelswap(string command_name) {
+	commands_guide_entry_set(
+		g_commands_guide_entry_actor, 
+		command_name, 
+		" This command changes the model of an actor. It can be used with target. <br> @modelswap ->[target] [modelname] [variation] <br> Examples: <br> @modelswap Beacon_Apex <br> @modelswap HavenTree 02 <br> @target 123;@attach beacon_apex head;@modelswap ->123 shapesmileyface "
+	);
+}
+
+
 
 // libapx_command_play
 // ================
@@ -551,6 +602,15 @@ void libapx_command_play(int user, unitgroup u, string argv, int spawningCount, 
 	}
 	return;
 }
+void libapx_define_play(string command_name) {
+	commands_guide_entry_set(
+		g_commands_guide_entry_actor, 
+		command_name, 
+		" This command plays animations on an actor. It can be used with target. The parameter loop makes the animation loop. <br> @play ->[target] [animations] [animations] <br> Examples: <br> @play attack <br> @play attack loop <br> @play walk loop <br> @play start loop <br> @play cover loop <br> @play burrow loop <br> @play x 00 <br> @play x 01 <br> @play walk,01 loop <br> @play x 02 "
+	);
+}
+
+
 
 // libapx_command_animspeed
 // ===================
@@ -589,6 +649,13 @@ void libapx_command_animspeed(int user, unitgroup u, string argv, int spawningCo
 						  libNtve_gf_AnimSetTimeScaleGlobal(anm_speed));
 
 	return;
+}
+void libapx_define_animspeed(string command_name) {
+	commands_guide_entry_set(
+		g_commands_guide_entry_actor, 
+		command_name, 
+		" This command sets the animation speed of an actor. It can be used with target. <br> @animspeed ->[target] [animationspeed] <br> Examples: <br> @animspeed 3 <br> @animspeed 5 <br> @animspeed 0 <br> @target 6;@attach marauder origin 0 0 3;@animspeed ->6 3 "
+	);
 }
 
 // libapx_command_rotate
@@ -633,6 +700,16 @@ void libapx_command_rotate(int user, unitgroup u, string argv, int spawningCount
 						  libNtve_gf_SetRotation(forwardX, forwardY, forwardZ, upX, upY, upZ));
 	return;
 }
+void libapx_define_rotate(string command_name) {
+	commands_guide_entry_set(
+		g_commands_guide_entry_actor, 
+		command_name, 
+		" This command applies a rotation to a unit. It can be used with target. <br> Note: This rotation is removed if a unit moves. <br> @rotate  ->[target] [x] [y] [z] <br> Examples: <br> @rotation 90 <br> @target 123;@attach marine weapon;l@rotation ->123 90 "
+	);
+}
+
+
+
 
 // libapx_command_statbars
 // ==================
@@ -660,6 +737,14 @@ void libapx_command_statbars(int user, unitgroup u, string argv, int spawningCou
 						  "SetShowStatusBar" + state);
 	return;
 }
+void libapx_define_statbars(string command_name) {
+	commands_guide_entry_set(
+		g_commands_guide_entry_actor, 
+		command_name, 
+		" This command sets an actors statbars on or off. It can be used with target. <br> Note: If you give the command no parameters it, by default, will turn the statbars off on the actor. <br> @statbars  ->[target] [state] <br> Examples: <br> @statbars <br> @statbars on <br> @target 123;@attach marine head;@statbars ->123 "
+	);
+}
+
 
 //libapx_command_setscaler
 //==========================
@@ -684,6 +769,14 @@ void libapx_command_setscaler(int user, unitgroup u, string argv, int spawningCo
 
 
 }
+void libapx_define_setscaler(string command_name) {
+	commands_guide_entry_set(
+	 	g_commands_guide_entry_general, 
+		command_name, 
+		" This command sets the default scale modifier for all units created after this point. This modifier multiplies against @scale, @actrmsg SetScale, @attach translations, and @actrmsg SetScaleAbsolute. <br> Note: The default scaler is 1 <br> @setscaler [newscale] <br> Examples: <br> @setscaler 3 <br> @setscaler .1 "
+	);
+}
+
 
 
 //libapx_command_setdelay
@@ -708,8 +801,13 @@ void libapx_command_setdelay(int user, unitgroup u, string argv, int spawningCou
 
 
 }
-
-//libapx_print_error(PlayerGroupSingle(user), "Scaler takes one arguement")
+void libapx_define_setdelay(string command_name) {
+	commands_guide_entry_set(
+	 	g_commands_guide_entry_general, 
+		command_name, 
+		" This command sets the default delay for all @attach commands and _gamesetup loading delays. <br> Note: By default it is .08, additionally the gamesetup delay will never go below a minimium value. Regardless of what you set this. <br> @setdelay [newdelay] <br> Examples: <br> @setdelay 3 <br> @setdelay .1 "
+	);
+}
 
 // libapx_command_attach_minus
 // =====================
@@ -727,20 +825,20 @@ void libapx_command_attach_minus(int user, unitgroup u, string argv, int spawnin
 
 
 
-//Colossus Check
-		unitgroup p = u;
-		int colcheker = 1;
-		while (StringWord(argv, colcheker) != "") {
-			if(StringFind(StringWord(argv, colcheker), "colossus", c_stringNoCase) != -1 ) {
-					UnitGroupLoopBegin(p);
-					while(!UnitGroupLoopDone()) {
-						libapx_unit_flag_colossus(UnitGroupLoopCurrent());
-						UnitGroupLoopStep();
-					}
-					UnitGroupLoopEnd();
-			}
-			colcheker = colcheker + 1;
+	//Colossus Check
+	unitgroup p = u;
+	int colcheker = 1;
+	while (StringWord(argv, colcheker) != "") {
+		if(StringFind(StringWord(argv, colcheker), "colossus", c_stringNoCase) != -1 ) {
+				UnitGroupLoopBegin(p);
+				while(!UnitGroupLoopDone()) {
+					libapx_unit_flag_colossus(UnitGroupLoopCurrent());
+					UnitGroupLoopStep();
+				}
+				UnitGroupLoopEnd();
 		}
+		colcheker = colcheker + 1;
+	}
 
 
 
@@ -796,6 +894,14 @@ void libapx_command_attach_minus(int user, unitgroup u, string argv, int spawnin
 		}
 		UnitGroupLoopEnd();
 }
+void libapx_define_attach_minus(string command_name) {
+	commands_guide_entry_set(
+	 	g_commands_guide_entry_actor, 
+		command_name, 
+		" This command uses the old attach method, it is depreciated and generally has no reason to be used if you use @target with the modern @attach as they can emulate and surpass what attachdummy could do. <br> It is not compatible with target. <br> @attach- [actor] [point] <br> Examples: <br> @attach- marine head "
+	);
+}
+
 
 
 
@@ -822,7 +928,7 @@ void libapx_command_attach(int user, unitgroup u, string argv, int spawningCount
 	string target = libapx_ACTOR_REF_MAIN;
 
 
-//Colossus Check
+	//Colossus Check
 	unitgroup p = u;
 	int colcheker = 1;
 	while (StringWord(argv, colcheker) != "") {
@@ -1030,6 +1136,13 @@ void libapx_command_attach(int user, unitgroup u, string argv, int spawningCount
 	}
 	return;
 }
+void libapx_define_attach(string command_name) {
+	commands_guide_entry_set(
+	 	g_commands_guide_entry_actor, 
+		command_name, 
+		" This command attaches an actor to another actor. It is compatible with target. <br> @attach ->[target] [actor] [point] [x] [y] [z] -r [x] [y] [z]  <br> To Note: The x y z after -r is largely depreciated and now replaced by @rotation and it's functionality.  <br> You can find a list of actors to attach with _ search actor [name] <br> You can find a list of valid attachpoints with @attach listpoints  <br> You can check what points on a model with @checkpoints <br> the first [x] [y] [z] is how you attach a model with an offset <br>Examples: <br>(This would attach the actor 3 units ahead of where you attach.) <br>@attach marine origin 0 -3 0 <br>  (This would attach above where you attach) <br> @attach marine origin 0 0 4 <br>(This would go above and ahead of what you attach) <br> @attach marine origin 0 -3 5 <br> @target 123;@attach marine overhead;@attach ->123 marauder weapon 0 -3 "
+	);
+}
 
 
 // libapx_command_rotation
@@ -1123,7 +1236,9 @@ void libapx_command_attach_rotation(int user, unitgroup u, string argv, int spaw
 			   }
 			}
 		}
-		
+		for (j = 1; j <= UnitGroupCount(u, c_unitCountAll); j += 1) {
+			libapx_unit_cache_update(UnitGroupUnit(u, j), "@rotation", argv);
+		}
 
 
 		i += 1;
@@ -1132,7 +1247,13 @@ void libapx_command_attach_rotation(int user, unitgroup u, string argv, int spaw
 
 
 }
-
+void libapx_define_rotation(string command_name) {
+	commands_guide_entry_set(
+	 	g_commands_guide_entry_actor, 
+		command_name, 
+		" This command creates a new actor on top of what actor it is called on with a specified rotation. It is not compatible with target. <br> @rotation [modifiers] [rotations.. <br> @rotation can have it's functionality and inputs modified with two modifiers, these modifiers are <br> -b: This changes the end actor from a default actor to a Beacon_Apex actor <br> -ypr: This changes it's xyz inputs into yaw pitch roll inputs <br> Examples: <br> @rotation 30y <br> @rotation 90y 10z <br> @rotation -b 90x 35z 190y <br> @rotation -ypr 90y 32p 15r "
+	);
+}
 //Helper commands for rotation
 void attach_rotation_x(int degrees, bool abs_scale, unit u) {
 	int point_num;
@@ -1141,7 +1262,7 @@ void attach_rotation_x(int degrees, bool abs_scale, unit u) {
 	//X is Target_01-08
 	//Y is Hit_01-08
 	//Z is Hardpoint_01-08
-	string actor_name = "Beacon_Terran";
+	string actor_name = "Beacon_Apex";
 	int degreesAbs = AbsI(degrees);
 
 	while(degreesAbs > 360 || degreesAbs == 360) {
@@ -1187,7 +1308,7 @@ void attach_rotation_z(int degrees, bool abs_scale, unit u) {
 	//X is Target_01-08
 	//Y is Hit_01-08
 	//Z is Hardpoint_01-08
-	string actor_name = "Beacon_Terran";
+	string actor_name = "Beacon_Apex";
 	int degreesAbs = AbsI(degrees);
 
 	while(degreesAbs > 360 || degreesAbs == 360) {
@@ -1233,7 +1354,7 @@ void attach_rotation_y(int degrees, bool abs_scale, unit u) {
 	//X is Target_01-08
 	//Y is Hit_01-08
 	//Z is Hardpoint_01-08
-	string actor_name = "Beacon_Terran";
+	string actor_name = "Beacon_Apex";
 	int degreesAbs = AbsI(degrees);
 
 	while(degreesAbs > 360 || degreesAbs == 360) {

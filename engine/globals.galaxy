@@ -1,0 +1,123 @@
+//=========================================================
+//		Apex Roleplaying Engine
+//		Copyright (c) 2019, Apex Group
+//=========================================================
+// This software is distributed under the MIT License:
+// <http://opensource.org/licenses/MIT>
+//=========================================================
+int g_commands_guide_entry_admin = 0; //!admin
+int g_commands_guide_entry_general = 1;  //generalshit
+int g_commands_guide_entry_unit = 2; //@spawn
+int g_commands_guide_entry_actor = 3; //@attach
+int g_commands_guide_entry_region = 4; //#create
+int g_commands_guide_entry_stats = 5; //@maxlife
+
+//
+string commands_guide_get_entry(int entryType) {
+    if(entryType == g_commands_guide_entry_admin) {
+        return "Admin";
+    } 
+    if(entryType == g_commands_guide_entry_general) {
+        return "General";
+    } 
+    if(entryType == g_commands_guide_entry_unit) {
+        return "Unit";
+    } 
+    if(entryType == g_commands_guide_entry_actor) {
+        return "Actor";
+    } 
+    if(entryType == g_commands_guide_entry_region) {
+        return "Region";
+    } 
+    if(entryType == g_commands_guide_entry_stats) {
+        return "Stats";
+    } 
+    return "";
+}
+
+struct commands_guide_entry {
+    int type;               //Type of command
+    string name;            //Name of the command
+    string description;     //Description of command
+    int uiPosition;
+};
+struct command_guide_type_count {
+    int Admin;
+    int General;
+    int Unit;
+    int Actor;
+    int Region;
+    int Stats;
+};
+
+void command_guide_format_description(int dialog, playergroup pg, string description) {
+    int maxDialogCharacters = 60;
+    string currentVal;
+    string preText;
+    string postText;
+    int i;
+    //Form dialog
+    i = 1;
+    currentVal = "";
+    while(StringWord(description, i) != "") {
+        
+
+
+        if (currentVal == "") {
+            currentVal+= StringWord(description, i)+" "; 
+        }
+        else if (StringLength(currentVal + StringWord(description, i)) > maxDialogCharacters) {
+            //currentVal = libapx_string_trim(currentVal);
+            DialogControlAddItem(dialog, pg,StringToText(currentVal));
+            currentVal = "";
+        }
+        else {
+            currentVal += StringWord(description, i)+" ";
+        }
+
+        if(StringWord(description, i) == "<br>") {
+            currentVal = StringReplaceWord(currentVal, "<br>","",1,c_stringNoCase);
+            DialogControlAddItem(dialog, pg,StringToText(currentVal));
+            currentVal = "";
+        }
+        i+=1;
+    }
+
+    if(currentVal != "") {
+        DialogControlAddItem(dialog, pg,StringToText(currentVal));
+    }
+
+
+}
+
+command_guide_type_count g_command_guide_type_count;
+
+commands_guide_entry[500] g_commands_guide_entries;
+
+int commands_guide_entry_count = 0;
+
+
+void commands_guide_entry_set(int type, string name, string description) {
+    if (type == g_commands_guide_entry_admin) {
+        g_command_guide_type_count.Admin += 1;
+    }
+    if (type == g_commands_guide_entry_general) {
+        g_command_guide_type_count.General += 1;
+    }
+    if (type == g_commands_guide_entry_unit) {
+        g_command_guide_type_count.Unit += 1;
+    }
+    if (type == g_commands_guide_entry_actor) {
+        g_command_guide_type_count.Actor += 1;
+    }
+    if (type == g_commands_guide_entry_region) {
+        g_command_guide_type_count.Region += 1;
+    }
+    if (type == g_commands_guide_entry_stats) {
+        g_command_guide_type_count.Stats += 1;
+    }
+    g_commands_guide_entries[commands_guide_entry_count].type = type;
+    g_commands_guide_entries[commands_guide_entry_count].name = name;
+    g_commands_guide_entries[commands_guide_entry_count].description = description;
+    commands_guide_entry_count += 1;
+}

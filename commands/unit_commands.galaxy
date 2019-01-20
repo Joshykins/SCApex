@@ -1,10 +1,12 @@
 //=========================================================
 //		Apex Roleplaying Engine
-//		Copyright (c) 2017, Apex Group
+//		Copyright (c) 2019, Apex Group
 //=========================================================
 // This software is distributed under the MIT License:
 // <http://opensource.org/licenses/MIT>
 //=========================================================
+
+
 
 // libapx_command_kill
 // ====================
@@ -16,6 +18,13 @@ void libapx_command_kill(int user, unitgroup u, string argv, int spawningCount, 
 		UnitGroupLoopStep();
 	}
 	UnitGroupLoopEnd();
+}
+void libapx_define_kill(string command_name) {
+	commands_guide_entry_set(
+		g_commands_guide_entry_unit, 
+		command_name, 
+		" This command kills a unit, meaning all it's actors play their death animations. <br> @kill <br> Examples: <br> @kill "
+	);
 }
 
 
@@ -30,6 +39,16 @@ void libapx_command_remove(int user, unitgroup u, string argv, int spawningCount
 	}
 	UnitGroupLoopEnd();
 }
+void libapx_define_remove(string command_name) {
+	commands_guide_entry_set(
+		g_commands_guide_entry_unit, 
+		command_name, 
+		" This command removess a unit, this means it and all it's actors are immediately removed. <br> @remove <br> Examples: <br> @remove "
+	);
+}
+
+
+
 
 // libapx_command_unitvar
 // ============================
@@ -62,17 +81,31 @@ void libapx_command_unitvar(int user, unitgroup u, string argv, int spawningCoun
 	}
 
 }
+void libapx_define_unitvar(string command_name) {
+	commands_guide_entry_set(
+		g_commands_guide_entry_unit, 
+		command_name, 
+		" This command makes the unit(s) have a name to be refered to later with @context. It does very little on it's own. <br> @unitvar [modifier] [name] <br> The modifier for this command is -add, this modifier changes the commands default behavior of replacing the variable with the new one you set, and instead adds it to the new one. <br> Examples: <br> @unitvar bob <br> @unitvar -add bobross "
+	);
+}
 
 
 	// libapx_command_context
 	// ============================
 	// Switches the context of this parsing thread.
-	void libapx_command_context(int user, unitgroup u, string argv, int spawningCount, string bracketText) {
+void libapx_command_context(int user, unitgroup u, string argv, int spawningCount, string bracketText) {
 	string unitvarprefix = "unitvar_";
 	unitgroup target = DataTableGetUnitGroup(true, unitvarprefix + StringWord(argv,2));
 
-libapx_set_target(user, target, spawningCount);
-// libapx_set_target(int player, unitgroup target, int spawningCount)
+	libapx_set_target(user, target, spawningCount);
+	// libapx_set_target(int player, unitgroup target, int spawningCount)
+}
+void libapx_define_context(string command_name) {
+	commands_guide_entry_set(
+		g_commands_guide_entry_unit, 
+		command_name, 
+		" This command changes what unit commands apply to by refering to the names set by @unitvar. It does very little on it's own. <br> @context [unitvariable] <br> Examples: <br> @context trevor <br> @spawn marine;@unitvar bobross;@spawn marine;@context bobross;@scale 3 <br>   "
+	);
 }
 
 
@@ -250,9 +283,7 @@ void libapx_command_move (int user, unitgroup u, string argv, int spawningCount,
 		); 
 		unitAmt += 1;
 
-		libapx_print_output(user, FixedToString(WorldHeight(c_heightMapGround, UnitGetPosition(current)),4)+ "map ground");
-		libapx_print_output(user, FixedToString(WorldHeight(c_heightMapGlide, UnitGetPosition(current)),4)+ "map glide");
-		libapx_print_output(user, FixedToString(WorldHeight(c_heightMapAir, UnitGetPosition(current)),4)+ "map glide");
+	
 		UnitGroupLoopStep();
 	}
 	UnitGroupLoopEnd();
@@ -1703,6 +1734,7 @@ void libapx_command_copy(int user, unitgroup u, string argv, int spawningCount, 
 	unit target;
 	int i;
 	int cache;
+	string cacheValue;
 	string source_unit_id;
 	string param = StringWord(argv, 2);
 
@@ -1810,12 +1842,17 @@ void libapx_command_copy(int user, unitgroup u, string argv, int spawningCount, 
 			source_unit_id = FixedToString(UnitGetCustomValue(source, libapx_UNIT_INDEX_ID), 0);
 			cache = 1;
 			while( DataTableValueExists(true, source_unit_id + "." + IntToString(cache)) ) {
-				libapx_chat_parse(DataTableGetString(true, source_unit_id + "." + IntToString(cache)), user, targets, spawningCount);
-				spawningCount = spawningCount + 1;
+				cacheValue += ";" + DataTableGetString(true, source_unit_id + "." + IntToString(cache));
+				Wait(2, c_timeGame);
 				cache += 1;
-
 			}
+			cache = 1;
+			libapx_print_output(user, cacheValue);
+			libapx_chat_parse(cacheValue, user, targets, spawningCount);
+			
 		}
+
+
 
 		UnitGroupLoopStep();
 	}

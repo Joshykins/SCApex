@@ -1,6 +1,6 @@
 //=========================================================
 //		Apex Roleplaying Engine
-//		Copyright (c) 2017, Apex Group
+//		Copyright (c) 2019, Apex Group
 //=========================================================
 // This software is distributed under the MIT License:
 // <http://opensource.org/licenses/MIT>
@@ -71,14 +71,14 @@ static void libapx_ui_initialize_panels() {
 void libapx_ui_initialize() {
 	int player;
 
-	UISetFrameVisible(PlayerGroupAll(), c_syncFrameTypeIdleWorkerButton, false);
-	UISetFrameVisible(PlayerGroupAll(), c_syncFrameTypeSupply, false);
-	UISetFrameVisible(PlayerGroupAll(), c_syncFrameTypeConsolePanel, false);
-	UISetFrameVisible(PlayerGroupAll(), c_syncFrameTypeArmyButton, false);
-	UISetFrameVisible(PlayerGroupAll(), c_syncFrameTypeControlGroupPanel, false);
-	UISetFrameVisible(PlayerGroupAll(), c_syncFrameTypeResourcePanel, false);
-	UISetFrameVisible(PlayerGroupAll(), c_syncFrameTypeAllianceButton, false);
-	UISetFrameVisible(PlayerGroupAll(), c_syncFrameTypeSupply, false);
+	//UISetFrameVisible(PlayerGroupAll(), c_syncFrameTypeIdleWorkerButton, false);
+	//UISetFrameVisible(PlayerGroupAll(), c_syncFrameTypeSupply, false);
+	//UISetFrameVisible(PlayerGroupAll(), c_syncFrameTypeConsolePanel, false);
+	//UISetFrameVisible(PlayerGroupAll(), c_syncFrameTypeArmyButton, false);
+	//UISetFrameVisible(PlayerGroupAll(), c_syncFrameTypeControlGroupPanel, false);
+	//UISetFrameVisible(PlayerGroupAll(), c_syncFrameTypeResourcePanel, false);
+	//UISetFrameVisible(PlayerGroupAll(), c_syncFrameTypeAllianceButton, false);
+	//UISetFrameVisible(PlayerGroupAll(), c_syncFrameTypeSupply, false);
 
 	// initialize panels
 //	libapx_ui_modelpreviewer_init();

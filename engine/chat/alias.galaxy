@@ -1,13 +1,14 @@
 //=========================================================
 //		Apex Roleplaying Engine
-//		Copyright (c) 2017, Apex Group
+//		Copyright (c) 2019, Apex Group
 //=========================================================
 // This software is distributed under the MIT License:
 // <http://opensource.org/licenses/MIT>
 //=========================================================
 
-const int libapx_ALIAS_MAX_DEPTH = 10;	// max depth of recursive alias replacing (prevent infinite aliasing)
+const int libapx_ALIAS_MAX_DEPTH = 12;	// max depth of recursive alias replacing (prevent infinite aliasing)
 const string libapx_BANK_SECTION_ALIAS = "aliases";
+void libapx_alias_chk(string alias, int player);
 
 // libapx_alias_insert_in_list
 // =====================
@@ -35,6 +36,7 @@ static string libapx_alias_insert_in_list(string list, string alias) {
 	// else, append to end
 	return StringReplace(list, " " + alias + " ", index, index);
 }
+
 
 // libapx_alias_command_redirect
 // ===================
@@ -64,6 +66,7 @@ bool libapx_alias_command_redirect(string command, int player) {
 			libapx_bank_create(libapx_BANK_SECTION_ALIAS, alias, content, player);
 			libapx_player[player].aliases = libapx_alias_insert_in_list(libapx_player[player].aliases, alias);
 			libapx_print_success(player, "ALIAS CREATED: " + alias + "\n" + "[\'" + content + "\']");
+			libapx_alias_chk(alias, player);
 
 			return true;
 		}
@@ -72,6 +75,7 @@ bool libapx_alias_command_redirect(string command, int player) {
 			libapx_bank_create(libapx_BANK_SECTION_ALIAS, alias, content, player);
 			libapx_player[player].aliases = libapx_alias_insert_in_list(libapx_player[player].aliases, alias);
 			libapx_print_success(player, "ALIAS CREATED: " + alias + "\n" + "[\'" + content + "\']");
+			libapx_alias_chk(alias, player);
 		}
 		else {
 			libapx_print_error(player, "ALIAS CANNOT BE EMPTY");
@@ -142,6 +146,72 @@ string libapx_alias_sub(string msg, int player, int recursion_depth) {
 	// remove extra front end " " for return
 	return StringSub(subbed, 2, StringLength(subbed));
 }
+
+//libapx_chk_all_aliases
+// =====================
+// Checks all aliases
+void libapx_chk_all_aliases(int player) {
+	string aliases = libapx_string_trim(libapx_player[player].aliases);
+	int i = 1;
+	while(StringWord(aliases, i) != "") {
+		libapx_alias_chk(StringWord(aliases, i), player);
+		i += 1;
+	}
+}
+
+// libapx_chk_alias
+// =====================
+// Checks alias for recursion or an invalid key
+void libapx_alias_chk(string alias, int player) {
+	string invalidKeyList = libapx_settings.commands;
+	int i = 1;
+	string aliasVal = "";
+	if( !BankKeyExists( libapx_player[player].bank_storage, libapx_BANK_SECTION_ALIAS, alias ) ) { 
+		return;
+	}
+	//Remove "," from commands list
+	while(StringFind(invalidKeyList, ",", c_stringNoCase) != -1 ) {
+		invalidKeyList = StringReplace(invalidKeyList,
+		"",
+		StringFind(invalidKeyList, ",", c_stringNoCase),
+		StringFind(invalidKeyList, ",", c_stringNoCase)
+		);
+	}
+	
+	//Check if invalid key
+	while(StringWord(invalidKeyList, i) != "") {
+		if(alias == StringWord(invalidKeyList, i)) {
+			libapx_print_text(PlayerGroupActive(), libapx_player_name_colored(player) + StringToText(" had a alias with the key of <c val=\"00ffff\">" + alias + " </c> </n> As such this alias was removed because you can't have an alias with a key that matches a command."));
+			libapx_bank_remove(libapx_BANK_SECTION_ALIAS, alias, player);
+			libapx_player[player].aliases = StringReplaceWord(libapx_player[player].aliases, " " + alias + " ", " ", 1, c_stringCase);
+			return;
+		}
+		i += 1;
+	}
+
+	//Check for face-level recursion 
+	aliasVal = BankValueGetAsString(libapx_player[player].bank_storage, libapx_BANK_SECTION_ALIAS, alias);
+	while(StringFind(aliasVal, ";", c_stringNoCase) != -1 ) {
+		aliasVal = StringReplace(aliasVal,
+		" ",
+		StringFind(aliasVal, ";", c_stringNoCase),
+		StringFind(aliasVal, ";", c_stringNoCase)
+		);
+	}
+	i = 1;
+
+	while(StringWord(aliasVal, i) != "") {
+		if(alias == StringWord(aliasVal, i)) {
+			libapx_print_text(PlayerGroupActive(), libapx_player_name_colored(player) + StringToText(" had a recursive alias with the key of <c val=\"00ffff\">" + alias + " </c> </n> As such this alias was removed because recursion is prohibited."));
+			libapx_bank_remove(libapx_BANK_SECTION_ALIAS, alias, player);
+			libapx_player[player].aliases = StringReplaceWord(libapx_player[player].aliases, " " + alias + " ", " ", 1, c_stringCase);
+			return;
+		}
+		i += 1;
+	}
+	
+}
+
 
 // libapx_strcmp
 // =============

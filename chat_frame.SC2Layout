@@ -27,7 +27,7 @@
     </Frame>
 
 	<!-- base UI frames (minimap, character info, and command panel backgrounds -->
-	<Frame type="Frame" name="GameUI/UIContainer/FullscreenLowerContainer" file="GameUI">
+	<!--Frame type="Frame" name="GameUI/UIContainer/FullscreenLowerContainer" file="GameUI">
 		<Frame type="Frame" name="Left">
 			<Anchor side="Left" relative="$parent" pos="Min" offset="-4"/>
 			<Anchor side="Bottom" relative="$parent" pos="Max" offset="4"/>
@@ -166,4 +166,4 @@
 	</Frame>
 
 
-</Desc>
+</Desc-->

@@ -1,10 +1,13 @@
 //=========================================================
 //		Apex Roleplaying Engine
-//		Copyright (c) 2017, Apex Group
+//		Copyright (c) 2019, Apex Group
 //=========================================================
 // This software is distributed under the MIT License:
 // <http://opensource.org/licenses/MIT>
 //=========================================================
+
+//Prototypes
+void libapx_chk_all_aliases(int player);
 
 // basic game player constants
 const int libapx_MAX_PLAYERS = 16; // max players supported is 16 (0 - neutral, 15 - hostile)
@@ -208,7 +211,7 @@ void libapx_player_initialize(int player) {
 	libapx_player[player].spawner_toggled = false;
 	libapx_player[player].spawn_splat = null;
 	libapx_player[player].spawningCount = 1;
-	libapx_player[player].delay =  0.02;
+	libapx_player[player].delay =  0.08;
 	libapx_player[player].waygate_dialog = 0;
 	libapx_player[player].clan_tag = "";
 
@@ -217,17 +220,13 @@ void libapx_player_initialize(int player) {
 	// create alphabetized alias list
 	libapx_player[player].aliases = libapx_sort_aliases(player);
 
+	libapx_chk_all_aliases(player);
+
+	
 	CameraPan( player, RegionGetCenter(RegionEntireMap()), 0.0, 10.0, 10.0, false );
 
 	//Ui
-	UISetFrameVisible(PlayerGroupAll(), c_syncFrameTypeIdleWorkerButton, false);
-	UISetFrameVisible(PlayerGroupAll(), c_syncFrameTypeSupply, false);
-	UISetFrameVisible(PlayerGroupAll(), c_syncFrameTypeConsolePanel, false);
-	UISetFrameVisible(PlayerGroupAll(), c_syncFrameTypeArmyButton, false);
-	UISetFrameVisible(PlayerGroupAll(), c_syncFrameTypeControlGroupPanel, false);
-	UISetFrameVisible(PlayerGroupAll(), c_syncFrameTypeResourcePanel, false);
-	UISetFrameVisible(PlayerGroupAll(), c_syncFrameTypeAllianceButton, false);
-	UISetFrameVisible(PlayerGroupAll(), c_syncFrameTypeSupply, false);
+
 }
 
 // libapx_player_name_colored
@@ -392,8 +391,8 @@ void libapx_waitDelay(int player) {
 
 void libapx_waitDelayGS(int player) {
 	fixed time = libapx_player[player].delay;
-	if(time < .02) {
-		time = .02;
+	if(time < .3) {
+		time = .3;
 	}
 	
 	Wait(time, c_timeGame);

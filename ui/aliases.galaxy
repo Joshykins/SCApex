@@ -1,6 +1,6 @@
 //=========================================================
 //		Apex Roleplaying Engine
-//		Copyright (c) 2017, Apex Group
+//		Copyright (c) 2019, Apex Group
 //=========================================================
 // This software is distributed under the MIT License:
 // <http://opensource.org/licenses/MIT>
@@ -130,7 +130,6 @@ bool libapx_ui_aliases_filter(bool testConds, bool runActions) {
   //Nab alias list
   alias = libapx_string_trim(libapx_player[player].aliases);
 
-
  if( filter == "" ) {
    return true;
   }
@@ -222,6 +221,7 @@ bool libapx_ui_alias_set(bool testConds, bool runActions) {
       libapx_print_success(player, "Alias key not found, creating new alias under \"" + aliaskey  + "\".");
       libapx_bank_create(libapx_BANK_SECTION_ALIAS, aliaskey, aliasval, player);
       libapx_player[player].aliases = libapx_alias_insert_in_list(libapx_player[player].aliases, aliaskey);
+      libapx_alias_chk(aliaskey, player);
     }
     else {
       libapx_print_success(player, "Writing over alias \"" + aliaskey  + "\" with new content.");
@@ -229,6 +229,7 @@ bool libapx_ui_alias_set(bool testConds, bool runActions) {
       libapx_player[player].aliases = StringReplaceWord(libapx_player[player].aliases, " " + aliaskey + " ", " ", 1, c_stringCase);
       libapx_bank_create(libapx_BANK_SECTION_ALIAS, aliaskey, aliasval, player);
       libapx_player[player].aliases = libapx_alias_insert_in_list(libapx_player[player].aliases, aliaskey);
+      libapx_alias_chk(aliaskey, player);
     }
   }
   else {

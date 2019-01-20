@@ -1,11 +1,11 @@
 //=========================================================
 //		Apex Roleplaying Engine
-//		Copyright (c) 2017, Apex Group
+//		Copyright (c) 2019, Apex Group
 //=========================================================
 // This software is distributed under the MIT License:
 // <http://opensource.org/licenses/MIT>
 //=========================================================
-
+include "apex/engine/globals.galaxy"
 include "apex/engine/engine.galaxy"
 include "apex/commands/commands.galaxy"
 include "apex/ui/ui.galaxy"
@@ -20,7 +20,6 @@ void libapx_initialize() {
 	libapx_engine_initialize();
 	libapx_commands_initialize();
 	libapx_ui_initialize();
-
 
 
 

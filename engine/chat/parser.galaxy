@@ -1,6 +1,6 @@
 //=========================================================
 //		Apex Roleplaying Engine
-//		Copyright (c) 2017, Apex Group
+//		Copyright (c) 2019, Apex Group
 //=========================================================
 // This software is distributed under the MIT License:
 // <http://opensource.org/licenses/MIT>
@@ -161,8 +161,15 @@ string bracketTextGrab(string bracketText, int arg) {
 // function signature for Apex chat commands
 void libapx_command_signature(int user, unitgroup u, string argv, int spawningCount, string bracketText);
 
+//function signature for Apex commands guide entry
+void libapx_command_guide_signature(string command_name);
+
 // funcref type for Apex commands
 typedef funcref<libapx_command_signature> libapx_command_type;
+
+// funcref type for Apex commands guide
+typedef funcref<libapx_command_guide_signature> libapx_command_guide;
+
 
 // Table of all Apex commands:
 // ===========================
@@ -186,11 +193,12 @@ int libapx_command_table_counter = 0;
 // ==================
 // Adds a command function to the global array of commands.
 // Use data table to map command name (string) to the array index.
-void libapx_chat_command_create(string command, libapx_command_type func) {
+void libapx_chat_command_create(string command, libapx_command_type func,libapx_command_guide guideFunc) {
 	DataTableSetInt(true, libapx_CHAT_COMMAND_DATA_TABLE_PREFIX + command, libapx_command_table_counter);
 	libapx_command_table[libapx_command_table_counter] = func;
 	libapx_command_table_counter += 1;
 
+	guideFunc(command);
 	// add command to list of commands
 	libapx_settings.commands = libapx_settings.commands +  ", " + command;
 }
