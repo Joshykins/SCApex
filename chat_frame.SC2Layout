@@ -12,19 +12,1002 @@
 
 	<!-- Use DebugDisplay chat area as our new main chat area for Apex. We can output to this through triggers as needed. -->
 	<Frame type="MessageDisplay" name="GameUI/UIContainer/FullscreenUpperContainer/DebugDisplay" file="GameUI">
-        <AlternateTime val="true"/>
         <MaxMessages val="64"/>
         <MessageDuration val="25000"/>
 		<FadeDuration val="5000"/>
 		<Style val="ChatDisplay"/>
         <AcceptsMouse val="false"/>
 		<BatchText val="true"/>
-				<Anchor side="Bottom" relative="$parent" pos="Max" offset="-335"/>
-				<Anchor side="Left" relative="$parent" pos="Mid" offset="0"/>
-				<Anchor side="Right" relative="$parent" pos="Mid" offset="0"/>
-				<Width val="720"/>
-				<Height val="700"/>
+		<Anchor side="Bottom" relative="$parent" pos="Max" offset="-335"/>
+		<Anchor side="Left" relative="$parent" pos="Mid" offset="0"/>
+		<Anchor side="Right" relative="$parent" pos="Mid" offset="0"/>
+		<Width val="720"/>
+		<Height val="700"/>
     </Frame>
+
+	<!-- Menu Being moved over -->
+	<Frame type="MenuBar" name="GameUI/UIContainer/FullscreenUpperContainer/MenuBar" file="GameUI">
+		<Height val="60"/>
+		<Width val="259"/>
+		<Frame type="Image" name="MenuBarBackgroundImage">
+			<Visible val="false"/>
+		</Frame>
+	</Frame>
+	<Frame type="Frame" name="GameUI/UIContainer/FullscreenUpperContainer/MenuBarConsoleAnchor" file="GameUI">
+		<Anchor side="Left" relative="$parent" pos="Min" offset="10"/>
+		<Anchor side="Bottom" relative="$parent" pos="Max" offset="-295"/>
+		<Anchor side="Right" relative="$parent" pos="min" offset="210"/>
+		<Height val="60"/>
+		<Width val="200"/>
+	</Frame>
+	<!--Chat box-->
+	<Frame type="ChatBar" name="GameUI/UIContainer/FullscreenUpperContainer/ChatBar">
+		<Frame type="EditBox" name="ChatEditBox">
+			
+		</Frame>
+	</Frame>
+	<!--Getting rid of hero panel, uneeded-->
+	<Frame type="HeroPanel" name="GameUI/UIContainer/FullscreenUpperContainer/HeroPanel">
+		<Anchor side="Bottom" relative="$parent" pos="Max" offset="-200"/>
+	</Frame>
+	<Frame type="Frame" name="GameUI/UIContainer/ConsoleUIContainer" file="GameUI">
+		<!--Asthetics-->
+		<Frame type="Frame" name="BeautifyingFrame">
+			<Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
+			<Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+			<Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+			<Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
+			<Frame name="rightBar1" type="Image">
+					<IgnoreParentAlpha val="true"/>
+					<RenderPriority val="2"/>
+					<DisabledAlpha val="0"/>
+					<Anchor side="Left" relative="$parent" pos="Mid" offset="550"/>
+					<Anchor side="Right" relative="$parent" pos="Max" offset="-150"/>
+					<Anchor side="Top" relative="$parent" pos="Max" offset="-30"/>
+					<Anchor side="Bottom" relative="$parent" pos="Max" offset="-28"/>
+					<Texture val="Assets/Textures/flare_aiurcompletenebula01_dirtlylensflare_whitebox.dds"/>
+					<TextureType val="Normal"/>
+			</Frame>
+			<Frame name="rightBar2" type="Image">
+					<IgnoreParentAlpha val="true"/>
+					<RenderPriority val="2"/>
+					<DisabledAlpha val="0"/>
+					<Anchor side="Left" relative="$parent" pos="Mid" offset="550"/>
+					<Anchor side="Right" relative="$parent" pos="Max" offset="-150"/>
+					<Anchor side="Top" relative="$parent" pos="Max" offset="-35"/>
+					<Anchor side="Bottom" relative="$parent" pos="Max" offset="-33"/>
+					<Texture val="Assets/Textures/flare_aiurcompletenebula01_dirtlylensflare_whitebox.dds"/>
+					<TextureType val="Normal"/>
+			</Frame>
+			<Frame name="rightEmblem" type="Image">
+					<IgnoreParentAlpha val="true"/>
+					<RenderPriority val="2"/>
+					<DisabledAlpha val="0"/>
+					<Anchor side="Left" relative="$parent" pos="Max" offset="-130"/>
+					<Anchor side="Right" relative="$parent" pos="Max" offset="-30"/>
+					<Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
+					<Height val="100"/>
+					<Texture val="Apex/Assets/Textures/Info.png"/>
+					<TextureType val="Normal"/>
+			</Frame>
+			<Frame name="leftBar1" type="Image">
+					<IgnoreParentAlpha val="true"/>
+					<RenderPriority val="2"/>
+					<DisabledAlpha val="0"/>
+					<Anchor side="Left" relative="$parent" pos="Min" offset="325"/>
+					<Anchor side="Right" relative="$parent" pos="Mid" offset="-250"/>
+					<Anchor side="Top" relative="$parent" pos="Max" offset="-30"/>
+					<Anchor side="Bottom" relative="$parent" pos="Max" offset="-28"/>
+					<Texture val="Assets/Textures/flare_aiurcompletenebula01_dirtlylensflare_whitebox.dds"/>
+					<TextureType val="Normal"/>
+			</Frame>
+			<Frame name="leftBar2" type="Image">
+					<IgnoreParentAlpha val="true"/>
+					<RenderPriority val="2"/>
+					<DisabledAlpha val="0"/>
+					<Anchor side="Left" relative="$parent" pos="Min" offset="325"/>
+					<Anchor side="Right" relative="$parent" pos="Mid" offset="-250"/>
+					<Anchor side="Top" relative="$parent" pos="Max" offset="-35"/>
+					<Anchor side="Bottom" relative="$parent" pos="Max" offset="-33"/>
+					<Texture val="Assets/Textures/flare_aiurcompletenebula01_dirtlylensflare_whitebox.dds"/>
+					<TextureType val="Normal"/>
+			</Frame>
+		</Frame>
+		<!-- Timer  -->
+		<Frame type="MissionTimePanel" name="MissionTimePanel">
+			<Anchor side="Left" relative="$parent" pos="Min" offset="230"/>
+			<Anchor side="Bottom" relative="$parent" pos="Max" offset="-305"/>
+			<Frame type="Image" name="BackgroundImage">
+				<Visible val="false"/>
+			</Frame>
+			<Frame type="Label" name="TimeLabel">
+
+			</Frame>
+		</Frame>
+			
+		<!-- Minimap Styling -->
+		<Frame type="Frame" name="MinimapPanelHelper">
+			<Anchor side="Bottom" relative="$parent" pos="Max" offset="-160"/>
+			<Anchor side="Left" relative="$parent" pos="Min" offset="260"/>
+			<Height val="138"/> <!--Default value 286-->
+			<Width val="86"/>
+			<RenderPriority val="1"/>
+			<Frame name="background" type="Image">
+				<IgnoreParentAlpha val="true"/>
+				<RenderPriority val="2"/>
+				<DisabledAlpha val="0"/>
+				<Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+				<Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
+				<Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+				<Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
+				<Texture val="Assets\Textures\border-protoss-transportslot-filled.dds"/>
+				<TextureType val="Border"/>
+				<Tiled val="true"/>
+			</Frame>
+			<Frame name="backgroundGrey" type="Image">
+					<IgnoreParentAlpha val="true"/>
+					<RenderPriority val="2"/>
+					<DisabledAlpha val="0"/>
+					<Anchor side="Left" relative="$parent" pos="Min" offset="-100"/>
+					<Anchor side="Right" relative="$parent" pos="Max" offset="100"/>
+					<Anchor side="Top" relative="$parent" pos="Min" offset="-100"/>
+					<Anchor side="Bottom" relative="$parent" pos="Max" offset="100"/>
+					<Texture val="Apex\Assets\Textures\ApexUI.dds"/>
+					<TextureType val="Border"/>
+					<Tiled val="true"/>
+			</Frame>
+		</Frame>
+		<Frame type="MinimapPanel" name="MinimapPanel">
+			<Frame type="Minimap" name="Minimap">
+					<Anchor side="Bottom" relative="$parent" pos="Max" offset="-10"/>
+					<Anchor side="Left" relative="$parent" pos="Min" offset="10"/>
+					<Height val="286"/> <!--Default value 286-->
+					<Width val="291"/>	<!--default value 291-->
+					<RenderPriority val="900"/>
+					<Frame name="background" type="Image">
+							<IgnoreParentAlpha val="true"/>
+							<RenderPriority val="2"/>
+							<DisabledAlpha val="0"/>
+							<Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+							<Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
+							<Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+							<Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
+							<Texture val="Assets\Textures\border-protoss-transportslot-filled.dds"/>
+							<TextureType val="Border"/>
+							<Tiled val="true"/>
+						</Frame>
+			</Frame>
+			<Frame type="Button" name="PingButton">
+					<Anchor side="Bottom" relative="$parent" pos="Max" offset="-252"/> <!-- -10 + -height + buttonSize(42) -->
+					<Anchor side="Left" relative="$parent" pos="Min" offset="255"/> <!-- 10 + width - ButtonSize(42) -->
+			</Frame>
+			<Frame type="Button" name="TerrainButton">
+					<Anchor side="Bottom" relative="$parent" pos="Max" offset="-210"/> <!-- -10 + -height + buttonSize(42) -->
+					<Anchor side="Left" relative="$parent" pos="Min" offset="255"/> <!-- 10 + width - ButtonSize(42) -->
+			</Frame>
+			<Frame type="Button" name="ColorButton">
+					<Anchor side="Bottom" relative="$parent" pos="Max" offset="-168"/> <!-- -10 + -height + buttonSize(42) -->
+					<Anchor side="Left" relative="$parent" pos="Min" offset="255"/> <!-- 10 + width - ButtonSize(42) -->
+			</Frame>
+
+		</Frame>
+		<!-- Info Panel -->
+		<!-- Grouped units -->
+		<Frame type="Frame" name="InfoPanel/InfoPaneGroup/PageFrame0" file="InfoPaneGroup">
+			<Frame type="UnitButton" name="GroupUnitButton0">
+				<Width val="45"/>
+				<Height val="45"/>
+			</Frame>
+			<Frame type="UnitButton" name="GroupUnitButton1">
+					<Width val="45"/>
+					<Height val="45"/>
+			</Frame>
+			<Frame type="UnitButton" name="GroupUnitButton2">
+					<Width val="45"/>
+					<Height val="45"/>
+			</Frame>
+			<Frame type="UnitButton" name="GroupUnitButton3">
+					<Width val="45"/>
+					<Height val="45"/>
+			</Frame>
+			<Frame type="UnitButton" name="GroupUnitButton4">
+					<Width val="45"/>
+					<Height val="45"/>
+			</Frame>
+			<Frame type="UnitButton" name="GroupUnitButton5">
+					<Width val="45"/>
+					<Height val="45"/>
+			</Frame>
+			<Frame type="UnitButton" name="GroupUnitButton6">
+					<Width val="45"/>
+					<Height val="45"/>
+			</Frame>
+			<Frame type="UnitButton" name="GroupUnitButton7">
+					<Width val="45"/>
+					<Height val="45"/>
+			</Frame>
+			<Frame type="UnitButton" name="GroupUnitButton8">
+					<Width val="45"/>
+					<Height val="45"/>
+			</Frame>
+			<Frame type="UnitButton" name="GroupUnitButton9">
+					<Width val="45"/>
+					<Height val="45"/>
+			</Frame>
+			<Frame type="UnitButton" name="GroupUnitButton10">
+					<Width val="45"/>
+					<Height val="45"/>
+			</Frame>
+			<Frame type="UnitButton" name="GroupUnitButton11">
+					<Width val="45"/>
+					<Height val="45"/>
+			</Frame>
+			<Frame type="UnitButton" name="GroupUnitButton12">
+					<Width val="45"/>
+					<Height val="45"/>
+			</Frame>
+			<Frame type="UnitButton" name="GroupUnitButton13">
+					<Width val="45"/>
+					<Height val="45"/>
+			</Frame>
+			<Frame type="UnitButton" name="GroupUnitButton14">
+					<Width val="45"/>
+					<Height val="45"/>
+			</Frame>
+			<Frame type="UnitButton" name="GroupUnitButton15">
+					<Width val="45"/>
+					<Height val="45"/>
+			</Frame>
+			<Frame type="UnitButton" name="GroupUnitButton16">
+					<Width val="45"/>
+					<Height val="45"/>
+			</Frame>
+			<Frame type="UnitButton" name="GroupUnitButton17">
+					<Width val="45"/>
+					<Height val="45"/>
+			</Frame>
+			<Frame type="UnitButton" name="GroupUnitButton18">
+					<Width val="45"/>
+					<Height val="45"/>
+			</Frame>
+			<Frame type="UnitButton" name="GroupUnitButton19">
+					<Width val="45"/>
+					<Height val="45"/>
+			</Frame>
+			<Frame type="UnitButton" name="GroupUnitButton20">
+					<Width val="45"/>
+					<Height val="45"/>
+			</Frame>
+			<Frame type="UnitButton" name="GroupUnitButton21">
+					<Width val="45"/>
+					<Height val="45"/>
+			</Frame>
+			<Frame type="UnitButton" name="GroupUnitButton22">
+					<Width val="45"/>
+					<Height val="45"/>
+			</Frame>
+			<Frame type="UnitButton" name="GroupUnitButton23">
+					<Width val="45"/>
+					<Height val="45"/>
+			</Frame>
+		</Frame>
+		<Frame type="Frame" name="InfoPanel/InfoPaneGroup/PageFrame1" file="InfoPaneGroup">
+
+			<Frame type="UnitButton" name="GroupUnitButton0">
+				<Width val="45"/>
+				<Height val="45"/>
+			</Frame>
+			<Frame type="UnitButton" name="GroupUnitButton1">
+					<Width val="45"/>
+					<Height val="45"/>
+			</Frame>
+			<Frame type="UnitButton" name="GroupUnitButton2">
+					<Width val="45"/>
+					<Height val="45"/>
+			</Frame>
+			<Frame type="UnitButton" name="GroupUnitButton3">
+					<Width val="45"/>
+					<Height val="45"/>
+			</Frame>
+			<Frame type="UnitButton" name="GroupUnitButton4">
+					<Width val="45"/>
+					<Height val="45"/>
+			</Frame>
+			<Frame type="UnitButton" name="GroupUnitButton5">
+					<Width val="45"/>
+					<Height val="45"/>
+			</Frame>
+			<Frame type="UnitButton" name="GroupUnitButton6">
+					<Width val="45"/>
+					<Height val="45"/>
+			</Frame>
+			<Frame type="UnitButton" name="GroupUnitButton7">
+					<Width val="45"/>
+					<Height val="45"/>
+			</Frame>
+			<Frame type="UnitButton" name="GroupUnitButton8">
+					<Width val="45"/>
+					<Height val="45"/>
+			</Frame>
+			<Frame type="UnitButton" name="GroupUnitButton9">
+					<Width val="45"/>
+					<Height val="45"/>
+			</Frame>
+			<Frame type="UnitButton" name="GroupUnitButton10">
+					<Width val="45"/>
+					<Height val="45"/>
+			</Frame>
+			<Frame type="UnitButton" name="GroupUnitButton11">
+					<Width val="45"/>
+					<Height val="45"/>
+			</Frame>
+			<Frame type="UnitButton" name="GroupUnitButton12">
+					<Width val="45"/>
+					<Height val="45"/>
+			</Frame>
+			<Frame type="UnitButton" name="GroupUnitButton13">
+					<Width val="45"/>
+					<Height val="45"/>
+			</Frame>
+			<Frame type="UnitButton" name="GroupUnitButton14">
+					<Width val="45"/>
+					<Height val="45"/>
+			</Frame>
+			<Frame type="UnitButton" name="GroupUnitButton15">
+					<Width val="45"/>
+					<Height val="45"/>
+			</Frame>
+			<Frame type="UnitButton" name="GroupUnitButton16">
+					<Width val="45"/>
+					<Height val="45"/>
+			</Frame>
+			<Frame type="UnitButton" name="GroupUnitButton17">
+					<Width val="45"/>
+					<Height val="45"/>
+			</Frame>
+			<Frame type="UnitButton" name="GroupUnitButton18">
+					<Width val="45"/>
+					<Height val="45"/>
+			</Frame>
+			<Frame type="UnitButton" name="GroupUnitButton19">
+					<Width val="45"/>
+					<Height val="45"/>
+			</Frame>
+			<Frame type="UnitButton" name="GroupUnitButton20">
+					<Width val="45"/>
+					<Height val="45"/>
+			</Frame>
+			<Frame type="UnitButton" name="GroupUnitButton21">
+					<Width val="45"/>
+					<Height val="45"/>
+			</Frame>
+			<Frame type="UnitButton" name="GroupUnitButton22">
+					<Width val="45"/>
+					<Height val="45"/>
+			</Frame>
+			<Frame type="UnitButton" name="GroupUnitButton23">
+					<Width val="45"/>
+					<Height val="45"/>
+			</Frame>
+		</Frame>
+		<Frame type="Frame" name="InfoPanel/InfoPaneGroup/PageFrame2" file="InfoPaneGroup">
+			<Frame type="UnitButton" name="GroupUnitButton0">
+				<Width val="45"/>
+				<Height val="45"/>
+			</Frame>
+			<Frame type="UnitButton" name="GroupUnitButton1">
+					<Width val="45"/>
+					<Height val="45"/>
+			</Frame>
+			<Frame type="UnitButton" name="GroupUnitButton2">
+					<Width val="45"/>
+					<Height val="45"/>
+			</Frame>
+			<Frame type="UnitButton" name="GroupUnitButton3">
+					<Width val="45"/>
+					<Height val="45"/>
+			</Frame>
+			<Frame type="UnitButton" name="GroupUnitButton4">
+					<Width val="45"/>
+					<Height val="45"/>
+			</Frame>
+			<Frame type="UnitButton" name="GroupUnitButton5">
+					<Width val="45"/>
+					<Height val="45"/>
+			</Frame>
+			<Frame type="UnitButton" name="GroupUnitButton6">
+					<Width val="45"/>
+					<Height val="45"/>
+			</Frame>
+			<Frame type="UnitButton" name="GroupUnitButton7">
+					<Width val="45"/>
+					<Height val="45"/>
+			</Frame>
+			<Frame type="UnitButton" name="GroupUnitButton8">
+					<Width val="45"/>
+					<Height val="45"/>
+			</Frame>
+			<Frame type="UnitButton" name="GroupUnitButton9">
+					<Width val="45"/>
+					<Height val="45"/>
+			</Frame>
+			<Frame type="UnitButton" name="GroupUnitButton10">
+					<Width val="45"/>
+					<Height val="45"/>
+			</Frame>
+			<Frame type="UnitButton" name="GroupUnitButton11">
+					<Width val="45"/>
+					<Height val="45"/>
+			</Frame>
+			<Frame type="UnitButton" name="GroupUnitButton12">
+					<Width val="45"/>
+					<Height val="45"/>
+			</Frame>
+			<Frame type="UnitButton" name="GroupUnitButton13">
+					<Width val="45"/>
+					<Height val="45"/>
+			</Frame>
+			<Frame type="UnitButton" name="GroupUnitButton14">
+					<Width val="45"/>
+					<Height val="45"/>
+			</Frame>
+			<Frame type="UnitButton" name="GroupUnitButton15">
+					<Width val="45"/>
+					<Height val="45"/>
+			</Frame>
+			<Frame type="UnitButton" name="GroupUnitButton16">
+					<Width val="45"/>
+					<Height val="45"/>
+			</Frame>
+			<Frame type="UnitButton" name="GroupUnitButton17">
+					<Width val="45"/>
+					<Height val="45"/>
+			</Frame>
+			<Frame type="UnitButton" name="GroupUnitButton18">
+					<Width val="45"/>
+					<Height val="45"/>
+			</Frame>
+			<Frame type="UnitButton" name="GroupUnitButton19">
+					<Width val="45"/>
+					<Height val="45"/>
+			</Frame>
+			<Frame type="UnitButton" name="GroupUnitButton20">
+					<Width val="45"/>
+					<Height val="45"/>
+			</Frame>
+			<Frame type="UnitButton" name="GroupUnitButton21">
+					<Width val="45"/>
+					<Height val="45"/>
+			</Frame>
+			<Frame type="UnitButton" name="GroupUnitButton22">
+					<Width val="45"/>
+					<Height val="45"/>
+			</Frame>
+			<Frame type="UnitButton" name="GroupUnitButton23">
+					<Width val="45"/>
+					<Height val="45"/>
+			</Frame>
+		</Frame>
+		<Frame type="Frame" name="InfoPanel/InfoPaneGroup/PageFrame3" file="InfoPaneGroup">
+			<Frame type="UnitButton" name="GroupUnitButton0">
+				<Width val="45"/>
+				<Height val="45"/>
+			</Frame>
+			<Frame type="UnitButton" name="GroupUnitButton1">
+					<Width val="45"/>
+					<Height val="45"/>
+			</Frame>
+			<Frame type="UnitButton" name="GroupUnitButton2">
+					<Width val="45"/>
+					<Height val="45"/>
+			</Frame>
+			<Frame type="UnitButton" name="GroupUnitButton3">
+					<Width val="45"/>
+					<Height val="45"/>
+			</Frame>
+			<Frame type="UnitButton" name="GroupUnitButton4">
+					<Width val="45"/>
+					<Height val="45"/>
+			</Frame>
+			<Frame type="UnitButton" name="GroupUnitButton5">
+					<Width val="45"/>
+					<Height val="45"/>
+			</Frame>
+			<Frame type="UnitButton" name="GroupUnitButton6">
+					<Width val="45"/>
+					<Height val="45"/>
+			</Frame>
+			<Frame type="UnitButton" name="GroupUnitButton7">
+					<Width val="45"/>
+					<Height val="45"/>
+			</Frame>
+			<Frame type="UnitButton" name="GroupUnitButton8">
+					<Width val="45"/>
+					<Height val="45"/>
+			</Frame>
+			<Frame type="UnitButton" name="GroupUnitButton9">
+					<Width val="45"/>
+					<Height val="45"/>
+			</Frame>
+			<Frame type="UnitButton" name="GroupUnitButton10">
+					<Width val="45"/>
+					<Height val="45"/>
+			</Frame>
+			<Frame type="UnitButton" name="GroupUnitButton11">
+					<Width val="45"/>
+					<Height val="45"/>
+			</Frame>
+			<Frame type="UnitButton" name="GroupUnitButton12">
+					<Width val="45"/>
+					<Height val="45"/>
+			</Frame>
+			<Frame type="UnitButton" name="GroupUnitButton13">
+					<Width val="45"/>
+					<Height val="45"/>
+			</Frame>
+			<Frame type="UnitButton" name="GroupUnitButton14">
+					<Width val="45"/>
+					<Height val="45"/>
+			</Frame>
+			<Frame type="UnitButton" name="GroupUnitButton15">
+					<Width val="45"/>
+					<Height val="45"/>
+			</Frame>
+			<Frame type="UnitButton" name="GroupUnitButton16">
+					<Width val="45"/>
+					<Height val="45"/>
+			</Frame>
+			<Frame type="UnitButton" name="GroupUnitButton17">
+					<Width val="45"/>
+					<Height val="45"/>
+			</Frame>
+			<Frame type="UnitButton" name="GroupUnitButton18">
+					<Width val="45"/>
+					<Height val="45"/>
+			</Frame>
+			<Frame type="UnitButton" name="GroupUnitButton19">
+					<Width val="45"/>
+					<Height val="45"/>
+			</Frame>
+			<Frame type="UnitButton" name="GroupUnitButton20">
+					<Width val="45"/>
+					<Height val="45"/>
+			</Frame>
+			<Frame type="UnitButton" name="GroupUnitButton21">
+					<Width val="45"/>
+					<Height val="45"/>
+			</Frame>
+			<Frame type="UnitButton" name="GroupUnitButton22">
+					<Width val="45"/>
+					<Height val="45"/>
+			</Frame>
+			<Frame type="UnitButton" name="GroupUnitButton23">
+					<Width val="45"/>
+					<Height val="45"/>
+			</Frame>
+		</Frame>
+		<Frame type="Frame" name="InfoPanel/InfoPaneGroup/PageFrame4" file="InfoPaneGroup">
+			<Frame type="UnitButton" name="GroupUnitButton0">
+				<Width val="45"/>
+				<Height val="45"/>
+			</Frame>
+			<Frame type="UnitButton" name="GroupUnitButton1">
+					<Width val="45"/>
+					<Height val="45"/>
+			</Frame>
+			<Frame type="UnitButton" name="GroupUnitButton2">
+					<Width val="45"/>
+					<Height val="45"/>
+			</Frame>
+			<Frame type="UnitButton" name="GroupUnitButton3">
+					<Width val="45"/>
+					<Height val="45"/>
+			</Frame>
+			<Frame type="UnitButton" name="GroupUnitButton4">
+					<Width val="45"/>
+					<Height val="45"/>
+			</Frame>
+			<Frame type="UnitButton" name="GroupUnitButton5">
+					<Width val="45"/>
+					<Height val="45"/>
+			</Frame>
+			<Frame type="UnitButton" name="GroupUnitButton6">
+					<Width val="45"/>
+					<Height val="45"/>
+			</Frame>
+			<Frame type="UnitButton" name="GroupUnitButton7">
+					<Width val="45"/>
+					<Height val="45"/>
+			</Frame>
+			<Frame type="UnitButton" name="GroupUnitButton8">
+					<Width val="45"/>
+					<Height val="45"/>
+			</Frame>
+			<Frame type="UnitButton" name="GroupUnitButton9">
+					<Width val="45"/>
+					<Height val="45"/>
+			</Frame>
+			<Frame type="UnitButton" name="GroupUnitButton10">
+					<Width val="45"/>
+					<Height val="45"/>
+			</Frame>
+			<Frame type="UnitButton" name="GroupUnitButton11">
+					<Width val="45"/>
+					<Height val="45"/>
+			</Frame>
+			<Frame type="UnitButton" name="GroupUnitButton12">
+					<Width val="45"/>
+					<Height val="45"/>
+			</Frame>
+			<Frame type="UnitButton" name="GroupUnitButton13">
+					<Width val="45"/>
+					<Height val="45"/>
+			</Frame>
+			<Frame type="UnitButton" name="GroupUnitButton14">
+					<Width val="45"/>
+					<Height val="45"/>
+			</Frame>
+			<Frame type="UnitButton" name="GroupUnitButton15">
+					<Width val="45"/>
+					<Height val="45"/>
+			</Frame>
+			<Frame type="UnitButton" name="GroupUnitButton16">
+					<Width val="45"/>
+					<Height val="45"/>
+			</Frame>
+			<Frame type="UnitButton" name="GroupUnitButton17">
+					<Width val="45"/>
+					<Height val="45"/>
+			</Frame>
+			<Frame type="UnitButton" name="GroupUnitButton18">
+					<Width val="45"/>
+					<Height val="45"/>
+			</Frame>
+			<Frame type="UnitButton" name="GroupUnitButton19">
+					<Width val="45"/>
+					<Height val="45"/>
+			</Frame>
+			<Frame type="UnitButton" name="GroupUnitButton20">
+					<Width val="45"/>
+					<Height val="45"/>
+			</Frame>
+			<Frame type="UnitButton" name="GroupUnitButton21">
+					<Width val="45"/>
+					<Height val="45"/>
+			</Frame>
+			<Frame type="UnitButton" name="GroupUnitButton22">
+					<Width val="45"/>
+					<Height val="45"/>
+			</Frame>
+			<Frame type="UnitButton" name="GroupUnitButton23">
+					<Width val="45"/>
+					<Height val="45"/>
+			</Frame>
+		</Frame>
+		<Frame type="Frame" name="InfoPanel/InfoPaneGroup/PageFrame5" file="InfoPaneGroup">
+			<Frame type="UnitButton" name="GroupUnitButton0">
+				<Width val="45"/>
+				<Height val="45"/>
+			</Frame>
+			<Frame type="UnitButton" name="GroupUnitButton1">
+					<Width val="45"/>
+					<Height val="45"/>
+			</Frame>
+			<Frame type="UnitButton" name="GroupUnitButton2">
+					<Width val="45"/>
+					<Height val="45"/>
+			</Frame>
+			<Frame type="UnitButton" name="GroupUnitButton3">
+					<Width val="45"/>
+					<Height val="45"/>
+			</Frame>
+			<Frame type="UnitButton" name="GroupUnitButton4">
+					<Width val="45"/>
+					<Height val="45"/>
+			</Frame>
+			<Frame type="UnitButton" name="GroupUnitButton5">
+					<Width val="45"/>
+					<Height val="45"/>
+			</Frame>
+			<Frame type="UnitButton" name="GroupUnitButton6">
+					<Width val="45"/>
+					<Height val="45"/>
+			</Frame>
+			<Frame type="UnitButton" name="GroupUnitButton7">
+					<Width val="45"/>
+					<Height val="45"/>
+			</Frame>
+			<Frame type="UnitButton" name="GroupUnitButton8">
+					<Width val="45"/>
+					<Height val="45"/>
+			</Frame>
+			<Frame type="UnitButton" name="GroupUnitButton9">
+					<Width val="45"/>
+					<Height val="45"/>
+			</Frame>
+			<Frame type="UnitButton" name="GroupUnitButton10">
+					<Width val="45"/>
+					<Height val="45"/>
+			</Frame>
+			<Frame type="UnitButton" name="GroupUnitButton11">
+					<Width val="45"/>
+					<Height val="45"/>
+			</Frame>
+			<Frame type="UnitButton" name="GroupUnitButton12">
+					<Width val="45"/>
+					<Height val="45"/>
+			</Frame>
+			<Frame type="UnitButton" name="GroupUnitButton13">
+					<Width val="45"/>
+					<Height val="45"/>
+			</Frame>
+			<Frame type="UnitButton" name="GroupUnitButton14">
+					<Width val="45"/>
+					<Height val="45"/>
+			</Frame>
+			<Frame type="UnitButton" name="GroupUnitButton15">
+					<Width val="45"/>
+					<Height val="45"/>
+			</Frame>
+			<Frame type="UnitButton" name="GroupUnitButton16">
+					<Width val="45"/>
+					<Height val="45"/>
+			</Frame>
+			<Frame type="UnitButton" name="GroupUnitButton17">
+					<Width val="45"/>
+					<Height val="45"/>
+			</Frame>
+			<Frame type="UnitButton" name="GroupUnitButton18">
+					<Width val="45"/>
+					<Height val="45"/>
+			</Frame>
+			<Frame type="UnitButton" name="GroupUnitButton19">
+					<Width val="45"/>
+					<Height val="45"/>
+			</Frame>
+			<Frame type="UnitButton" name="GroupUnitButton20">
+					<Width val="45"/>
+					<Height val="45"/>
+			</Frame>
+			<Frame type="UnitButton" name="GroupUnitButton21">
+					<Width val="45"/>
+					<Height val="45"/>
+			</Frame>
+			<Frame type="UnitButton" name="GroupUnitButton22">
+					<Width val="45"/>
+					<Height val="45"/>
+			</Frame>
+			<Frame type="UnitButton" name="GroupUnitButton23">
+					<Width val="45"/>
+					<Height val="45"/>
+			</Frame>
+		</Frame>
+		<!-- Unit name and wireframe panel -->
+		<Frame type="InfoPanel" name="InfoPanel">
+			<Anchor side="Left" relative="$parent" pos=".5" offset="-225"/> <!--tbd 166 -->
+			<Anchor side="Right" relative="$parent" pos=".5" offset="225"/>
+			<Anchor side="Bottom" relative="$parent" pos="Max" offset="-20"/>
+			<Height val="250"/>
+			<Frame name="background" type="Image">
+				<IgnoreParentAlpha val="true"/>
+				<RenderPriority val="2"/>
+				<DisabledAlpha val="0"/>
+				<Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+				<Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
+				<Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+				<Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
+				<Texture val="Assets\Textures\border-protoss-transportslot-filled.dds"/>
+				<TextureType val="Border"/>
+				<Tiled val="true"/>
+			</Frame>
+			<Frame name="backgroundGrey" type="Image">
+					<IgnoreParentAlpha val="true"/>
+					<RenderPriority val="2"/>
+					<DisabledAlpha val="0"/>
+					<Anchor side="Left" relative="$parent" pos="Min" offset="-100"/>
+					<Anchor side="Right" relative="$parent" pos="Max" offset="100"/>
+					<Anchor side="Top" relative="$parent" pos="Min" offset="-100"/>
+					<Anchor side="Bottom" relative="$parent" pos="Max" offset="100"/>
+					<Texture val="Apex\Assets\Textures\ApexUI.dds"/>
+					<TextureType val="Border"/>
+					<Tiled val="true"/>
+			</Frame>
+			<!--Stats positioning-->
+			<Frame type="UnitWireframe" name="UnitPanel/UnitWireframe">
+				<Width val="438"/>
+				<Anchor side="Left" relative="$parent" pos="Min" offset="6"/>
+				<Anchor side="Bottom" relative="$parent" pos="Max" offset="6"/>
+				<Anchor side="Top" relative="$parent/BehaviorBar" pos="Min" offset="40"/>
+				<Frame type="Image" name="Image0">
+					<Anchor side="Bottom" relative="$parent" pos="Max" offset="400"/>
+				</Frame>
+				<Frame type="Image" name="Image1">
+					<Anchor side="Bottom" relative="$parent" pos="Max" offset="400"/>
+				</Frame>
+				<Frame type="Image" name="Image3">
+					<Anchor side="Bottom" relative="$parent" pos="Max" offset="400"/>
+				</Frame>
+			</Frame>
+			<!--Normal unit-->
+			<Frame type="InfoPaneUnit" name="InfoPaneUnit">
+				<Width val="450"/>
+				<Anchor side="Left" relative="$parent" pos="Min" offset="6"/>
+				<Anchor side="Bottom" relative="$parent" pos="Max" offset="6"/>
+				<Anchor side="Top" relative="$parent" pos=".25" offset="0"/>
+				<Frame type="Label" name="NameLabel">
+					<Visible val="false"/>
+					<Anchor side="Top" relative="$parent" pos="Max" offset="100"/>
+					<Anchor side="Bottom" relative="$parent" pos="Max" offset="100"/>
+				</Frame>
+				<Frame type="Label" name="Subtitle">
+						<Visible val="false"/>
+						<Anchor side="Top" relative="$parent" pos="Max" offset="100"/>
+						<Anchor side="Bottom" relative="$parent" pos="Max" offset="100"/>
+				</Frame>
+				<Frame type="Label" name="InfoLabel">
+						<Visible val="false"/>
+						<Anchor side="Top" relative="$parent" pos="Max" offset="100"/>
+						<Anchor side="Bottom" relative="$parent" pos="Max" offset="100"/>
+				</Frame>
+				<Frame type="Frame" name="EquipmentPanel">
+						<Anchor side="Top" relative="$parent" pos="Min" offset="50"/>
+				</Frame>
+				<Frame type="Label" name="TypeLabel">
+						<Visible val="false"/>
+						<Anchor side="Top" relative="$parent" pos="Max" offset="100"/>
+						<Anchor side="Bottom" relative="$parent" pos="Max" offset="100"/>
+				</Frame>
+			</Frame>
+			<!-- Hero Unit -->
+			<Frame type="InfoPaneHero" name="InfoPaneHero">
+				<Frame type="ProgressBar" name="ExperienceBar">
+					<Anchor side="Top" relative="$parent" pos="Min" offset="100"/>
+				</Frame>
+				<Frame type="Label" name="NameLabel">
+					<Visible val="false"/>
+					<Anchor side="Top" relative="$parent" pos="Max" offset="100"/>
+					<Anchor side="Bottom" relative="$parent" pos="Max" offset="100"/>
+				</Frame>
+				<Frame type="Label" name="InfoLabel">
+					<Visible val="false"/>
+					<Anchor side="Top" relative="$parent" pos="Max" offset="100"/>
+					<Anchor side="Bottom" relative="$parent" pos="Max" offset="100"/>
+				</Frame>
+				<Frame type="Label" name="TypeLabel">
+					<Visible val="false"/>
+					<Anchor side="Top" relative="$parent" pos="Max" offset="100"/>
+					<Anchor side="Bottom" relative="$parent" pos="Max" offset="100"/>
+				</Frame>
+			</Frame>
+		</Frame>
+		<!-- name Button container -->
+		<Frame type="Frame" name="CommandPanelHelper">
+				<Anchor side="Left" relative="$parent" pos=".5" offset="225"/>
+				<Anchor side="Right" relative="$parent" pos=".5" offset="525"/> <!-- Offset is 300+width -->
+				<Height val="68.5"/>
+				<Width val="302"/>
+				<Anchor side="Bottom" relative="$parent" pos="Max" offset="-201"/>
+				<Frame name="background" type="Image">
+						<IgnoreParentAlpha val="true"/>
+						<RenderPriority val="1"/>
+						<DisabledAlpha val="0"/>
+						<Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+						<Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
+						<Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+						<Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
+						<Texture val="Assets\Textures\border-protoss-transportslot-filled.dds"/>
+						<TextureType val="Border"/>
+						<Tiled val="true"/>
+					</Frame>
+					<Frame name="backgroundGrey" type="Image">
+							<IgnoreParentAlpha val="true"/>
+							<RenderPriority val="2"/>
+							<DisabledAlpha val="0"/>
+							<Anchor side="Left" relative="$parent" pos="Min" offset="-100"/>
+							<Anchor side="Right" relative="$parent" pos="Max" offset="100"/>
+							<Anchor side="Top" relative="$parent" pos="Min" offset="-100"/>
+							<Anchor side="Bottom" relative="$parent" pos="Max" offset="100"/>
+							<Texture val="Apex\Assets\Textures\ApexUI.dds"/>
+							<TextureType val="Border"/>
+							<Tiled val="true"/>
+					</Frame>
+		</Frame>
+		<!-- Unit abilities/command panel -->
+		<Frame type="CommandPanel" name="CommandPanel">
+			<Anchor side="Left" relative="$parent" pos=".5" offset="225"/>
+			<Anchor side="Right" relative="$parent" pos=".5" offset="525"/> <!-- Offset is 300+width -->
+			<Height val="181.5"/>
+			<Width val="302"/>
+			<Anchor side="Bottom" relative="$parent" pos="Max" offset="-20"/>
+			<Frame name="background" type="Image">
+				<IgnoreParentAlpha val="true"/>
+				<RenderPriority val="1"/>
+				<DisabledAlpha val="0"/>
+				<Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+				<Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
+				<Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+				<Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
+				<Texture val="Assets\Textures\border-protoss-transportslot-filled.dds"/>
+				<TextureType val="Border"/>
+				<Tiled val="true"/>
+			</Frame>
+			<Frame name="backgroundGrey" type="Image">
+					<IgnoreParentAlpha val="true"/>
+					<RenderPriority val="2"/>
+					<DisabledAlpha val="0"/>
+					<Anchor side="Left" relative="$parent" pos="Min" offset="-100"/>
+					<Anchor side="Right" relative="$parent" pos="Max" offset="100"/>
+					<Anchor side="Top" relative="$parent" pos="Min" offset="-100"/>
+					<Anchor side="Bottom" relative="$parent" pos="Max" offset="100"/>
+					<Texture val="Apex\Assets\Textures\ApexUI.dds"/>
+					<TextureType val="Border"/>
+					<Tiled val="true"/>
+			</Frame>
+			<Frame type="CommandButton" name="CommandButton00">
+				<Height val="57"/> <!--Default size is 76 x 76-->
+				<Width val="57"/>
+				<Anchor side="Top" relative="$parent" pos="Min" offset="4"/>
+				<Anchor side="Left" relative="$parent" pos="Min" offset="6"/>
+			</Frame>
+			<Frame type="CommandButton" name="CommandButton01">
+					<Height val="57"/>
+					<Width val="57"/>
+			</Frame>
+			<Frame type="CommandButton" name="CommandButton02">
+					<Height val="57"/>
+					<Width val="57"/>
+			</Frame>
+			<Frame type="CommandButton" name="CommandButton03">
+					<Height val="57"/>
+					<Width val="57"/>
+			</Frame>
+			<Frame type="CommandButton" name="CommandButton04">
+					<Height val="57"/>
+					<Width val="57"/>
+			</Frame>
+			<Frame type="CommandButton" name="CommandButton05">
+					<Height val="57"/>
+					<Width val="57"/>
+			</Frame>
+			<Frame type="CommandButton" name="CommandButton06">
+					<Height val="57"/>
+					<Width val="57"/>
+			</Frame>
+			<Frame type="CommandButton" name="CommandButton07">
+					<Height val="57"/>
+					<Width val="57"/>
+			</Frame>
+			<Frame type="CommandButton" name="CommandButton08">
+					<Height val="57"/>
+					<Width val="57"/>
+			</Frame>
+			<Frame type="CommandButton" name="CommandButton09">
+					<Height val="57"/>
+					<Width val="57"/>
+			</Frame>
+			<Frame type="CommandButton" name="CommandButton10">
+					<Height val="57"/>
+					<Width val="57"/>
+			</Frame>
+			<Frame type="CommandButton" name="CommandButton11">
+					<Height val="57"/>
+					<Width val="57"/>
+			</Frame>
+			<Frame type="CommandButton" name="CommandButton12">
+					<Height val="57"/>
+					<Width val="57"/>
+			</Frame>
+			<Frame type="CommandButton" name="CommandButton13">
+					<Height val="57"/>
+					<Width val="57"/>
+			</Frame>
+			<Frame type="CommandButton" name="CommandButton14">
+					<Height val="57"/>
+					<Width val="57"/>
+			</Frame>
+		</Frame>
+	</Frame>
+</Desc>
 
 	<!-- base UI frames (minimap, character info, and command panel backgrounds -->
 	<!--Frame type="Frame" name="GameUI/UIContainer/FullscreenLowerContainer" file="GameUI">
@@ -99,7 +1082,7 @@
 	</Frame>
 
 	<!--Info Panel Move-->
-	<Frame type="Frame" name="GameUI/UIContainer/ConsoleUIContainer" file="GameUI">
+	<!--Frame type="Frame" name="GameUI/UIContainer/ConsoleUIContainer" file="GameUI">
 		<Frame type="InfoPanel" name="InfoPanel">
 			<Anchor side="Left" relative="$parent" pos="Min" offset="420"/>
 			<Anchor side="Bottom" relative="$parent" pos="Max" offset="-30"/>
@@ -138,7 +1121,7 @@
 	</Frame>
 
 	<!--Game Timer Alterations-->
-    <Frame type="GameUI" name="GameUI" file="GameUI">
+    <!--Frame type="GameUI" name="GameUI" file="GameUI">
         <Frame type="Frame" name="UIContainer">
             <Frame type="Frame" name="ConsoleUIContainer">
 
@@ -163,7 +1146,5 @@
 
 			</Frame>
 		</Frame>
-	</Frame>
+	</Frame-->
 
-
-</Desc-->

@@ -1,0 +1,26 @@
+//=========================================================
+//		Apex Roleplaying Engine
+//		Copyright (c) 2019, Apex Group
+//=========================================================
+// This software is distributed under the MIT License:
+// <http://opensource.org/licenses/MIT>
+//=========================================================
+
+//DEPRECIATED UNTIL LATER
+
+
+//Dialog for user settings
+int libapx_ui_settings;
+
+
+void libapx_ui_settings_init() {
+  //Main Dialog init
+  libapx_ui_settings = libapx_create_dialog(670, 750, c_anchorTopLeft, libapx_ui_panel_spacing, 0);
+
+  //Title
+  libapx_create_dialog_title(libapx_ui_settings , 300, 40, 00, 40, "User Preferences", libapx_UI_HEADER1, 200);
+}
+
+void libapx_ui_settings_init_player(int player) {
+
+}

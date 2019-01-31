@@ -191,7 +191,7 @@ void libapx_command_keypress(int user, unitgroup u, string argv, int spawningCou
 
 			libapx_unit_set_val(UnitGroupLoopCurrent(), StringWord(argv, 2), keypress_string);
 
-			libapx_print_output(user, "Set keypress key " + StringWord(argv, 2) + " On unit to string.");
+			libapx_print_output(user, "Set keypress <c val=\"d63031\">\"" + StringWord(argv, 2) + "\"</c> on unit to this text: \n <c val=\"00cec9\">"+keypress_string+"</c>");
 			UnitGroupLoopStep();
 		}
 		UnitGroupLoopEnd();
@@ -199,11 +199,6 @@ void libapx_command_keypress(int user, unitgroup u, string argv, int spawningCou
 	else {
 		libapx_print_error(user, "Invalid key inputted, type </c>\" >keypress help \"<c val=\"ff0000\"> to list all assignable keys.");
 	}
-
-
-
-
-
 
 	return;
 }

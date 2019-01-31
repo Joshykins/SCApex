@@ -12,13 +12,13 @@
 
 // default image path used for ui dialog background/border styles
 // to ensure the Apex ui has a consistent theme
-const string libapx_UI_DIALOG_BACKGROUND = "Assets\\Textures\\ui_ingame_subpanel1.dds";
-const string libapx_UI_DIALOG_BUTTON = "Assets\\Textures\\ui_help_frame_tips_checkbox_normalpressed.dds"; // for normal and hover
-const string libapx_UI_DIALOG_BUTTON_HOV = "Assets\\Textures\\ui_help_frame_tips_checkbox_normaloverpressedover.dds"; // for normal and hover
+const string libapx_UI_DIALOG_BACKGROUND = "Apex\\Assets\\Textures\\apexUI.dds";
+const string libapx_UI_DIALOG_BUTTON = "Apex\\Assets\\Textures\\apexUIButtons.dds"; // for normal and hover
+const string libapx_UI_DIALOG_BUTTON_HOV = "Apex\\Assets\\Textures\\apexUIButtons.dds"; // for normal and hover
 const string libapx_UI_SUBPANEL_BACKGROUND = "Assets\\Textures\\ui_ingame_subpanel.dds";
 
 // text header styles
-const string libapx_UI_HEADER1 = "CantinaLevelStart";
+const string libapx_UI_HEADER1 = "GlueButton";
 const string libapx_UI_HEADER2 = "DirectiveDisplay";
 const string libapx_UI_HEADER3 = "DebugTechPanelLabel";
 const string libapx_UI_HEADER4 = "Header18";
@@ -35,17 +35,93 @@ const string libapx_UI_ICON_MINUS = "EditorData\\Images\\ToolbarDeleteValue.tga"
 const string libapx_UI_ICON_LEFT = "Assets\\Textures\\ui-editoricon-previewer_timeline_back.dds";
 const string libapx_UI_ICON_RIGHT = "Assets\\Textures\\ui-editoricon-previewer_timeline_forward.dds";
 
+//libapx_ui_startup_panel
+//========================
+//Switches to the target panel for the given player
+void libapx_ui_switchto_panel(int panelIndex, int player);
+
+
+// libapx_create_dialog_btn
+// =========================
+// Creates a dialog control button for a given dialog and sets default style
+int libapx_create_dialog_btn(int dialog, int width, int height, int anchor, int offset_x, int offset_y, string tooltip, string btn_text );
+
+// libapx_create_dialog_btn
+// =========================
+// Creates a dialog control button for a given dialog and makes it invisible
+int libapx_create_dialog_btn_invis(int dialog, int width, int height, int anchor, int offset_x, int offset_y, string tooltip, string btn_text );
+
+// libapx_create_dialog_btn_icon
+// ===================
+// Creates a static image "icon" using a desaturated image dialog control
+// anchored to the center of the input "btn" dialog control (can actually
+// be any type of dialog control, not just a button)
+int libapx_create_dialog_btn_icon(int dialog, int btn, int width, int height, string icon);
+
+//Color btn
+int libapx_create_dialog_btn_icon_colored(int dialog, int btn, int width, int height, string icon, color btnColor);
+
+// libapx_create_dialog_btn_icon_colored_title
+// ====
+// Inbuild offset
+int libapx_create_dialog_btn_icon_colored_title(int dialog, int btn, int width, int height, string icon, color btnColor) {
+	int img = libNtve_gf_CreateDialogItemImage(
+		dialog,
+		 width, height,
+		  c_anchorCenter, 0, 0, 
+		  StringToText(""), 
+		  icon, c_triggerImageTypeNormal, false, 
+		  btnColor, 
+		  c_triggerBlendModeNormal);
+	DialogControlSetPositionRelative(img, PlayerGroupAll(), c_anchorCenter, btn, c_anchorCenter, 0, 0);
+	return img;
+}
+
 // libapx_create_dialog
 // ================
 // Creates a dialog and sets its background style to default Apex ui frame
 int libapx_create_dialog(int width, int height, int anchor, int offset_x, int offset_y ) {
 	int frame = DialogCreate(width, height, anchor, offset_x, offset_y, true);
-
+	
 	// set frame appearance
 	DialogSetImage(frame, libapx_UI_DIALOG_BACKGROUND);
 	//libNtve_gf_CreateDialogItemImage(frame, width, height, c_anchorCenter, 0, 0, StringToText(""), libapx_UI_DIALOG_BORDER, c_triggerImageTypeHorizontalBorder, false, Color(100,100,100), c_triggerBlendModeNormal);
 
+
 	return frame;
+}
+
+int libapx_create_dialog_invis(int width, int height, int anchor, int offset_x, int offset_y ) {
+	int frame = DialogCreate(width, height, anchor, offset_x, offset_y, true);
+	
+	// set frame appearance
+	DialogSetImage(frame, libapx_UI_DIALOG_BACKGROUND);
+	DialogSetImageVisible(frame, false);
+	//libNtve_gf_CreateDialogItemImage(frame, width, height, c_anchorCenter, 0, 0, StringToText(""), libapx_UI_DIALOG_BORDER, c_triggerImageTypeHorizontalBorder, false, Color(100,100,100), c_triggerBlendModeNormal);
+
+	return frame;
+}
+
+
+//libapx_create_dialog_close_btn
+//==========
+//This creates an exit button for the target dialog
+int libapx_create_dialog_close_btn(int dialog, int width, int height, int anchor, int offset_x, int offset_y) {
+	int parrent;
+	int btn;
+	string icon = "Assets\\Textures\\sc2_ui_glues_icons_closebuttonhover.dds";
+	if(anchor == c_anchorTop) {
+		parrent = libapx_create_dialog_invis(50, 50, anchor, offset_x+(width/2)+10, offset_y+15);
+		btn = libapx_create_dialog_btn_invis(parrent, 50,50,c_anchorCenter, 0,0,"Close","");
+	}
+	else {
+		parrent = libapx_create_dialog_invis(50, 50, anchor, offset_x+width-10, offset_y+15);
+		btn = libapx_create_dialog_btn_invis(parrent, 50,50,c_anchorCenter, 0,0,"Close","");
+	}
+	TriggerAddEventDialogControl(TriggerCreate("libapx_ui_panel_toggle_btn"), c_playerAny, btn, c_triggerControlEventTypeClick);
+	libapx_create_dialog_btn_icon_colored(parrent, btn, 50,50,icon,Color(100,100,100));
+
+	return parrent;
 }
 
 // libapx_create_dialog_label
@@ -54,6 +130,24 @@ int libapx_create_dialog(int width, int height, int anchor, int offset_x, int of
 int libapx_create_dialog_label(int dialog, int width, int height, int anchor, int offset_x, int offset_y, string s, string style ) {
 	int label = libNtve_gf_CreateDialogItemLabel(dialog, width, height, anchor, offset_x, offset_y, StringToText(s), ColorWithAlpha(0,0,0,0), false, 0);
 	libNtve_gf_SetDialogItemStyle(label, style, PlayerGroupAll());
+
+	return label;
+}
+
+// libapx_create_dialog_title
+// =================
+// Creates a title for a ui panel
+int libapx_create_dialog_title(int dialog, int width, int height, int offset_x, int offset_y, string s, string style, int spread ) {
+	int label = libNtve_gf_CreateDialogItemLabel(dialog, width, height, c_anchorTop, offset_x, offset_y, StringToText(s), ColorWithAlpha(0,0,0,0), false, 0);
+	int imgl;
+	int imgr;
+	libNtve_gf_SetDialogItemStyle(label, style, PlayerGroupAll());
+
+	//Create Images near it.
+	imgl = libapx_create_dialog_btn_invis(dialog, 200, 0,c_anchorTop,offset_x-spread, offset_y-15, "","" );
+	imgr = libapx_create_dialog_btn_invis(dialog, 200, 0,c_anchorTop,offset_x+spread, offset_y-15, "","" );
+	libapx_create_dialog_btn_icon_colored_title(dialog, imgl, 200, 60,"Apex\\Assets\\Textures\\LeftHandSideTitle.png",Color(100,100,100));
+	libapx_create_dialog_btn_icon_colored_title(dialog, imgr, 200, 60,"Apex\\Assets\\Textures\\RightHandSideTitle.png",Color(100,100,100));
 
 	return label;
 }
@@ -78,6 +172,21 @@ int libapx_create_dialog_btn(int dialog, int width, int height, int anchor, int 
 	// set background/border
 	libNtve_gf_SetDialogItemImage(btn, libapx_UI_DIALOG_BUTTON, PlayerGroupAll());
 	libNtve_gf_SetDialogItemImage2(btn, libapx_UI_DIALOG_BUTTON_HOV, PlayerGroupAll());
+	libNtve_gf_SetDialogItemImageType(btn, c_triggerImageTypeBorder, PlayerGroupAll());
+
+	return btn;
+}
+// libapx_create_dialog_btn_invis
+// =========================
+// Creates a dialog control button for a given dialog and sets default style
+int libapx_create_dialog_btn_invis(int dialog, int width, int height, int anchor, int offset_x, int offset_y, string tooltip, string btn_text ) {
+	int btn = libNtve_gf_CreateDialogItemButton(dialog, width, height, anchor, offset_x, offset_y, StringToText(tooltip), StringToText(btn_text), "");
+	libNtve_gf_SetDialogItemRenderPriority(btn, 513, PlayerGroupAll());
+	
+
+	// set background/border
+	libNtve_gf_SetDialogItemImage(btn, "Assets\\Textures\\blank.dds", PlayerGroupAll());
+	libNtve_gf_SetDialogItemImage2(btn, "Assets\\Textures\\blank.dds", PlayerGroupAll());
 	libNtve_gf_SetDialogItemImageType(btn, c_triggerImageTypeBorder, PlayerGroupAll());
 
 	return btn;
@@ -144,5 +253,18 @@ int libapx_create_dialog_btn_icon(int dialog, int btn, int width, int height, st
 	int img = libNtve_gf_CreateDialogItemImage(dialog, width, height, c_anchorCenter, 0, 0, StringToText(""), icon, c_triggerImageTypeNormal, false, Color(100, 100, 100), c_triggerBlendModeNormal);
 	DialogControlSetPositionRelative(img, PlayerGroupAll(), c_anchorCenter, btn, c_anchorCenter, 0, 0);
 	libNtve_gf_SetDialogItemDesaturated(img, true, PlayerGroupAll());
+	return img;
+}
+
+int libapx_create_dialog_btn_icon_colored(int dialog, int btn, int width, int height, string icon, color btnColor) {
+	int img = libNtve_gf_CreateDialogItemImage(
+		dialog,
+		 width, height,
+		  c_anchorCenter, 0, 0, 
+		  StringToText(""), 
+		  icon, c_triggerImageTypeNormal, false, 
+		  btnColor, 
+		  c_triggerBlendModeNormal);
+	DialogControlSetPositionRelative(img, PlayerGroupAll(), c_anchorCenter, btn, c_anchorCenter, 0, 0);
 	return img;
 }

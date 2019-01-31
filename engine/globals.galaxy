@@ -5,6 +5,17 @@
 // This software is distributed under the MIT License:
 // <http://opensource.org/licenses/MIT>
 //=========================================================
+
+//Gamesetups loading
+int g_gamesetups_loading = 0;
+
+//Camera
+trigger g_camera_updater;
+trigger g_camera_mouse_wheel;
+
+//Commands guide
+//======
+//Commands guide entries
 int g_commands_guide_entry_admin = 0; //!admin
 int g_commands_guide_entry_general = 1;  //generalshit
 int g_commands_guide_entry_unit = 2; //@spawn
@@ -12,7 +23,9 @@ int g_commands_guide_entry_actor = 3; //@attach
 int g_commands_guide_entry_region = 4; //#create
 int g_commands_guide_entry_stats = 5; //@maxlife
 
-//
+//Dialog for name
+int g_libapx_ui_name;
+
 string commands_guide_get_entry(int entryType) {
     if(entryType == g_commands_guide_entry_admin) {
         return "Admin";
@@ -70,6 +83,7 @@ void command_guide_format_description(int dialog, playergroup pg, string descrip
             //currentVal = libapx_string_trim(currentVal);
             DialogControlAddItem(dialog, pg,StringToText(currentVal));
             currentVal = "";
+            continue;
         }
         else {
             currentVal += StringWord(description, i)+" ";
@@ -120,4 +134,33 @@ void commands_guide_entry_set(int type, string name, string description) {
     g_commands_guide_entries[commands_guide_entry_count].name = name;
     g_commands_guide_entries[commands_guide_entry_count].description = description;
     commands_guide_entry_count += 1;
+}
+
+void command_guide_preset_descriptions() {
+    commands_guide_entry_set(
+		g_commands_guide_entry_actor, 
+		"What are actors?", 
+        " Actors are essentially everything you attach to a unit. Anytime you spawn a unit the unit creates the respective units actor. Usually these things are named the same (@spawn marine = @attach marine). <br> <br> That means any command under the actor cateogry doesn't apply to the entire unit. It only applies to the \"main\" actor of the unit. Aka the last actor that was attached or created. Or the actor you target with @target. This is a critical piece of understanding to becoming a good modeler. <br> <br> Extra info: <br> The first actor of a unit carries some of it's commands onto the later actors of the unit. For instance if you do <br> @spawn marine;@tint 255;@attach marine head <br> The first marine will be tinted red aswell as the second marine. That is because the second marine copied the first marine's commands. "
+    );
+    commands_guide_entry_set(
+		g_commands_guide_entry_general, 
+		"_alias", 
+        " This command creates, removes an alias. It can also list all your aliases. <br> alias [aliasname] [commands.. <br> Examples: <br> alias create s @spawn <br> alias create orc1 @spawn marine;@renameall orc;@tint 0 255 <br> alias remove s <br> alias list <br> alias removeall   "
+    ); 
+    commands_guide_entry_set(
+		g_commands_guide_entry_general, 
+		"<<", 
+        " If you start typing with everything you type afterwards will be display. Regardless of if it's a command or an alias/macro/variable. <br> Examples: <br> << @spawn goat doesn't work man!; what do you mean son?;Idk!  "
+    ); 
+    commands_guide_entry_set(
+		g_commands_guide_entry_general, 
+		"\\;", 
+        " If you preceed a semicolen with a slash the colen will display reguarly and not break apart statements like it usually does.  "
+    );
+    commands_guide_entry_set(
+		g_commands_guide_entry_general, 
+		";", 
+        " Semicolens break apart statements and commands. It's is vital to entering more than one command at a time or creating complicated aliases.  "
+    );
+
 }

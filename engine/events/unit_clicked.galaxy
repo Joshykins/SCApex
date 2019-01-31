@@ -1,0 +1,37 @@
+//=========================================================
+//		Apex Roleplaying Engine
+//		Copyright (c) 2019, Apex Group
+//=========================================================
+// This software is distributed under the MIT License:
+// <http://opensource.org/licenses/MIT>
+//=========================================================
+
+
+//Prototypes from unitname ui.
+
+//Call this when you wish to update the ui. For isntance if you do an @rename
+void libapx_ui_unitname_update(int p);
+
+bool libapx_unit_clicked(bool testConds, bool runActions) {
+    int p;
+    unitgroup selected;
+    unit u;
+    int i;
+    for (i = 1; i <= PlayerGroupCount(PlayerGroupActive()); i += 1) {
+        p = PlayerGroupPlayer(PlayerGroupActive(), i);
+        selected = UnitGroupSelected(p);
+
+        if(UnitGroupCount(selected, c_unitCountAll) > 1 || UnitGroupCount(selected, c_unitCountAll) < 1) {
+            libapx_player[p].name_display = false;
+            //libapx_print_output(1, "Not displaying unit name");
+            //update unitname
+        }
+        else {
+            libapx_player[p].name_display = true;
+            u = UnitGroupUnit(selected, 1);
+            //libapx_print_output(1, "Displaying Unit name");
+        }
+        libapx_ui_unitname_update(p);
+    }
+	return true;
+}

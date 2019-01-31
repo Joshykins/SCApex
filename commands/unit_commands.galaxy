@@ -85,7 +85,7 @@ void libapx_define_unitvar(string command_name) {
 	commands_guide_entry_set(
 		g_commands_guide_entry_unit, 
 		command_name, 
-		" This command makes the unit(s) have a name to be refered to later with @context. It does very little on it's own. <br> @unitvar [modifier] [name] <br> The modifier for this command is -add, this modifier changes the commands default behavior of replacing the variable with the new one you set, and instead adds it to the new one. <br> Examples: <br> @unitvar bob <br> @unitvar -add bobross "
+		" This command makes the unit(s) have a name to be refered to later with @context. It does very little on it's own. <br> @unitvar [modifier] [name] <br> The modifier for this command is -add, this modifier changes the commands default behavior of replacing the variable with the new one you set, and instead adds it to the new one. <br> Examples: <br> @unitvar bob <br> @unitvar -add bobross <br> @spawn marauder;@unitvar bobross;@spawn marine;@context bobross;@scale 3  "
 	);
 }
 
@@ -104,9 +104,13 @@ void libapx_define_context(string command_name) {
 	commands_guide_entry_set(
 		g_commands_guide_entry_unit, 
 		command_name, 
-		" This command changes what unit commands apply to by refering to the names set by @unitvar. It does very little on it's own. <br> @context [unitvariable] <br> Examples: <br> @context trevor <br> @spawn marine;@unitvar bobross;@spawn marine;@context bobross;@scale 3 <br>   "
+		" This command changes what unit commands apply to by refering to the names set by @unitvar. It does very little on it's own. <br> @context [unitvariable] <br> Examples: <br> @context trevor <br> @spawn marauder;@unitvar bobross;@spawn marine;@context bobross;@scale 3 <br>   "
 	);
 }
+
+
+
+
 
 
 
@@ -165,12 +169,21 @@ void libapx_command_unitswap(int user, unitgroup u, string argv, int spawningCou
 
 
 }
+void libapx_define_unitswap(string command_name) {
+	commands_guide_entry_set(
+		g_commands_guide_entry_unit, 
+		command_name, 
+		" This command swaps out the selected units with a new unit. By default the unit it swaps with is Beacon_Nova. <br> @unitswap [unitname] <br> Examples: <br> @unitswap <br> @unitswap marauder <br> @spawn marine 25;_delay 3;@unitswap;@modelswap dynamicgrass "
+	);
+}
+
+
+
 
 
 // libapx_command_position
 // =====================
 // sets the position of a unit
-
 void libapx_command_unitmimic (int user, unitgroup u, string argv, int spawningCount, string bracketText) {
 	string targetUnit;
 	fixed x;
@@ -219,6 +232,14 @@ void libapx_command_unitmimic (int user, unitgroup u, string argv, int spawningC
 	}
 
 	UnitGroupLoopEnd();
+}
+
+void libapx_define_unitmimic(string command_name) {
+	commands_guide_entry_set(
+		g_commands_guide_entry_unit, 
+		command_name, 
+		" This command spawns a new unit at the same position of the selected unit, by default this new unit is Beacon_Nova. <br> @unitmimic [unitname] <br> Examples: <br> @spawn marine;@unitmimic <br> @unitmimic marauder  "
+	);
 }
 
 
@@ -292,13 +313,19 @@ void libapx_command_move (int user, unitgroup u, string argv, int spawningCount,
 
 	return;
 }
-
+void libapx_define_move(string command_name) {
+	commands_guide_entry_set(
+		g_commands_guide_entry_unit, 
+		command_name, 
+		" This command moves units to your mousepoint. It has a modifier called -all which selects all units on the map to be moved. <br> @move [modifiers] <br> Examples: <br> @spawn marine 25;_delay 2;@move <br> @move -all <br> (@move -all will move all units on the map, be careful.) "
+	);
+	
+}
 
 
 // libapx_command_position
 // =====================
 // sets the position of a unit
-
 void libapx_command_position (int user, unitgroup u, string argv, int spawningCount, string bracketText) {
 	fixed x;
 	fixed y;
@@ -340,56 +367,56 @@ void libapx_command_position (int user, unitgroup u, string argv, int spawningCo
 		libapx_print_error(p,"@pos requires both an X and Y coordinate to move a unit to (X,Y)");
 		return;
 	}
-//:TODO Arithmatic in Position
-//Yebois
+	//:TODO Arithmatic in Position
+	//Yebois
 
 
 
 
-		// x Stuff
-		// + or - found, isolating
-		if (StringFind(StringWord(argv, 2), "+", c_stringNoCase) != -1 ) {
-			//It's a +
-			shifterX = 2;
-			//Now remove the +
-			i = StringFind(StringWord(argv, 2), "+", c_stringNoCase);
-			x = StringToFixed(StringReplace(StringWord(argv, 2), "", i, i));
-		}
-		else if (StringFind(StringWord(argv, 2), "-", c_stringNoCase) != -1 ) {
-			//It's a -
-			shifterX = 0;
-			//Now remove the -
-			i = StringFind(StringWord(argv, 2), "-", c_stringNoCase);
-			x = StringToFixed(StringReplace(StringWord(argv, 2), "", i, i));
-		}
-		else {
-			shifterX= 1;
-			x = StringToFixed(StringWord(argv, 2));
-		}
+	// x Stuff
+	// + or - found, isolating
+	if (StringFind(StringWord(argv, 2), "+", c_stringNoCase) != -1 ) {
+		//It's a +
+		shifterX = 2;
+		//Now remove the +
+		i = StringFind(StringWord(argv, 2), "+", c_stringNoCase);
+		x = StringToFixed(StringReplace(StringWord(argv, 2), "", i, i));
+	}
+	else if (StringFind(StringWord(argv, 2), "-", c_stringNoCase) != -1 ) {
+		//It's a -
+		shifterX = 0;
+		//Now remove the -
+		i = StringFind(StringWord(argv, 2), "-", c_stringNoCase);
+		x = StringToFixed(StringReplace(StringWord(argv, 2), "", i, i));
+	}
+	else {
+		shifterX= 1;
+		x = StringToFixed(StringWord(argv, 2));
+	}
 
 
 
 
-		// y Stuff
-		// + or - found, isolating
-		if (StringFind(StringWord(argv, 3), "+", c_stringNoCase) != -1 ) {
-			//It's a +
-			shifterY = 2;
-			//Now remove the +
-			i = StringFind(StringWord(argv, 3), "+", c_stringNoCase);
-			y = StringToFixed(StringReplace(StringWord(argv, 3), "", i, i));
-		}
-		else if (StringFind(StringWord(argv, 3), "-", c_stringNoCase) != -1 ) {
-			//It's a -
-			shifterY = 0;
-			//Now remove the -
-			i = StringFind(StringWord(argv, 3), "-", c_stringNoCase);
-			y = StringToFixed(StringReplace(StringWord(argv, 3), "", i, i));
-		}
-		else {
-			shifterY = 1;
-			y = StringToFixed(StringWord(argv, 3));y = StringToFixed(StringWord(argv, 3));
-		}
+	// y Stuff
+	// + or - found, isolating
+	if (StringFind(StringWord(argv, 3), "+", c_stringNoCase) != -1 ) {
+		//It's a +
+		shifterY = 2;
+		//Now remove the +
+		i = StringFind(StringWord(argv, 3), "+", c_stringNoCase);
+		y = StringToFixed(StringReplace(StringWord(argv, 3), "", i, i));
+	}
+	else if (StringFind(StringWord(argv, 3), "-", c_stringNoCase) != -1 ) {
+		//It's a -
+		shifterY = 0;
+		//Now remove the -
+		i = StringFind(StringWord(argv, 3), "-", c_stringNoCase);
+		y = StringToFixed(StringReplace(StringWord(argv, 3), "", i, i));
+	}
+	else {
+		shifterY = 1;
+		y = StringToFixed(StringWord(argv, 3));y = StringToFixed(StringWord(argv, 3));
+	}
 
 
 	if(relative) {
@@ -468,7 +495,14 @@ void libapx_command_position (int user, unitgroup u, string argv, int spawningCo
 		}
 		UnitGroupLoopEnd();
 	}
-	
+}
+
+void libapx_define_position(string command_name) {
+	commands_guide_entry_set(
+		g_commands_guide_entry_unit, 
+		command_name, 
+		" This command sets the position of a unit. It has a modifier called -rel which positions the units relative to where the unit is facing. <br> @position [modifiers] [x] [y] <br> Examples: <br> @position 125 125 <br> @position +0 +4 <br> @position -rel +0 -3 "
+	);
 }
 
 // libapx_command_removearea
@@ -493,7 +527,13 @@ void libapx_command_removearea(int user, unitgroup u, string argv, int spawningC
 
 	libNtve_gf_RemoveDeathModelsinRegion( RegionCircle( libapx_player[user].mouse_position, radius) );
 }
-
+void libapx_define_removearea(string command_name) {
+	commands_guide_entry_set(
+		g_commands_guide_entry_unit, 
+		command_name, 
+		" This command removes all units in a given radius. It only removes units that you own, or units owned by a player of an inferior permission level(admin>mod>user) <br> @removearea [radius] <br> Examples: <br> @removearea 3 "
+	);
+}
 
 
 // libapx_command_selectarea
@@ -506,17 +546,20 @@ void libapx_command_selectarea(int user, unitgroup u, string argv, int spawningC
 		radius = 5.0;
 	}
 
-	g = UnitGroup( null, c_playerAny, RegionCircle( libapx_player[user].mouse_position, radius), null, 0 );
+	g = UnitGroup( null, user, RegionCircle( libapx_player[user].mouse_position, radius), null, 0 );
 	g = libapx_enforce_unit_permissions(g, user);
-
 
 
 	libapx_player_parser[user][spawningCount].context = g;
 	UnitGroupSelect(g, user, true);
-
-
 }
-
+void libapx_define_selectarea(string command_name) {
+	commands_guide_entry_set(
+		g_commands_guide_entry_unit, 
+		command_name, 
+		" This command selects all units you own in a given radius. <br> @selectarea [radius] <br> Examples: <br> @selectarea 3 "
+	);
+}
 
 
 // libapx_command_cache
@@ -550,7 +593,13 @@ void libapx_command_cache(int user, unitgroup u, string argv, int spawningCount,
 	UnitGroupLoopEnd();
 	return;
 }
-
+void libapx_define_cache(string command_name) {
+	commands_guide_entry_set(
+		g_commands_guide_entry_unit, 
+		command_name, 
+		" This command prints out the number of caches the unit has or the content within those caches. <br> @cache [cachenumber] <br> Examples: <br> @cache (lists command cache amount) <br> @cache 1 (displays first cache) "
+	);
+}
 
 
 // libapx_command_give
@@ -564,7 +613,6 @@ void libapx_command_give(int user, unitgroup u, string argv, int spawningCount, 
 		return;
 	}
 
-
 	UnitGroupLoopBegin(g);
 	while(!UnitGroupLoopDone()) {
 		UnitSetOwner( UnitGroupLoopCurrent(), new_owner, true );
@@ -575,6 +623,40 @@ void libapx_command_give(int user, unitgroup u, string argv, int spawningCount, 
 
 	return;
 }
+void libapx_define_give(string command_name) {
+	commands_guide_entry_set(
+		g_commands_guide_entry_unit, 
+		command_name, 
+		" This command gives selected units to the target player. <br> @give [TargetPlayerColor] <br> Examples: <br> @give purple "
+	);
+}
+
+
+//libapx_command_rename
+//===================
+//Renames a unit (Setting datatable entry)
+void libapx_command_rename(int user, unitgroup u, string argv, int spawningCount, string bracketText) {
+	string val;
+	unitgroup g = u;
+	unit tmp_unit;
+	int i;
+
+	val = argv;
+	val = StringSub( val, StringFind(val, " ", c_stringCase)+1, StringLength(val)); // The remainder of the chat message.
+
+	for (i = 1; i <= UnitGroupCount(g, c_unitCountAll); i += 1) {
+		tmp_unit = UnitGroupUnit(g, i);
+		libapx_unitname_set_entry(tmp_unit, val);
+		libapx_unit_cache_update(tmp_unit, "@rename", argv);
+	}
+}
+void libapx_define_rename(string command_name) {
+	commands_guide_entry_set(
+		g_commands_guide_entry_unit, 
+		command_name, 
+		" This command renames a unit to the desired name. <br> @rename [desired name.. <br> Examples: <br> @rename Bob R "
+	);
+}
 
 // libapx_command_renameall
 // ===================
@@ -582,9 +664,6 @@ void libapx_command_give(int user, unitgroup u, string argv, int spawningCount, 
 void libapx_command_renameall(int user, unitgroup u, string argv, int spawningCount, string bracketText) {
 	string val;
 	unitgroup g = u;
-	int dialogname;
-	dialogname = DialogControlHookupStandard(c_triggerControlTypePanel, "GameUI/UIContainer/ConsoleUIContainer/InfoPaneUnit/FakeNameLabel");
-	DialogControlSetPropertyAsText(dialogname, c_triggerControlPropertyText, PlayerGroupAll() ,StringToText("BobPossIsGod"));
 
 	val = argv;
 	val = StringSub( val, StringFind(val, " ", c_stringCase)+1, StringLength(val)); // The remainder of the chat message.
@@ -597,6 +676,13 @@ void libapx_command_renameall(int user, unitgroup u, string argv, int spawningCo
 	}
 	UnitGroupLoopEnd();
 	return;
+}
+void libapx_define_renameall(string command_name) {
+	commands_guide_entry_set(
+		g_commands_guide_entry_unit, 
+		command_name, 
+		" This command renames an entire unit-types name to the target name. <br> @renameall [desired name.. <br> Examples: <br> @renameall Bob R "
+	);
 }
 
 // libapx_command_behaviors
@@ -628,6 +714,13 @@ void libapx_command_behaviors(int user, unitgroup u, string argv, int spawningCo
 
 	return;
 }
+void libapx_define_behaviors(string command_name) {
+	commands_guide_entry_set(
+		g_commands_guide_entry_unit, 
+		command_name, 
+		" This command prints out a list of all of a unit's behaviors and their respective stack count.(behaviors can stack) <br> @behaviors (there are no parameters) <br> Examples: <br> @behaviors "
+	);
+}
 
 // libapx_command_addbehavior
 // =====================
@@ -652,6 +745,13 @@ void libapx_command_addbehavior(int user, unitgroup u, string argv, int spawning
 
 	return;
 }
+void libapx_define_addbehavior(string command_name) {
+	commands_guide_entry_set(
+		g_commands_guide_entry_unit, 
+		command_name, 
+		" This command adds a behavior to the selected unit. <br> @addbehavior [behaviorname] <br> Examples: <br> @addbehavior DamageTakenNone <br> @addbehavior DamageDealtNone <br> @addbehavior BlankNameSpace "
+	);
+}
 
 // libapx_command_removebehavior
 // =======================
@@ -675,6 +775,13 @@ void libapx_command_removebehavior(int user, unitgroup u, string argv, int spawn
 	UnitGroupLoopEnd();
 
 	return;
+}
+void libapx_define_removebehavior(string command_name) {
+	commands_guide_entry_set(
+		g_commands_guide_entry_unit, 
+		command_name, 
+		" This command removes a behavior to the selected unit. <br> @removebehavior [behaviorname] <br> Examples: <br> @removebehavior DamageTakenNone <br> @removebehavior DamageDealtNone <br> @removebehavior BlankNameSpace "
+	);
 }
 
 // libapx_command_weapons
@@ -702,6 +809,13 @@ void libapx_command_weapons(int user, unitgroup u, string argv, int spawningCoun
 	}
 	UnitGroupLoopEnd();
 	return;
+}
+void libapx_define_weapons(string command_name) {
+	commands_guide_entry_set(
+		g_commands_guide_entry_unit, 
+		command_name, 
+		" This command prints out a list of all of a unit's weapons. <br> @weapons (there are no parameters) <br> Examples: <br> @weapons "
+	);
 }
 
 // libapx_command_addweapon
@@ -742,23 +856,43 @@ void libapx_command_addweapon(int user, unitgroup u, string argv, int spawningCo
 
 	return;
 }
+void libapx_define_addweapon(string command_name) {
+	commands_guide_entry_set(
+		g_commands_guide_entry_unit, 
+		command_name, 
+		" This command adds a weapon to a unit. You can specify which turret to give the weapon to with the second parameter though it is not needed. <br> @addweapon [weapon] [turret] <br> Examples: <br> @addweapon GuassRifle <br> @spawn SiegeTank;@addweapon GaussRifle SiegeTank(using the siegetank turret makes the turret rotate when it attacks) "
+	);
+}
 
 // libapx_command_removeweapon
 // ====================
 // removes a weapon from a unit
 void libapx_command_removeweapon(int user, unitgroup u, string argv, int spawningCount, string bracketText) {
 	string weapon = StringWord( argv, 2 );
-
+	int i = 30;
 	// get catalog entry for weapon and make sure weapon is valid
-	weapon = libapx_catalog_get(c_gameCatalogWeapon, weapon);
-	if ( weapon == null || CatalogEntryScope(c_gameCatalogWeapon, weapon) == weapon) {
-		libapx_print_error(user, "<c val=\"ff0000\">Unable to remove weapon</c>: No such weapon exists.");
-		return;
+	if( !(weapon == "-all")) {
+		weapon = libapx_catalog_get(c_gameCatalogWeapon, weapon);
+		if ( weapon == null || CatalogEntryScope(c_gameCatalogWeapon, weapon) == weapon) {
+			libapx_print_error(user, "<c val=\"ff0000\">Unable to remove weapon</c>: No such weapon exists.");
+			return;
+		}
 	}
 
 	UnitGroupLoopBegin(u);
 	while( !UnitGroupLoopDone() ) {
-		UnitWeaponRemove( UnitGroupLoopCurrent(), weapon );
+
+		if(StringWord(argv, 2) == "-all") {
+			i = 1;
+			while(!(UnitWeaponGet(UnitGroupLoopCurrent(),i) == null)) {
+				UnitWeaponRemove(UnitGroupLoopCurrent(), UnitWeaponGet(UnitGroupLoopCurrent(), i));
+				i+= 1;
+			}
+			
+		}
+		else {
+			UnitWeaponRemove( UnitGroupLoopCurrent(), weapon );
+		}
 		libapx_unit_cache_update(UnitGroupLoopCurrent(), "@removeweapon", argv);
 		UnitGroupLoopStep();
 	}
@@ -766,7 +900,13 @@ void libapx_command_removeweapon(int user, unitgroup u, string argv, int spawnin
 
 	return;
 }
-
+void libapx_define_removeweapon(string command_name) {
+	commands_guide_entry_set(
+		g_commands_guide_entry_unit, 
+		command_name, 
+		" This command removes a weapon from a unit. It has a modifier called -all which removes all weapons from the targeted unit <br> @removeweapon [modifier] [name] <br> Examples: <br> @removeweapon GuassRifle <br> @removeweapon -all "
+	);
+}
 // libapx_command_life
 // libapx_command_shields
 // libapx_command_energy
@@ -817,6 +957,14 @@ void libapx_command_life(int user, unitgroup u, string argv, int spawningCount, 
 
 	return;
 }
+void libapx_define_life(string command_name) {
+	commands_guide_entry_set(
+		g_commands_guide_entry_stats, 
+		command_name, 
+		" This commands sets a unit's life, not it's max amount of life. <br> @life [amount] <br> Examples: <br> @life 30 <br> @life 10% <br> @life +10 <br> @life +10% "
+	);
+}
+
 
 void libapx_command_shields(int user, unitgroup u, string argv, int spawningCount, string bracketText) {
 	string param;
@@ -861,6 +1009,13 @@ void libapx_command_shields(int user, unitgroup u, string argv, int spawningCoun
 	UnitGroupLoopEnd();
 
 	return;
+}
+void libapx_define_shields(string command_name) {
+	commands_guide_entry_set(
+		g_commands_guide_entry_stats, 
+		command_name, 
+		" This commands sets a unit's shields, not it's max amount of shields. <br> @shields [amount] <br> Examples: <br> @shields 30 <br> @shields 10% <br> @shields +10 <br> @shields +10% "
+	);
 }
 
 void libapx_command_energy(int user, unitgroup u, string argv, int spawningCount, string bracketText) {
@@ -907,7 +1062,13 @@ void libapx_command_energy(int user, unitgroup u, string argv, int spawningCount
 
 	return;
 }
-
+void libapx_define_energy(string command_name) {
+	commands_guide_entry_set(
+		g_commands_guide_entry_stats, 
+		command_name, 
+		" This commands sets a unit's energy, not it's max amount of energy. <br> @energy [amount] <br> Examples: <br> @energy 30 <br> @energy 10% <br> @energy +10 <br> @energy +10% "
+	);
+}
 // libapx_command_maxlife
 // libapx_command_maxshields
 // libapx_command_maxenergy
@@ -935,7 +1096,7 @@ void libapx_command_maxlife(int user, unitgroup u, string argv, int spawningCoun
 
 	val = StringToFixed(param);
 
-	if( val <= 0 && absolute) {
+	if( val < 0 && absolute) {
 		return;
 	}
 
@@ -962,6 +1123,13 @@ void libapx_command_maxlife(int user, unitgroup u, string argv, int spawningCoun
 
 	return;
 }
+void libapx_define_maxlife(string command_name) {
+	commands_guide_entry_set(
+		g_commands_guide_entry_stats, 
+		command_name, 
+		" This commands sets a unit's max life. <br> @maxlife [amount] <br> Examples: <br> @maxlife 30 <br> @maxlife 10% <br> @maxlife +10 <br> @maxlife +10% "
+	);
+}
 
 void libapx_command_maxshields(int user, unitgroup u, string argv, int spawningCount, string bracketText) {
 	string param;
@@ -983,7 +1151,7 @@ void libapx_command_maxshields(int user, unitgroup u, string argv, int spawningC
 
 	val = StringToFixed(param);
 
-	if( val <= 0 && absolute) {
+	if( val < 0 && absolute) {
 		return;
 	}
 
@@ -1010,7 +1178,13 @@ void libapx_command_maxshields(int user, unitgroup u, string argv, int spawningC
 
 	return;
 }
-
+void libapx_define_maxshields(string command_name) {
+	commands_guide_entry_set(
+		g_commands_guide_entry_stats, 
+		command_name, 
+		" This commands sets a unit's max shields. <br> @maxshields [amount] <br> Examples: <br> @maxshields 30 <br> @maxshields 10% <br> @maxshields +10 <br> @maxshields +10% "
+	);
+}
 void libapx_command_maxenergy(int user, unitgroup u, string argv, int spawningCount, string bracketText) {
 	string param;
 	fixed val;
@@ -1031,7 +1205,7 @@ void libapx_command_maxenergy(int user, unitgroup u, string argv, int spawningCo
 
 	val = StringToFixed(param);
 
-	if( val <= 0 && absolute) {
+	if( val < 0 && absolute) {
 		return;
 	}
 
@@ -1058,7 +1232,13 @@ void libapx_command_maxenergy(int user, unitgroup u, string argv, int spawningCo
 
 	return;
 }
-
+void libapx_define_maxenergy(string command_name) {
+	commands_guide_entry_set(
+		g_commands_guide_entry_stats, 
+		command_name, 
+		" This commands sets a unit's max energy. <br> @maxenergy [amount] <br> Examples: <br> @maxenergy 30 <br> @maxenergy 10% <br> @maxenergy +10 <br> @maxenergy +10% "
+	);
+}
 // libapx_command_liferegen
 // libapx_command_shieldsregen
 // libapx_command_energyregen
@@ -1093,6 +1273,14 @@ void libapx_command_liferegen(int user, unitgroup u, string argv, int spawningCo
 
 	return;
 }
+void libapx_define_liferegen(string command_name) {
+	commands_guide_entry_set(
+		g_commands_guide_entry_stats, 
+		command_name, 
+		" This commands sets a unit's life regen. <br> @liferegen [amount] <br> Examples: <br> @liferegen 30 <br> @liferegen 10% "
+	);
+}
+
 
 void libapx_command_shieldsregen(int user, unitgroup u, string argv, int spawningCount, string bracketText) {
 	string param = StringWord( argv, 2 );
@@ -1120,6 +1308,13 @@ void libapx_command_shieldsregen(int user, unitgroup u, string argv, int spawnin
 	UnitGroupLoopEnd();
 
 	return;
+}
+void libapx_define_shieldsregen(string command_name) {
+	commands_guide_entry_set(
+		g_commands_guide_entry_stats, 
+		command_name, 
+		" This commands sets a unit's shields regen. <br> @shieldsregen [amount] <br> Examples: <br> @shieldsregen 30 <br> @shieldsregen 10% "
+	);
 }
 
 void libapx_command_energyregen(int user, unitgroup u, string argv, int spawningCount, string bracketText) {
@@ -1149,6 +1344,13 @@ void libapx_command_energyregen(int user, unitgroup u, string argv, int spawning
 
 	return;
 }
+void libapx_define_energyregen(string command_name) {
+	commands_guide_entry_set(
+		g_commands_guide_entry_stats, 
+		command_name, 
+		" This commands sets a unit's energy regen. <br> @energyregen [amount] <br> Examples: <br> @energyregen 30 <br> @energyregen 10% "
+	);
+}
 
 // libapx_command_speed
 // ==================
@@ -1156,12 +1358,15 @@ void libapx_command_energyregen(int user, unitgroup u, string argv, int spawning
 void libapx_command_speed(int user, unitgroup u, string argv, int spawningCount, string bracketText) {
 	string param = StringWord( argv, 2 );
 	fixed val;
-	bool is_permanent = false;
+	bool all = false;
 	bool absolute = true;
 	unitgroup g = u;
 
-	is_permanent = StringContains(argv, "all", c_stringAnywhere, false) ||
-				  StringContains(argv, "permanent", c_stringAnywhere, false);
+	all = StringContains(argv, "-all", c_stringAnywhere, false);
+	if (all) {
+		argv = StringReplaceWord(argv, "-all", "", 1 ,c_stringNoCase);
+		param = StringWord( argv, 2 );
+	}
 
 	if( StringContains(param, "+", c_stringBegin, c_stringCase) ) {
 		absolute = false;
@@ -1175,7 +1380,7 @@ void libapx_command_speed(int user, unitgroup u, string argv, int spawningCount,
 	}
 
 	UnitGroupLoopBegin(g);
-	if(is_permanent) {
+	if(all) {
 		while(!UnitGroupLoopDone()) {
 			if(!absolute) {
 				val = UnitGetPropertyFixed(UnitGroupLoopCurrent(), c_unitPropMovementSpeed, c_unitPropCurrent) + val;
@@ -1204,6 +1409,13 @@ void libapx_command_speed(int user, unitgroup u, string argv, int spawningCount,
 
 	return;
 }
+void libapx_define_speed(string command_name) {
+	commands_guide_entry_set(
+		g_commands_guide_entry_stats, 
+		command_name, 
+		" This command sets a unit's speed. It has a modifier, -all which changes the speed for all units of the same type. <br> @speed [modifier] [speed] <br> Examples: <br> @speed 1 <br> @speed -all 3 "
+	);
+}
 
 // libapx_command_height
 // ====================
@@ -1213,28 +1425,52 @@ void libapx_command_height(int user, unitgroup u, string argv, int spawningCount
 	fixed time;
 	string param;
 	unitgroup g = u;
+	bool addition;
+	bool subtraction;
+	fixed currentHeight;
 	param = StringWord( argv, 2 );
 	height = StringToFixed( param );
 	param = StringWord( argv, 3 );
 	time = StringToFixed( param );
-
+	if(StringContains(argv, "+", c_stringAnywhere, false)) {
+		addition = true;
+		argv = StringReplace(argv, "+", 1, StringLength(argv));
+	} 
+	else if(StringContains(argv, "-", c_stringAnywhere, false)) {
+		subtraction = true;
+		argv = StringReplace(argv, "-", 1, StringLength(argv));
+	}
 
 	UnitGroupLoopBegin(g);
 	while( !UnitGroupLoopDone() ) {
-
+		currentHeight = UnitGetHeight(UnitGroupLoopCurrent());
 		if (height > 10) {
 			libapx_unit_flag_col_crashable(UnitGroupLoopCurrent());
 		}
 
 		libapx_unit_colossus_remove(UnitGroupLoopCurrent());
-
-		UnitSetHeight( UnitGroupLoopCurrent(), height, time );
+		if(!addition && !subtraction) {
+			UnitSetHeight( UnitGroupLoopCurrent(), height, time );
+		}
+		if(addition) {
+			UnitSetHeight( UnitGroupLoopCurrent(), height+currentHeight, time);
+		}
+		else if(subtraction) {
+			UnitSetHeight( UnitGroupLoopCurrent(), height-currentHeight, time);
+		}
 		libapx_unit_cache_update(UnitGroupLoopCurrent(), "@height", argv);
 		UnitGroupLoopStep();
 	}
 	UnitGroupLoopEnd();
 
 	return;
+}
+void libapx_define_height(string command_name) {
+	commands_guide_entry_set(
+		g_commands_guide_entry_unit, 
+		command_name, 
+		" This command sets a unit's height. <br> @height [desiredHeight] [durationToGetToHeight] <br> Examples: <br> @height 3 <br> @height 5 7 <br> @height +3 5 <br> @height -3 5 "
+	);
 }
 
 // libapx_command_color
@@ -1259,6 +1495,13 @@ void libapx_command_color(int user, unitgroup u, string argv, int spawningCount,
 	UnitGroupLoopEnd();
 	return;
 }
+void libapx_define_color(string command_name) {
+	commands_guide_entry_set(
+		g_commands_guide_entry_unit, 
+		command_name, 
+		" This command sets the team-color of a unit. <br> @color [colorName] <br> Example: <br> @color red <br> @color violet  "
+	);
+}
 
 // libapx_command_invulnerable
 // libapx_command_vulnerable
@@ -1274,6 +1517,13 @@ void libapx_command_invulnerable(int user, unitgroup u, string argv, int spawnin
 	UnitGroupLoopEnd();
 	return;
 }
+void libapx_define_invulnerable(string command_name) {
+	commands_guide_entry_set(
+		g_commands_guide_entry_unit, 
+		command_name, 
+		" This command makes a unit invulnerable. <br> @invulnerable(noparms) <br> Example: <br> @invulnerable  "
+	);
+}
 void libapx_command_vulnerable(int user, unitgroup u, string argv, int spawningCount, string bracketText) {
 	UnitGroupLoopBegin(u);
 	while(!UnitGroupLoopDone()) {
@@ -1284,7 +1534,13 @@ void libapx_command_vulnerable(int user, unitgroup u, string argv, int spawningC
 	UnitGroupLoopEnd();
 	return;
 }
-
+void libapx_define_vulnerable(string command_name) {
+	commands_guide_entry_set(
+		g_commands_guide_entry_unit, 
+		command_name, 
+		" This command makes a unit vulnerable. <br> @vulnerable(noparms) <br> Example: <br> @vulnerable  "
+	);
+}
 // libapx_command_face
 // ===============
 // makes a unit face an angle. (modified from Cortex engine)
@@ -1292,33 +1548,103 @@ void libapx_command_vulnerable(int user, unitgroup u, string argv, int spawningC
 void libapx_command_face(int user, unitgroup u, string argv, int spawningCount, string bracketText) {
 	fixed angle;
 	string param;
-	bool absolute = true;
+	bool addition;
+	bool subtraction;
+	fixed duration = StringToFixed(StringWord ( argv,3 ));
+	bool relative;
+	int i;
+	unit tmpUnit;
+	fixed totalX;
+	fixed totalY;
+	point averagePt;
+	point tmpPoint;
+	fixed tmpAngle;
+	if(StringContains(argv, "-rel", c_stringAnywhere, false)) {
+		argv = StringReplaceWord(argv, "-rel", "", 1, c_stringNoCase);
+		duration = StringToFixed(StringWord ( argv,3 ));
+		relative = true;
+	}
+	if (StringWord(argv, 3) == "") {
+		duration = 0.0;
+	}
 
 	param = StringWord( argv, 2 );
 	if( param != "" ) {
 		if( StringContains(param, "+", c_stringBegin, c_stringCase) ) {
-			absolute = false;
+			addition = true;
 			param = StringSub(param, 2, StringLength(param));
 		}
+		if( StringContains(param, "-", c_stringBegin, c_stringCase) ) {
+			subtraction = true;
+			param = StringSub(param, 2, StringLength(param));
+		}
+
 		angle = StringToFixed( param );
+		
+	}
+
+	if(relative) {
+		for (i = 1; i <= UnitGroupCount(u, c_unitCountAll); i += 1) {
+			tmpUnit = UnitGroupUnit(u, i);
+			//Gather all positions
+			tmpPoint = UnitGetPosition(tmpUnit);
+			totalX += PointGetX(tmpPoint);
+			totalY += PointGetY(tmpPoint);
+		}
+		//Average the totals
+		averagePt = Point(totalX/(i-1),totalY/(i-1));
 	}
 
 	UnitGroupLoopBegin(u);
 	while(!UnitGroupLoopDone()) {
-		if( param == "" ) { // face mouse
-			libNtve_gf_MakeUnitFacePoint( UnitGroupLoopCurrent(), libapx_player[user].mouse_position, 0.0 );
+		tmpUnit = UnitGroupLoopCurrent();
+		if(relative) {
+			if( param == "" || param == "x" ) {
+				libapx_print_error(user, "-rel in @position cannon't use mouse facing. It must use +/-");
+				return; 
+			}
+			else {
+				tmpAngle = AngleBetweenPoints(averagePt, UnitGetPosition(tmpUnit) ); // Angle between origin and unit
+				if(addition) {
+					tmpPoint = PointWithOffsetPolar(averagePt, DistanceBetweenPoints(UnitGetPosition(tmpUnit), averagePt), tmpAngle + angle);
+					tmpAngle = UnitGetFacing(tmpUnit) + angle;
+				}
+				else if(subtraction) {
+					tmpPoint = PointWithOffsetPolar(averagePt, DistanceBetweenPoints(UnitGetPosition(tmpUnit), averagePt), tmpAngle - angle);
+					tmpAngle = UnitGetFacing(tmpUnit) - angle;
+				}
+				
+				UnitSetPosition(tmpUnit,tmpPoint,false);
+				UnitSetFacing(tmpUnit, tmpAngle, .3);
+			}
 		}
-		else if(!absolute) {
-			UnitSetFacing(UnitGroupLoopCurrent(), UnitGetFacing(UnitGroupLoopCurrent()) + angle, 0.0);
-		}
-		else { // face angle
-			UnitSetFacing( UnitGroupLoopCurrent(), angle, 0.0 );
+		else {
+			if( param == "" || param == "x" ) { // face mouse
+				libNtve_gf_MakeUnitFacePoint( UnitGroupLoopCurrent(), libapx_player[user].mouse_position, duration );
+			}
+			else if(addition) {
+				UnitSetFacing(UnitGroupLoopCurrent(), UnitGetFacing(UnitGroupLoopCurrent()) + angle, duration);
+			}
+			else if(subtraction) {
+				UnitSetFacing(UnitGroupLoopCurrent(), UnitGetFacing(UnitGroupLoopCurrent()) - angle, duration);
+			}
+			else { // face angle
+				UnitSetFacing( UnitGroupLoopCurrent(), angle, duration );
+			}		
 		}
 		UnitGroupLoopStep();
 	}
 	UnitGroupLoopEnd();
 	return;
 }
+void libapx_define_face(string command_name) {
+	commands_guide_entry_set(
+		g_commands_guide_entry_unit, 
+		command_name, 
+		" This command faces a unit to a given point. It has a modifier called -rel which faces units relative to the other units you have selected. <br> @face [modifiers] [facing] [duration] <br> Examples: <br> @face (by itself just faces to mouse) <br> @face 360 <br> @face -131 <br> @face +255 <br> @face +90 3 <br> @face x 2 (X is stand in, this faces to mouse point) <br> @spawn marine 25 ; _delay 1 ; @face -rel 25 "
+	);
+}
+
 
 // libapx_command_damage
 // =================
@@ -1393,6 +1719,20 @@ void libapx_command_damage(int user, unitgroup u, string argv, int spawningCount
 
 	return;
 }
+void libapx_define_adddamage(string command_name) {
+	commands_guide_entry_set(
+		g_commands_guide_entry_stats, 
+		command_name, 
+		" This command adds damage to a unit. <br> @adddamage [damage] <br> Examples: <br> @adddamage 25 "
+	);
+}
+void libapx_define_removedamage(string command_name) {
+	commands_guide_entry_set(
+		g_commands_guide_entry_stats, 
+		command_name, 
+		" This command removes damage to a unit. <br> @removedamage [damage] <br> Examples: <br> @removedamage 25 "
+	);
+}
 
 // libapx_command_range
 // =================
@@ -1439,7 +1779,20 @@ void libapx_command_range(int user, unitgroup u, string argv, int spawningCount,
 
 	return;
 }
-
+void libapx_define_addrange(string command_name) {
+	commands_guide_entry_set(
+		g_commands_guide_entry_stats, 
+		command_name, 
+		" This command adds range to a unit. <br> @addrange [range] <br> Examples: <br> @addrange 25 "
+	);
+}
+void libapx_define_removerange(string command_name) {
+	commands_guide_entry_set(
+		g_commands_guide_entry_stats, 
+		command_name, 
+		" This command removes range to a unit. <br> @removerange [range] <br> Examples: <br> @removerange 25 "
+	);
+}
 // libapx_command_armor
 // ===============
 // used for both @armor and @shieldsarmor
@@ -1534,7 +1887,20 @@ void libapx_command_armor(int user, unitgroup u, string argv, int spawningCount,
 
 	return;
 }
-
+void libapx_define_armor(string command_name) {
+	commands_guide_entry_set(
+		g_commands_guide_entry_stats, 
+		command_name, 
+		" This command sets the armor of a unit. <br> @armor [amount] <br> Examples: <br> @armor 25 "
+	);
+}
+void libapx_define_shieldsarmor(string command_name) {
+	commands_guide_entry_set(
+		g_commands_guide_entry_stats, 
+		command_name, 
+		" This command sets the shield's armor of a unit. <br> @shieldsarmor [amount] <br> Examples: <br> @shieldsarmor 25 "
+	);
+}
 // libapx_command_weaponspeed
 // =====================
 // Changes the weapon speed of a unit (local change)
@@ -1599,6 +1965,13 @@ void libapx_command_weaponspeed(int user, unitgroup u, string argv, int spawning
 
 	return;
 }
+void libapx_define_weaponspeed(string command_name) {
+	commands_guide_entry_set(
+		g_commands_guide_entry_stats, 
+		command_name, 
+		" This command sets the weaponspeed of a unit. <br> @weaponspeed [speed] <br> Examples: <br> @weaponspeed .25 <br> @weaponspeed .1 "
+	);
+}
 
 // libapx_command_weaponspeedall
 // ====================
@@ -1639,11 +2012,58 @@ void libapx_command_weaponspeedall(int user, unitgroup u, string argv, int spawn
 
 	return;
 }
+void libapx_define_weaponspeedall(string command_name) {
+	commands_guide_entry_set(
+		g_commands_guide_entry_stats, 
+		command_name, 
+		" This command sets the weaponspeed of a unit type. <br> @weaponspeedall [speed] <br> Examples: <br> @weaponspeedall .25 <br> @weaponspeedall .1 "
+	);
+}
+
+
+//libapx_command_rename
+//===================
+//Renames a unit (Setting datatable entry)
+void libapx_command_subtitle(int user, unitgroup u, string argv, int spawningCount, string bracketText) {
+	string val;
+	unitgroup g = u;
+	unit tmp_unit;
+	int i;
+	bool add;
+
+	val = argv;
+	val = StringSub( val, StringFind(val, " ", c_stringCase)+1, StringLength(val)); // The remainder of the chat message.
+	
+	if (StringWord(argv, 2) == "+add" || StringWord(argv, 2) == "-add" ) {
+		val = StringSub( val, StringFind(val, " ", c_stringCase)+1, StringLength(val));
+		add = true;
+	}
+
+	for (i = 1; i <= UnitGroupCount(g, c_unitCountAll); i += 1) {
+		tmp_unit = UnitGroupUnit(g, i);
+		if(add) {
+			libapx_unitsubtitle_set_entry(tmp_unit,libapx_unitsubtitle_get_entry(tmp_unit) + " " + val);
+			libapx_unit_cache_update(tmp_unit, "@subtitle", argv);
+		} 
+		else {
+			libapx_unitsubtitle_set_entry(tmp_unit, val);
+			libapx_unit_cache_update(tmp_unit, "@subtitle", argv);
+		}
+
+	}
+}
+void libapx_define_subtitle(string command_name) {
+	commands_guide_entry_set(
+		g_commands_guide_entry_unit, 
+		command_name, 
+		" This command sets the description of a unit. It takes the modifier -add, which adds onto the current subtitle. <br> @subtitle [desired desc.. <br> Examples: <br> @subtitle Bob R <br> @subtitle -add was a very cool man. "
+	);
+}
 
 // libapx_command_subtitle
 // =================
 // sets a unit's subtitle (underneath a unit name)
-void libapx_command_subtitle(int user, unitgroup u, string argv, int spawningCount, string bracketText) {
+void libapx_command_subtitleall(int user, unitgroup u, string argv, int spawningCount, string bracketText) {
 	string val = argv;
 	unitgroup g = u;
 	bool add = false;
@@ -1658,19 +2078,26 @@ void libapx_command_subtitle(int user, unitgroup u, string argv, int spawningCou
 	while(!UnitGroupLoopDone()) {
 		if(!add) {
 			CatalogFieldValueSet(c_gameCatalogUnit, UnitGetType(UnitGroupLoopCurrent()), "Subtitle", UnitGetOwner(UnitGroupLoopCurrent()), val);
-			libapx_unit_cache_update(UnitGroupLoopCurrent(), "@subtitle", argv);
+			libapx_unit_cache_update(UnitGroupLoopCurrent(), "@subtitleall", argv);
 		}
 		else {
 
 			val = CatalogFieldValueGet(c_gameCatalogUnit, UnitGetType(UnitGroupLoopCurrent()), "Subtitle", UnitGetOwner(UnitGroupLoopCurrent())) + " " + val;
 			CatalogFieldValueSet(c_gameCatalogUnit, UnitGetType(UnitGroupLoopCurrent()), "Subtitle", UnitGetOwner(UnitGroupLoopCurrent()), val);
-			libapx_unit_cache_update(UnitGroupLoopCurrent(), "@subtitle", argv);
+			libapx_unit_cache_update(UnitGroupLoopCurrent(), "@subtitleall", argv);
 		}
 
 		UnitGroupLoopStep();
 	}
 	UnitGroupLoopEnd();
 	return;
+}
+void libapx_define_subtitleall(string command_name) {
+	commands_guide_entry_set(
+		g_commands_guide_entry_unit, 
+		command_name, 
+		" This command sets the sbutitle of a unit-type(the text under the units name). It has a modifier called -add which, instead of overwriting the subtitle, adds to the subtitle. <br> @subtitle [modifier] [subtitle.. <br> Examples: <br> @subtitle Bob ross is a cool guy <br> @subtitle -add and most agree that he is that cool. "
+	);
 }
 
 // libapx_command_tooltip
@@ -1711,15 +2138,170 @@ void libapx_command_tooltip(int user, unitgroup u, string argv, int spawningCoun
 
 	return;
 }
+void libapx_define_tooltip(string command_name) {
+	commands_guide_entry_set(
+		g_commands_guide_entry_unit, 
+		command_name, 
+		" This command sets the tooltip of a unit. This is the text that displays when another player hovers over your unit. <br> @tooltip [name] <br> Examples: <br> @tooltip BobRoss is Serobliss <br> @state tooltips on;@tooltip test (This will allow you to see your own tooltip)  "
+	);
+}
+
+int undo_find_last_index(string cache) {
+	int index = 0;
+	while( StringFind(cache, ";",c_stringNoCase) != -1) {
+		index += StringFind(cache, ";",c_stringNoCase);
+		cache = StringReplace(cache, "", 1, StringFind(cache, ";",c_stringNoCase));
+	}
+	return index;
+};
+
+int undo_find_last_actor(string cache) {
+	int attachMIndex = 0;
+	int attachIndex = 0;
+	int rotationIndex = 0;
+	int index = 0;
+	string tmp;
+	tmp = cache;
+	while( (StringFind(tmp, "@attach-",c_stringNoCase) != -1)) {
+		attachMIndex += StringFind(tmp, "@attach-",c_stringNoCase);
+		tmp = StringReplace(tmp, "", 1, StringFind(tmp, "@attach-",c_stringNoCase)+6);
+	}
+	tmp = cache;
+	while( (StringFind(tmp, "@attach",c_stringNoCase) != -1)) {
+		attachIndex += StringFind(tmp, "@attach",c_stringNoCase);
+		tmp = StringReplace(tmp, "", 1, StringFind(tmp, "@attach",c_stringNoCase)+5);
+	}
+	tmp = cache;
+	while( (StringFind(tmp, "@rotation",c_stringNoCase) != -1)) {
+		rotationIndex += StringFind(tmp, "@rotation",c_stringNoCase);
+		tmp = StringReplace(tmp, "", 1, StringFind(tmp, "@rotation",c_stringNoCase)+8);
+	}
+	if( attachMIndex>=attachIndex && attachMIndex>=rotationIndex ) {
+		index = attachMIndex;
+	}
+	if( attachIndex>=attachMIndex && attachIndex>=rotationIndex ) {
+		index = attachIndex;
+	}
+	if( rotationIndex>=attachMIndex && rotationIndex>=attachIndex ) {
+		index = rotationIndex;
+	}
+
+	return index;
+}
 
 //libapx_command_undo
 // ========================
 // Undos X amount of cache and remakes the unit.
 void libapx_command_undo(int user, unitgroup u, string argv, int spawningCount, string bracketText)
 {
+	int undos = StringToInt(StringWord(argv, 2));
+	string cacheValue;
+	string tmp;
+	int cache;
+	string unit_id;
+	int i;
+	unit ul;
+	int indexOfLastCommand;
+	string currentUndo;
+	string msg;
+	string postDestroyCommands;
+	bool respawn;
+	if(StringWord(argv,2) == "") {
+		return;
+	}
+	for (i = 1; i <= UnitGroupCount(u, c_unitCountAll); i += 1) {
+		ul = UnitGroupUnit(u, i);
+		unit_id = FixedToString(UnitGetCustomValue(ul, libapx_UNIT_INDEX_ID), 0);
+		cache = 1;
+		while( DataTableValueExists(true, unit_id + "." + IntToString(cache)) ) {
+			if (cache == 1) {
+				cacheValue +=  DataTableGetString(true, unit_id + "." + IntToString(cache));
+			}
+			else {
+				cacheValue += libapx_string_trim(";" + DataTableGetString(true, unit_id + "." + IntToString(cache)));
+			}
+			cache += 1;
+		}		
+		//Lets remake the cache and destroy actors that were killed in undos
+		for (i = 1; i <= undos ; i += 1) {
+			indexOfLastCommand = undo_find_last_index(cacheValue);
+			currentUndo = StringSub(cacheValue, indexOfLastCommand, StringLength(cacheValue));
+			cacheValue = StringReplace(cacheValue, "", indexOfLastCommand, StringLength(cacheValue));
+
+			//Destroy If Required
+			if(StringContains(currentUndo,"@attach",c_stringAnywhere, false)) {
+				ActorSendTo(libNtve_gf_MainActorofUnit(ul), "::Main", "Destroy");
+			}
+			if(StringContains(currentUndo,"@attach-",c_stringAnywhere, false)) {
+				ActorSendTo(libNtve_gf_MainActorofUnit(ul), "::Main", "Destroy");
+			}
+			if(StringContains(currentUndo,"@rotation",c_stringAnywhere, false)) {
+				if(StringContains(currentUndo,"x",c_stringAnywhere, false)) {
+					ActorSendTo(libNtve_gf_MainActorofUnit(ul), "::Main", "Destroy");
+					ActorSendTo(libNtve_gf_MainActorofUnit(ul), "::Main", "Destroy");
+				} 
+				else if (StringContains(currentUndo,"r",c_stringAnywhere, false)) {
+					ActorSendTo(libNtve_gf_MainActorofUnit(ul), "::Main", "Destroy");
+					ActorSendTo(libNtve_gf_MainActorofUnit(ul), "::Main", "Destroy");
+				}
+				else {
+					ActorSendTo(libNtve_gf_MainActorofUnit(ul), "::Main", "Destroy");
+				}
+
+			}
+		}
+		//clear up to last actor command
+		i = undo_find_last_actor(cacheValue);
+		if(i != 0) {
+			msg = StringSub(cacheValue, i, StringLength(cacheValue));
+			//Remove
+			if(StringContains(msg,"@attach",c_stringAnywhere, false)) {
+				ActorSendTo(libNtve_gf_MainActorofUnit(ul), "::Main", "Destroy");
+			}
+			if(StringContains(msg,"@attach-",c_stringAnywhere, false)) {
+				ActorSendTo(libNtve_gf_MainActorofUnit(ul), "::Main", "Destroy");
+			}
+			if(StringContains(msg,"@rotation",c_stringAnywhere, false)) {
+				if(StringContains(msg,"x",c_stringAnywhere, false)) {
+					ActorSendTo(libNtve_gf_MainActorofUnit(ul), "::Main", "Destroy");
+					ActorSendTo(libNtve_gf_MainActorofUnit(ul), "::Main", "Destroy");
+				} 
+				else if (StringContains(msg,"r",c_stringAnywhere, false)) {
+					ActorSendTo(libNtve_gf_MainActorofUnit(ul), "::Main", "Destroy");
+					ActorSendTo(libNtve_gf_MainActorofUnit(ul), "::Main", "Destroy");
+				}
+				else {
+					ActorSendTo(libNtve_gf_MainActorofUnit(ul), "::Main", "Destroy");
+				}
+	
+			}
+		}
+		else {
+			libapx_print_output(user, " Undo without a reference attachpoint doesn't work yet.  Attach something.");
+			return;
+		}
+
+
+	}
+	libapx_chat_parse(msg, user, u, libapx_player[user].spawningCount);
+	//Run new cmds
+
+	//Remake cache
+	for (i = 1; i <= UnitGroupCount(u, c_unitCountAll); i += 1) {
+		ul = UnitGroupUnit(u, i);
+		libapx_unit_cache_replaceeall(ul, cacheValue);
+	}
+
+
 
 }
-
+void libapx_define_undo(string command_name) {
+	commands_guide_entry_set(
+		g_commands_guide_entry_unit, 
+		command_name, 
+		"  "
+	);
+}
 
 // libapx_command_copy
 // ===============
@@ -1733,6 +2315,7 @@ void libapx_command_copy(int user, unitgroup u, string argv, int spawningCount, 
 	unitgroup targets;
 	unit target;
 	int i;
+	int j;
 	int cache;
 	string cacheValue;
 	string source_unit_id;
@@ -1740,9 +2323,8 @@ void libapx_command_copy(int user, unitgroup u, string argv, int spawningCount, 
 
 
 
-	UnitGroupLoopBegin(g);
-	while(!UnitGroupLoopDone()) {
-		source = UnitGroupLoopCurrent();
+	for (j = 1; j <= UnitGroupCount(g, c_unitCountAll); j += 1) {
+		source = UnitGroupUnit(g, j);
 		targets = UnitCreate(1, UnitGetType(source), c_unitCreateIgnorePlacement, UnitGetOwner(source), libapx_player[user].mouse_position, UnitGetFacing(source));
 		target = UnitGroupUnit(targets, 1);
 
@@ -1838,29 +2420,35 @@ void libapx_command_copy(int user, unitgroup u, string argv, int spawningCount, 
 
 		// Skipping implementing setname duplications
 		// Copy the visuals via cache
-		if ( (StringEqual(param, "+visual", c_stringNoCase)) ) {
+		if ( (StringEqual(param, "+visual", c_stringNoCase)) || (StringEqual(param, "-visual", c_stringNoCase)) ) {
 			source_unit_id = FixedToString(UnitGetCustomValue(source, libapx_UNIT_INDEX_ID), 0);
 			cache = 1;
 			while( DataTableValueExists(true, source_unit_id + "." + IntToString(cache)) ) {
-				cacheValue += ";" + DataTableGetString(true, source_unit_id + "." + IntToString(cache));
-				Wait(2, c_timeGame);
+				if (cache == 1) {
+					cacheValue +=  DataTableGetString(true, source_unit_id + "." + IntToString(cache));
+				}
+				else {
+					cacheValue += ";" + DataTableGetString(true, source_unit_id + "." + IntToString(cache));
+				}
 				cache += 1;
 			}
 			cache = 1;
-			libapx_print_output(user, cacheValue);
 			libapx_chat_parse(cacheValue, user, targets, spawningCount);
-			
 		}
-
-
-
-		UnitGroupLoopStep();
 	}
-	UnitGroupLoopEnd();
+
+
 
 	u = created;
 
 	return;
+}
+void libapx_define_copy(string command_name) {
+	commands_guide_entry_set(
+		g_commands_guide_entry_unit, 
+		command_name, 
+		" This command copies a unit. It can optionally copy the caches of a unit too with the modifier -visual. <br> @copy [modifiers] <br> Examples: <br> @copy <br> @copy -visual"
+	);
 }
 
 // libapx_command_effect
@@ -1901,6 +2489,13 @@ void libapx_command_effect(int user, unitgroup u, string argv, int spawningCount
 
 	return;
 }
+void libapx_define_effect(string command_name) {
+	commands_guide_entry_set(
+		g_commands_guide_entry_unit, 
+		command_name, 
+		" This command creates an effect at a units position. <br> @effect [effectname] <br> Examples: <br> @effect MercenaryShield"
+	);
+}
 
 // libapx_command_kills
 // ==============
@@ -1921,6 +2516,13 @@ void libapx_command_kills(int user, unitgroup u, string argv, int spawningCount,
 	}
 	UnitGroupLoopEnd();
 	return;
+}
+void libapx_define_kills(string command_name) {
+	commands_guide_entry_set(
+		g_commands_guide_entry_stats, 
+		command_name, 
+		" This command sets the kill-count of a unit, it's useful for changing a units kill rank. <br> @kills [amount] <br> Examples: <br> @kills 15 "
+	);
 }
 
 // libapx_command_level
@@ -1954,6 +2556,13 @@ void libapx_command_level(int user, unitgroup u, string argv, int spawningCount,
 	UnitGroupLoopEnd();
 
 	return;
+}
+void libapx_define_level(string command_name) {
+	commands_guide_entry_set(
+		g_commands_guide_entry_stats, 
+		command_name, 
+		" This command sets a unit's level. <br> @level [levelnumber] <br> Examples: <br> @level 15 "
+	);
 }
 
 // libapx_command_label
@@ -1989,7 +2598,6 @@ void libapx_command_label(int user, unitgroup u, string argv, int spawningCount,
 									40, UnitGetPosition(UnitGroupLoopCurrent()), 1.0, true, true, PlayerGroupAll() );
 			TextTagSetTextShadow(tag_id, true);
 			TextTagAttachToUnit(tag_id, UnitGroupLoopCurrent(), 1.0);
-
 			UnitSetCustomValue(UnitGroupLoopCurrent(), libapx_UNIT_INDEX_TEXTTAG, IntToFixed(tag_id));
 		}
 		UnitGroupLoopStep();
@@ -1997,6 +2605,13 @@ void libapx_command_label(int user, unitgroup u, string argv, int spawningCount,
 	UnitGroupLoopEnd();
 
 	return;
+}
+void libapx_define_label(string command_name) {
+	commands_guide_entry_set(
+		g_commands_guide_entry_unit, 
+		command_name, 
+		" This command attaches a label to a unit that is constantly displayed to everyone. <br> @label [label name.. <br> Examples: <br> @label I am a cool unit! "
+	);
 }
 
 // libapx_command_radius
@@ -2024,6 +2639,7 @@ void libapx_command_radius(int user, unitgroup u, string argv, int spawningCount
 			val = FixedToString(StringToFixed(val) * radius, 8);
 			CatalogFieldValueSet(c_gameCatalogUnit, UnitGetType(UnitGroupLoopCurrent()), "InnerRadius", UnitGetOwner(UnitGroupLoopCurrent()), val);
 			UnitGroupLoopStep();
+			libapx_unit_cache_update(UnitGroupLoopCurrent(), "@radius", argv);
 		}
 		UnitGroupLoopEnd();
 	}
@@ -2033,11 +2649,19 @@ void libapx_command_radius(int user, unitgroup u, string argv, int spawningCount
 			CatalogFieldValueSet(c_gameCatalogUnit, UnitGetType(UnitGroupLoopCurrent()), "Radius", UnitGetOwner(UnitGroupLoopCurrent()), val);
 			CatalogFieldValueSet(c_gameCatalogUnit, UnitGetType(UnitGroupLoopCurrent()), "InnerRadius", UnitGetOwner(UnitGroupLoopCurrent()), val);
 			UnitGroupLoopStep();
+			libapx_unit_cache_update(UnitGroupLoopCurrent(), "@radius", argv);
 		}
 		UnitGroupLoopEnd();
 	}
 
 	return;
+}
+void libapx_define_radius(string command_name) {
+	commands_guide_entry_set(
+		g_commands_guide_entry_stats, 
+		command_name, 
+		" This command sets a unit's radius. <br> @radius [radius] <br> Examples: <br> @radius 1 <br> @radius 3 <br> @radius .03%    "
+	);
 }
 
 // libapx_command_state
@@ -2106,4 +2730,11 @@ void libapx_command_state(int user, unitgroup u, string argv, int spawningCount,
 	UnitGroupLoopEnd();
 
 	return;
+}
+void libapx_define_state(string command_name) {
+	commands_guide_entry_set(
+		g_commands_guide_entry_unit, 
+		command_name, 
+		" This command sets a unit's state. You can find a list of states with just typing @state. Or refer to.. <br> States: fidget, highlightable, highlighted, ignoreterrainheight, invulnerable, hidden, paused, selectable, statusbar, targetable, tooltips, cursor, movable, turnable, usessupply <br> @state [state] [on/off] <br> Examples <br> @state fidget off <br> @state ignoreterrainheight on "
+	);
 }

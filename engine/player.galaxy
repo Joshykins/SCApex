@@ -27,6 +27,7 @@ struct libapx_player_properties {
 	// Location of player mouse
 	point mouse_position;		// x,y position in world
 	point mouse_position_ui;	// x,y position in the game UI
+	point mouse_position_lasttick_ui;
 
 
 	// keys + mouse flags
@@ -34,19 +35,76 @@ struct libapx_player_properties {
 	// flags for whether keys/mouse pressed up/down:
 	// false - up
 	// true - down
-	bool key_ctrl;
-	bool key_alt;
 	bool key_shift;
-	bool key_x;
-	bool key_z;
-	bool key_q;
-	bool key_w;
+	bool key_ctrl;
+	bool key_ctrl_lasttick;
+	bool key_alt;
+
+	//new keys
+	bool key_0;
+	bool key_1;
+	bool key_2;
+	bool key_3;
+	bool key_4;
+	bool key_5;
+	bool key_6;
+	bool key_7;
+	bool key_8;
+	bool key_9;
+	//Done
+	bool key_a;
+	bool key_b;
+	bool key_c;
+	bool key_d;
 	bool key_e;
+	bool key_f;
+	bool key_g;
+	bool key_h;
+	bool key_i;
+	bool key_j;
+	bool key_k;
+	bool key_l;
+	bool key_m;
+	bool key_n;
+	bool key_o;
+	bool key_p;
+	bool key_q;
 	bool key_r;
+	bool key_s;
 	bool key_t;
+	bool key_u;
+	bool key_v;
+	bool key_w;
+	bool key_x;
 	bool key_y;
+	bool key_z;
+	bool key_up;
+	bool key_down;
+	bool key_left;
+	bool key_right;
+	bool key_pgUp;
+	bool key_pgDown;
+	bool key_numPad0;
+	bool key_numPad1;
+	bool key_numPad2;
+	bool key_numPad3;
+	bool key_numPad4;
+	bool key_numPad5;
+	bool key_numPad6;
+	bool key_numPad7;
+	bool key_numPad8;
+	bool key_numPad9;
+	bool key_numPadPlus;
+	bool key_numPadMinus;
+	bool key_numPadMultiply;
+	bool key_numPadDivide;
+	bool key_numPadDecimal;
+	bool key_grave;
+	bool key_grave_lasttick;
+
 
 	bool mouse_right;
+
 
 	// chat_msg
 	// ================
@@ -161,9 +219,29 @@ struct libapx_player_properties {
 	fixed delay;
 	string clan_tag;
 
+	//Editor mouse wheel trigger;
+	trigger editor_mouse_wheel;
+	//Editor camera unit
+	unit camera_unit;
+	//Editor camera toggle
+	bool editor_toggled;
+	//Height
+	fixed editor_heightoffset;
+	//Disabled units
+	unitgroup editor_pausedunits;
+	//Rotating still,
+	bool editor_rotating;
 	//Unit for spawner
 	unit spawner_unit;
 	bool spawner_toggled;
+
+	//This name controler
+	bool name_display;
+	bool name_leveled_display;
+
+	//Name and subtitle displays when selectingn units
+	int unit_display_name;
+	int unit_display_subtitle;
 };
 
 // libapx_player_parser_properties
@@ -201,6 +279,7 @@ string libapx_sort_aliases(int player);
 // ==============================
 // initialize players (default settings)
 void libapx_player_initialize(int player) {
+	unit u;
 	libapx_player[player].bank_storage = BankLoad( libapx_PLAYER_BANK_NAME, player );
 	libapx_player[player].map_revealer = VisRevealerCreate(player, RegionEntireMap());
 	libapx_player[player].mouse_position = RegionGetCenter( RegionEntireMap() );
@@ -209,16 +288,32 @@ void libapx_player_initialize(int player) {
 	libapx_player[player].scaler = 1;
 	libapx_player[player].spawner_unit = null;
 	libapx_player[player].spawner_toggled = false;
+	libapx_player[player].editor_toggled = false;
 	libapx_player[player].spawn_splat = null;
 	libapx_player[player].spawningCount = 1;
 	libapx_player[player].delay =  0.08;
 	libapx_player[player].waygate_dialog = 0;
 	libapx_player[player].clan_tag = "";
+	libapx_player[player].editor_heightoffset = 0.0;
+	libapx_player[player].editor_pausedunits = UnitGroupEmpty();
 
 	libapx_player[player].active_ui_panel = libapx_UI_PANEL_NONE;
 
+	//The only thing that needs an active runtime.
+	TriggerAddEventTimePeriodic(TriggerCreate("libapx_unit_clicked"), .1, c_timeGame);
+
+	
+	TriggerAddEventUnitRemoved(TriggerCreate("libapx_respawn_camera_unit"),UnitRefFromUnit(libapx_player[player].camera_unit));
+	TriggerAddEventUnitDied(TriggerCreate("libapx_respawn_camera_unit"),UnitRefFromUnit(libapx_player[player].camera_unit));
 	// create alphabetized alias list
 	libapx_player[player].aliases = libapx_sort_aliases(player);
+	u = UnitGroupUnit(UnitCreate(player, "ScienceVessel", c_unitCreateIgnorePlacement, player, CameraGetTarget(player), 270),1);
+	UnitSetState(u, c_unitStateInvulnerable, true);
+	UnitSetHeight(u, 500,0);
+	ActorSendTo(libNtve_gf_MainActorofUnit(u), "::Main", "MinimapIcon 0");
+	ActorSendTo(libNtve_gf_MainActorofUnit(u), "::Main", "ModelAllowHitTest 0");
+	ActorSendTo(libNtve_gf_MainActorofUnit(u), "::Main", "SetScale 0.0005");
+	libapx_player[player].camera_unit = u;
 
 	libapx_chk_all_aliases(player);
 
@@ -391,8 +486,9 @@ void libapx_waitDelay(int player) {
 
 void libapx_waitDelayGS(int player) {
 	fixed time = libapx_player[player].delay;
-	if(time < .3) {
-		time = .3;
+	fixed compare_time = .3 * g_gamesetups_loading;
+	if(time < compare_time) {
+		time = compare_time;
 	}
 	
 	Wait(time, c_timeGame);

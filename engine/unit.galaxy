@@ -80,31 +80,12 @@ string libapx_unit_get_val(unit u, string valuename) {
 	string unit_id;
 	string key;
 	unit_id = FixedToString(UnitGetCustomValue(u, libapx_UNIT_INDEX_ID), 0);
-	if (valuename == "key_q") {
-		key = unit_id + "_key_q";
-		return DataTableGetString(true, key);
-	}
-	if (valuename == "key_w") {
-		key = unit_id + "_key_w";
-		return DataTableGetString(true, key);
-	}
-	if (valuename == "key_e") {
-		key = unit_id + "_key_e";
-		return DataTableGetString(true, key);
-	}
-	if (valuename == "key_r") {
-		key = unit_id + "_key_r";
-		return DataTableGetString(true, key);
-	}
-	if (valuename == "key_t") {
-		key = unit_id + "_key_t";
-		return DataTableGetString(true, key);
-	}
-	//returns blank if nothing found :(
-	return "";
+	key = unit_id + "_" + valuename;
+	return DataTableGetString(true, key);
+
 }
 
-const string libapx_all_keys = "key_q key_w key_e key_r key_t";
+const string libapx_all_keys = "key_0 key_1 key_2 key_3 key_4 key_5 key_6 key_7 key_8 key_9 key_a key_b key_c key_d key_e key_f key_g key_h key_i key_j key_k key_l key_m key_n key_o key_p key_q key_r key_s key_t key_u key_v key_w key_x key_y key_z key_up key_down key_left key_right key_pgUp key_pgDown key_numPad0 key_numPad1 key_numPad2 key_numPad3 key_numPad4 key_numPad5 key_numPad6 key_numPad7 key_numPad8 key_numPad9 key_numPadPlus key_numPadMinus key_numPadMultiply key_numPadDivide key_numPadDecimal key_grave";
 
 // libapx_unit_set_val
 // ===========================
@@ -112,21 +93,16 @@ const string libapx_all_keys = "key_q key_w key_e key_r key_t";
 void libapx_unit_set_val(unit u, string valuename, string value) {
 	string unit_id;
 	string key;
+	int i;
+	string comparison;
 	unit_id = FixedToString(UnitGetCustomValue(u, libapx_UNIT_INDEX_ID), 0);
-	if (valuename == "key_q") {
-		key = unit_id + "_key_q";
-	}
-	if (valuename == "key_w") {
-		key = unit_id + "_key_w";
-	}
-	if (valuename == "key_e") {
-		key = unit_id + "_key_e";
-	}
-	if (valuename == "key_r") {
-		key = unit_id + "_key_r";
-	}
-	if (valuename == "key_t") {
-		key = unit_id + "_key_t";
+	i = 1;
+	while(StringWord(libapx_all_keys, i) != "") {
+		comparison = StringWord(libapx_all_keys, i);
+		if(comparison == valuename) {
+			key =  unit_id + "_" + comparison;
+		}
+		i+=1;
 	}
 	DataTableSetString(true, key, value);
 	return;
@@ -139,6 +115,8 @@ void libapx_unit_set_val(unit u, string valuename, string value) {
 string libapx_unit_id(unit u) {
 	return FixedToString(UnitGetCustomValue(u, libapx_UNIT_INDEX_ID), 0);
 }
+
+
 
 // libapx_unit_initialize
 // ===================
@@ -503,6 +481,7 @@ void libapx_unit_cache_update_add(unit subject, string unit_id, string user_comm
 		return;
 	}
 	else if(StringLength(cache + "; " + user_command) <= libapx_UNIT_CACHE_MAX_STRING_LENGTH) {
+		
 		cache = cache + "; " + user_command;
 		DataTableSetString(true, unit_id + "." + FixedToString(UnitGetCustomValue(subject, libapx_UNIT_INDEX_CACHE_COUNT), 0), cache);
 		return;
@@ -514,6 +493,7 @@ void libapx_unit_cache_update_add(unit subject, string unit_id, string user_comm
 	}
 
 }
+
 
 // libapx_unit_cache_update_overwrite
 // =======================
@@ -529,9 +509,11 @@ void libapx_unit_cache_update_overwrite(unit subject, string unit_id, string com
 	int pos_start;
 	int pos_end;
 	int i = 0;
+	int j;
 
 	//narrow to a certain cache number
 	//overwrite check added because if check limit is too large, A LOT OF LAG
+	i = 0;
 	while(i < unit_caches && i < libapx_UNIT_CACHE_OVERWRITE_CHECK_LIMIT) {
 		if(StringContains(DataTableGetString(true, unit_id + "." + IntToString(unit_caches - i)), command, c_stringAnywhere, c_stringNoCase)) {
 			break;
@@ -656,6 +638,90 @@ void libapx_unit_cache_update_overwrite(unit subject, string unit_id, string com
 	libapx_unit_cache_update_add(subject, unit_id, user_command);
 }
 
+void libapx_unit_cache_update(unit subject, string command, string user_command);
+
+void libapx_unit_cache_replaceeall(unit subject, string commands) {
+	int unit_caches = FixedToInt(UnitGetCustomValue(subject, libapx_UNIT_INDEX_CACHE_COUNT));
+	int caches = unit_caches;
+	string unit_id = FixedToString(UnitGetCustomValue(subject, libapx_UNIT_INDEX_ID), 0);
+	string command;
+	string userinput;
+
+
+	//Remove caches
+	while(caches != 0) {
+		libapx_print_output(EventPlayer(), unit_id + "." + IntToString(caches) + " Unit ID  + Caches Wiped");
+		DataTableSetString(true, unit_id + "." + IntToString(caches), "");
+		caches -= 1;
+	}
+
+	UnitSetCustomValue(subject, libapx_UNIT_INDEX_CACHE_COUNT, 1);
+
+	while( commands != "" ) {
+		//get command
+		if (StringFind(commands, ";", c_stringNoCase) != -1) {
+			command = StringSub(commands, 1, StringFind(commands, ";", c_stringNoCase));
+			command = StringReplace(command, "", StringFind(command, ";",c_stringNoCase), StringFind(command, ";",c_stringNoCase)+1 );
+		}
+		else {
+			command = StringSub(commands, 1, StringLength(commands));
+		}
+		commands = StringReplace(commands, "", StringFind(commands, ";",c_stringNoCase), StringFind(command, ";",c_stringNoCase)+1 );
+		commands = StringSub(commands, StringLength(command)+1, StringLength(commands));
+		
+		libapx_print_output(EventPlayer(), command);
+		//check if command exceeds cache limit
+		libapx_unit_cache_update(subject, StringWord(command, 1), command);
+		//Apply command
+
+	}
+	
+}
+
+string libapx_unitsubtitle_get_entry(unit u);
+
+//This formats subtitle when @subtitle -add is used to include the new text.
+string libapx_unit_cache_reformatsubtitle_all(unit u, string argv) {
+	string description;
+    //REturn renameall
+	description = CatalogFieldValueGet(c_gameCatalogUnit, UnitGetType(u), "Subtitle", UnitGetOwner(u));
+	
+	while(
+		StringContains(description, "-add",c_stringAnywhere, false) ||
+		StringContains(description, "+add",c_stringAnywhere, false) ||
+		StringContains(description, "@subtitleall",c_stringAnywhere, false)
+	)	{
+		description = StringReplaceWord(description, "-add", "", 1, c_stringNoCase);
+		description = StringReplaceWord(description, "+add", "", 1, c_stringNoCase);
+		description = StringReplaceWord(description, "@subtitleall", "", 1, c_stringNoCase);
+	}
+
+    //Will sometimes return Unit/Name/{Units Name}
+    //Thus we check if it does and then substring if needed.
+    if(StringContains(description, "UnitSubtitle/", c_stringAnywhere, false)) {
+        description = StringSub(description, 14, StringLength(description));
+    }
+	return "@subtitleall " + description;
+}
+
+//This formats subtitle when @subtitle -add is used to include the new text.
+string libapx_unit_cache_reformatsubtitle(unit u, string argv) {
+	string description;
+	description = libapx_unitsubtitle_get_entry(u);
+
+	while(
+		StringContains(description, "-add",c_stringAnywhere, false) ||
+		StringContains(description, "+add",c_stringAnywhere, false) ||
+		StringContains(description, "@subtitle",c_stringAnywhere, false)
+	)	{
+		description = StringReplaceWord(description, "-add", "", 1, c_stringNoCase);
+		description = StringReplaceWord(description, "+add", "", 1, c_stringNoCase);
+		description = StringReplaceWord(description, "@subtitle", "", 1, c_stringNoCase);
+	}
+
+	return "@subtitle " + description;
+}
+
 // libapx_unit_cache_update
 // =====================
 // redirects to proper cache update function depending on command:
@@ -672,7 +738,7 @@ void libapx_unit_cache_update(unit subject, string command, string user_command)
 
 	// VISUALS - attach, modelswap, tint, scale, animspeed, play
 	// only overwrite for specific instances of an actor (after attach)
-	if(command == "@attach") {
+	if(command == "@attach" || command == "@rotation") {
 		libapx_unit_cache_update_add(subject, unit_id, user_command);
 		UnitSetCustomValue(subject, libapx_UNIT_INDEX_FLAG_TINT, 0); //"reset" tint
 		UnitSetCustomValue(subject, libapx_UNIT_INDEX_FLAG_SCALE, 0); //"reset" scale
@@ -792,140 +858,42 @@ void libapx_unit_cache_update(unit subject, string command, string user_command)
 			 command == "@invulnerable" ||
 			 command == "@setname" ||
 			 command == "@setnamecolor" ||
-			 command == "@subtitle" ||
-			 command == "@renameall" ||
 			 command == "@color" ||
 			 command == "@tooltip" ||
 			 command == "@weaponspeed" ||
 			 command == "@weaponspeedall" ||
 			 command == "@armor" ||
+			 command == "@radius" ||
+			 command == "@renameall" ||
+			 command == "@rename" ||
 			 command == "@shieldsarmor" ) {
 		libapx_unit_cache_update_overwrite(subject, unit_id, command, user_command);
+		return;
+	}
+	else if (
+		command == "@subtitle" ||
+		command == "@subtitleall"
+	) {
+		if (StringWord(user_command, 2) == "+add" || StringWord(user_command, 2) == "-add" ) {
+			if(command == "@subtitle") {
+				user_command = libapx_unit_cache_reformatsubtitle(subject, user_command);
+				libapx_unit_cache_update_overwrite(subject, unit_id, command, user_command);
+			}
+			else {
+				user_command = libapx_unit_cache_reformatsubtitle_all(subject, user_command);
+				libapx_unit_cache_update_overwrite(subject, unit_id, command, user_command);
+			}
+			return;
+		}
+		else {
+			//Won't really work, o well.
+			libapx_unit_cache_update_overwrite(subject, unit_id, command, user_command);
+		}
 		return;
 	}
 
 }
 
-// libapx_unit_cache_undo
-// =====================
-// Undos previous commands (only those that were cached) by rebuilding
-// a unit using caches up to (-X commands), where X is undo depth specified by:
-// syntax: @undo X
-unit libapx_unit_cache_undo(unit subject_orig, int undo_iterations) {
-	int cache = 1;
-	int iterations = undo_iterations;
-	int pos_start;
-	string unit_cache_current;
-	string unit_id;
-	string unit_id_old = FixedToString(UnitGetCustomValue(subject_orig, libapx_UNIT_INDEX_ID), 0);
-	unit subject_undo;
-	unitgroup g;
-
-	//create new and remove old
-	UnitCreate(1, UnitGetType(subject_orig), c_unitCreateIgnorePlacement, UnitGetOwner(subject_orig),
-		UnitGetPosition(subject_orig), UnitGetFacing(subject_orig));
-
-	subject_undo = UnitLastCreated();
-	//set new undo unit cache
-	libapx_unit_set_id( subject_undo );
-	DataTableSetBool(true, unit_id + ".unit", true);
-	UnitSetCustomValue(subject_undo, libapx_UNIT_INDEX_CACHE_COUNT, 1); //set the unit cache value
-	UnitSetCustomValue(UnitLastCreated(), 16, 0); //set the modelswap flag to 0
-
-	//set undo units properties
-	UnitSetState(subject_undo, c_unitStateHidden,
-		UnitTestState(subject_orig, c_unitStateHidden));
-	UnitSetState(subject_undo, c_unitStateHighlightable,
-		UnitTestState(subject_orig, c_unitStateHighlightable));
-	UnitSetState(subject_undo, c_unitStateIgnoreTerrainZ,
-		UnitTestState(subject_orig, c_unitStateIgnoreTerrainZ));
-	UnitSetState(subject_undo, c_unitStateFidget,
-		UnitTestState(subject_orig, c_unitStateFidget));
-	UnitSetState(subject_undo, c_unitStateTargetable,
-		UnitTestState(subject_orig, c_unitStateTargetable));
-	UnitSetState(subject_undo, c_unitStateTooltipable,
-		UnitTestState(subject_orig, c_unitStateTooltipable));
-	UnitSetState(subject_undo, c_unitStateCursorable,
-		UnitTestState(subject_orig, c_unitStateCursorable));
-	UnitSetState(subject_undo, c_unitStateHighlighted,
-		UnitTestState(subject_orig, c_unitStateHighlighted));
-	UnitSetState(subject_undo, c_unitStateUsingSupply,
-		UnitTestState(subject_orig, c_unitStateUsingSupply));
-	UnitSetPropertyFixed(subject_undo, c_unitPropLifeMax,
-		UnitGetPropertyFixed(subject_orig, c_unitPropLifeMax, true));
-	UnitSetPropertyFixed(subject_undo, c_unitPropLife,
-		UnitGetPropertyFixed(subject_orig, c_unitPropLife, true));
-	UnitSetPropertyFixed(subject_undo, c_unitPropLifeRegen,
-		UnitGetPropertyFixed(subject_orig, c_unitPropLifeRegen, true));
-	UnitSetPropertyFixed(subject_undo, c_unitPropEnergyMax,
-		UnitGetPropertyFixed(subject_orig, c_unitPropEnergyMax, true));
-	UnitSetPropertyFixed(subject_undo, c_unitPropEnergy,
-		UnitGetPropertyFixed(subject_orig, c_unitPropEnergy, true));
-	UnitSetPropertyFixed(subject_undo, c_unitPropEnergyRegen,
-		UnitGetPropertyFixed(subject_orig, c_unitPropEnergyRegen, true));
-	UnitSetPropertyFixed(subject_undo, c_unitPropShieldsMax,
-		UnitGetPropertyFixed(subject_orig, c_unitPropShieldsMax, true));
-	UnitSetPropertyFixed(subject_undo, c_unitPropShields,
-		UnitGetPropertyFixed(subject_orig, c_unitPropShields, true));
-	UnitSetPropertyFixed(subject_undo, c_unitPropShieldsRegen,
-		UnitGetPropertyFixed(subject_orig, c_unitPropShieldsRegen, true));
-	UnitSetPropertyFixed(subject_undo, c_unitPropKills,
-		UnitGetPropertyFixed(subject_orig, c_unitPropKills, true));
-	UnitSetPropertyFixed(subject_undo, c_unitPropMovementSpeed,
-		UnitGetPropertyFixed(subject_orig, c_unitPropMovementSpeed, true));
-	UnitSetPropertyFixed(subject_undo, c_unitPropResources,
-		UnitGetPropertyFixed(subject_orig, c_unitPropResources, true));
-
-
-	//undo iterations listed in original units cache
-	cache = FixedToInt(UnitGetCustomValue(subject_orig, libapx_UNIT_INDEX_CACHE_COUNT));
-	while(iterations > 0 && cache > 0) {
-		if(DataTableValueExists(true, unit_id_old + "." + IntToString(cache))) {
-			unit_cache_current = DataTableGetString(true, unit_id_old + "." + IntToString(cache));
-			pos_start = StringLength(unit_cache_current);
-
-			while(pos_start > 0 && iterations > 0) {
-				if(StringSub(unit_cache_current, pos_start, pos_start) == ";") {
-					//command found: remove it
-					unit_cache_current = StringReplace(unit_cache_current, "", pos_start, StringLength(unit_cache_current));
-					iterations -= 1;
-				}
-				pos_start -= 1;
-			}
-			if(pos_start == 0) {
-				DataTableValueRemove(true, unit_id_old + "." + IntToString(cache));
-				iterations -= 1;
-			}
-			else {
-				DataTableSetString(true, unit_id_old + "." + IntToString(cache), unit_cache_current);
-			}
-		}
-		cache -= 1;
-	}
-
-	//remove the old unit
-	UnitRemove(subject_orig);
-
-	//now parse all the commands from original unit to the new unit
-	cache = 1;
-	g = UnitGroupEmpty();
-	UnitGroupAdd(g, subject_undo);
-
-	libapx_player_parser[UnitGetOwner(subject_undo)][libapx_player[EventPlayer()].spawningCount].context = g;
-	while(DataTableValueExists(true, unit_id_old + "." + IntToString(cache))) {
-		//libapx_chat_parsechat(UnitGetOwner(subject_undo), DataTableGetString(true, unit_id_old + "." + IntToString(cache)), libapx_chat_recursion_limit);
-		cache += 1;
-	}
-	//libapx_unit_cache_isCopying[UnitGetOwner(subject_undo)] = false;
-
-	//remove old unit's cache
-	libapx_unit_data_remove(subject_orig);
-
-	//finally, write how many commands undid and return the unit
-	libapx_print_success(EventPlayer(), "(Unit: " + UnitGetType(subject_undo) + ") " + "Undid " + IntToString(undo_iterations - iterations) + " commands");
-
-	return subject_undo;
-}
 
 void libapx_unit_keypress_check() {
 	int i;
@@ -955,36 +923,234 @@ void libapx_unit_keypress_check() {
 	}
 	UnitGroupLoopEnd();
 	if(i > 1) {
-		libapx_print_error( player, " Keypress can only be fired with one unit selected! " );
 		return;
 	}
 	if(	player != UnitGetOwner(u) ) {
-		libapx_print_output( player, "You must own the unit to use keypress on it. ");
 		return;
 	}
-	if(libapx_player[player].key_q == true ) {
-		input = libapx_unit_get_val(u, "key_q");
+	if(libapx_player[player].key_0 == true ) {
+		input = libapx_unit_get_val(u, "key_0");
 		libapx_chat_parse(input, player, g, libapx_player[player].spawningCount);
 	}
-	if(libapx_player[player].key_w == true ) {
-		input = libapx_unit_get_val(u, "key_w");
+	if(libapx_player[player].key_1 == true ) {
+		input = libapx_unit_get_val(u, "key_1");
+		libapx_chat_parse(input, player, g, libapx_player[player].spawningCount);
+	}
+	if(libapx_player[player].key_2 == true ) {
+		input = libapx_unit_get_val(u, "key_2");
+		libapx_chat_parse(input, player, g, libapx_player[player].spawningCount);
+	}
+	if(libapx_player[player].key_3 == true ) {
+		input = libapx_unit_get_val(u, "key_3");
+		libapx_chat_parse(input, player, g, libapx_player[player].spawningCount);
+	}
+	if(libapx_player[player].key_4 == true ) {
+		input = libapx_unit_get_val(u, "key_4");
+		libapx_chat_parse(input, player, g, libapx_player[player].spawningCount);
+	}
+	if(libapx_player[player].key_5 == true ) {
+		input = libapx_unit_get_val(u, "key_5");
+		libapx_chat_parse(input, player, g, libapx_player[player].spawningCount);
+	}
+	if(libapx_player[player].key_6 == true ) {
+		input = libapx_unit_get_val(u, "key_6");
+		libapx_chat_parse(input, player, g, libapx_player[player].spawningCount);
+	}
+	if(libapx_player[player].key_7 == true ) {
+		input = libapx_unit_get_val(u, "key_7");
+		libapx_chat_parse(input, player, g, libapx_player[player].spawningCount);
+	}
+	if(libapx_player[player].key_8 == true ) {
+		input = libapx_unit_get_val(u, "key_8");
+		libapx_chat_parse(input, player, g, libapx_player[player].spawningCount);
+	}
+	if(libapx_player[player].key_9 == true ) {
+		input = libapx_unit_get_val(u, "key_9");
+		libapx_chat_parse(input, player, g, libapx_player[player].spawningCount);
+	}
+	if(libapx_player[player].key_a == true ) {
+		input = libapx_unit_get_val(u, "key_a");
+		libapx_chat_parse(input, player, g, libapx_player[player].spawningCount);
+	}
+	if(libapx_player[player].key_b == true ) {
+		input = libapx_unit_get_val(u, "key_b");
+		libapx_chat_parse(input, player, g, libapx_player[player].spawningCount);
+	}
+	if(libapx_player[player].key_c == true ) {
+		input = libapx_unit_get_val(u, "key_c");
+		libapx_chat_parse(input, player, g, libapx_player[player].spawningCount);
+	}
+	if(libapx_player[player].key_d == true ) {
+		input = libapx_unit_get_val(u, "key_d");
 		libapx_chat_parse(input, player, g, libapx_player[player].spawningCount);
 	}
 	if(libapx_player[player].key_e == true ) {
 		input = libapx_unit_get_val(u, "key_e");
 		libapx_chat_parse(input, player, g, libapx_player[player].spawningCount);
 	}
+	if(libapx_player[player].key_g == true ) {
+		input = libapx_unit_get_val(u, "key_g");
+		libapx_chat_parse(input, player, g, libapx_player[player].spawningCount);
+	}
+	if(libapx_player[player].key_h == true ) {
+		input = libapx_unit_get_val(u, "key_h");
+		libapx_chat_parse(input, player, g, libapx_player[player].spawningCount);
+	}
+	if(libapx_player[player].key_i == true ) {
+		input = libapx_unit_get_val(u, "key_i");
+		libapx_chat_parse(input, player, g, libapx_player[player].spawningCount);
+	}
+	if(libapx_player[player].key_j == true ) {
+		input = libapx_unit_get_val(u, "key_j");
+		libapx_chat_parse(input, player, g, libapx_player[player].spawningCount);
+	}
+	if(libapx_player[player].key_k == true ) {
+		input = libapx_unit_get_val(u, "key_k");
+		libapx_chat_parse(input, player, g, libapx_player[player].spawningCount);
+	}
+	if(libapx_player[player].key_l == true ) {
+		input = libapx_unit_get_val(u, "key_l");
+		libapx_chat_parse(input, player, g, libapx_player[player].spawningCount);
+	}
+	if(libapx_player[player].key_m == true ) {
+		input = libapx_unit_get_val(u, "key_m");
+		libapx_chat_parse(input, player, g, libapx_player[player].spawningCount);
+	}
+	if(libapx_player[player].key_n == true ) {
+		input = libapx_unit_get_val(u, "key_n");
+		libapx_chat_parse(input, player, g, libapx_player[player].spawningCount);
+	}
+	if(libapx_player[player].key_o == true ) {
+		input = libapx_unit_get_val(u, "key_o");
+		libapx_chat_parse(input, player, g, libapx_player[player].spawningCount);
+	}
+	if(libapx_player[player].key_p == true ) {
+		input = libapx_unit_get_val(u, "key_p");
+		libapx_chat_parse(input, player, g, libapx_player[player].spawningCount);
+	}
+	if(libapx_player[player].key_q == true ) {
+		input = libapx_unit_get_val(u, "key_q");
+		libapx_chat_parse(input, player, g, libapx_player[player].spawningCount);
+	}
 	if(libapx_player[player].key_r == true ) {
 		input = libapx_unit_get_val(u, "key_r");
+		libapx_chat_parse(input, player, g, libapx_player[player].spawningCount);
+	}
+	if(libapx_player[player].key_s == true ) {
+		input = libapx_unit_get_val(u, "key_s");
 		libapx_chat_parse(input, player, g, libapx_player[player].spawningCount);
 	}
 	if(libapx_player[player].key_t == true ) {
 		input = libapx_unit_get_val(u, "key_t");
 		libapx_chat_parse(input, player, g, libapx_player[player].spawningCount);
 	}
-
-
-
-
+	if(libapx_player[player].key_u == true ) {
+		input = libapx_unit_get_val(u, "key_u");
+		libapx_chat_parse(input, player, g, libapx_player[player].spawningCount);
+	}
+	if(libapx_player[player].key_v == true ) {
+		input = libapx_unit_get_val(u, "key_v");
+		libapx_chat_parse(input, player, g, libapx_player[player].spawningCount);
+	}
+	if(libapx_player[player].key_x == true ) {
+		input = libapx_unit_get_val(u, "key_x");
+		libapx_chat_parse(input, player, g, libapx_player[player].spawningCount);
+	}
+	if(libapx_player[player].key_y == true ) {
+		input = libapx_unit_get_val(u, "key_y");
+		libapx_chat_parse(input, player, g, libapx_player[player].spawningCount);
+	}
+	if(libapx_player[player].key_z == true ) {
+		input = libapx_unit_get_val(u, "key_z");
+		libapx_chat_parse(input, player, g, libapx_player[player].spawningCount);
+	}
+	if(libapx_player[player].key_up == true ) {
+		input = libapx_unit_get_val(u, "key_up");
+		libapx_chat_parse(input, player, g, libapx_player[player].spawningCount);
+	}
+	if(libapx_player[player].key_down == true ) {
+		input = libapx_unit_get_val(u, "key_down");
+		libapx_chat_parse(input, player, g, libapx_player[player].spawningCount);
+	}
+	if(libapx_player[player].key_left == true ) {
+		input = libapx_unit_get_val(u, "key_left");
+		libapx_chat_parse(input, player, g, libapx_player[player].spawningCount);
+	}
+	if(libapx_player[player].key_right == true ) {
+		input = libapx_unit_get_val(u, "key_right");
+		libapx_chat_parse(input, player, g, libapx_player[player].spawningCount);
+	}
+	if(libapx_player[player].key_pgUp == true ) {
+		input = libapx_unit_get_val(u, "key_pgUp");
+		libapx_chat_parse(input, player, g, libapx_player[player].spawningCount);
+	}
+	if(libapx_player[player].key_pgDown == true ) {
+		input = libapx_unit_get_val(u, "key_pgDown");
+		libapx_chat_parse(input, player, g, libapx_player[player].spawningCount);
+	}
+	if(libapx_player[player].key_numPad0 == true ) {
+		input = libapx_unit_get_val(u, "key_numPad0");
+		libapx_chat_parse(input, player, g, libapx_player[player].spawningCount);
+	}
+	if(libapx_player[player].key_numPad1 == true ) {
+		input = libapx_unit_get_val(u, "key_numPad1");
+		libapx_chat_parse(input, player, g, libapx_player[player].spawningCount);
+	}
+	if(libapx_player[player].key_numPad2 == true ) {
+		input = libapx_unit_get_val(u, "key_numPad2");
+		libapx_chat_parse(input, player, g, libapx_player[player].spawningCount);
+	}
+	if(libapx_player[player].key_numPad3 == true ) {
+		input = libapx_unit_get_val(u, "key_numPad3");
+		libapx_chat_parse(input, player, g, libapx_player[player].spawningCount);
+	}
+	if(libapx_player[player].key_numPad4 == true ) {
+		input = libapx_unit_get_val(u, "key_numPad4");
+		libapx_chat_parse(input, player, g, libapx_player[player].spawningCount);
+	}
+	if(libapx_player[player].key_numPad5 == true ) {
+		input = libapx_unit_get_val(u, "key_numPad5");
+		libapx_chat_parse(input, player, g, libapx_player[player].spawningCount);
+	}
+	if(libapx_player[player].key_numPad6 == true ) {
+		input = libapx_unit_get_val(u, "key_numPad6");
+		libapx_chat_parse(input, player, g, libapx_player[player].spawningCount);
+	}
+	if(libapx_player[player].key_numPad7 == true ) {
+		input = libapx_unit_get_val(u, "key_numPad7");
+		libapx_chat_parse(input, player, g, libapx_player[player].spawningCount);
+	}
+	if(libapx_player[player].key_numPad8 == true ) {
+		input = libapx_unit_get_val(u, "key_numPad8");
+		libapx_chat_parse(input, player, g, libapx_player[player].spawningCount);
+	}
+	if(libapx_player[player].key_numPad9 == true ) {
+		input = libapx_unit_get_val(u, "key_numPad9");
+		libapx_chat_parse(input, player, g, libapx_player[player].spawningCount);
+	}
+	if(libapx_player[player].key_numPadPlus == true ) {
+		input = libapx_unit_get_val(u, "key_numPadPlus");
+		libapx_chat_parse(input, player, g, libapx_player[player].spawningCount);
+	}
+	if(libapx_player[player].key_numPadMinus == true ) {
+		input = libapx_unit_get_val(u, "key_numPadMinus");
+		libapx_chat_parse(input, player, g, libapx_player[player].spawningCount);
+	}
+	if(libapx_player[player].key_numPadMultiply == true ) {
+		input = libapx_unit_get_val(u, "key_numPadMultiply");
+		libapx_chat_parse(input, player, g, libapx_player[player].spawningCount);
+	}
+	if(libapx_player[player].key_numPadDivide == true ) {
+		input = libapx_unit_get_val(u, "key_numPadDivide");
+		libapx_chat_parse(input, player, g, libapx_player[player].spawningCount);
+	}
+	if(libapx_player[player].key_numPadDecimal == true ) {
+		input = libapx_unit_get_val(u, "key_numPadDecimal");
+		libapx_chat_parse(input, player, g, libapx_player[player].spawningCount);
+	}
+	if(libapx_player[player].key_grave == true ) {
+		input = libapx_unit_get_val(u, "key_grave");
+		libapx_chat_parse(input, player, g, libapx_player[player].spawningCount);
+	}
 	return;
 }

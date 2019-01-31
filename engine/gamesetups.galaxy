@@ -118,6 +118,7 @@ void libapx_gamesetup_load(int player, string gamesetup_name) {
 	string commands;
 	unitgroup g;
 
+	g_gamesetups_loading+=1;
 	//load units
 	while( BankKeyExists(libapx_player[player].bank_storage, gamesetup_section, id + ".0" ) ) {
 		unit_properties = BankValueGetAsString(libapx_player[player].bank_storage, gamesetup_section, id + ".0");
@@ -175,8 +176,10 @@ void libapx_gamesetup_load(int player, string gamesetup_name) {
 		libapx_waitDelayGS(player);
 	}
 
+
 	//loading complete!
 	libapx_print_success(player, "Game setup loaded: \"" + gamesetup_name + "\"");
+	g_gamesetups_loading -= 1;
 }
 
 // libapx_gamesetup_alias_commands

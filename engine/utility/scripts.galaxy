@@ -13,3 +13,14 @@ include "apex/engine/utility/apexUtil.galaxy"
 void libapx_scripts_init() {
 	libx_qsort_init();
 }
+
+fixed libapx_boundsFixed(fixed src, fixed min, fixed max) {
+	if( src < min ) {
+		return min;
+	}
+	else if( src > max ) {
+		return max;
+	}
+	
+	return src;
+}

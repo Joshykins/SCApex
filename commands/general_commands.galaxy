@@ -55,65 +55,7 @@ string libapx_param_catalog(int catalog, string word)
 
 
 
-//libapx_command_upgrade
-void libapx_command_upgrade(int user, unitgroup u, string argv, int spawningCount, string bracketText)
-{
-    string upgrade = StringWord(argv, 2);
-    string nextParam = StringCase(StringWord(argv, 3), false);
-    int player = EventPlayer();
-    unitgroup g;
-    int curLevel;
-    int newLevel;
-    upgrade = libapx_param_catalog(c_gameCatalogUpgrade, upgrade);
-    if(upgrade == null)
-    {
-        libapx_print_output(user, "<c val=\"ff0000\">Unable to modify upgrade</c>: That upgrade does not exists.");
-        return;
-    }
 
-        curLevel = TechTreeUpgradeCount(player, upgrade, c_techCountQueuedOrBetter);
-    newLevel = StringToInt(nextParam);
-    if (CatalogFieldValueGet(c_gameCatalogUpgrade, upgrade, "MaxLevel", player) == "1")
-    {
-
-        if(StringWord(argv, 3) == "")
-        {
-        // toggle upgrade
-            newLevel = 1;
-            if(curLevel == 1)
-            {
-                newLevel = 0;
-            }
-        }
-        else if(nextParam == "on" || nextParam == "enabled")
-        {
-            newLevel = 1;
-        }
-        else if(nextParam == "off" || nextParam == "disabled")
-        {
-            newLevel = 0;
-        }
-        else if(nextParam == "query")
-        {
-            libapx_print_output(user, "Upgrade level is at: " +
-                IntToString(curLevel));
-            return;
-        }
-        else if(nextParam != "0" && newLevel == 0)
-        {
-            libapx_print_output(user,"Usage: upgrade upgradename [on/off/query/number]");
-            return;
-        }
-    }
-		else if(nextParam == "")
-    {
-        libapx_print_output(user, "Upgrade level is at: " + IntToString(curLevel));
-        return;
-    }
-    TechTreeUpgradeAddLevel(player, upgrade, newLevel - curLevel);
-
-    return;
-}
 
 
 void libapx_camera_reset (int player);
@@ -165,15 +107,240 @@ void libapx_camera_reset (int player)
 	CameraInfoSetValue(cam[player], c_cameraValueShadowClip, val);
 }
 
+bool libapx_respawn_camera_unit(bool testConds,bool runActions) {
+	int player = EventPlayer();
+	unit u;
+	u = UnitGroupUnit(UnitCreate(player, "ScienceVessel", c_unitCreateIgnorePlacement, player, CameraGetTarget(player), 270),1);
+	UnitSetState(u, c_unitStateInvulnerable, true);
+	UnitSetHeight(u, 500,0);
+	ActorSendTo(libNtve_gf_MainActorofUnit(u), "::Main", "MinimapIcon 0");
+	ActorSendTo(libNtve_gf_MainActorofUnit(u), "::Main", "ModelAllowHitTest 0");
+	ActorSendTo(libNtve_gf_MainActorofUnit(u), "::Main", "SetScale 0.0005");
+	TriggerAddEventUnitRemoved(TriggerCreate("libapx_respawn_camera_unit"),UnitRefFromUnit(u));
+	TriggerAddEventUnitDied(TriggerCreate("libapx_respawn_camera_unit"),UnitRefFromUnit(u));
+	libapx_player[player].camera_unit = u;
+	return true;
+}
+
+bool libapx_editor_mouse_wheel(bool testConds,bool runActions) {
+	int p = EventPlayer();
+	fixed wheelspin = EventMouseWheelSpin();
+	if(!libapx_player[p].mouse_right && !libapx_player[p].key_ctrl && !libapx_player[p].key_alt) {
+		CameraSetValue(EventPlayer(), c_cameraValueDistance, CameraGetDistance(p)-(wheelspin*2), 0, 0, 0);
+	}
+	else if(libapx_player[p].key_alt) {
+		libapx_player[p].editor_heightoffset = libapx_player[p].editor_heightoffset + wheelspin*.2;
+		CameraSetValue(EventPlayer(), c_cameraValueHeightOffset, libapx_player[p].editor_heightoffset, 0, 0, 0);
+	}
+
+	return true;
+}
+bool libapx_update_camera(bool testConds,bool runActions) {
+	int i;
+	int p;
+	point unitpos;
+	point increment;
+	fixed p1x;
+	fixed p1y;
+	fixed p2x;
+	fixed p2y;
+	fixed absy;
+	fixed absx;
+	point upos;
+	fixed orientation;
+	unit u;
+	point newUnitPos;
+	for (i = 1; i <= PlayerGroupCount(PlayerGroupActive()); i += 1) {
+		p = PlayerGroupPlayer(PlayerGroupActive(), i);
+		
+		if(libapx_player[p].editor_toggled) {
+			if(libapx_player[p].mouse_right && !libapx_player[p].key_ctrl && !libapx_player[p].key_alt && !libapx_player[p].key_grave) {
+				u = libapx_player[p].camera_unit;
+				UnitSetFacing(u, CameraGetYaw(p), 0);
+				orientation = UnitGetFacing(u);
+				upos = UnitGetPosition(u);
+				p1x = PointGetX(libapx_player[p].mouse_position_lasttick_ui);
+				p1y = PointGetY(libapx_player[p].mouse_position_lasttick_ui);
+				p2x = PointGetX(libapx_player[p].mouse_position_ui);
+				p2y = PointGetY(libapx_player[p].mouse_position_ui);
+				absx = p1x-p2x;
+				absy = p1y-p2y;
+				absx *= -.025;
+				absy *= -.025;
+				upos = PointWithOffsetPolar(upos, absy, orientation);
+				upos = PointWithOffsetPolar(upos, absx, orientation+90);
+				UnitSetPosition(u, upos, false);
+				CameraPan(p, upos, 0, 0, 0 , false);
+			}
+			else if (libapx_player[p].key_ctrl != libapx_player[p].key_ctrl_lasttick) {
+				if( libapx_player[p].key_ctrl) {
+					CameraForceMouseRelative(p, true);
+					CameraSetMouseRotates(p, true);
+					CameraLockInput(p, false);
+					libapx_player[p].editor_rotating = true;
+				}
+				else {
+					CameraForceMouseRelative(p, false);
+					CameraSetMouseRotates(p, false);
+					CameraLockInput(p, true);
+					libapx_player[p].editor_rotating = false;
+				}
+			}
+			else if (libapx_player[p].editor_rotating && !libapx_player[p].key_ctrl) {
+
+				//Catch if keypress misses it.
+				CameraForceMouseRelative(p, false);
+				CameraSetMouseRotates(p, false);
+				CameraLockInput(p, true);
+				libapx_player[p].editor_rotating = false;
+			}
+			if(libapx_player[p].key_grave) {
+				UnitGroupAddUnitGroup(libapx_player[p].editor_pausedunits, UnitGroupSelected(p));
+				UnitGroupPauseAll(libapx_player[p].editor_pausedunits, false);
+				if(libapx_player[p].key_grave != libapx_player[p].key_grave_lasttick) {
+					UnitGroupIssueOrder(libapx_player[p].editor_pausedunits, Order(AbilityCommand("stop", 0)), c_orderQueueReplace);
+				}
+				
+			}
+			else if(!libapx_player[p].key_grave) {
+				UnitGroupAddUnitGroup(libapx_player[p].editor_pausedunits, UnitGroupSelected(p));
+				UnitGroupPauseAll(libapx_player[p].editor_pausedunits, true);
+			}
+
+			libapx_player[p].key_grave_lasttick = libapx_player[p].key_grave;
+			libapx_player[p].key_ctrl_lasttick = libapx_player[p].key_ctrl;
+			libapx_player[p].mouse_position_lasttick_ui = libapx_player[p].mouse_position_ui;
+		}
+	}
+	return true;
+}
+void libapx_enable_editor_camera(int p, bool state) {
+	int i;
+	int tmp_p;
+	bool already_trigged;
+	fixed val;
+	libapx_camera_reset(p);
+	if(state) {
+		for (i = 1; i <= PlayerGroupCount(PlayerGroupActive()); i += 1) {
+			tmp_p = PlayerGroupPlayer(PlayerGroupActive(), i);
+			if(libapx_player[tmp_p].editor_toggled) {
+				already_trigged =  true;
+				return;
+			}
+		}
+		if(!already_trigged) {
+			//If you are the first player to toggle the editor camera, create the camera update trigger.
+			g_camera_updater = TriggerCreate("libapx_update_camera");
+			libapx_player[tmp_p].editor_toggled = true;
+			TriggerAddEventTimePeriodic(g_camera_updater, 0, c_timeReal);
+			
+		}
+
+		//Enable Camera
+		//When nothing held
+		//When ctrl held
+
+		val = StringToFixed(CatalogFieldValueGet(c_gameCatalogCamera, CatalogFieldValueGet(c_gameCatalogTerrain, GameTerrainSet(), "Camera", p), "ParamInitial[5]", p));
+		CameraSetValue(p, c_cameraValuePitch, val, 1.0, -1, 10);
+			val = StringToFixed(CatalogFieldValueGet(c_gameCatalogCamera, CatalogFieldValueGet(c_gameCatalogTerrain, GameTerrainSet(), "Camera", p), "ParamInitial[9]", p));
+		CameraSetValue(p, c_cameraValueDepthOfField, val, 1.0, -1, 10);
+			val = StringToFixed(CatalogFieldValueGet(c_gameCatalogCamera, CatalogFieldValueGet(c_gameCatalogTerrain, GameTerrainSet(), "Camera", p), "ParamInitial[4]", p));
+		CameraSetValue(p, c_cameraValueDistance, val, 1.0, -1, 10);
+			val = StringToFixed(CatalogFieldValueGet(c_gameCatalogCamera, CatalogFieldValueGet(c_gameCatalogTerrain, GameTerrainSet(), "Camera", p), "ParamInitial[12]", p));
+		CameraSetValue(p, c_cameraValueFalloffEnd, val, 1.0, -1, 10);
+			val = StringToFixed(CatalogFieldValueGet(c_gameCatalogCamera, CatalogFieldValueGet(c_gameCatalogTerrain, GameTerrainSet(), "Camera", p), "ParamInitial[11]", p));
+		CameraSetValue(p, c_cameraValueFalloffStart, val, 1.0, -1, 10);
+			val = StringToFixed(CatalogFieldValueGet(c_gameCatalogCamera, CatalogFieldValueGet(c_gameCatalogTerrain, GameTerrainSet(), "Camera", p), "ParamInitial[2]", p));
+		CameraSetValue(p, c_cameraValueFarClip, val, 1.0, -1, 10);
+			val = StringToFixed(CatalogFieldValueGet(c_gameCatalogCamera, CatalogFieldValueGet(c_gameCatalogTerrain, GameTerrainSet(), "Camera", p), "ParamInitial[0]", p));
+		CameraSetValue(p, c_cameraValueFieldOfView, val, 1.0, -1, 10);
+			val = StringToFixed(CatalogFieldValueGet(c_gameCatalogCamera, CatalogFieldValueGet(c_gameCatalogTerrain, GameTerrainSet(), "Camera", p), "ParamInitial[10]", p));
+		CameraSetValue(p, c_cameraValueFocalDepth, val, 1.0, -1, 10);
+			val = StringToFixed(CatalogFieldValueGet(c_gameCatalogCamera, CatalogFieldValueGet(c_gameCatalogTerrain, GameTerrainSet(), "Camera", p), "ParamInitial[8]", p));
+		CameraSetValue(p, c_cameraValueHeightOffset, val, 1.0, -1, 10);
+			val = StringToFixed(CatalogFieldValueGet(c_gameCatalogCamera, CatalogFieldValueGet(c_gameCatalogTerrain, GameTerrainSet(), "Camera", p), "ParamInitial[1]", p));
+		CameraSetValue(p, c_cameraValueNearClip, val, 1.0, -1, 10);
+			val = StringToFixed(CatalogFieldValueGet(c_gameCatalogCamera, CatalogFieldValueGet(c_gameCatalogTerrain, GameTerrainSet(), "Camera", p), "ParamInitial[7]", p));
+		CameraSetValue(p, c_cameraValueRoll, val, 1.0, -1, 10);
+			val = 90;
+		CameraSetValue(p, c_cameraValueYaw, val, 1.0, -1, 10);
+			val = StringToFixed(CatalogFieldValueGet(c_gameCatalogCamera, CatalogFieldValueGet(c_gameCatalogTerrain, GameTerrainSet(), "Camera", p), "ParamInitial[3]", p));
+		CameraSetValue(p, c_cameraValueShadowClip, val, 1.0, -1, 10);
+
+		cam[p] = CameraInfoDefault();
+		libapx_camera_reset(p);
+
+		CameraLockInput(p, true);
+		UnitSetPosition(libapx_player[p].camera_unit, CameraGetTarget(p), false);
+		libapx_player[p].editor_mouse_wheel = TriggerCreate("libapx_editor_mouse_wheel");
+		TriggerAddEventMouseWheel(libapx_player[p].editor_mouse_wheel,p);
+
+	}
+	else {
+		//Reseting
+		val = StringToFixed(CatalogFieldValueGet(c_gameCatalogCamera, CatalogFieldValueGet(c_gameCatalogTerrain, GameTerrainSet(), "Camera", p), "ParamInitial[5]", p));
+		CameraSetValue(p, c_cameraValuePitch, val, 1.0, -1, 10);
+			val = StringToFixed(CatalogFieldValueGet(c_gameCatalogCamera, CatalogFieldValueGet(c_gameCatalogTerrain, GameTerrainSet(), "Camera", p), "ParamInitial[9]", p));
+		CameraSetValue(p, c_cameraValueDepthOfField, val, 1.0, -1, 10);
+			val = StringToFixed(CatalogFieldValueGet(c_gameCatalogCamera, CatalogFieldValueGet(c_gameCatalogTerrain, GameTerrainSet(), "Camera", p), "ParamInitial[4]", p));
+		CameraSetValue(p, c_cameraValueDistance, val, 1.0, -1, 10);
+			val = StringToFixed(CatalogFieldValueGet(c_gameCatalogCamera, CatalogFieldValueGet(c_gameCatalogTerrain, GameTerrainSet(), "Camera", p), "ParamInitial[12]", p));
+		CameraSetValue(p, c_cameraValueFalloffEnd, val, 1.0, -1, 10);
+			val = StringToFixed(CatalogFieldValueGet(c_gameCatalogCamera, CatalogFieldValueGet(c_gameCatalogTerrain, GameTerrainSet(), "Camera", p), "ParamInitial[11]", p));
+		CameraSetValue(p, c_cameraValueFalloffStart, val, 1.0, -1, 10);
+			val = StringToFixed(CatalogFieldValueGet(c_gameCatalogCamera, CatalogFieldValueGet(c_gameCatalogTerrain, GameTerrainSet(), "Camera", p), "ParamInitial[2]", p));
+		CameraSetValue(p, c_cameraValueFarClip, val, 1.0, -1, 10);
+			val = StringToFixed(CatalogFieldValueGet(c_gameCatalogCamera, CatalogFieldValueGet(c_gameCatalogTerrain, GameTerrainSet(), "Camera", p), "ParamInitial[0]", p));
+		CameraSetValue(p, c_cameraValueFieldOfView, val, 1.0, -1, 10);
+			val = StringToFixed(CatalogFieldValueGet(c_gameCatalogCamera, CatalogFieldValueGet(c_gameCatalogTerrain, GameTerrainSet(), "Camera", p), "ParamInitial[10]", p));
+		CameraSetValue(p, c_cameraValueFocalDepth, val, 1.0, -1, 10);
+			val = StringToFixed(CatalogFieldValueGet(c_gameCatalogCamera, CatalogFieldValueGet(c_gameCatalogTerrain, GameTerrainSet(), "Camera", p), "ParamInitial[8]", p));
+		CameraSetValue(p, c_cameraValueHeightOffset, val, 1.0, -1, 10);
+			val = StringToFixed(CatalogFieldValueGet(c_gameCatalogCamera, CatalogFieldValueGet(c_gameCatalogTerrain, GameTerrainSet(), "Camera", p), "ParamInitial[1]", p));
+		CameraSetValue(p, c_cameraValueNearClip, val, 1.0, -1, 10);
+			val = StringToFixed(CatalogFieldValueGet(c_gameCatalogCamera, CatalogFieldValueGet(c_gameCatalogTerrain, GameTerrainSet(), "Camera", p), "ParamInitial[7]", p));
+		CameraSetValue(p, c_cameraValueRoll, val, 1.0, -1, 10);
+			val = 90;
+		CameraSetValue(p, c_cameraValueYaw, val, 1.0, -1, 10);
+			val = StringToFixed(CatalogFieldValueGet(c_gameCatalogCamera, CatalogFieldValueGet(c_gameCatalogTerrain, GameTerrainSet(), "Camera", p), "ParamInitial[3]", p));
+		CameraSetValue(p, c_cameraValueShadowClip, val, 1.0, -1, 10);
+
+		cam[p] = CameraInfoDefault();
+		libapx_camera_reset(p);
+
+		//Clearing UG
+		UnitGroupAddUnitGroup(libapx_player[p].editor_pausedunits, UnitGroupSelected(p));
+		UnitGroupPauseAll(libapx_player[p].editor_pausedunits, false);
+		UnitGroupIssueOrder(libapx_player[p].editor_pausedunits, Order(AbilityCommand("stop", 0)), c_orderQueueReplace);
+		libapx_player[p].editor_pausedunits = UnitGroupEmpty();
+
+		//Disable Editor Camera
+		CameraLockInput(p, false);
+		libapx_player[p].editor_heightoffset = 0.0;
+		libapx_player[p].editor_toggled = false;
+		TriggerDestroy(libapx_player[p].editor_mouse_wheel);
+		for (i = 1; i <= PlayerGroupCount(PlayerGroupActive()); i += 1) {
+			tmp_p = PlayerGroupPlayer(PlayerGroupActive(), i);
+			if(libapx_player[tmp_p].editor_toggled) {
+				already_trigged =  true;
+				return;
+			}
+		}
+		if(!already_trigged) {
+			//If no other players have the editor camera toggled destroy the timer trigger.
+			TriggerDestroy(g_camera_updater);
+		}
+		libapx_camera_reset(p);
+	}
+}
 
 void libapx_command_camera(int user, unitgroup u, string argv, int spawningCount, string bracketText) {
 	string s;
 	string paremVal;
 	fixed time;
 	fixed val;
-
 	const string cameraProperties = "AngleOfAttack, DepthOfField, Distance, FalloffEnd, FalloffStart, FarClip, FieldOfView, FocalDepth, HeightOffset, NearClip, Roll, Rotation, ShadowClip";
-
+	int targetp;
 	s = StringWord( argv, 2 );
 	paremVal = StringWord(argv, 3);
 	if(StringWord(argv, 4) == "" || StringToFixed(StringWord(argv, 4)) < 0) {
@@ -186,7 +353,18 @@ void libapx_command_camera(int user, unitgroup u, string argv, int spawningCount
 	if(s == "") {
 		return;
 	}
-
+	if(StringEqual(s, "editor", false)) {
+		if(paremVal == "on") {
+			libapx_enable_editor_camera(user, true);
+			libapx_print_output(user, "<c val=\"00ff00\">Enabling Editor Camera</c><n/>");
+			libapx_print_output(user, "Use the [RightMouseButton]+[Mouse] to pan the camera. Use [Ctrl]+[Mouse] to orbit the camera. Use [Alt]+[MouseWheel] to change the height of the camera. Use [MouseWheel] to zoom the camera.  The camera disable your ability to control units unless you hold [Tilde].");
+		}
+		else {
+			libapx_enable_editor_camera(user, false);
+			libapx_print_output(user, "<c val=\"00ff00\">Disabling Editor Camera</c><n/>");
+		}
+		return;
+	}
 	if(StringEqual(s, "properties", false)) {
 		libapx_print_output(user, "<c val=\"00ff00\">Camera properties:</c><n/>" + cameraProperties);
 		return;
@@ -226,7 +404,16 @@ void libapx_command_camera(int user, unitgroup u, string argv, int spawningCount
 
 		return;
 	}
+	if(StringEqual(s, "Match", false) ) {
+		targetp = libapx_color_to_player( StringCase( paremVal, false ));
+		if( targetp == -1 ) {
+			libapx_print_error(user, "Invalid player");
+			return;
+		}
+		libapx_print_text(PlayerGroupSingle(user), StringToText("Camera matching ") + libapx_player_name_colored(targetp) + StringToText("'s properties now."));
 
+
+	}
 	if(StringEqual(s, "AngleOfAttack", false) ) {
 		if(paremVal == "") {
 			val = StringToFixed(CatalogFieldValueGet(c_gameCatalogCamera, CatalogFieldValueGet(c_gameCatalogTerrain, GameTerrainSet(), "Camera", EventPlayer()), "ParamInitial[5]", EventPlayer()));
@@ -375,6 +562,79 @@ void libapx_command_camera(int user, unitgroup u, string argv, int spawningCount
 		return;
 	}
 }
+void libapx_define_camera(string command_name) {
+	commands_guide_entry_set(
+		g_commands_guide_entry_general, 
+		command_name, 
+		" This command changes the players camera. <br> The properties it can use are AngleOfAttack, DepthOfField, Distance, FalloffEnd, FalloffStart, FarClip, FieldOfView, FocalDepth, HeightOffset, NearClip, Roll, Rotation, ShadowClip, and editor <br> _camera [property/reset] <br> Examples: _camera roll 90 <br> _camera reset <br> _camera editor on (This enables an entirely new camera)");
+}
+
+
+//libapx_command_upgrade
+void libapx_command_upgrade(int user, unitgroup u, string argv, int spawningCount, string bracketText)
+{
+    string upgrade = StringWord(argv, 2);
+    string nextParam = StringCase(StringWord(argv, 3), false);
+    int player = EventPlayer();
+    unitgroup g;
+    int curLevel;
+    int newLevel;
+    upgrade = libapx_param_catalog(c_gameCatalogUpgrade, upgrade);
+    if(upgrade == null)
+    {
+        libapx_print_output(user, "<c val=\"ff0000\">Unable to modify upgrade</c>: That upgrade does not exists.");
+        return;
+    }
+
+        curLevel = TechTreeUpgradeCount(player, upgrade, c_techCountQueuedOrBetter);
+    newLevel = StringToInt(nextParam);
+    if (CatalogFieldValueGet(c_gameCatalogUpgrade, upgrade, "MaxLevel", player) == "1")
+    {
+
+        if(StringWord(argv, 3) == "")
+        {
+        // toggle upgrade
+            newLevel = 1;
+            if(curLevel == 1)
+            {
+                newLevel = 0;
+            }
+        }
+        else if(nextParam == "on" || nextParam == "enabled")
+        {
+            newLevel = 1;
+        }
+        else if(nextParam == "off" || nextParam == "disabled")
+        {
+            newLevel = 0;
+        }
+        else if(nextParam == "query")
+        {
+            libapx_print_output(user, "Upgrade level is at: " +
+                IntToString(curLevel));
+            return;
+        }
+        else if(nextParam != "0" && newLevel == 0)
+        {
+            libapx_print_output(user,"Usage: upgrade upgradename [on/off/query/number]");
+            return;
+        }
+    }
+		else if(nextParam == "")
+    {
+        libapx_print_output(user, "Upgrade level is at: " + IntToString(curLevel));
+        return;
+    }
+    TechTreeUpgradeAddLevel(player, upgrade, newLevel - curLevel);
+
+    return;
+}
+void libapx_define_upgrade(string command_name) {
+	commands_guide_entry_set(
+		g_commands_guide_entry_general, 
+		command_name, 
+		" This command modifies or changes the upgrades you have. <br> _upgrade upgradename [on/off/query/number] <br> Examples: <br> _upgrade TerranInfantryArmorslevel3 on <br> _upgrade TerranInfantryArmorslevel3 off ");
+}
 
 // libapx_command_info
 // ====================
@@ -386,6 +646,13 @@ void libapx_command_info(int user, unitgroup u, string argv, int spawningCount, 
 	libapx_print_output(user, "Special Thanks to: Xethyr, Dalgar, and Motive");
 	libapx_print_output(user, "Report bugs at serobliss2@gmail.com");
 }
+void libapx_define_info(string command_name) {
+	commands_guide_entry_set(
+		g_commands_guide_entry_general, 
+		command_name, 
+		" This command gives information about the engine and it's version. <br> _info <br> Examples: <br> _info ");
+}
+
 
 // libapx_command_list_commands
 // ===============
@@ -393,13 +660,24 @@ void libapx_command_info(int user, unitgroup u, string argv, int spawningCount, 
 void libapx_command_list_commands(int user, unitgroup u, string argv, int spawningCount, string bracketText) {
 	libapx_print_output(user, "LISTING GAME COMMANDS:\n" + libapx_settings.commands);
 }
-
+void libapx_define_list_commands(string command_name) {
+	commands_guide_entry_set(
+		g_commands_guide_entry_general, 
+		command_name, 
+		" This command lists all the available commands possible. <br> _commands <br> Examples: <br> _commands ");
+}
 // libapx_command_wait
 // ===============
 // creates a delay
 void libapx_command_delay(int user, unitgroup u, string argv, int spawningCount, string bracketText) {
 	fixed time = StringToFixed(StringWord(argv, 2));
 	Wait(time, c_timeGame);
+}
+void libapx_define_delay(string command_name) {
+	commands_guide_entry_set(
+		g_commands_guide_entry_general, 
+		command_name, 
+		" This command waits a given amount of time before allowing more commands to be ran. <br> _delay [time] <br> Examples: <br> @spawn marine; _delay 5 ; @attach marine head ");
 }
 
 // libapx_command_players
@@ -435,6 +713,12 @@ void libapx_command_players(int user, unitgroup u, string argv, int spawningCoun
 	}
 
 	libapx_print_text(PlayerGroupSingle(user), output);
+}
+void libapx_define_players(string command_name) {
+	commands_guide_entry_set(
+		g_commands_guide_entry_general, 
+		command_name, 
+		" This command prints out the permission level, color, and status of all the players in the game. <br> _players <br> Examples: <br> _players ");
 }
 
 // libapx_command_gamesetup
@@ -550,6 +834,12 @@ void libapx_command_gamesetup(int user, unitgroup u, string argv, int spawningCo
 		return;
 	}
 }
+void libapx_define_gamesetup(string command_name) {
+	commands_guide_entry_set(
+		g_commands_guide_entry_general, 
+		command_name, 
+		" This command allows you to save all of your units on the map and reload them at a later point. <br> _gamesetup [save/load/list/remove/removeall] [gamesetupName] <br> Examples: <br> _gamesetup save bob <br> _gamesetup list <br> _gamesetup remove bob <br> _gamesetup removeall ");
+}
 
 // libapx_command_control
 // ==================
@@ -616,6 +906,12 @@ void libapx_command_control(int user, unitgroup u, string argv, int spawningCoun
 	}
 
 	return;
+}
+void libapx_define_control(string command_name) {
+	commands_guide_entry_set(
+		g_commands_guide_entry_general, 
+		command_name, 
+		" This command allows your units to be controled by the target player. <br> _control [targetplayer] <br> Examples: <br> _control brown ");
 }
 
 // libapx_command_uncontrol
@@ -684,6 +980,12 @@ void libapx_command_uncontrol(int user, unitgroup u, string argv, int spawningCo
 
 	return;
 }
+void libapx_define_uncontrol(string command_name) {
+	commands_guide_entry_set(
+		g_commands_guide_entry_general, 
+		command_name, 
+		" This command disallows your units to be controled by the target player. <br> _uncontrol [targetplayer] <br> Examples: <br> _uncontrol brown ");
+}
 
 // libapx_command_ally
 // ==================
@@ -737,14 +1039,21 @@ void libapx_command_ally(int user, unitgroup u, string argv, int spawningCount, 
 		else {
 			libNtve_gf_SetAllianceOneWay( context, i, 1);
 			// Now check, do we have permission to modify this player's alliances, too?
-			if( user == i || libapx_player[user].permission_level > libapx_player[i].permission_level ) {
+			// Nah. Lets always be able to be friends.
+			//if( user == i || libapx_player[user].permission_level > libapx_player[i].permission_level ) {
 				libNtve_gf_SetAllianceOneWay( i, context, 1);
-			}
+			//}
 		}
 
 		i += 1;
 	}
 
+}
+void libapx_define_ally(string command_name) {
+	commands_guide_entry_set(
+		g_commands_guide_entry_general, 
+		command_name, 
+		" This command allies the player you target. This also means they ally you. <br> _ally [targetplayer] <br> Examples: <br> _ally brown ");
 }
 
 // libapx_command_unally
@@ -800,39 +1109,11 @@ void libapx_command_unally(int user, unitgroup u, string argv, int spawningCount
 	return;
 }
 
-// libapx_command_remove_player
-// ===================
-// removes all of a specific players units from the map
-void libapx_command_remove_player(int user, unitgroup u, string argv, int spawningCount, string bracketText) {
-	int target_player = libapx_color_to_player( StringCase( StringWord(libapx_player[user].chat_msg, 2), false ) ); //GET PLAYER COLOR FROM STRING.
-	unitgroup g;
-
-	if( target_player == -1 ) {
-		libapx_print_error(user, "Invalid player");
-		return;
-	}
-
-	// if target_player is not yourself or a non-user, do permissions check
-	if ( target_player != user && PlayerType(target_player) == c_playerTypeUser ) {
-		if( libapx_player[user].permission_level < libapx_PERMISSIONS_LEVEL_MOD &&
-			libapx_player[user].permission_level <= libapx_player[target_player].permission_level ) {
-			libapx_print_error(user, "You cannot remove someone of equal or greater rank than you (while not a moderator or admin)");
-			return;
-		}
-	}
-
-	// remove all of target player's units
-	g = UnitGroup( null, target_player, RegionEntireMap(), UnitFilter(0, 0, 0, 0), 0 );
-	UnitGroupLoopBegin(g);
-	while( !UnitGroupLoopDone() ) {
-		UnitRemove( UnitGroupLoopCurrent() );
-		UnitGroupLoopStep();
-	}
-	UnitGroupLoopEnd();
-
-	libapx_print_text(PlayerGroupAll(), libapx_player_name_colored(target_player) + StringToText(" has been removed by ") + libapx_player_name_colored(user));
-
-	return;
+void libapx_define_unally(string command_name) {
+	commands_guide_entry_set(
+		g_commands_guide_entry_general, 
+		command_name, 
+		" This command unallies the player you target. This also means they unally you. <br> _unally [targetplayer] <br> Examples: <br> _unally brown ");
 }
 
 // libapx_command_roll
@@ -873,7 +1154,12 @@ void libapx_command_roll(int user, unitgroup u, string argv, int spawningCount, 
 	return;
 
 }
-
+void libapx_define_roll(string command_name) {
+	commands_guide_entry_set(
+		g_commands_guide_entry_general, 
+		command_name, 
+		" This command rolls a dice or finds a random number in a given range. <br> _roll [dice/min] [max] <br> Examples: <br> _roll <br> _roll 3 5 <br> _roll 5 3 <br> _roll 5d15 ");
+}
 
 // libapx_command_search
 // ===================
@@ -905,7 +1191,6 @@ void libapx_command_search(int user, unitgroup u, string argv, int spawningCount
 		j += 1;
 
 	}
-
 
 
 
@@ -1016,7 +1301,12 @@ void libapx_command_search(int user, unitgroup u, string argv, int spawningCount
 
 	return;
 }
-
+void libapx_define_search(string command_name) {
+	commands_guide_entry_set(
+		g_commands_guide_entry_general, 
+		command_name, 
+		" This command searches a catalog for whatever keywords you give it. It prints out a set number of results that can be paged through with just typing _search again. <br> Catalogs = ability|actor|behavior|weapon|validator|upgrade|unit|turret|light|footprint|model|decal <br> _search [catalog] [keys.. <br> Examples: <br> _search actor marine <br> _search model wall ; _delay 1 ; _search <br> _search model temple wall aiur ");
+}
 // libapx_command_replace
 // ==================
 // replaces an entry in a data catalog with another entry
@@ -1122,7 +1412,12 @@ void libapx_command_replace(int user, unitgroup u, string argv, int spawningCoun
 
 	return;
 }
-
+void libapx_define_replace(string command_name) {
+	commands_guide_entry_set(
+		g_commands_guide_entry_general, 
+		command_name, 
+		" This command replaces a thing in a given catalog. <br> Catalogs = ability|actor|behavior|weapon|validator|upgrade|unit|turret|light|footprint|model|decal <br> _replace [catalog] [source] [replacement] <br> Examples: <br> _replace model marine marauder ;@spawn marine  ");
+}
 // 	libapx_command_minerals
 // 	libapx_command_gas
 // 	libapx_command_terrazine
@@ -1137,6 +1432,12 @@ void libapx_command_minerals(int user, unitgroup u, string argv, int spawningCou
     PlayerModifyPropertyInt( user, c_playerPropMinerals, c_playerPropOperAdd, param );
     return;
 }
+void libapx_define_minerals(string command_name) {
+	commands_guide_entry_set(
+		g_commands_guide_entry_general, 
+		command_name, 
+		" This command sets your minerals amount. <br> _minerals [amount] <br> Examples: <br> _minerals 1000 ");
+}
 void libapx_command_gas(int user, unitgroup u, string argv, int spawningCount, string bracketText) {
     int param = StringToInt(StringWord(libapx_player[user].chat_msg, 2));
     if(param == 0) {
@@ -1144,6 +1445,12 @@ void libapx_command_gas(int user, unitgroup u, string argv, int spawningCount, s
     }
     PlayerModifyPropertyInt( user, c_playerPropVespene, c_playerPropOperAdd, param );
     return;
+}
+void libapx_define_gas(string command_name) {
+	commands_guide_entry_set(
+		g_commands_guide_entry_general, 
+		command_name, 
+		" This command sets your gas amount. <br> _gas [amount] <br> Examples: <br> _gas 1000 ");
 }
 void libapx_command_terrazine(int user, unitgroup u, string argv, int spawningCount, string bracketText) {
     int param = StringToInt(StringWord(libapx_player[user].chat_msg, 2));
@@ -1153,16 +1460,15 @@ void libapx_command_terrazine(int user, unitgroup u, string argv, int spawningCo
     PlayerModifyPropertyInt( user, c_playerPropTerrazine, c_playerPropOperAdd, param );
     return;
 }
-
-// libapx_command_supply
-// ===================
-// Sets the player's built supply to a value (default 200)
-void libapx_define_super(string command_name) {
+void libapx_define_terrazine(string command_name) {
 	commands_guide_entry_set(
 		g_commands_guide_entry_general, 
 		command_name, 
-		" A debug command. <br>  ");
+		" This command sets your terrazine amount. <br> _terrazine [amount] <br> Examples: <br> _terrazine 1000 ");
 }
+// libapx_command_supply
+// ===================
+// Sets the player's built supply to a value (default 200)
 void libapx_command_supply(int user, unitgroup u, string argv, int spawningCount, string bracketText) {
     int param = StringToInt(StringWord(libapx_player[user].chat_msg, 2));
     if(param == 0) {
@@ -1171,6 +1477,13 @@ void libapx_command_supply(int user, unitgroup u, string argv, int spawningCount
     PlayerModifyPropertyInt( user, c_playerPropSuppliesMade, c_playerPropOperSetTo, param );
     return;
 }
+void libapx_define_supply(string command_name) {
+	commands_guide_entry_set(
+		g_commands_guide_entry_general, 
+		command_name, 
+		" This command sets your max supply. <br> _supply [amount] <br> Examples: <br> _supply 250 ");
+}
+
 // SuperCommand
 // ===================
 // Test of Phandle
@@ -1242,7 +1555,12 @@ void libapx_command_super(int user, unitgroup u, string argv, int spawningCount,
 
 	return;
 }
-
+void libapx_define_super(string command_name) {
+	commands_guide_entry_set(
+		g_commands_guide_entry_general, 
+		command_name, 
+		" A debug command. <br>  ");
+}
 // libapx_command_zoom
 // =================
 // Zooms out a player's camera (max distance: 128)
@@ -1263,39 +1581,12 @@ void libapx_command_zoom(int user, unitgroup u, string argv, int spawningCount, 
 	}
 	return;
 }
-
-// libapx_command_light
-// ==================
-// Changes the map's lighting over a specified period of time
-// if no light is specified, defaults to map terrain's lighting
-void libapx_command_light(int user, unitgroup u, string argv, int spawningCount, string bracketText) {
-	string light = StringWord(libapx_player[user].chat_msg, 2);
-	fixed blend_time = StringToFixed(StringWord(libapx_player[user].chat_msg, 3));
-
-	if( libapx_player[user].permission_level < libapx_PERMISSIONS_LEVEL_MOD  ) {
-		libapx_print_error(user, "Only moderators or admins can change the light");
-		return;
-	}
-
-	if(light == "") { // get default lighting for terrain set
-		light = CatalogFieldValueGet(c_gameCatalogTerrain,  GameTerrainSet(), "Lighting", user);
-	}
-
-	light = libapx_catalog_get(c_gameCatalogLight, light);
-	if(light == null) {
-		libapx_print_error(user, "<c val=\"ff0000\">Unable to change lighting</c>: No such light exists.");
-		return;
-	}
-
-	if(StringWord(libapx_player[user].chat_msg, 3) == "") {
-		blend_time = 2;
-	}
-
-	GameSetLighting(light, blend_time);
-
-	return;
+void libapx_define_zoom(string command_name) {
+	commands_guide_entry_set(
+		g_commands_guide_entry_general, 
+		command_name, 
+		" This command sets a players zoom level. <br> _zoom [distance] <br> Examples: <br> _zoom 128 <br> _zoom 5 ");
 }
-
 
 //libapx_get_playerhandle
 //======================
@@ -1309,7 +1600,12 @@ void libpax_command_get_playerhandle(int user, unitgroup u, string argv, int spa
 	libapx_print_output(user,  player_handle);
 	return;
 }
-
+void libapx_define_get_playerhandle(string command_name) {
+	commands_guide_entry_set(
+		g_commands_guide_entry_general, 
+		command_name, 
+		" This command displays a persons player handle to you. <br> _handle [playercolor] <br> Examples: <br> _handle red ");
+}
 
 //libapx_relink
 //======================
@@ -1319,7 +1615,12 @@ void libpax_command_relink(int user, unitgroup u, string argv, int spawningCount
 	libapx_print_output(user, "Heres the link ya wanted! <c val=\"ff0000 \">https://discord.gg/mPcjgX5</c>");
 	return;
 }
-
+void libapx_define_relink(string command_name) {
+	commands_guide_entry_set(
+		g_commands_guide_entry_general, 
+		command_name, 
+		" This command displays the link to the Official Starcraft2 Roleplay Discord server. Come join us! <br> _relink <br> Examples: <br> _relink ");
+}
 
 // libapx_command_blacklist
 // =================
@@ -1404,7 +1705,12 @@ void libapx_command_blacklist(int user, unitgroup u, string argv, int spawningCo
 
 	return;
 }
-
+void libapx_define_blacklist(string command_name) {
+	commands_guide_entry_set(
+		g_commands_guide_entry_general, 
+		command_name, 
+		" This command blacklists a player from joining a lobby where you are admin in. <br> _blacklist [add/remove/removeall/list] [player] <br> Examples: <br> _blacklist add purple <br> _blacklist remove purple <br> _blacklist list <br> _blacklist removeall ");
+}
 
 // libapx_command_showterrain
 // ===================
@@ -1416,18 +1722,24 @@ void libapx_command_showterrain(int user, unitgroup u, string argv, int spawning
 	string param = StringWord(argv, 2);
 	string state = StringWord(argv, 3);
 	region r;
+	point position = Point(
+		StringToFixed(StringWord(argv, 4)),
+		StringToFixed(StringWord(argv, 5))
+	);
 	if( param == "" ) { // no input param,
-		libapx_print_output(user, "Command syntax: <c val=\"1abc9c\">_showterrain</c> [#region]/[radius] on/off");
+		libapx_print_output(user, "Command syntax: <c val=\"1abc9c\">_showterrain</c> [#region]/[radius] on/off [posX] [posY]");
 		return;
 	}
 
-	// get the region of interest
 	if( StringSub(param, 1, 1) == "#" ) { // if input param begins with #, assume it is a region
 		r = libapx_region( StringSub(param, 2, StringLength(param)), user );
 		if( r == null ) {
 			libapx_print_error(user, "Region " + StringSub(param, 2, StringLength(param)) + " does not exist.");
 			return;
 		}
+	}
+	else if(StringWord(argv,4) != "") {
+		r = RegionCircle(position, StringToFixed(param));
 	}
 	else {
 		r = RegionCircle(libapx_player[user].mouse_position, StringToFixed(param));
@@ -1442,7 +1754,12 @@ void libapx_command_showterrain(int user, unitgroup u, string argv, int spawning
 	}
 	return;
 }
-
+void libapx_define_showterrain(string command_name) {
+	commands_guide_entry_set(
+		g_commands_guide_entry_general, 
+		command_name, 
+		" This command turns the terrain cells a region or radius on or off. (Invisible or visible) <br> _showterrain [on/off] [radius/region] [posX] [posY] <br> Examples: <br> _showterrain 15 off <br>  _showterrain 15 off <br> 50 50 #create myregion 15;_showterrain #myregion off ");
+}
 
 // libapx_command_doodads
 // ===================
@@ -1453,12 +1770,18 @@ void libapx_command_showterrain(int user, unitgroup u, string argv, int spawning
 void libapx_command_doodads(int user, unitgroup u, string argv, int spawningCount, string bracketText) {
 	string param = StringWord(libapx_player[user].chat_msg, 2);
 	string state = StringWord(libapx_player[user].chat_msg, 3);
+	point position = Point(
+		StringToFixed(StringWord(argv, 4)),
+		StringToFixed(StringWord(argv, 5))
+	);
 	region r;
 
+	
 	if( param == "" ) { // no input param,
-		libapx_print_output(user, "Command syntax: <c val=\"1abc9c\">_doodads</c> [#region]/[radius] on/off");
+		libapx_print_output(user, "Command syntax: <c val=\"1abc9c\">_doodads</c> [#region]/[radius] on/off [posX] [posY]");
 		return;
 	}
+
 
 	// get the region of interest
 	if( StringSub(param, 1, 1) == "#" ) { // if input param begins with #, assume it is a region
@@ -1468,7 +1791,9 @@ void libapx_command_doodads(int user, unitgroup u, string argv, int spawningCoun
 			return;
 		}
 	}
-
+	else if(StringWord(argv,4) != "") {
+		r = RegionCircle(position, StringToFixed(param));
+	}
 	else {
 		r = RegionCircle(libapx_player[user].mouse_position, StringToFixed(param));
 	}
@@ -1492,7 +1817,12 @@ void libapx_command_doodads(int user, unitgroup u, string argv, int spawningCoun
 
 	return;
 }
-
+void libapx_define_doodads(string command_name) {
+	commands_guide_entry_set(
+		g_commands_guide_entry_general, 
+		command_name, 
+		" This command turns the doodads in a region or radius on or off. <br> _doodads [on/off] [radius/region] [posX] [posY] <br> Examples: <br> _doodads 15 off <br> _doodads 15 off 50 50 <br> #create myregion 15;_doodads #myregion off ");
+}
 // libapx_command_event
 // ===================
 // Prototype trigger event creation proof of concept:
@@ -1568,7 +1898,12 @@ void libapx_command_event(int user, unitgroup u, string argv, int spawningCount,
 	// stop player from further chat parsing
 	libapx_player[user].done_parsing = true;
 }
-
+void libapx_define_event(string command_name) {
+	commands_guide_entry_set(
+		g_commands_guide_entry_general, 
+		command_name, 
+		" A debug command. <br>  ");
+}
 
 // libapx_command_sound
 //  ===================
@@ -1576,7 +1911,12 @@ void libapx_command_event(int user, unitgroup u, string argv, int spawningCount,
 void libapx_command_sound(int user, unitgroup u, string argv, int spawningCount, string bracketText) {
 
 }
-
+void libapx_define_sound(string command_name) {
+	commands_guide_entry_set(
+		g_commands_guide_entry_general, 
+		command_name, 
+		" will do stuff  ");
+}
 
 // libapx_command_camerapan
 //  ===================
@@ -1590,4 +1930,10 @@ void libapx_command_camerapan(int user, unitgroup u, string argv, int spawningCo
 	target = Point(StringToFixed(StringWord(argv, 3)), StringToFixed(StringWord(argv, 4)));
 
 	CameraPan(user, target, duration, 0, 1, true);
+}
+void libapx_define_camerapan(string command_name) {
+	commands_guide_entry_set(
+		g_commands_guide_entry_general, 
+		command_name, 
+		" This command moves your camera to a given position. <br> _camera [x] [y] [duration] <br> Examples: <br> _camerapan 125 50 3  ");
 }

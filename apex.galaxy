@@ -12,20 +12,25 @@ include "apex/ui/ui.galaxy"
 include "apex/toolkit/toolkit.galaxy"
 
 // welcome message
-const string libapx_SPLASH_MESSAGE = "Welcome to Apex Roleplay Engine. Type \"_commands\" to get started!";
+static string[7] libapx_inspirational_quotes;
 
 void libapx_initialize() {
-	
+	int i = RandomInt(0,6);
 	libapx_toolkit_initialize();
 	libapx_engine_initialize();
 	libapx_commands_initialize();
 	libapx_ui_initialize();
+	libapx_inspirational_quotes[0] = " Be inspired. This engine can do almost anything you could want! ";
+	libapx_inspirational_quotes[1] = " Don't always be a passive roleplayer. Have your character be proactive and go to people instead of waiting about for someone to come to you. ";
+	libapx_inspirational_quotes[2] = " Cooperate and be considerate of what others want while roleplaying. Try your best to make everyone in the roleplay satisfied with their experience. ";
+	libapx_inspirational_quotes[3] = " Don't constrict others. Roleplayers and creators alike don't like having their freedom constricted, don't force your desires onto others unless they're being harmfull to the roleplay. ";
+	libapx_inspirational_quotes[4] = " Don't know something? Are you looking to do what that person just did but it isn't in the commands guide or references? Come to the discord and pose your question, someone will know how to do it. ";
+	libapx_inspirational_quotes[5] = " If you're new be public about it. Come join us on discord and we'll make your time in Apex easier. ";
+	libapx_inspirational_quotes[6] = " Help the new players. A good and welcoming community is only possible if most will it. Don't drag everyone down. ";
 
 
 
-
-
-	libapx_print(PlayerGroupAll(), "Welcome to <c val=\"ff0000\"> Apex Roleplaying</c> version Apex Engine v" + IntToString(libapx_BUILD_VERSION) + "." + IntToString(libapx_BUILD_SUB_VERSION) + libapx_BUILD_VERSION_MODIFIER + ".</n> Join the community on the reddit  <c val=\"3498db\">https://www.reddit.com/r/StarCraftRP/></c> or more preferably join us on the discord to discuss the engine, create private lobbies, and much more! <c val=\"3498db\">https://discord.gg/mPcjgX5></c> </n> Type <c val=\"3498db\"> _relink </c> to get the link again.");
+	libapx_print(PlayerGroupAll(), "Welcome to the <c val=\"ff0000\"> Apex Roleplaying Engine</c> created by Serobliss. " + libapx_inspirational_quotes[i]);
 
 
 

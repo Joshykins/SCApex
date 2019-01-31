@@ -32,7 +32,7 @@ bool libapx_mouse_moved(bool testConds, bool runActions) {
 	}
 	// update mouse in UI position:
 	libapx_player[EventPlayer()].mouse_position_ui = Point(EventMouseMovedPosXUI(), EventMouseMovedPosYUI());
-
+	
 	return true;
 }
 

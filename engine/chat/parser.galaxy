@@ -235,11 +235,10 @@ void libapx_chat_parse(string msg, int player, unitgroup target, int spawningCou
 	int i;
 	string current_temp;
 
-
+	
 	libapx_command_type func; // command ref test
 	libapx_chat_parse_increment();
 	libapx_player_parser[player][spawningCount].context = target; //Sets Target of cmd
-
 
 
 	// manual interrupt flag to stop parsing, intialize as false
@@ -294,6 +293,7 @@ void libapx_chat_parse(string msg, int player, unitgroup target, int spawningCou
 				else {
 					current = libapx_string_trim( StringSub(msg, 1, semicolon_index - 1) );
 					msg = StringSub( msg, semicolon_index + 1, StringLength(msg));
+					
 					break;
 				}
 			}
@@ -325,7 +325,7 @@ void libapx_chat_parse(string msg, int player, unitgroup target, int spawningCou
 					current_temp = StringReplace(current_temp, "", pairStart, pairEnd);
 
 
-//>chance 1/2 [bob] [bpb2]
+			//>chance 1/2 [bob] [bpb2]
 
 				}
 				else {

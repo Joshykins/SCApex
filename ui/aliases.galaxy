@@ -28,6 +28,7 @@ static string libapx_alias_insert_in_list(string list, string alias) {
 
 //Dialog for aliases
 int libapx_ui_aliases;
+int libapx_ui_aliases_exit;
 static string[libapx_MAX_PLAYERS]  searchQuery;
 
 //Dialog Control Items
@@ -50,37 +51,40 @@ void libapx_ui_aliases_init() {
 
 
   //Main Dialog init
-  libapx_ui_aliases = libapx_create_dialog(600, 600, c_anchorRight, 60, -100);
+  libapx_ui_aliases = libapx_create_dialog(650, 700, c_anchorTopLeft, libapx_ui_panel_spacing, 0);
+  libapx_ui_aliases_exit = libapx_create_dialog_close_btn(libapx_ui_aliases, 650, 700, c_anchorTopLeft, libapx_ui_panel_spacing, 0);
 
-  //Title
-	libapx_create_dialog_label(libapx_ui_aliases, 250, 40, c_anchorTop, -200, 4, "Alias List", libapx_UI_HEADER2);
+  //Title for page
+  libapx_create_dialog_title(libapx_ui_aliases , 300, 40, 00, 40, "Alias Editor", libapx_UI_HEADER1,  180);
+  //Title For List
+	libapx_create_dialog_label(libapx_ui_aliases, 250, 40, c_anchorTop, -200, 84, "Alias List", libapx_UI_HEADER2);
   //SearchTitle
-	libapx_create_dialog_label(libapx_ui_aliases, 250, 40, c_anchorTop, -200, 437, "Search", libapx_UI_HEADER2);
+	libapx_create_dialog_label(libapx_ui_aliases, 250, 40, c_anchorTop, -200, 517, "Search", libapx_UI_HEADER2);
   //Key Title
-	libapx_create_dialog_label(libapx_ui_aliases, 250, 40, c_anchorTop, -200, 485, "Key Value", libapx_UI_HEADER2);
+	libapx_create_dialog_label(libapx_ui_aliases, 250, 40, c_anchorTop, -200, 565, "Key Value", libapx_UI_HEADER2);
   //keyvalue
-  libapx_ui_aliases_key = libapx_create_dialog_editbox(libapx_ui_aliases, 270, 50, c_anchorTopLeft, 190, 480);
-  libapx_ui_aliases_key_btn = libapx_create_dialog_btn(libapx_ui_aliases, 50, 50, c_anchorTopLeft, 490, 480, "Set Alias", "" );
-  libapx_ui_aliases_key_btn_remove = libapx_create_dialog_btn(libapx_ui_aliases, 50, 50, c_anchorTopLeft, 540, 480, "Remove Alias", "" );
+  libapx_ui_aliases_key = libapx_create_dialog_editbox(libapx_ui_aliases, 270, 50, c_anchorTopLeft, 215, 560);
+  libapx_ui_aliases_key_btn = libapx_create_dialog_btn(libapx_ui_aliases, 50, 50, c_anchorTopLeft, 515, 560, "Set Alias", "" );
+  libapx_ui_aliases_key_btn_remove = libapx_create_dialog_btn(libapx_ui_aliases, 50, 50, c_anchorTopLeft, 565, 560, "Remove Alias", "" );
 	libapx_create_dialog_btn_icon(libapx_ui_aliases, libapx_ui_aliases_key_btn, 40, 40, libapx_UI_ICON_GO);
 	libapx_create_dialog_btn_icon(libapx_ui_aliases, libapx_ui_aliases_key_btn_remove, 40, 40, libapx_UI_ICON_X);
   //value
-  libapx_ui_aliases_val = libapx_create_dialog_editbox(libapx_ui_aliases, 580, 50, c_anchorTopLeft, 10, 530);
+  libapx_ui_aliases_val = libapx_create_dialog_editbox(libapx_ui_aliases, 580, 50, c_anchorTopLeft, 25, 610);
 
   //search
-  libapx_ui_aliases_search = libapx_create_dialog_editbox(libapx_ui_aliases, 270, 50, c_anchorTopLeft, 190, 430);
-  libapx_ui_aliases_search_reset = libapx_create_dialog_btn(libapx_ui_aliases, 50, 50, c_anchorTopLeft, 540, 430, "Reset List", "" );
-  libapx_ui_aliases_search_btn = libapx_create_dialog_btn(libapx_ui_aliases, 50, 50, c_anchorTopLeft, 490, 430, "Search Bank", "" );
+  libapx_ui_aliases_search = libapx_create_dialog_editbox(libapx_ui_aliases, 270, 50, c_anchorTopLeft, 215, 510);
+  libapx_ui_aliases_search_reset = libapx_create_dialog_btn(libapx_ui_aliases, 50, 50, c_anchorTopLeft, 565, 510, "Reset List", "" );
+  libapx_ui_aliases_search_btn = libapx_create_dialog_btn(libapx_ui_aliases, 50, 50, c_anchorTopLeft, 515, 510, "Search Bank", "" );
 
 	libapx_create_dialog_btn_icon(libapx_ui_aliases, libapx_ui_aliases_search_btn, 40, 40, libapx_UI_ICON_SEARCH);
 	libapx_create_dialog_btn_icon(libapx_ui_aliases, libapx_ui_aliases_search_reset, 40, 40, libapx_UI_ICON_RESET);
 
 
   //alias List Dialog(keyvalue)
-  libapx_ui_aliases_list_key = libapx_create_dialog_list(libapx_ui_aliases, 230, 400, c_anchorTopLeft, 10, 32);
+  libapx_ui_aliases_list_key = libapx_create_dialog_list(libapx_ui_aliases, 230, 400, c_anchorTopLeft, 25, 112);
 
   //alias Output Dialog(pair)
-  libapx_ui_aliases_list_output = libapx_create_dialog_list(libapx_ui_aliases, 340, 400, c_anchorTopRight, 10, 32);
+  libapx_ui_aliases_list_output = libapx_create_dialog_list(libapx_ui_aliases, 340, 400, c_anchorTopRight, 25, 112);
 
   //Triggers for search
 	TriggerAddEventDialogControl(TriggerCreate("libapx_ui_aliases_filter"), c_playerAny, libapx_ui_aliases_search_btn, c_triggerControlEventTypeClick);

@@ -1,0 +1,88 @@
+//=========================================================
+//		Apex Roleplaying Engine
+//		Copyright (c) 2019, Apex Group
+//=========================================================
+// This software is distributed under the MIT License:
+// <http://opensource.org/licenses/MIT>
+//=========================================================
+
+//Base panel
+int libapx_ui_unitname;
+
+//Displayed
+static const int main_height =  2000;
+static const int main_width = 560;
+//
+static int[16] current_name;
+static int[16] current_subtitle;
+
+void libapx_ui_unitname_init() {
+    int btn;
+    libapx_ui_unitname = libapx_create_dialog(main_width, main_height, c_anchorTopRight, -10, -50);
+
+    //Make Bar
+    btn = libapx_create_dialog_btn_invis(libapx_ui_unitname, main_width-100, 2, c_anchorTop, 0, 130, "", "");
+    libapx_create_dialog_btn_icon(libapx_ui_unitname, btn, main_width-100, 2, "Asset\\Textures\\flare_aiurcompletenebula01_dirtlylensflare_whitebox.dds");
+
+}
+void libapx_ui_unitname_unit_player(int p) {
+
+}
+static void show_for_player(int p, int dialog) {
+    int i;
+    int tmp_player;
+    for (i = 1; i <= PlayerGroupCount(PlayerGroupActive()); i += 1) {
+        tmp_player = PlayerGroupPlayer(PlayerGroupActive(), i);
+        if(tmp_player != p) {
+            
+            DialogControlSetVisible(dialog, PlayerGroupSingle(tmp_player), false);
+        } 
+    }
+}
+//Call this when you wish to update the ui. For isntance if you do an @rename
+void libapx_ui_unitname_update(int p) {
+    string name;
+    string description;
+    unitgroup ug = UnitGroupSelected(p);
+    if(UnitGroupCount(ug, c_unitCountAll) < 1) {
+        name = " <c val=\"ff0000\">Nothing Selected</c> ";
+        description = "";
+    }
+    else {
+        //Lets display the first unit in the ug, cuz we can't display them all lul.
+        name = libapx_unitname_get(UnitGroupUnit(ug, 1));
+        description = libapx_subtitle_get(UnitGroupUnit(ug, 1));
+    }
+
+    DialogControlDestroy(current_name[p]);
+    DialogControlDestroy(current_subtitle[p]);
+
+    DialogControlDestroy(libapx_player[p].unit_display_name);
+    DialogControlDestroy(libapx_player[p].unit_display_subtitle);
+    if(libapx_player[p].name_display) {
+        libapx_player[p].unit_display_name = libapx_create_dialog_label(g_libapx_ui_name , 420, 40, c_anchorTop, 00, 10, name, libapx_UI_HEADER1);
+        libapx_player[p].unit_display_subtitle = libapx_create_dialog_label(g_libapx_ui_name , 420, 60, c_anchorTop, 00, 50, description, libapx_UI_HEADER4);
+    }
+
+    current_name[p] = libapx_create_dialog_label(
+        libapx_ui_unitname,   //btn (const)
+        main_width-100,                //Width 
+        30,                     //Height
+        c_anchorTop,        //Anchor (const)
+        0,                    //x-off
+        80,                    //y-off
+        //Content
+        name,
+        libapx_UI_HEADER1);  
+
+    current_subtitle[p] = libapx_create_dialog_label(
+        libapx_ui_unitname,   //btn (const)
+        main_width-100,                //Width-offsetleft-offsetright
+        main_height-180,                     //Height
+        c_anchorTop,        //Anchor (const)
+        0,                    //x-off
+        130,                    //y-off
+        //Content
+        description,
+        libapx_UI_HEADER4);     //style
+}

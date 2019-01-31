@@ -81,18 +81,12 @@ static void libapx_apply_actormsg(unitgroup g, string target, string argv, strin
 //
 // TODO: convert to new generalized amsg target system?
 void libapx_command_actormessage(int user, unitgroup u, string argv, int spawningCount, string bracketText) {
-
-
 	unitgroup g = u;
 	string target = StringWord( argv, 2);
 	bool target_scope_global = false;
 	string amsg;
 	int amsg_start_word_index = 1;
 	int amsg_start_index;
-
-
-
-
 	unitgroup p = u;
 	int colcheker = 1;
 	bool colFlag = false;
@@ -107,18 +101,6 @@ void libapx_command_actormessage(int user, unitgroup u, string argv, int spawnin
 		}
 		colcheker = colcheker + 1;
 	}
-
-
-
-
-
-
-
-
-
-
-
-
 	if(target == "") {
 		return;
 	}
@@ -926,11 +908,14 @@ void libapx_command_attach(int user, unitgroup u, string argv, int spawningCount
 	string actormsg;
 	string attachPoints = "Origin Center Damage Engine Hardpoint Head Hit Overhead RallyPoint StatusBar Left Right Target Turret TurretY TurretZ Upgrade Weapon WeaponLeft WeaponRight Left Right";
 	string target = libapx_ACTOR_REF_MAIN;
-
-
-	//Colossus Check
 	unitgroup p = u;
 	int colcheker = 1;
+	bool nocache;
+	if( StringFind(argv, "-nocache" ,c_stringNoCase) != -1 ) {
+		argv =  StringReplaceWord(argv, "-nocache", "", 1, c_stringNoCase);
+		libapx_print_output(user, argv);
+		nocache = true;
+	}
 	while (StringWord(argv, colcheker) != "") {
 		if(StringFind(StringWord(argv, colcheker), "colossus", c_stringNoCase) != -1 ) {
 				UnitGroupLoopBegin(p);
@@ -942,13 +927,7 @@ void libapx_command_attach(int user, unitgroup u, string argv, int spawningCount
 		}
 		colcheker = colcheker + 1;
 	}
-
-
-
-
 	libapx_waitDelay(user);
-
-
 	// get actor reference target
 	if( libapx_has_actor_ref(StringWord(argv, 2)) ) {
 		target = StringWord(argv, 2);
@@ -1119,7 +1098,9 @@ void libapx_command_attach(int user, unitgroup u, string argv, int spawningCount
 
 			// TODO: need to generalize actors that shouldnt update cache
 			if(!StringContains(actr, "TalkIcon", c_stringAnywhere, c_stringNoCase)) {
-				libapx_unit_cache_update(UnitGroupLoopCurrent(), "@attach", argv);
+				if(!nocache) {
+					libapx_unit_cache_update(UnitGroupLoopCurrent(), "@attach", argv);
+				}
 			}
 			UnitGroupLoopStep();
 		}
@@ -1140,7 +1121,7 @@ void libapx_define_attach(string command_name) {
 	commands_guide_entry_set(
 	 	g_commands_guide_entry_actor, 
 		command_name, 
-		" This command attaches an actor to another actor. It is compatible with target. <br> @attach ->[target] [actor] [point] [x] [y] [z] -r [x] [y] [z]  <br> To Note: The x y z after -r is largely depreciated and now replaced by @rotation and it's functionality.  <br> You can find a list of actors to attach with _ search actor [name] <br> You can find a list of valid attachpoints with @attach listpoints  <br> You can check what points on a model with @checkpoints <br> the first [x] [y] [z] is how you attach a model with an offset <br>Examples: <br>(This would attach the actor 3 units ahead of where you attach.) <br>@attach marine origin 0 -3 0 <br>  (This would attach above where you attach) <br> @attach marine origin 0 0 4 <br>(This would go above and ahead of what you attach) <br> @attach marine origin 0 -3 5 <br> @target 123;@attach marine overhead;@attach ->123 marauder weapon 0 -3 "
+		" This command attaches an actor to another actor. It is compatible with target. <br> @attach ->[target] [actor] [point] [x] [y] [z] -r [x] [y] [z]  <br> To Note: The x y z after -r is largely depreciated and now replaced by @rotation and it's functionality.  <br> You can find a list of actors to attach with _ search actor [name] <br> You can find a list of valid attachpoints with @attach listpoints  <br> You can check what points on a model with @checkpoints <br> the first [x] [y] [z] is how you attach a model with an offset <br> -nocache can be used with this command to stop it from caching in a unit's caches. <br> Examples: <br> (This would attach the actor 3 units ahead of where you attach.) <br> @attach marine origin 0 -3 0 <br>  (This would attach above where you attach) <br> @attach marine origin 0 0 4 <br> (This would go above and ahead of what you attach) <br> @attach marine origin 0 -3 5 <br> @target 123;@attach marine overhead;@attach ->123 marauder weapon 0 -3 "
 	);
 }
 
@@ -1165,6 +1146,11 @@ void libapx_command_attach_rotation(int user, unitgroup u, string argv, int spaw
 	int i;
 	int j;
 	string temp;
+	bool nocache;
+	if(StringFind( argv, "-nocache",c_stringNoCase) != -1) {
+		argv =  StringReplaceWord(argv, "-nocache", "", 1, c_stringNoCase);
+		nocache = true;
+	}
 	//Remove, and check for, modifiers.
 	if( StringFind(argv, "-ypr", c_stringNoCase) != -1 ) {
 		mod_ypr = true;
@@ -1237,7 +1223,10 @@ void libapx_command_attach_rotation(int user, unitgroup u, string argv, int spaw
 			}
 		}
 		for (j = 1; j <= UnitGroupCount(u, c_unitCountAll); j += 1) {
-			libapx_unit_cache_update(UnitGroupUnit(u, j), "@rotation", argv);
+			if(!nocache) {
+				libapx_unit_cache_update(UnitGroupUnit(u, j), "@rotation", argv);
+			}
+
 		}
 
 
@@ -1251,7 +1240,7 @@ void libapx_define_rotation(string command_name) {
 	commands_guide_entry_set(
 	 	g_commands_guide_entry_actor, 
 		command_name, 
-		" This command creates a new actor on top of what actor it is called on with a specified rotation. It is not compatible with target. <br> @rotation [modifiers] [rotations.. <br> @rotation can have it's functionality and inputs modified with two modifiers, these modifiers are <br> -b: This changes the end actor from a default actor to a Beacon_Apex actor <br> -ypr: This changes it's xyz inputs into yaw pitch roll inputs <br> Examples: <br> @rotation 30y <br> @rotation 90y 10z <br> @rotation -b 90x 35z 190y <br> @rotation -ypr 90y 32p 15r "
+		" This command creates a new actor on top of what actor it is called on with a specified rotation. It is not compatible with target. <br> @rotation [modifiers] [rotations.. <br> @rotation can have it's functionality and inputs modified with three modifiers, these modifiers are <br> -b: This changes the end actor from a default actor to a Beacon_Apex actor <br> -ypr: This changes it's xyz inputs into yaw pitch roll inputs <br> -nocache: This makes the command no longer store in the units caches. <br> Examples: <br> @rotation 30y <br> @rotation 90y 10z <br> @rotation -b 90x 35z 190y <br> @rotation -ypr 90y 32p 15r "
 	);
 }
 //Helper commands for rotation

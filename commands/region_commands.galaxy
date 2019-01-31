@@ -38,6 +38,13 @@ void libapx_command_region_create(int user, unitgroup u, string argv, int spawni
 
 	return;
 }
+void libapx_define_region_create(string command_name) {
+	commands_guide_entry_set(
+		g_commands_guide_entry_region, 
+		command_name, 
+		" This command creates a region with a given radius. <br> #create [name] [radius] <br> Examples: <br> #create bob 3 "
+	);
+}
 
 // libapx_command_region_remove
 // ==================
@@ -67,7 +74,13 @@ void libapx_command_region_remove(int user, unitgroup u, string argv, int spawni
 
 	return;
 }
-
+void libapx_define_region_remove(string command_name) {
+	commands_guide_entry_set(
+		g_commands_guide_entry_region, 
+		command_name, 
+		" This command removes a region that matches the name given. <br> #remove [name]<br> Examples: <br> #remove bob "
+	);
+}
 // libapx_command_region_removeall
 // ======================
 // removes all regions and links
@@ -101,6 +114,14 @@ void libapx_command_region_removeall(int user, unitgroup u, string argv, int spa
 
 	return;
 }
+void libapx_define_region_removeall(string command_name) {
+	commands_guide_entry_set(
+		g_commands_guide_entry_region, 
+		command_name, 
+		" This command removes all regions you have. <br> #removeall<br> Examples: <br> #removeall "
+	);
+}
+
 // libapx_command_region_list
 // ======================
 // lists a player's regions from the data table
@@ -128,7 +149,13 @@ void libapx_command_region_list(int user, unitgroup u, string argv, int spawning
 
 	return;
 }
-
+void libapx_define_region_list(string command_name) {
+	commands_guide_entry_set(
+		g_commands_guide_entry_region, 
+		command_name, 
+		" This command list all regions you have. <br> #list <br> Examples: <br> #list "
+	);
+}
 // libapx_command_region_teleport
 // =========================
 // creates a "waygate" between two regions, allowing (any) player
@@ -168,6 +195,13 @@ void libapx_command_region_teleport(int user, unitgroup u, string argv, int spaw
 	                    + " and " + libapx_region_get_public_name(rgn_2_name));
 
 	return;
+}
+void libapx_define_region_teleport(string command_name) {
+	commands_guide_entry_set(
+		g_commands_guide_entry_region, 
+		command_name, 
+		" This command connects two regions together. Allowing units to teleport between the regions. <br> #teleport [region1] [region2] <br> Examples <br> #teleport a b <br> @spawn marine ; #create a ; _delay 3 ; #create b ; #teleport a b "
+	);
 }
 
 // libapx_command_region_attach
@@ -228,4 +262,11 @@ void libapx_command_region_attach(int user, unitgroup u, string argv, int spawni
 	}
 
 	return;
+}
+void libapx_define_region_attach(string command_name) {
+	commands_guide_entry_set(
+		g_commands_guide_entry_region, 
+		command_name, 
+		" This command attaches a region to a unit. <br> #attach [regionname] <br> Examples <br> #attach a <br> @spawn marine;#create a;#attach a "
+	);
 }

@@ -28,6 +28,7 @@ static bool[libapx_MAX_PLAYERS][libapx_MAX_PLAYERS] libapx_chatlog_filter;
 
 // dialog for the chat log
 int libapx_ui_chatlog;
+int libapx_ui_chatlog_exit;
 
 // dialog controls for the chat log
 int libapx_ui_chatlog_list;
@@ -38,13 +39,15 @@ static int libapx_ui_chatlog_filter_last = 0; // last player check in filter lis
 // Creates the chat log ui panel
 void libapx_ui_chatlog_init() {
 	int i;
-	libapx_ui_chatlog = libapx_create_dialog(820, 600, c_anchorRight, 60, -150);
+	libapx_ui_chatlog = libapx_create_dialog(840, 710, c_anchorTopLeft, libapx_ui_panel_spacing, 0);
+    libapx_ui_chatlog_exit = libapx_create_dialog_close_btn(libapx_ui_chatlog, 840, 710, c_anchorTopLeft, libapx_ui_panel_spacing, 0);
 
+	libapx_create_dialog_title(libapx_ui_chatlog , 300, 40, 00, 40, "Chat Log", libapx_UI_HEADER1, 160);
 	// create the list used for chatlog messages as list items
-	libapx_ui_chatlog_list = libapx_create_dialog_list(libapx_ui_chatlog, 600, 580, c_anchorTopLeft, 10, 10);
+	libapx_ui_chatlog_list = libapx_create_dialog_list(libapx_ui_chatlog, 600, 580, c_anchorTopLeft, 20, 85);
 
 	// create "Players:" label for player filter list
-	libapx_create_dialog_label(libapx_ui_chatlog, 120, 40, c_anchorTopRight, 90, 10, "Players:", libapx_UI_HEADER3);
+	libapx_create_dialog_label(libapx_ui_chatlog, 120, 40, c_anchorTopRight, 90, 85, "Players", libapx_UI_HEADER3);
 
 	for( i = 0; i < libapx_NLOGGED_MSG; i += 1 ) {
 		TriggerAddEventGeneric(TriggerCreate("libapx_ui_chatlog_update"), libapx_EVENT_CHATLOG + IntToString(i));
@@ -55,7 +58,7 @@ void libapx_ui_chatlog_init() {
 // ===================
 // adds a player's name to the list of players to filter in the
 void libapx_ui_chatlog_init_player(int player) {
-	int checkbox = libapx_create_dialog_checkbox(libapx_ui_chatlog, 30, 30, c_anchorTopRight, 175, 50);
+	int checkbox = libapx_create_dialog_checkbox(libapx_ui_chatlog, 30, 30, c_anchorTopRight, 175, 120);
 	int playername = libapx_create_dialog_label_text(libapx_ui_chatlog, 200, 20, c_anchorTopRight, 14, 12, libapx_player_name_colored(player), libapx_UI_HEADER5);
 	DialogControlSetPositionRelative(playername, PlayerGroupAll(), c_anchorLeft, checkbox, c_anchorRight, 0, 0);
 

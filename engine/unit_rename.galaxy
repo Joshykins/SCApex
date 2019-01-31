@@ -1,0 +1,64 @@
+//=========================================================
+//		Apex Roleplaying Engine
+//		Copyright (c) 2019, Apex Group
+//=========================================================
+// This software is distributed under the MIT License:
+// <http://opensource.org/licenses/MIT>
+//=========================================================
+const string g_name_identifier =  "libapx_rename_";
+
+const string g_subtitle_identifier = "libapx_subtitle_";
+
+//Setters
+void libapx_unitname_set_entry(unit u, string name) {
+    string id = libapx_unit_id(u);
+    DataTableSetString(true, g_name_identifier + id, name);
+}
+void libapx_unitsubtitle_set_entry(unit u, string subtitle) {
+    string id = libapx_unit_id(u);
+    DataTableSetString(true, g_subtitle_identifier + id, subtitle);
+}
+//getters
+string libapx_unitname_get_entry(unit u) {
+    string id = libapx_unit_id(u);
+    return DataTableGetString(true, g_name_identifier + id);
+}
+string libapx_unitsubtitle_get_entry(unit u) {
+    string id = libapx_unit_id(u);
+    return DataTableGetString(true, g_subtitle_identifier + id);
+}
+
+
+//Formal getters
+string libapx_unitname_get(unit u) {
+    string id = libapx_unit_id(u);
+    string catalogName;
+    //check for name
+    if(DataTableValueExists(true, g_name_identifier + id)) {
+        return libapx_unitname_get_entry(u);
+    }
+    //REturn renameall
+    catalogName = CatalogFieldValueGet(c_gameCatalogUnit, UnitGetType(u), "Name", UnitGetOwner(u));
+    //Will sometimes return Unit/Name/{Units Name}
+    //Thus we check if it does and then substring if needed.
+    if(StringContains(catalogName, "Unit/Name/", c_stringAnywhere, false)) {
+        catalogName = StringSub(catalogName, 11, StringLength(catalogName));
+    }
+    return catalogName;
+}
+string libapx_subtitle_get(unit u) {
+    string id = libapx_unit_id(u);
+    string catalogName;
+    //check for name
+    if(DataTableValueExists(true, g_subtitle_identifier + id)) {
+        return libapx_unitsubtitle_get_entry(u);
+    }
+    //REturn renameall
+    catalogName = CatalogFieldValueGet(c_gameCatalogUnit, UnitGetType(u), "Subtitle", UnitGetOwner(u));
+    //Will sometimes return Unit/Name/{Units Name}
+    //Thus we check if it does and then substring if needed.
+    if(StringContains(catalogName, "UnitSubtitle/", c_stringAnywhere, false)) {
+        catalogName = StringSub(catalogName, 14, StringLength(catalogName));
+    }
+    return catalogName;
+}

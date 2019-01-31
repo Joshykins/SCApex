@@ -74,3 +74,70 @@ fixed util_parabolaCalc(point vertex, point pointGiven, fixed targetX) {
 	y = (a*xh)+PointGetY(vertex);
 	return y;
 };
+fixed util_255_to_100(fixed num) {
+	num = (100*num)/255;
+	if(num <= 0) {
+		return 0.0;
+	}
+	return num;
+}
+
+color util_hsb_to_rgb(fixed h, fixed s, fixed b) {
+	fixed rgb_r;
+	fixed rgb_g;
+	fixed rgb_b;
+	fixed t1;
+	fixed t2;
+	fixed t3;
+	fixed v;
+	h = Round(h);
+	s = Round(s * 255 / 100);
+	v = Round(b * 255 / 100);
+	if (s == 0) {
+		rgb_b = v;
+		rgb_g = rgb_b;
+		rgb_r = rgb_g;
+
+	} 
+	else {
+		t1 = v;
+		t2 = (255 - s) * v / 255;
+		t3 = (t1 - t2) * (h % 60) / 60;
+		if (h == 360){ h = 0;};
+		if (h < 60) {
+			rgb_r = t1;
+			rgb_b = t2;
+			rgb_g = t2 + t3;
+		} else if (h < 120) {
+			rgb_g = t1;
+			rgb_b = t2;
+			rgb_r = t1 - t3;
+		} else if (h < 180) {
+			rgb_g = t1;
+			rgb_r = t2;
+			rgb_b = t2 + t3;
+		} else if (h < 240) {
+			rgb_b = t1;
+			rgb_r = t2;
+			rgb_g = t1 - t3;
+		} else if (h < 300) {
+			rgb_b = t1;
+			rgb_g = t2;
+			rgb_r = t2 + t3;
+		} else if (h < 360) {
+			rgb_r = t1;
+			rgb_g = t2;
+			rgb_b = t1 - t3;
+		} else {
+			rgb_r = 0;
+			rgb_g = 0;
+			rgb_b = 0;
+		}
+	}
+	return Color(
+		util_255_to_100(rgb_r),
+		util_255_to_100(rgb_g),
+		util_255_to_100(rgb_b)
+		);
+	
+}

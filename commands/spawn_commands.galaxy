@@ -154,6 +154,13 @@ void libapx_command_spawn(int user, unitgroup u, string argv, int spawningCount,
 
 	return;
 }
+void libapx_define_region_spawn(string command_name) {
+	commands_guide_entry_set(
+		g_commands_guide_entry_unit, 
+		command_name, 
+		" This command spawns a unit or units. <br> @spawn [unitname] [amount] <br> Examples: <br> @spawn marauder 3  "
+	);
+}
 //libapx_command_spawn_plus
 void libapx_command_spawn_plus(int user, unitgroup u, string argv, int spawningCount, string bracketText) {
 	point spawn_point = libapx_player[user].mouse_position;
@@ -299,4 +306,11 @@ void libapx_command_spawn_plus(int user, unitgroup u, string argv, int spawningC
 	}
 
 	return;
+}
+void libapx_define_region_spawn_plus(string command_name) {
+	commands_guide_entry_set(
+		g_commands_guide_entry_unit, 
+		command_name, 
+		" This command spawns a unit or units on click. <br> @spawn+ [unitname] [amount] <br> Examples: <br> @spawn+ marauder <br> @spawn+ marine;@scale 3 "
+	);
 }

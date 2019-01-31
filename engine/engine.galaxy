@@ -52,7 +52,6 @@ include "apex/engine/utility/scripts.galaxy"
 // bank
 // =============
 // Contains custom functions for writing to player banks
-
 include "apex/engine/bank.galaxy"
 
 // log (chat)
@@ -99,6 +98,13 @@ include "apex/engine/regions.galaxy"
 // -> allows creation of "gamesetups" (act like game saves)
 include "apex/engine/gamesetups.galaxy"
 
+
+// unit_rename
+//===============
+// functions to handle unit renaming and subtitling
+// Stores name and subtitle to datatable to be used in ui.
+include "apex/engine/unit_rename"
+
 // events
 // =============
 // Events that require triggers to run and update things
@@ -123,9 +129,9 @@ include "apex/engine/debug.galaxy"
 
 
 // engine version
-const int libapx_BUILD_VERSION = 1;
-const int libapx_BUILD_SUB_VERSION = 5;
-const string libapx_BUILD_VERSION_MODIFIER = "";
+const int libapx_BUILD_VERSION = 2;
+const int libapx_BUILD_SUB_VERSION = 0;
+const string libapx_BUILD_VERSION_MODIFIER = ".35";
 
 void libapx_engine_initialize() {
 	int player = 1;

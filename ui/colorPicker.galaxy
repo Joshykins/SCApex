@@ -1,0 +1,223 @@
+//=========================================================
+//		Apex Roleplaying Engine
+//		Copyright (c) 2019, Apex Group
+//=========================================================
+// This software is distributed under the MIT License:
+// <http://opensource.org/licenses/MIT>
+//=========================================================
+
+//fuk keepin that writin here sOME oTHER iNDIAN d O iT
+//Dialog for color_picker
+int libapx_ui_color_picker;
+int libapx_ui_color_picker_exit;
+
+struct player_colors {
+    fixed r;
+    fixed g;
+    fixed b;
+    fixed hdr;
+};
+
+//The Color List ;o
+static int libapx_ui_red_btn;                           //Selector
+static int libapx_ui_blue_btn;                          //Selector
+static int libapx_ui_green_btn;                         //Selector
+static int libapx_ui_hdr_btn;                           //Selector
+static int total_height_of_colors = 400;                //Size of stuff
+static int base_adjust = -175;
+static int[16] libapx_ui_red_arrow;                     //hindicators
+static int[16] libapx_ui_blue_arrow;                    //hindicators
+static int[16] libapx_ui_green_arrow;                   //hindicators
+static int[16] libapx_ui_hdr_arrow;
+static player_colors[16] libapx_ui_color_selected;
+static int libapx_ui_color_editbox;                    //Edit Boxes
+static int[16] libapx_ui_applytint_checkbox;
+static bool[16] apply_tint;
+void libapx_ui_color_picker_init() {
+    int i;
+    fixed position;
+    color tmpColor;
+    fixed increment;
+    int j;
+    //Main Dialog init
+    libapx_ui_color_picker = libapx_create_dialog(600, 760, c_anchorTopLeft, libapx_ui_panel_spacing, 0);
+    libapx_ui_color_picker_exit = libapx_create_dialog_close_btn(libapx_ui_color_picker, 600, 760, c_anchorTopLeft, libapx_ui_panel_spacing, 0);
+
+    //Title
+    libapx_create_dialog_title(libapx_ui_color_picker, 300, 40, 00, 40, "Color Picker", libapx_UI_HEADER1, 170);
+
+    //RGB names
+    libapx_create_dialog_label(libapx_ui_color_picker, 80, 50, c_anchorTop, base_adjust, 90, "Red", libapx_UI_HEADER1);
+    libapx_create_dialog_label(libapx_ui_color_picker, 80, 50, c_anchorTop, base_adjust+125, 90, "Green", libapx_UI_HEADER1);
+    libapx_create_dialog_label(libapx_ui_color_picker, 80, 50, c_anchorTop, base_adjust+250, 90, "Blue", libapx_UI_HEADER1);
+    libapx_create_dialog_label(libapx_ui_color_picker, 80, 50, c_anchorTop, base_adjust+375, 90, "HDR", libapx_UI_HEADER1);
+
+    libapx_ui_red_btn = libapx_create_dialog_btn_invis(libapx_ui_color_picker, 50, total_height_of_colors , c_anchorTop, base_adjust, 160, "", "");        
+    libapx_create_dialog_btn_icon_colored(libapx_ui_color_picker, libapx_ui_red_btn, 50, total_height_of_colors, "Apex\\Assets\\Textures\\RedRange.png", Color(100,100,100));
+
+    libapx_ui_green_btn = libapx_create_dialog_btn_invis(libapx_ui_color_picker, 50, total_height_of_colors , c_anchorTop, base_adjust+125, 160, "", "");        
+    libapx_create_dialog_btn_icon_colored(libapx_ui_color_picker, libapx_ui_green_btn, 50, total_height_of_colors, "Apex\\Assets\\Textures\\GreenRange.png", Color(100,100,100));
+
+    libapx_ui_blue_btn = libapx_create_dialog_btn_invis(libapx_ui_color_picker, 50, total_height_of_colors , c_anchorTop, base_adjust+250, 160, "", "");        
+    libapx_create_dialog_btn_icon_colored(libapx_ui_color_picker, libapx_ui_blue_btn, 50, total_height_of_colors, "Apex\\Assets\\Textures\\BlueRange.png", Color(100,100,100));
+
+    libapx_ui_hdr_btn = libapx_create_dialog_btn_invis(libapx_ui_color_picker, 50, total_height_of_colors , c_anchorTop, base_adjust+375, 160, "", "");        
+    libapx_create_dialog_btn_icon_colored(libapx_ui_color_picker, libapx_ui_hdr_btn, 50, total_height_of_colors, "Apex\\Assets\\Textures\\HDRRange.png", Color(100,100,100));
+
+    //Edit boxes
+    libapx_ui_color_editbox = libapx_create_dialog_editbox(libapx_ui_color_picker, 450, 50, c_anchorTop, 0, 580);
+    TriggerAddEventDialogControl(TriggerCreate("libapx_red_select"), c_playerAny, libapx_ui_red_btn  , c_triggerControlEventTypeClick);
+    TriggerAddEventDialogControl(TriggerCreate("libapx_blue_select"), c_playerAny, libapx_ui_blue_btn  , c_triggerControlEventTypeClick);
+    TriggerAddEventDialogControl(TriggerCreate("libapx_green_select"), c_playerAny, libapx_ui_green_btn  , c_triggerControlEventTypeClick);
+    TriggerAddEventDialogControl(TriggerCreate("libapx_hdr_select"), c_playerAny, libapx_ui_hdr_btn  , c_triggerControlEventTypeClick);
+
+
+}
+void libapx_ui_color_picker_init_player(int player) {
+    //Create Arrows/bars.
+    libapx_ui_red_arrow[player] = libapx_create_dialog_btn_invis(libapx_ui_color_picker, 50, 3, c_anchorTop, base_adjust, 160,"","");
+    libapx_create_dialog_btn_icon_colored(libapx_ui_color_picker, libapx_ui_red_arrow[player], 50, 3, "Apex\\Assets\\Textures\\bar.png", Color(100,100,100));
+    
+    libapx_ui_blue_arrow[player] = libapx_create_dialog_btn_invis(libapx_ui_color_picker, 50, 3, c_anchorTop, base_adjust+125, 160,"","");
+    libapx_create_dialog_btn_icon_colored(libapx_ui_color_picker, libapx_ui_blue_arrow[player], 50, 3, "Apex\\Assets\\Textures\\bar.png", Color(100,100,100));
+    
+    libapx_ui_green_arrow[player] = libapx_create_dialog_btn_invis(libapx_ui_color_picker, 50, 3, c_anchorTop, base_adjust+250, 160,"","");
+    libapx_create_dialog_btn_icon_colored(libapx_ui_color_picker, libapx_ui_green_arrow[player], 50, 3, "Apex\\Assets\\Textures\\bar.png", Color(100,100,100));
+    
+    libapx_ui_hdr_arrow[player] = libapx_create_dialog_btn_invis(libapx_ui_color_picker, 50, 3, c_anchorTop, base_adjust+375, 160,"","");
+    libapx_create_dialog_btn_icon_colored(libapx_ui_color_picker, libapx_ui_hdr_arrow[player], 50, 3, "Apex\\Assets\\Textures\\bar.png", Color(100,100,100));
+    
+    //Set default hue, saturation, and brightness values
+    libapx_ui_color_selected[player].r = 255;
+    libapx_ui_color_selected[player].g = 255;
+    libapx_ui_color_selected[player].b = 255;
+    libapx_ui_color_selected[player].hdr = 1;
+
+    libNtve_gf_SetDialogItemEditorValue(libapx_ui_color_editbox, "@tint 255 255 255 1 1", PlayerGroupSingle(player));
+
+    //Apply tint checkbox
+    libapx_ui_applytint_checkbox[player] =  libapx_create_dialog_checkbox(libapx_ui_color_picker, 30, 30, c_anchorTop, base_adjust-30, 660);
+    libapx_create_dialog_label(libapx_ui_color_picker, 480, 110, c_anchorTop, base_adjust+210, 625, "Check to apply tints to selected unit.", libapx_UI_HEADER1);
+
+	// add trigger for toggling tinting
+	TriggerAddEventDialogControl(TriggerCreate("libapx_ui_colorpikcker_tinter"), c_playerAny, libapx_ui_applytint_checkbox[player], c_triggerControlEventTypeChecked);
+
+}
+static fixed libapx_color_select(int dialog, int player);
+
+static void libapx_ui_colorpicker_apply_tint(int p) {
+    string msg = "@tint ";
+    int spawningcount = libapx_player[p].spawningCount;
+    msg += FixedToString(libapx_ui_color_selected[p].r,0) + " ";
+    msg += FixedToString(libapx_ui_color_selected[p].g,0) + " ";
+    msg += FixedToString(libapx_ui_color_selected[p].b,0) + " ";
+    msg += "1" + " ";
+    msg += FixedToString(libapx_ui_color_selected[p].hdr,0) + " ";
+    
+    libapx_chat_parse(msg, p, UnitGroupSelected(p), spawningcount);
+}
+
+bool libapx_ui_colorpikcker_tinter(bool testconds, bool runActions) {
+    int p =  EventPlayer();
+    int dialog = EventDialogControl();
+    bool state = libNtve_gf_DialogItemIsChecked(dialog, p);
+    apply_tint[p] = state;
+
+
+    return true;
+}
+
+static void change_tint_box_display(int p) {
+    string tint = "@tint " + 
+    FixedToString(libapx_ui_color_selected[p].r, 0)+" "+ //r
+    FixedToString(libapx_ui_color_selected[p].g, 0)+" "+ //g
+    FixedToString(libapx_ui_color_selected[p].b, 0)+" "+ //b
+    IntToString(1)+" "+
+    FixedToString(libapx_ui_color_selected[p].hdr, 2);
+    libNtve_gf_SetDialogItemEditorValue(libapx_ui_color_editbox, tint,PlayerGroupSingle(p));
+}
+
+bool libapx_red_select(bool testConds, bool runActions) {
+    int player = EventPlayer();
+    fixed val = libapx_color_select(EventDialogControl(),  player);
+    //Remake UI
+    DialogControlDestroy(libapx_ui_red_arrow[player]);
+    libapx_ui_red_arrow[player] = libapx_create_dialog_btn_invis(libapx_ui_color_picker, 50, 3, c_anchorTop, base_adjust, 160+FixedToInt(val*total_height_of_colors),"","");
+    libapx_create_dialog_btn_icon_colored(libapx_ui_color_picker, libapx_ui_red_arrow[player], 50, 3, "Apex\\Assets\\Textures\\bar.png", Color(100,100,100));
+    
+    val = -(val-1);
+    //Assign value
+    libapx_ui_color_selected[player].r = val * 255;
+    change_tint_box_display(player);
+    if(apply_tint[player]) {
+        libapx_ui_colorpicker_apply_tint(player);
+    }
+    return true;
+}
+bool libapx_green_select(bool testConds, bool runActions) {
+    int player = EventPlayer();
+    fixed val = libapx_color_select(EventDialogControl(), player);
+
+    //Remake UI
+    DialogControlDestroy(libapx_ui_green_arrow[player]);
+    libapx_ui_green_arrow[player] = libapx_create_dialog_btn_invis(libapx_ui_color_picker, 50, 3, c_anchorTop, base_adjust+125, 160+FixedToInt(val*total_height_of_colors),"","");
+    libapx_create_dialog_btn_icon_colored(libapx_ui_color_picker, libapx_ui_green_arrow[player], 50, 3, "Apex\\Assets\\Textures\\bar.png", Color(100,100,100));
+    
+    val = -(val-1);
+    //Assign value
+    libapx_ui_color_selected[player].g = val * 255;
+    change_tint_box_display(player);
+    if(apply_tint[player]) {
+        libapx_ui_colorpicker_apply_tint(player);
+    }
+    return true;
+}
+bool libapx_blue_select(bool testConds, bool runActions) {
+    int player = EventPlayer();
+    fixed val = libapx_color_select(EventDialogControl(), player);
+    //Remake UI
+    DialogControlDestroy(libapx_ui_blue_arrow[player]);
+    libapx_ui_blue_arrow[player] = libapx_create_dialog_btn_invis(libapx_ui_color_picker, 50, 3, c_anchorTop, base_adjust+250, 160+FixedToInt(val*total_height_of_colors),"","");
+    libapx_create_dialog_btn_icon_colored(libapx_ui_color_picker, libapx_ui_blue_arrow[player], 50, 3, "Apex\\Assets\\Textures\\bar.png", Color(100,100,100));
+    
+    val = -(val-1);
+    //Assign value
+    libapx_ui_color_selected[player].b = val * 255;
+    change_tint_box_display(player);
+    if(apply_tint[player]) {
+        libapx_ui_colorpicker_apply_tint(player);
+    }
+    return true; 
+}
+bool libapx_hdr_select(bool testConds, bool runActions) {
+    int player = EventPlayer();
+    fixed val = libapx_color_select(EventDialogControl(), player);
+    //Remake UI
+    DialogControlDestroy(libapx_ui_hdr_arrow[player]);
+    libapx_ui_hdr_arrow[player] = libapx_create_dialog_btn_invis(libapx_ui_color_picker, 50, 3, c_anchorTop, base_adjust+375, 160+FixedToInt(val*total_height_of_colors),"","");
+    libapx_create_dialog_btn_icon_colored(libapx_ui_color_picker, libapx_ui_hdr_arrow[player], 50, 3, "Apex\\Assets\\Textures\\bar.png", Color(100,100,100));
+    
+    val = -(val-1);
+    //Assign value
+    libapx_ui_color_selected[player].hdr = val * 15;
+    change_tint_box_display(player);
+    if(apply_tint[player]) {
+        libapx_ui_colorpicker_apply_tint(player);
+    }
+    return true;
+}
+
+static fixed libapx_color_select(int dialog, int player) {
+    //tmp hopefully i automate later because having literally 220 triggers running is a bit dumb.
+    int h = DialogControlGetOffsetY(dialog, player);
+    fixed value;
+    fixed mouse = PointGetY(libapx_player[player].mouse_position_ui);
+    int offeset = DialogGetOffsetY(libapx_ui_color_picker)+h;
+    mouse = mouse - offeset;
+    
+    value = (total_height_of_colors - mouse - 1)/ total_height_of_colors;
+    value = -(value-1);
+
+    return value;
+
+}

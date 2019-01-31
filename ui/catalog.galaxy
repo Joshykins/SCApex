@@ -1,0 +1,226 @@
+//=========================================================
+//		Apex Roleplaying Engine
+//		Copyright (c) 2019, Apex Group
+//=========================================================
+// This software is distributed under the MIT License:
+// <http://opensource.org/licenses/MIT>
+//=========================================================
+
+//Base panel
+int libapx_ui_catalog;
+int libapx_ui_catalog_exit;
+
+static int max_display_amount = 1000;
+static int libapx_ui_catalog_type;
+static int libapx_ui_catalog_fields;
+static int libapx_ui_catalog_filter_editbox;
+static int libapx_ui_catalog_filter_btn;
+static int[16] libapx_ui_catalog_apply_checkbox;
+static bool[16] apply_field;
+static string[16] current_catagory;
+static string[16][1000] all_queries;
+
+static string types = "Ability Actor Behavior Effect Footprint Light Model Decal Turret Unit Upgrade Validator Weapon Sound Soundtrack";
+
+void libapx_ui_catalog_init() {
+
+
+    //Main Dialog init
+    libapx_ui_catalog = libapx_create_dialog(650, 700, c_anchorTopLeft, libapx_ui_panel_spacing, 0);
+    libapx_ui_catalog_exit = libapx_create_dialog_close_btn(libapx_ui_catalog, 650, 700, c_anchorTopLeft, libapx_ui_panel_spacing, 0);
+
+    //Title for page
+    libapx_create_dialog_title(libapx_ui_catalog , 300, 40, 00, 40, "Data Catalog", libapx_UI_HEADER1,  180);
+
+    //Mini titles
+    libapx_create_dialog_label(libapx_ui_catalog , 300, 40, c_anchorTop, -160, 84, "Categories", libapx_UI_HEADER1);
+    libapx_create_dialog_label(libapx_ui_catalog , 300, 40, c_anchorTop,  155, 84, "Values", libapx_UI_HEADER1);
+
+    //lists
+    libapx_ui_catalog_type = libapx_create_dialog_list(libapx_ui_catalog, 280, 300, c_anchorTop, -155, 124);
+    libapx_ui_catalog_fields = libapx_create_dialog_list(libapx_ui_catalog, 280, 300, c_anchorTop, 155, 124);
+
+    //Trigger for category selection
+    TriggerAddEventDialogControl(TriggerCreate("libapx_ui_category_select_type"), c_playerAny, libapx_ui_catalog_type, c_triggerControlEventTypeSelectionChanged);
+    //trigger for field selection
+    TriggerAddEventDialogControl(TriggerCreate("libapx_ui_category_select_field"), c_playerAny, libapx_ui_catalog_fields, c_triggerControlEventTypeSelectionChanged);
+        
+
+    //Filter box
+    libapx_ui_catalog_filter_editbox = libapx_create_dialog_editbox(libapx_ui_catalog, 370, 50, c_anchorTopLeft, 190, 450);
+    //Filter Button
+    libapx_ui_catalog_filter_btn = libapx_create_dialog_btn(libapx_ui_catalog, 50, 50, c_anchorTopLeft, 565, 450, "Search", "" );
+    libapx_create_dialog_btn_icon(libapx_ui_catalog, libapx_ui_catalog_filter_btn, 50, 50, libapx_UI_ICON_SEARCH);
+    //Trigger for filter
+    TriggerAddEventDialogControl(TriggerCreate("libapx_ui_category_filter"), c_playerAny, libapx_ui_catalog_filter_btn , c_triggerControlEventTypeClick);
+
+    
+    //Labeling Filter Btn
+    libapx_create_dialog_label(libapx_ui_catalog, 100, 50, c_anchorTopLeft,60, 450, "Search", libapx_UI_HEADER1);
+
+    //Creating Apply Checkbox
+    libapx_create_dialog_label(libapx_ui_catalog, 550, 300, c_anchorTop, 30, 450, " Check this box to apply the value's respective command. For instance a model will modelswap your current selected unit.", libapx_UI_HEADER1);
+
+}
+
+void libapx_ui_catalog_init_player(int player) { 
+    //Populate with types
+    int i;
+    for (i = 1; StringWord(types, i) != ""; i += 1) {
+        DialogControlAddItem(libapx_ui_catalog_type, PlayerGroupSingle(player), StringToText(StringWord(types, i)));
+    }
+    current_catagory[player] = "Model";
+    apply_field[player] = false;
+
+    //Creating checkbox
+    libapx_ui_catalog_apply_checkbox[player] = libapx_create_dialog_checkbox(libapx_ui_catalog, 30, 30 ,c_anchorTopLeft, 50, 550);
+	TriggerAddEventDialogControl(TriggerCreate("libapx_ui_category_apply"), c_playerAny, libapx_ui_catalog_apply_checkbox[player], c_triggerControlEventTypeChecked);
+
+}
+int find_catelog(string type) {
+    int catalog;
+    type = StringCase(type, false);
+
+	if(type == "ability" || type == "abilities") {
+		catalog = c_gameCatalogAbil;
+	}
+	else if(type == "actor" || type == "actors") {
+		catalog = c_gameCatalogActor;
+	}
+	else if(type == "behavior" || type == "behaviors") {
+		catalog = c_gameCatalogBehavior;
+	}
+	else if(type == "effect" || type == "effects") {
+		catalog = c_gameCatalogEffect;
+	}
+	else if(type == "footprint" || type == "footprints") {
+		catalog = c_gameCatalogFootprint;
+	}
+	else if(type == "light" || type == "lights") {
+		catalog = c_gameCatalogLight;
+	}
+	else if(type == "model" || type == "models") {
+		catalog = c_gameCatalogModel;
+	}
+	else if(type == "decal" || type == "decals") {
+		catalog = c_gameCatalogTexture;
+	}
+	else if(type == "turret" || type == "turrets") {
+		catalog = c_gameCatalogTurret;
+	}
+	else if(type == "unit" || type == "units") {
+		catalog = c_gameCatalogUnit;
+	}
+	else if(type == "upgrade" || type == "upgrades") {
+		catalog = c_gameCatalogUpgrade;
+	}
+	else if(type == "validator" || type == "validators") {
+		catalog = c_gameCatalogValidator;
+	}
+	else if(type == "weapon" || type == "weapons") {
+		catalog = c_gameCatalogWeapon;
+	}
+	else if(type == "sound" || type == "sounds") {
+		catalog = c_gameCatalogSound;
+	}
+	else if(type == "soundtrack" || type == "soundtracks") {
+		catalog = c_gameCatalogSoundtrack;
+    }
+    return catalog;
+}
+
+static void populate_fields(string catalogstr,int p) {
+    int catalog = find_catelog(catalogstr);
+    string filter = libNtve_gf_DialogItemEditValue(libapx_ui_catalog_filter_editbox, p);
+    int entryCount;
+    string entry;
+    int i;
+    int position;
+    int j;
+    bool passesFilters;
+    string currentFilter;
+
+    //Populate
+    DialogControlRemoveAllItems(libapx_ui_catalog_fields, PlayerGroupSingle(p));
+    entryCount = CatalogEntryCount(catalog);
+    position = 0;
+    for (i = 1; (i <= entryCount) || (position >= max_display_amount); i += 1) {
+        entry = CatalogEntryGet(catalog, i);
+        if(filter != "") {
+            j = 1;
+            while (StringWord(filter, j) != "" ) {
+                currentFilter = StringWord(filter, j);
+                passesFilters = true;
+    
+                if(StringContains(entry, currentFilter, c_stringAnywhere, c_stringNoCase) || currentFilter == "") {
+    
+                } else {
+                    passesFilters = false;
+                    break;
+                }
+
+                j += 1;
+            }
+            if(passesFilters) {
+                all_queries[p][position] = entry;
+                position +=1;
+                DialogControlAddItem(libapx_ui_catalog_fields, PlayerGroupSingle(p),StringToText(entry));
+            }
+        }
+        else {
+            all_queries[p][position] = entry;
+            position +=1;
+            //Poplate with everything
+            DialogControlAddItem(libapx_ui_catalog_fields, PlayerGroupSingle(p),StringToText(entry));
+        }
+    }
+    
+}
+
+bool libapx_ui_category_filter(bool testConds, bool runActions) {
+    int p = EventPlayer();
+    int desiredCatagory=DialogControlGetSelectedItem(libapx_ui_catalog_type, p);
+    string catalog= StringWord(types, desiredCatagory);
+    if(catalog == "") {
+        libapx_print_output(p, "Something went wrong! Tell sero about it!");
+        return true;
+    }
+
+    populate_fields(catalog, p);
+
+
+    return true;
+}
+
+bool libapx_ui_category_select_type(bool testConds, bool runActions) {
+    int p = EventPlayer();
+    int desiredCatagory=DialogControlGetSelectedItem(libapx_ui_catalog_type, p);
+    string catalog= StringWord(types, desiredCatagory);
+    if(catalog == "") {
+        libapx_print_output(p, "Something went wrong! Tell sero about it!");
+        return true;
+    }
+
+    populate_fields(catalog, p);
+
+    return true;
+}
+bool libapx_ui_category_apply(bool testConds, bool runActions) {
+    int p =  EventPlayer();
+    int dialog = EventDialogControl();
+    bool state = libNtve_gf_DialogItemIsChecked(dialog, p);
+    apply_field[p] = state;
+
+    return true;
+}
+bool libapx_ui_category_select_field(bool testConds, bool runActions) {
+    int p = EventPlayer();
+    int desiredCatagory=DialogControlGetSelectedItem(libapx_ui_catalog_type, p);
+    string catalog= StringWord(types, desiredCatagory);
+    int selectedIndex=DialogControlGetSelectedItem(libapx_ui_catalog_fields, p);
+    string selected = all_queries[p][selectedIndex];
+    if(catalog == "Model") {
+        libapx_chat_parse("@modelswap "+selected, p, UnitGroupSelected(p), libapx_player[p].spawningCount);
+    }
+    return true;
+}
