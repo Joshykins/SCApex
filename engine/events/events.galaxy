@@ -41,6 +41,9 @@ void libapx_events_initialize() {
 	//TriggerAddEventDialogControl(TriggerCreate("libapx_waygate_dialog_clicked_old"), c_playerAny, c_invalidDialogControlId, c_triggerControlEventTypeClick );
 	TriggerAddEventDialogControl(TriggerCreate("libapx_waygate_dialog_clicked"), c_playerAny, c_invalidDialogControlId, c_triggerControlEventTypeClick);
 
+	//The only thing that needs an active runtime.
+	TriggerAddEventTimePeriodic(TriggerCreate("libapx_trig_ticker"), .01, c_timeGame);
+
 }
 
 // libapx_player_events_initialize

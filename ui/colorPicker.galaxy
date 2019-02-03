@@ -108,13 +108,25 @@ static fixed libapx_color_select(int dialog, int player);
 static void libapx_ui_colorpicker_apply_tint(int p) {
     string msg = "@tint ";
     int spawningcount = libapx_player[p].spawningCount;
+    unitgroup ug = UnitGroupSelected(p);
+    unit u;
+    int i;
+    unitgroup applyGroup = UnitGroupEmpty();
     msg += FixedToString(libapx_ui_color_selected[p].r,0) + " ";
     msg += FixedToString(libapx_ui_color_selected[p].g,0) + " ";
     msg += FixedToString(libapx_ui_color_selected[p].b,0) + " ";
     msg += "1" + " ";
     msg += FixedToString(libapx_ui_color_selected[p].hdr,0) + " ";
     
-    libapx_chat_parse(msg, p, UnitGroupSelected(p), spawningcount);
+    for (i = 1; i <= UnitGroupCount(ug, c_unitCountAll); i += 1) {
+        u = UnitGroupUnit(ug, i);
+        libapx_print_output(p, "Hello this unit belongs to " + IntToString(UnitGetOwner(u)) + " and checked by " + IntToString(p));
+        if(UnitGetOwner(u) == p) {
+            UnitGroupAdd(applyGroup, u);
+        };
+    }
+
+    libapx_chat_parse(msg, p, applyGroup, spawningcount);
 }
 
 bool libapx_ui_colorpikcker_tinter(bool testconds, bool runActions) {
@@ -123,8 +135,19 @@ bool libapx_ui_colorpikcker_tinter(bool testconds, bool runActions) {
     bool state = libNtve_gf_DialogItemIsChecked(dialog, p);
     apply_tint[p] = state;
 
-
     return true;
+}
+
+static void show_for_player(int p, int dialog) {
+    int i;
+    int tmp_player;
+    for (i = 1; i <= PlayerGroupCount(PlayerGroupActive()); i += 1) {
+        tmp_player = PlayerGroupPlayer(PlayerGroupActive(), i);
+        if(tmp_player != p) {
+            DialogSetVisible(dialog, PlayerGroupSingle(tmp_player), false);
+            DialogControlSetVisible(dialog, PlayerGroupSingle(tmp_player), false);
+        } 
+    }
 }
 
 static void change_tint_box_display(int p) {
@@ -144,11 +167,13 @@ bool libapx_red_select(bool testConds, bool runActions) {
     DialogControlDestroy(libapx_ui_red_arrow[player]);
     libapx_ui_red_arrow[player] = libapx_create_dialog_btn_invis(libapx_ui_color_picker, 50, 3, c_anchorTop, base_adjust, 160+FixedToInt(val*total_height_of_colors),"","");
     libapx_create_dialog_btn_icon_colored(libapx_ui_color_picker, libapx_ui_red_arrow[player], 50, 3, "Apex\\Assets\\Textures\\bar.png", Color(100,100,100));
-    
+    show_for_player(player, libapx_ui_red_arrow[player]);
+
     val = -(val-1);
     //Assign value
     libapx_ui_color_selected[player].r = val * 255;
     change_tint_box_display(player);
+
     if(apply_tint[player]) {
         libapx_ui_colorpicker_apply_tint(player);
     }
@@ -162,7 +187,7 @@ bool libapx_green_select(bool testConds, bool runActions) {
     DialogControlDestroy(libapx_ui_green_arrow[player]);
     libapx_ui_green_arrow[player] = libapx_create_dialog_btn_invis(libapx_ui_color_picker, 50, 3, c_anchorTop, base_adjust+125, 160+FixedToInt(val*total_height_of_colors),"","");
     libapx_create_dialog_btn_icon_colored(libapx_ui_color_picker, libapx_ui_green_arrow[player], 50, 3, "Apex\\Assets\\Textures\\bar.png", Color(100,100,100));
-    
+    show_for_player(player, libapx_ui_green_arrow[player]);
     val = -(val-1);
     //Assign value
     libapx_ui_color_selected[player].g = val * 255;
@@ -179,7 +204,8 @@ bool libapx_blue_select(bool testConds, bool runActions) {
     DialogControlDestroy(libapx_ui_blue_arrow[player]);
     libapx_ui_blue_arrow[player] = libapx_create_dialog_btn_invis(libapx_ui_color_picker, 50, 3, c_anchorTop, base_adjust+250, 160+FixedToInt(val*total_height_of_colors),"","");
     libapx_create_dialog_btn_icon_colored(libapx_ui_color_picker, libapx_ui_blue_arrow[player], 50, 3, "Apex\\Assets\\Textures\\bar.png", Color(100,100,100));
-    
+    show_for_player(player, libapx_ui_blue_arrow[player]);
+
     val = -(val-1);
     //Assign value
     libapx_ui_color_selected[player].b = val * 255;

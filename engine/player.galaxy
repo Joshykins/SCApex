@@ -222,7 +222,7 @@ struct libapx_player_properties {
 	//Editor mouse wheel trigger;
 	trigger editor_mouse_wheel;
 	//Editor camera unit
-	unit camera_unit;
+	unitgroup camera_unit;
 	//Editor camera toggle
 	bool editor_toggled;
 	//Height
@@ -231,6 +231,7 @@ struct libapx_player_properties {
 	unitgroup editor_pausedunits;
 	//Rotating still,
 	bool editor_rotating;
+
 	//Unit for spawner
 	unit spawner_unit;
 	bool spawner_toggled;
@@ -275,6 +276,7 @@ libapx_player_parser_properties[libapx_MAX_PLAYERS][libapx_PARSER_THREAD_COUNT] 
 // provided by chat/aliases.galaxy.
 string libapx_sort_aliases(int player);
 
+
 // libapx_initialize_player
 // ==============================
 // initialize players (default settings)
@@ -299,21 +301,11 @@ void libapx_player_initialize(int player) {
 
 	libapx_player[player].active_ui_panel = libapx_UI_PANEL_NONE;
 
-	//The only thing that needs an active runtime.
-	TriggerAddEventTimePeriodic(TriggerCreate("libapx_unit_clicked"), .1, c_timeGame);
 
-	
-	TriggerAddEventUnitRemoved(TriggerCreate("libapx_respawn_camera_unit"),UnitRefFromUnit(libapx_player[player].camera_unit));
-	TriggerAddEventUnitDied(TriggerCreate("libapx_respawn_camera_unit"),UnitRefFromUnit(libapx_player[player].camera_unit));
 	// create alphabetized alias list
 	libapx_player[player].aliases = libapx_sort_aliases(player);
-	u = UnitGroupUnit(UnitCreate(player, "ScienceVessel", c_unitCreateIgnorePlacement, player, CameraGetTarget(player), 270),1);
-	UnitSetState(u, c_unitStateInvulnerable, true);
-	UnitSetHeight(u, 500,0);
-	ActorSendTo(libNtve_gf_MainActorofUnit(u), "::Main", "MinimapIcon 0");
-	ActorSendTo(libNtve_gf_MainActorofUnit(u), "::Main", "ModelAllowHitTest 0");
-	ActorSendTo(libNtve_gf_MainActorofUnit(u), "::Main", "SetScale 0.0005");
-	libapx_player[player].camera_unit = u;
+	
+
 
 	libapx_chk_all_aliases(player);
 

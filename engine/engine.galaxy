@@ -74,6 +74,13 @@ include "apex/engine/chat/parser.galaxy"
 // unit command caching functionality
 include "apex/engine/unit.galaxy"
 
+
+// unit_rename
+//===============
+// functions to handle unit renaming and subtitling
+// Stores name and subtitle to datatable to be used in ui.
+include "apex/engine/unit_rename"
+
 // scaler
 // =============
 // Contains various utility functions used throughout engine
@@ -98,12 +105,6 @@ include "apex/engine/regions.galaxy"
 // -> allows creation of "gamesetups" (act like game saves)
 include "apex/engine/gamesetups.galaxy"
 
-
-// unit_rename
-//===============
-// functions to handle unit renaming and subtitling
-// Stores name and subtitle to datatable to be used in ui.
-include "apex/engine/unit_rename"
 
 // events
 // =============

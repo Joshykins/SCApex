@@ -310,6 +310,10 @@ void libapx_command_skybox(int user, unitgroup u, string argv, int spawningCount
 	string model = StringWord(argv, 2);
 	fixed animation_speed = StringToFixed(StringWord(argv, 3));
 
+	if (StringWord(argv, 3) == "") {
+		animation_speed = 1;
+	}
+	
 	if( libapx_player[user].permission_level < libapx_PERMISSIONS_LEVEL_MOD  ) {
 		libapx_print_error(user, "Only moderators or admins can change the skybox");
 		return;

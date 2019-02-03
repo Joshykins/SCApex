@@ -34,7 +34,7 @@ static void show_for_player(int p, int dialog) {
     for (i = 1; i <= PlayerGroupCount(PlayerGroupActive()); i += 1) {
         tmp_player = PlayerGroupPlayer(PlayerGroupActive(), i);
         if(tmp_player != p) {
-            
+            DialogSetVisible(dialog, PlayerGroupSingle(tmp_player), false);
             DialogControlSetVisible(dialog, PlayerGroupSingle(tmp_player), false);
         } 
     }
@@ -56,33 +56,44 @@ void libapx_ui_unitname_update(int p) {
 
     DialogControlDestroy(current_name[p]);
     DialogControlDestroy(current_subtitle[p]);
-
     DialogControlDestroy(libapx_player[p].unit_display_name);
     DialogControlDestroy(libapx_player[p].unit_display_subtitle);
+
+    DialogDestroy(current_name[p]);
+    DialogDestroy(current_subtitle[p]);
+    DialogDestroy(libapx_player[p].unit_display_name);
+    DialogDestroy(libapx_player[p].unit_display_subtitle);
+
     if(libapx_player[p].name_display) {
         libapx_player[p].unit_display_name = libapx_create_dialog_label(g_libapx_ui_name , 420, 40, c_anchorTop, 00, 10, name, libapx_UI_HEADER1);
         libapx_player[p].unit_display_subtitle = libapx_create_dialog_label(g_libapx_ui_name , 420, 60, c_anchorTop, 00, 50, description, libapx_UI_HEADER4);
     }
 
     current_name[p] = libapx_create_dialog_label(
-        libapx_ui_unitname,   //btn (const)
-        main_width-100,                //Width 
-        30,                     //Height
-        c_anchorTop,        //Anchor (const)
-        0,                    //x-off
-        80,                    //y-off
-        //Content
-        name,
-        libapx_UI_HEADER1);  
+    libapx_ui_unitname,   //btn (const)
+    main_width-100,                //Width 
+    30,                     //Height
+    c_anchorTop,        //Anchor (const)
+    0,                    //x-off
+    80,                    //y-off
+    //Content
+    name,
+    libapx_UI_HEADER1);  
 
     current_subtitle[p] = libapx_create_dialog_label(
-        libapx_ui_unitname,   //btn (const)
-        main_width-100,                //Width-offsetleft-offsetright
-        main_height-180,                     //Height
-        c_anchorTop,        //Anchor (const)
-        0,                    //x-off
-        130,                    //y-off
-        //Content
-        description,
-        libapx_UI_HEADER4);     //style
+    libapx_ui_unitname,   //btn (const)
+    main_width-100,                //Width-offsetleft-offsetright
+    main_height-180,                     //Height
+    c_anchorTop,        //Anchor (const)
+    0,                    //x-off
+    130,                    //y-off
+    //Content
+    description,
+    libapx_UI_HEADER4);     //style
+
+
+    show_for_player(p, current_name[p]);
+    show_for_player(p, current_subtitle[p]);
+    show_for_player(p, libapx_player[p].unit_display_name);
+    show_for_player(p, libapx_player[p].unit_display_subtitle);
 }

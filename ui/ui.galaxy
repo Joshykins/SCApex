@@ -143,11 +143,23 @@ void libapx_ui_initialize() {
 	UISetFrameVisible(PlayerGroupAll(), c_syncFrameTypeSupply, false);
 	UISetFrameVisible(PlayerGroupAll(), c_syncFrameTypeConsolePanel, false);
 	UISetFrameVisible(PlayerGroupAll(), c_syncFrameTypeArmyButton, false);
-	UISetFrameVisible(PlayerGroupAll(), c_syncFrameTypeControlGroupPanel, false);
 	UISetFrameVisible(PlayerGroupAll(), c_syncFrameTypeResourcePanel, false);
 	UISetFrameVisible(PlayerGroupAll(), c_syncFrameTypeAllianceButton, false);
 	UISetFrameVisible(PlayerGroupAll(), c_syncFrameTypeSupply, false);
 	UISetFrameVisible(PlayerGroupAll(), c_syncFrameTypeHelpMenuButton, false);
+
+	//X colorpicker bars
+	//X Color picker perms
+	//X control groups
+	//X catalog modelswap flag
+	//X catalog wrong entry
+	//X fix skybox animation 
+	//X Increase camera tickrate
+	//X Attach Checker unit perms
+	//X Fixed keypress
+	//X Proper @rename in @say
+	//Transport units
+
 
 	// initialize panels
 	//	libapx_ui_modelpreviewer_init();
@@ -188,8 +200,8 @@ void libapx_ui_initialize() {
 	//Init for display names, needs dialog created in ui toolbar.
 	for( player = 1; player < libapx_MAX_PLAYERS; player += 1 ) {
 		if( PlayerType(player) == c_playerTypeUser && PlayerStatus(player) == c_playerStatusActive ) {
-			libapx_player[player].unit_display_name = libapx_create_dialog_label(g_libapx_ui_name , 420, 40, c_anchorTop, 00, 10, "testing purposes name", libapx_UI_HEADER1);
-			libapx_player[player].unit_display_subtitle = libapx_create_dialog_label(g_libapx_ui_name , 420, 60, c_anchorTop, 00, 50, "testing purposes sub ye big long sub", libapx_UI_HEADER4);
+			libapx_player[player].unit_display_name = libapx_create_dialog_label(g_libapx_ui_name , 420, 40, c_anchorTop, 00, 10, "", libapx_UI_HEADER1);
+			libapx_player[player].unit_display_subtitle = libapx_create_dialog_label(g_libapx_ui_name , 420, 60, c_anchorTop, 00, 50, "", libapx_UI_HEADER4);
 		}
 	}
 

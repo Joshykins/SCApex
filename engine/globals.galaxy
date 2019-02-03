@@ -23,6 +23,13 @@ int g_commands_guide_entry_actor = 3; //@attach
 int g_commands_guide_entry_region = 4; //#create
 int g_commands_guide_entry_stats = 5; //@maxlife
 
+
+//gets a units set name
+string libapx_unitname_get_entry(unit u);
+
+//Respawns/spawns the camera unit
+void libapx_respawn_camera_unit(int p);
+
 //Dialog for name
 int g_libapx_ui_name;
 

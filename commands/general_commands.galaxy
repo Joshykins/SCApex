@@ -107,19 +107,25 @@ void libapx_camera_reset (int player)
 	CameraInfoSetValue(cam[player], c_cameraValueShadowClip, val);
 }
 
-bool libapx_respawn_camera_unit(bool testConds,bool runActions) {
-	int player = EventPlayer();
+void libapx_respawn_camera_unit(int p) {
+	unitgroup ug = libapx_player[p].camera_unit;
+	unit tmp_unit;
+	int i;
 	unit u;
-	u = UnitGroupUnit(UnitCreate(player, "ScienceVessel", c_unitCreateIgnorePlacement, player, CameraGetTarget(player), 270),1);
+	
+	for (i = 1; i <= UnitGroupCount(ug, c_unitCountAll); i += 1) {
+		tmp_unit = UnitGroupUnit(ug, i);
+		UnitRemove(tmp_unit);
+	}
+	libapx_player[p].camera_unit = UnitGroupEmpty();
+	libapx_player[p].camera_unit = UnitCreate(1, "ScienceVessel", c_unitCreateIgnorePlacement, p, CameraGetTarget(p), 270);
+	u = UnitGroupUnit(libapx_player[p].camera_unit,1 );
 	UnitSetState(u, c_unitStateInvulnerable, true);
 	UnitSetHeight(u, 500,0);
 	ActorSendTo(libNtve_gf_MainActorofUnit(u), "::Main", "MinimapIcon 0");
 	ActorSendTo(libNtve_gf_MainActorofUnit(u), "::Main", "ModelAllowHitTest 0");
 	ActorSendTo(libNtve_gf_MainActorofUnit(u), "::Main", "SetScale 0.0005");
-	TriggerAddEventUnitRemoved(TriggerCreate("libapx_respawn_camera_unit"),UnitRefFromUnit(u));
-	TriggerAddEventUnitDied(TriggerCreate("libapx_respawn_camera_unit"),UnitRefFromUnit(u));
-	libapx_player[player].camera_unit = u;
-	return true;
+	return;
 }
 
 bool libapx_editor_mouse_wheel(bool testConds,bool runActions) {
@@ -135,7 +141,7 @@ bool libapx_editor_mouse_wheel(bool testConds,bool runActions) {
 
 	return true;
 }
-bool libapx_update_camera(bool testConds,bool runActions) {
+void libapx_update_camera() {
 	int i;
 	int p;
 	point unitpos;
@@ -152,10 +158,9 @@ bool libapx_update_camera(bool testConds,bool runActions) {
 	point newUnitPos;
 	for (i = 1; i <= PlayerGroupCount(PlayerGroupActive()); i += 1) {
 		p = PlayerGroupPlayer(PlayerGroupActive(), i);
-		
 		if(libapx_player[p].editor_toggled) {
 			if(libapx_player[p].mouse_right && !libapx_player[p].key_ctrl && !libapx_player[p].key_alt && !libapx_player[p].key_grave) {
-				u = libapx_player[p].camera_unit;
+				u = UnitGroupUnit(libapx_player[p].camera_unit,1);
 				UnitSetFacing(u, CameraGetYaw(p), 0);
 				orientation = UnitGetFacing(u);
 				upos = UnitGetPosition(u);
@@ -212,7 +217,6 @@ bool libapx_update_camera(bool testConds,bool runActions) {
 			libapx_player[p].mouse_position_lasttick_ui = libapx_player[p].mouse_position_ui;
 		}
 	}
-	return true;
 }
 void libapx_enable_editor_camera(int p, bool state) {
 	int i;
@@ -221,20 +225,7 @@ void libapx_enable_editor_camera(int p, bool state) {
 	fixed val;
 	libapx_camera_reset(p);
 	if(state) {
-		for (i = 1; i <= PlayerGroupCount(PlayerGroupActive()); i += 1) {
-			tmp_p = PlayerGroupPlayer(PlayerGroupActive(), i);
-			if(libapx_player[tmp_p].editor_toggled) {
-				already_trigged =  true;
-				return;
-			}
-		}
-		if(!already_trigged) {
-			//If you are the first player to toggle the editor camera, create the camera update trigger.
-			g_camera_updater = TriggerCreate("libapx_update_camera");
-			libapx_player[tmp_p].editor_toggled = true;
-			TriggerAddEventTimePeriodic(g_camera_updater, 0, c_timeReal);
-			
-		}
+			libapx_player[p].editor_toggled = true;
 
 		//Enable Camera
 		//When nothing held
@@ -271,10 +262,9 @@ void libapx_enable_editor_camera(int p, bool state) {
 		libapx_camera_reset(p);
 
 		CameraLockInput(p, true);
-		UnitSetPosition(libapx_player[p].camera_unit, CameraGetTarget(p), false);
+		UnitSetPosition( UnitGroupUnit(libapx_player[p].camera_unit,1), CameraGetTarget(p), false);
 		libapx_player[p].editor_mouse_wheel = TriggerCreate("libapx_editor_mouse_wheel");
 		TriggerAddEventMouseWheel(libapx_player[p].editor_mouse_wheel,p);
-
 	}
 	else {
 		//Reseting
@@ -319,17 +309,6 @@ void libapx_enable_editor_camera(int p, bool state) {
 		libapx_player[p].editor_heightoffset = 0.0;
 		libapx_player[p].editor_toggled = false;
 		TriggerDestroy(libapx_player[p].editor_mouse_wheel);
-		for (i = 1; i <= PlayerGroupCount(PlayerGroupActive()); i += 1) {
-			tmp_p = PlayerGroupPlayer(PlayerGroupActive(), i);
-			if(libapx_player[tmp_p].editor_toggled) {
-				already_trigged =  true;
-				return;
-			}
-		}
-		if(!already_trigged) {
-			//If no other players have the editor camera toggled destroy the timer trigger.
-			TriggerDestroy(g_camera_updater);
-		}
 		libapx_camera_reset(p);
 	}
 }

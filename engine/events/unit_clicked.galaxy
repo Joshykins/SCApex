@@ -12,11 +12,17 @@
 //Call this when you wish to update the ui. For isntance if you do an @rename
 void libapx_ui_unitname_update(int p);
 
-bool libapx_unit_clicked(bool testConds, bool runActions) {
+void libapx_update_camera();
+
+bool libapx_trig_ticker(bool testConds, bool runActions) {
     int p;
     unitgroup selected;
     unit u;
     int i;
+    
+    libapx_update_camera();
+
+
     for (i = 1; i <= PlayerGroupCount(PlayerGroupActive()); i += 1) {
         p = PlayerGroupPlayer(PlayerGroupActive(), i);
         selected = UnitGroupSelected(p);
@@ -31,6 +37,12 @@ bool libapx_unit_clicked(bool testConds, bool runActions) {
             u = UnitGroupUnit(selected, 1);
             //libapx_print_output(1, "Displaying Unit name");
         }
+
+        //Check Camera Unit Status
+        if( UnitGroupCount(libapx_player[p].camera_unit, c_unitCountAll) != 1 ) {
+            libapx_respawn_camera_unit(p);
+        }
+
         libapx_ui_unitname_update(p);
     }
 	return true;

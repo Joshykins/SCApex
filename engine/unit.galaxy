@@ -390,9 +390,13 @@ text libapx_unit_get_name(unit u) {
 	if( DataTableValueExists(true, unit_id + libapx_UNIT_NAME_DATA_TABLE_IDENTIFIER) ) {
 		name = StringToText( DataTableGetString(true, unit_id + libapx_UNIT_NAME_DATA_TABLE_IDENTIFIER) );
 	}
+	else if( (libapx_unitname_get_entry(u) != "") ) {
+		name = StringToText(libapx_unitname_get_entry(u));
+	}
 	else { //get default catalog name
 		name = StringExternal(  CatalogFieldValueGet(c_gameCatalogUnit, UnitGetType(u), "Name", UnitGetOwner(u)) );
 	}
+
 
 	// check if unit name has a custom color in data table
 	if( DataTableValueExists(true, unit_id + libapx_UNIT_NAME_COLOR_DATA_TABLE_IDENTIFIER) ) {
@@ -401,6 +405,8 @@ text libapx_unit_get_name(unit u) {
 	else { // tint to player's color
 		name = TextWithColor(name, ColorFromIndex((PlayerGetColorIndex(UnitGetOwner(u), false)), c_teamColorDiffuse));
 	}
+
+
 
 	return name;
 }
@@ -988,6 +994,10 @@ void libapx_unit_keypress_check() {
 		input = libapx_unit_get_val(u, "key_e");
 		libapx_chat_parse(input, player, g, libapx_player[player].spawningCount);
 	}
+	if(libapx_player[player].key_e == true ) {
+		input = libapx_unit_get_val(u, "key_f");
+		libapx_chat_parse(input, player, g, libapx_player[player].spawningCount);
+	}
 	if(libapx_player[player].key_g == true ) {
 		input = libapx_unit_get_val(u, "key_g");
 		libapx_chat_parse(input, player, g, libapx_player[player].spawningCount);
@@ -1050,6 +1060,10 @@ void libapx_unit_keypress_check() {
 	}
 	if(libapx_player[player].key_v == true ) {
 		input = libapx_unit_get_val(u, "key_v");
+		libapx_chat_parse(input, player, g, libapx_player[player].spawningCount);
+	}
+	if(libapx_player[player].key_w == true ) {
+		input = libapx_unit_get_val(u, "key_w");
 		libapx_chat_parse(input, player, g, libapx_player[player].spawningCount);
 	}
 	if(libapx_player[player].key_x == true ) {

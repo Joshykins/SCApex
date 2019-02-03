@@ -59,8 +59,10 @@ static string defaultAttachPointTarget = "HelpThisshit";
 
 
 static void remove_attachpoints(int p) {
+    unit u;
     unitgroup ug = UnitGroupSelected(p);
-    unit u = UnitGroupUnit(ug,1);
+    ug = UnitGroupFilterPlayer(ug, p, -1);
+    u = UnitGroupUnit(ug,1);
     ActorSendTo(libNtve_gf_MainActorofUnit(u), defaultAttachPointTarget, "AliasRemove " + defaultAttachPointTarget);
     
     ActorSendTo(libNtve_gf_MainActorofUnit(u), "attachmentsforchk", "SetScale 0.0005 .1 ");
@@ -70,13 +72,17 @@ static void remove_attachpoints(int p) {
 };
 
 static void set_target_attachchk(int p) {
+    unit u;
     unitgroup ug = UnitGroupSelected(p);
-    unit u = UnitGroupUnit(ug,1);
+    ug = UnitGroupFilterPlayer(ug, p, -1);
+    u = UnitGroupUnit(ug,1);
     ActorSendTo(libNtve_gf_MainActorofUnit(u), "::Main", "AliasAdd " + defaultAttachPointTarget);
 }
 static void apply_attachpoints(int p,string attachment, int idx, string tc) {
+    unit u;
     unitgroup ug = UnitGroupSelected(p);
-    unit u = UnitGroupUnit(ug,1);
+    ug = UnitGroupFilterPlayer(ug, p, -1);
+    u = UnitGroupUnit(ug,1);
 
     
     ActorSendTo(libNtve_gf_MainActorofUnit(u), defaultAttachPointTarget, " AttachModelOffset Beacon_Nova {} {"+attachment + "}");
@@ -90,9 +96,11 @@ static void apply_attachpoints(int p,string attachment, int idx, string tc) {
 };
 
 static void highlight_attachpoint(int p, string attachment, int idx) {
+    unit u;
     unitgroup ug = UnitGroupSelected(p);
-    unit u = UnitGroupUnit(ug,1);
     string target = IntToString(idx) + "_alias";
+    ug = UnitGroupFilterPlayer(ug, p, -1);
+    u = UnitGroupUnit(ug,1);
     ActorSendTo(libNtve_gf_MainActorofUnit(u), "attachmentsforchk", "SetScale 1,1,1.5 "+FixedToString(RandomFixed(.35,.45),2)+" ");
     ActorSendTo(libNtve_gf_MainActorofUnit(u), target, "SetScale 1.5,1.5,3 .4 ");
 

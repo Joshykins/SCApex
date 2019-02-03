@@ -10,6 +10,7 @@
 		<Visible val="false"/>
 	</Frame>
 
+
 	<!-- Use DebugDisplay chat area as our new main chat area for Apex. We can output to this through triggers as needed. -->
 	<Frame type="MessageDisplay" name="GameUI/UIContainer/FullscreenUpperContainer/DebugDisplay" file="GameUI">
         <MaxMessages val="64"/>
@@ -33,6 +34,8 @@
 			<Visible val="false"/>
 		</Frame>
 	</Frame>
+
+
 	<Frame type="Frame" name="GameUI/UIContainer/FullscreenUpperContainer/MenuBarConsoleAnchor" file="GameUI">
 		<Anchor side="Left" relative="$parent" pos="Min" offset="10"/>
 		<Anchor side="Bottom" relative="$parent" pos="Max" offset="-295"/>
@@ -50,7 +53,14 @@
 	<Frame type="HeroPanel" name="GameUI/UIContainer/FullscreenUpperContainer/HeroPanel">
 		<Anchor side="Bottom" relative="$parent" pos="Max" offset="-200"/>
 	</Frame>
+
+
 	<Frame type="Frame" name="GameUI/UIContainer/ConsoleUIContainer" file="GameUI">
+		<!--Control Groups-->
+		<Frame type="ControlGroupPanel" name="ControlGroupPanel">
+			<Anchor side="Bottom" relative="$parent" pos="Max" offset="300"/>
+		</Frame>
+		
 		<!--Asthetics-->
 		<Frame type="Frame" name="BeautifyingFrame">
 			<Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
