@@ -20,6 +20,8 @@ void libapx_initialize() {
 	libapx_engine_initialize();
 	libapx_commands_initialize();
 	libapx_ui_initialize();
+	libapx_globals_init();
+	libapx_statbars_init();
 	libapx_inspirational_quotes[0] = " Be inspired. This engine can do almost anything you could want! ";
 	libapx_inspirational_quotes[1] = " Don't always be a passive roleplayer. Have your character be proactive and go to people instead of waiting about for someone to come to you. ";
 	libapx_inspirational_quotes[2] = " Cooperate and be considerate of what others want while roleplaying. Try your best to make everyone in the roleplay satisfied with their experience. ";
@@ -29,8 +31,13 @@ void libapx_initialize() {
 	libapx_inspirational_quotes[6] = " Help the new players. A good and welcoming community is only possible if most will it. Don't drag everyone down. ";
 
 
-
-	libapx_print(PlayerGroupAll(), "Welcome to the <c val=\"ff0000\"> Apex Roleplaying Engine</c> created by Serobliss. " + libapx_inspirational_quotes[i]);
+	if(RandomInt(0,1000) != 666) {
+		libapx_print(PlayerGroupAll(), "Welcome to the <c val=\"ff0000\"> Apex Roleplaying Engine</c> created by Serobliss. " + libapx_inspirational_quotes[i]);
+	}
+	else {
+		libapx_print(PlayerGroupAll(), "Welcome to the <c val=\"ff0000\"> Apex Roleplaying Engine</c> created by Serobliss. hE'S kInDa a bIg dEaL. SeRoBliSs Is GaY ");
+	}
+	
 
 
 

@@ -1,0 +1,398 @@
+//=========================================================
+//		Apex Roleplaying Engine
+//		Copyright (c) 2019, Apex Group
+//=========================================================
+// This software is distributed under the MIT License:
+// <http://opensource.org/licenses/MIT>
+//=========================================================
+int libapx_ui_decal;
+int libapx_ui_decal_exit;
+
+//Dialogs for Decal adding/removing/selecting/renaming
+static int libapx_ui_decal_list;
+static int libapx_ui_decal_remove;
+static int libapx_ui_decal_add;
+static int libapx_ui_decal_name;
+
+
+
+//dialogs for selecting layer
+static int libapx_ui_decal_layer_list;
+static int libapx_ui_decal_layer_remove;
+static int libapx_ui_decal_layer_add;
+
+
+static int g_propTypeText = 0;
+static int g_propTypeToggle = 1;
+
+struct libapx_ui_decal_properties_sig {
+    string name;
+    int type;
+    int width;
+    int dialog;
+};
+//Dialog for editing properties
+const int libapx_ui_decal_prop_count = 12;
+static libapx_ui_decal_properties_sig[libapx_ui_decal_prop_count] libapx_ui_decal_props;
+
+//Preview(external hookup)
+
+
+void libapx_ui_decal_init() {
+    int tmp;
+    int width;
+    int i;
+    libapx_ui_decal = libapx_create_dialog(840, 710, c_anchorTopLeft, libapx_ui_panel_spacing, 0);
+    libapx_ui_decal_exit = libapx_create_dialog_close_btn(libapx_ui_decal, 840, 710, c_anchorTopLeft, libapx_ui_panel_spacing, 0);
+    
+	libapx_create_dialog_title(libapx_ui_decal , 300, 40, 00, 40, "Decal Editor", libapx_UI_HEADER1, 200);
+    
+
+
+
+    //Dialogs for decal list
+    tmp = libapx_create_dialog_label(libapx_ui_decal , 100, 40, c_anchorTopLeft, 40, 110, "Decals", libapx_UI_HEADER1);
+    width = 130;
+    libapx_ui_decal_list = libapx_create_dialog_list(libapx_ui_decal, width, 240, c_anchorTopLeft, 666, 666);
+    DialogControlSetPositionRelative(libapx_ui_decal_list, PlayerGroupAll(), c_anchorTop, tmp, c_anchorBottom, 0 ,0);
+    libapx_ui_decal_remove = libapx_create_dialog_btn(libapx_ui_decal, width, 50, c_anchorTop, 666, 666, "Remove Decal", "<s>Remove");
+    DialogControlSetPositionRelative(libapx_ui_decal_remove, PlayerGroupAll(), c_anchorTop, libapx_ui_decal_list, c_anchorBottom, 0, 10);
+    libapx_ui_decal_name = libapx_create_dialog_editbox(libapx_ui_decal, width, 50, c_anchorTop, 666, 666);
+    DialogControlSetPositionRelative(libapx_ui_decal_name, PlayerGroupAll(), c_anchorTop, libapx_ui_decal_remove, c_anchorBottom, 0, 10);
+    libapx_ui_decal_add = libapx_create_dialog_btn(libapx_ui_decal, width, 50, c_anchorTop, 666, 666, "Add Decal", "<s>Add");
+    DialogControlSetPositionRelative(libapx_ui_decal_add, PlayerGroupAll(), c_anchorTop, libapx_ui_decal_name, c_anchorBottom, 0, -5);
+    
+    //Dialogs for layer list
+    tmp = libapx_create_dialog_label(libapx_ui_decal , 100, 40, c_anchorTopLeft, 180, 110, "Layer", libapx_UI_HEADER1);
+    width = 100;
+    libapx_ui_decal_layer_list = libapx_create_dialog_list(libapx_ui_decal, width, 240, c_anchorTopLeft, 666, 666);
+    DialogControlSetPositionRelative(libapx_ui_decal_layer_list, PlayerGroupAll(), c_anchorTop, tmp, c_anchorBottom, 0 ,0);
+    libapx_ui_decal_layer_remove = libapx_create_dialog_btn(libapx_ui_decal, width, 50, c_anchorTop, 666, 666, "Remove Layer", "<s>Remove");
+    DialogControlSetPositionRelative(libapx_ui_decal_layer_remove, PlayerGroupAll(), c_anchorTop, libapx_ui_decal_layer_list, c_anchorBottom, 0, 10);
+    libapx_ui_decal_layer_add = libapx_create_dialog_btn(libapx_ui_decal, width, 50, c_anchorTop, 666, 666, "Add Layer", "<s>Add");
+    DialogControlSetPositionRelative(libapx_ui_decal_layer_add, PlayerGroupAll(), c_anchorTop, libapx_ui_decal_layer_remove, c_anchorBottom, 0, 10);
+
+    //Properties
+    for (i = 0; i < libapx_ui_decal_prop_count; i += 1) {
+        libapx_ui_decal_props[i].name = StringWord("ImagePath Red Green Blue Saturated RenderPriority OffsetX OffsetY Width Height Rotation Alpha",i+1);
+        if(libapx_ui_decal_props[i].name != "Saturated") {
+            libapx_ui_decal_props[i].type = g_propTypeText;
+        }
+        else {
+            libapx_ui_decal_props[i].type = g_propTypeToggle;
+        }
+        //Img path bigger
+        if(libapx_ui_decal_props[i].name == "ImagePath") {
+            libapx_ui_decal_props[i].width = 400;
+        }
+        else {
+            libapx_ui_decal_props[i].width = 120;
+        }
+        //Generate the properties
+        libapx_create_dialog_label(libapx_ui_decal , 100, 40, c_anchorTopLeft, 290, 110+(i*45), "<s>"+libapx_ui_decal_props[i].name, libapx_UI_HEADER1);
+        if(libapx_ui_decal_props[i].type == g_propTypeText) {
+            libapx_ui_decal_props[i].dialog = libapx_create_dialog_editbox(libapx_ui_decal , libapx_ui_decal_props[i].width, 50, c_anchorTopLeft, 385, 110+(i*45));           
+        }
+        if(libapx_ui_decal_props[i].type == g_propTypeToggle) {
+            libapx_ui_decal_props[i].dialog = libapx_create_dialog_checkbox(libapx_ui_decal , 50, 50, c_anchorTopLeft, 385, 110+(i*45));
+        }
+    }
+    DialogSetRenderPriority(libapx_ui_decal, 1);
+        //Trigger Hookup 
+}
+//For each player
+static void populate_decals(int p);
+static void populate_layers(int p, string decal);
+
+void libapx_ui_decal_init_player(int p) {
+    string name;
+    int i;
+    TriggerAddEventDialogControl(TriggerCreate("libapx_decal_decallist_select"), p, libapx_ui_decal_list, c_triggerControlEventTypeSelectionChanged);
+    TriggerAddEventDialogControl(TriggerCreate("libapx_decal_layerlist_select"), p, libapx_ui_decal_layer_list, c_triggerControlEventTypeSelectionChanged);
+    TriggerAddEventDialogControl(TriggerCreate("libapx_ui_decal_remove_clicked"), p, libapx_ui_decal_remove, c_triggerControlEventTypeClick);
+    TriggerAddEventDialogControl(TriggerCreate("libapx_ui_decal_add_clicked"), p, libapx_ui_decal_add, c_triggerControlEventTypeClick);
+    TriggerAddEventDialogControl(TriggerCreate("libapx_ui_decal_layer_remove_clicked"), p, libapx_ui_decal_layer_remove, c_triggerControlEventTypeClick);
+    TriggerAddEventDialogControl(TriggerCreate("libapx_ui_decal_layer_add_clicked"), p, libapx_ui_decal_layer_add, c_triggerControlEventTypeClick);
+    
+    for (i = 0; i < libapx_ui_decal_prop_count; i += 1) {
+        name = libapx_ui_decal_props[i].name;
+        if(libapx_ui_decal_props[i].type == g_propTypeText) {
+            TriggerAddEventDialogControl(TriggerCreate("libapx_decal_trig_typed"), p, libapx_ui_decal_props[i].dialog, c_triggerControlEventTypeTextChanged);
+        }
+        if(libapx_ui_decal_props[i].type == g_propTypeToggle) {
+            TriggerAddEventDialogControl(TriggerCreate("libapx_decal_trig_checked"), p, libapx_ui_decal_props[i].dialog, c_triggerControlEventTypeChecked);
+        }
+    }
+    populate_decals(p);
+
+}
+//Populate shit
+static void populate_decals(int p) {
+    string decals = libapx_wireframes_get_all(p);
+    int i;
+    DialogControlRemoveAllItems(libapx_ui_decal_list, PlayerGroupSingle(p));
+    i = 1;
+    while(StringWord(decals, i) != "") {
+        DialogControlAddItem(libapx_ui_decal_list, PlayerGroupSingle(p),StringToText(StringWord(decals,i)));
+        i+=1;
+    }
+    //Retrieve list
+};
+bool libapx_decal_layerlist_select(bool testConds,bool runActions) {
+    int p = EventPlayer();
+    int selected = DialogControlGetSelectedItem(libapx_ui_decal_list, p);
+    string decals = libapx_wireframes_get_all(p);
+    string decal = StringWord(decals, selected);
+    int layer = DialogControlGetSelectedItem(libapx_ui_decal_layer_list, p);
+    string params = BankValueGetAsString(libapx_player[p].bank_storage, "WF_"+decal, "WFL_"+IntToString(layer));
+    int i;
+    //Retrieve and populate info
+    //This order
+    //ImagePath Color Saturated RenderPriority OffsetX OffsetY Width Height Rotation Alpha
+    for (i = 0; i < libapx_ui_decal_prop_count; i += 1) {
+        if(libapx_ui_decal_props[i].type == g_propTypeText) { 
+            libNtve_gf_SetDialogItemEditorValue(libapx_ui_decal_props[i].dialog, StringWord(params, i+1),PlayerGroupSingle(p));
+        }
+        if(libapx_ui_decal_props[i].type == g_propTypeToggle) {
+            if(StringWord(params, i+1) == "1") {
+                libNtve_gf_SetDialogItemChecked(libapx_ui_decal_props[i].dialog, true,PlayerGroupSingle(p));
+            }
+            else {
+                libNtve_gf_SetDialogItemChecked(libapx_ui_decal_props[i].dialog, false,PlayerGroupSingle(p));
+            }
+        }
+    }
+    return true;
+}
+
+//RenderWF
+static void render_fakewireframe_layer(int p, int layer,
+    //Properties
+    string path,
+    int r,
+    int g,
+    int b,
+    int saturation,
+    int render_priority,
+    int offsetX,
+    int offsetY,
+    int width,
+    int height,
+    int rotation,
+    int alpha
+) {
+    int image;
+    offsetX *= 2;
+    offsetY *= 2;
+    width *= 2;
+    height *= 2;
+
+    image = DialogControlCreateInPanel(g_libapx_ui_fakewireframe, c_triggerControlTypeImage);
+    libapx_player[p].fakewireframe_layers[layer-1] = image;
+    //Path
+    DialogControlSetPropertyAsString(image, c_triggerControlPropertyImage, PlayerGroupSingle(p), path);
+    //Saturation and color
+    //Wait(1,c_timeReal);
+    if(saturation == 1) {
+        DialogControlSetPropertyAsColor(image, c_triggerControlPropertyColor, PlayerGroupSingle(p), Color(r, g, b));
+    }
+    else {
+        DialogControlSetPropertyAsBool(image, c_triggerControlPropertyDesaturated, PlayerGroupSingle(p), true);
+        DialogControlSetPropertyAsColor(image, c_triggerControlPropertyDesaturationColor, PlayerGroupSingle(p), Color(r, g, b));
+    }
+    //Render Priority
+    DialogControlSetPropertyAsInt(image, c_triggerControlPropertyRenderPriority, PlayerGroupSingle(p), render_priority);
+    //Offset
+    DialogControlSetPosition(image, PlayerGroupSingle(p), c_anchorTopLeft, offsetX, offsetY);
+    
+    //Width
+    DialogControlSetSize(image, PlayerGroupSingle(p), width, height);
+
+    //Rotation
+    DialogControlSetPropertyAsInt(image, c_triggerControlPropertyRotation, PlayerGroupSingle(p), rotation);
+    //Alpha
+    DialogControlSetPropertyAsInt(image, c_triggerControlPropertyAlpha, PlayerGroupSingle(p), alpha);
+    
+}
+
+static void libapx_decal_information_updated(int p) {
+    int selected = DialogControlGetSelectedItem(libapx_ui_decal_list, p);
+    string decals = libapx_wireframes_get_all(p);
+    string decal = StringWord(decals, selected);
+    int layer = DialogControlGetSelectedItem(libapx_ui_decal_layer_list, p);
+    string params = BankValueGetAsString(libapx_player[p].bank_storage, "WF_"+decal, IntToString(layer));
+    int i;
+    string val;
+    string settings;
+    
+    for (i = 0; i < libapx_ui_decal_prop_count; i += 1) {
+        if(libapx_ui_decal_props[i].type == g_propTypeText) {
+            val = libNtve_gf_DialogItemEditValue(libapx_ui_decal_props[i].dialog, p);
+            settings += " " + val; 
+        }
+        if(libapx_ui_decal_props[i].type == g_propTypeToggle) {
+            if(libNtve_gf_DialogItemIsChecked(libapx_ui_decal_props[i].dialog,p) == true) {
+                val = "1";
+            }
+            else {
+                val = "0";
+            }
+            settings += " " + val;
+        }
+    }
+    settings = libapx_string_trim(settings);
+    if(layer != 0) {
+        //Create Bank Entry
+        libapx_wireframe_layer_update(decal, layer, p, settings);
+        
+        //Remove Previously rendered layers
+        for (i = 0; i < libapx_player[p].fakewireframe_layer_count; i += 1) {
+            DialogControlDestroy(libapx_player[p].fakewireframe_layers[i]);
+        }
+        libapx_player[p].fakewireframe_layer_count = 0;
+        //Render Layers
+        i = 1;
+        while(BankKeyExists(libapx_player[p].bank_storage, "WF_"+decal, "WFL_"+IntToString(i))) {
+            params = BankValueGetAsString(libapx_player[p].bank_storage, "WF_"+decal, "WFL_"+IntToString(i));
+            render_fakewireframe_layer(p, i+1, 
+                StringWord(params, 1),
+                StringToInt(StringWord(params, 2)),
+                StringToInt(StringWord(params, 3)),
+                StringToInt(StringWord(params, 4)),
+                StringToInt(StringWord(params, 5)),
+                StringToInt(StringWord(params, 6)),
+                StringToInt(StringWord(params, 7)),
+                StringToInt(StringWord(params, 8)),
+                StringToInt(StringWord(params, 9)),
+                StringToInt(StringWord(params, 10)),
+                StringToInt(StringWord(params, 11)),
+                StringToInt(StringWord(params, 12)) 
+            );
+            i+=1; 
+        };
+        libapx_player[p].fakewireframe_layer_count =i+1;
+    }
+
+}
+
+
+bool libapx_decal_decallist_select(bool testConds,bool runActions) {
+    int p = EventPlayer();
+    int selected = DialogControlGetSelectedItem(libapx_ui_decal_list, p);
+    string decals = libapx_wireframes_get_all(p);
+    string decal = StringWord(decals, selected);
+    libNtve_gf_SetDialogItemEditorValue(libapx_ui_decal_name, decal, PlayerGroupSingle(p));
+    
+    populate_layers(p, decal);
+    return true;
+}
+bool libapx_ui_decal_remove_clicked(bool testConds,bool runActions) {
+    int p = EventPlayer();
+    int selected = DialogControlGetSelectedItem(libapx_ui_decal_list, p);
+    string decals = libapx_wireframes_get_all(p);
+    string decal = StringWord(decals, selected);
+    libapx_wireframe_remove(p, decal);
+    libNtve_gf_SetDialogItemEditorValue(libapx_ui_decal_name, "", PlayerGroupSingle(p));
+    populate_decals(p);
+    populate_layers(p, decal);
+    return true;
+}
+
+
+bool libapx_ui_decal_layer_remove_clicked(bool testConds,bool runActions) {
+    int p = EventPlayer();
+    int selected = DialogControlGetSelectedItem(libapx_ui_decal_layer_list, p);
+    int layer = selected;
+    int selected2 = DialogControlGetSelectedItem(libapx_ui_decal_list, p);
+    string decals = libapx_wireframes_get_all(p);
+    string decal = StringWord(decals, selected2);
+    int layer_count = libapx_wireframe_get_layercount(p, decal);
+    if(layer != 0) {
+        if(layer_count > 1) {
+            libapx_wireframe_layer_remove(decal, IntToString(layer), p);
+            populate_layers(p, decal);
+        }
+        else {
+            libapx_wireframe_remove(p, decal);
+            libNtve_gf_SetDialogItemEditorValue(libapx_ui_decal_name, "", PlayerGroupSingle(p));
+            populate_decals(p);
+            populate_layers(p, decal);
+        }
+    }
+    else {
+        return true;
+    }
+    return true;
+}
+
+bool libapx_ui_decal_layer_add_clicked(bool testConds,bool runActions) {
+    int p = EventPlayer();
+    int selected = DialogControlGetSelectedItem(libapx_ui_decal_list, p);
+    string decals = libapx_wireframes_get_all(p);
+    string decal = StringWord(decals, selected);
+    libapx_wireframe_layer_add(decal, p, 
+        default_wireframe.path + " " +       
+        IntToString(default_wireframe.r)+ " " +
+        IntToString(default_wireframe.g)+ " " +
+        IntToString(default_wireframe.b)+ " " +
+        IntToString(BoolToInt(default_wireframe.saturation))+ " " +
+        IntToString(default_wireframe.render_priority)+ " " +
+        IntToString(default_wireframe.OffsetX)+ " " +
+        IntToString(default_wireframe.OffsetY)+ " " +
+        IntToString(default_wireframe.width)+ " " +
+        IntToString(default_wireframe.height)+ " " +
+        IntToString(default_wireframe.rotation)+ " " +
+        IntToString(default_wireframe.alpha)
+    );
+    populate_layers(p, decal);
+    return true;
+}
+
+bool libapx_ui_decal_add_clicked(bool testConds,bool runActions) {
+    int p = EventPlayer();
+    string decal = StringWord(libNtve_gf_DialogItemEditValue(libapx_ui_decal_name, p),1);
+    if(decal != "") {
+
+        libapx_wireframe_bank_layer_set(p, decal, true, 1,
+            default_wireframe.path,
+            default_wireframe.r,
+            default_wireframe.g,
+            default_wireframe.b,
+            default_wireframe.saturation,
+            default_wireframe.render_priority,
+            default_wireframe.OffsetX,
+            default_wireframe.OffsetY,
+            default_wireframe.width,
+            default_wireframe.height,
+            default_wireframe.rotation,
+            default_wireframe.alpha
+        );
+        populate_decals(p);
+    }
+
+    return true;
+}
+
+static void populate_layers(int p, string decal) {
+    int layer_count = libapx_wireframe_get_layercount(p, decal);
+    int i;
+    DialogControlRemoveAllItems(libapx_ui_decal_layer_list, PlayerGroupSingle(p));
+    if(decal != "") {
+        for (i = 0; i < layer_count; i += 1) {
+            DialogControlAddItem(libapx_ui_decal_layer_list, PlayerGroupSingle(p),StringToText("Layer "+IntToString(i+1)));
+        }
+    }
+    
+
+};  
+
+bool libapx_decal_trig_typed(bool testConds,bool runActions) {
+    libapx_decal_information_updated(EventPlayer());
+    
+    return true;
+}
+bool libapx_decal_trig_checked(bool testConds,bool runActions) {
+    libapx_decal_information_updated(EventPlayer());
+    
+    return true;
+}

@@ -13,7 +13,8 @@ include "apex/engine/events/player_leaves.galaxy"
 include "apex/engine/events/region_waygates.galaxy"
 include "apex/engine/events/unit_events.galaxy"
 include "apex/engine/events/custom.galaxy"
-include "apex/engine/events/unit_clicked.galaxy"
+include "apex/engine/stat_bars.galaxy"
+include "apex/engine/events/ticker.galaxy"
 
 
 // create the default Apex events
@@ -43,6 +44,7 @@ void libapx_events_initialize() {
 
 	//The only thing that needs an active runtime.
 	TriggerAddEventTimePeriodic(TriggerCreate("libapx_trig_ticker"), .01, c_timeGame);
+
 
 }
 

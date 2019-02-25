@@ -109,11 +109,32 @@ void libapx_define_context(string command_name) {
 }
 
 
+// libapx_command_wireframe
+// ============================
+// Swaps the unit of selected units.
+void libapx_command_wireframe(int user, unitgroup u, string argv, int spawningCount, string bracketText) {
+	int i;
+	unit tmp_unit;
+	string name = StringWord(argv, 2);
+	int p = user;
+	if(!BankSectionExists(libapx_player[p].bank_storage, "WF_" + name)) {
+		libapx_print_error(p, " The wireframe " + name + " does not exist.");
+		return;
+    }
 
-
-
-
-
+	for (i = 1; i <= UnitGroupCount(u, c_unitCountAll); i += 1) {
+		tmp_unit = UnitGroupUnit(u, i);
+		libapx_wireframe_set_entry(tmp_unit, name);
+		libapx_unit_cache_update(tmp_unit, "@wireframe", argv);
+	}
+}
+void libapx_define_wireframe(string command_name) {
+	commands_guide_entry_set(
+		g_commands_guide_entry_unit, 
+		command_name, 
+		" This command changes the wireframe of a unit. The wireframe specified must have been created in the wireframe editor in the UI on the left. <br> @wireframe [wireframe] <br> Examples: <br> @wireframe <br> @wireframe mywireframe <br> "
+	);
+}
 
 // libapx_command_unitswap
 // ============================
@@ -950,7 +971,7 @@ void libapx_command_life(int user, unitgroup u, string argv, int spawningCount, 
 			else {
 				UnitSetPropertyFixed( UnitGroupLoopCurrent(), c_unitPropLife, val );
 			}
-		}
+		} 
 		UnitGroupLoopStep();
 	}
 	UnitGroupLoopEnd();
@@ -2056,9 +2077,11 @@ void libapx_define_subtitle(string command_name) {
 	commands_guide_entry_set(
 		g_commands_guide_entry_unit, 
 		command_name, 
-		" This command sets the description of a unit. It takes the modifier -add, which adds onto the current subtitle. <br> @subtitle [desired desc.. <br> Examples: <br> @subtitle Bob R <br> @subtitle -add was a very cool man. "
+		" This command sets the subtitle of a unit. It takes the modifier -add, which adds onto the current subtitle. <br> @subtitle [desired desc.. <br> Examples: <br> @subtitle Bob R <br> @subtitle -add was a very cool man. "
 	);
 }
+
+
 
 // libapx_command_subtitle
 // =================
@@ -2073,7 +2096,7 @@ void libapx_command_subtitleall(int user, unitgroup u, string argv, int spawning
 		val = StringSub( val, StringFind(val, " ", c_stringCase)+1, StringLength(val));
 		add = true;
 	}
-
+	
 	UnitGroupLoopBegin(g);
 	while(!UnitGroupLoopDone()) {
 		if(!add) {
@@ -2099,6 +2122,172 @@ void libapx_define_subtitleall(string command_name) {
 		" This command sets the sbutitle of a unit-type(the text under the units name). It has a modifier called -add which, instead of overwriting the subtitle, adds to the subtitle. <br> @subtitle [modifier] [subtitle.. <br> Examples: <br> @subtitle Bob ross is a cool guy <br> @subtitle -add and most agree that he is that cool. "
 	);
 }
+
+
+
+
+//libapx_command_desc
+//===================
+//Renames a unit (Setting datatable entry)
+void libapx_command_desc(int user, unitgroup u, string argv, int spawningCount, string bracketText) {
+	string val;
+	unitgroup g = u;
+	unit tmp_unit;
+	int i;
+	bool add;
+
+	val = argv;
+	val = StringSub( val, StringFind(val, " ", c_stringCase)+1, StringLength(val)); // The remainder of the chat message.
+	
+	if (StringWord(argv, 2) == "+add" || StringWord(argv, 2) == "-add" ) {
+		val = StringSub( val, StringFind(val, " ", c_stringCase)+1, StringLength(val));
+		add = true;
+	}
+
+	for (i = 1; i <= UnitGroupCount(g, c_unitCountAll); i += 1) {
+		tmp_unit = UnitGroupUnit(g, i);
+		if(add) {
+			libapx_unitdesc_set_entry(tmp_unit,libapx_unitdesc_get_entry(tmp_unit) + " " + val);
+			libapx_unit_cache_update(tmp_unit, "@desc", argv);
+		} 
+		else {
+			libapx_unitdesc_set_entry(tmp_unit, val);
+			libapx_unit_cache_update(tmp_unit, "@desc", argv);
+		}
+
+	}
+}
+void libapx_define_desc(string command_name) {
+	commands_guide_entry_set(
+		g_commands_guide_entry_unit, 
+		command_name, 
+		" This command sets the description of a unit. It takes the modifier -add, which adds onto the current subtitle. <br> @subtitle [desired desc.. <br> Examples: <br> @subtitle Bob R <br> @subtitle -add was a very cool man. "
+	);
+}
+
+
+// libapx_command_subtitle
+// =================
+// sets a unit's subtitle (underneath a unit name)
+void libapx_command_descall(int user, unitgroup u, string argv, int spawningCount, string bracketText) {
+	string val;
+	unitgroup g = u;
+	unit tmp_unit;
+	int i;
+	bool add;
+
+	val = argv;
+	val = StringSub( val, StringFind(val, " ", c_stringCase)+1, StringLength(val)); // The remainder of the chat message.
+	
+	if (StringWord(argv, 2) == "+add" || StringWord(argv, 2) == "-add" ) {
+		val = StringSub( val, StringFind(val, " ", c_stringCase)+1, StringLength(val));
+		add = true;
+	}
+
+	for (i = 1; i <= UnitGroupCount(g, c_unitCountAll); i += 1) {
+		tmp_unit = UnitGroupUnit(g, i);
+		if(add) {
+			libapx_unitdescall_set_entry(tmp_unit,libapx_unitdescall_get_entry(tmp_unit) + " " + val);
+			libapx_unit_cache_update(tmp_unit, "@descall", argv);
+		} 
+		else {
+			libapx_unitdescall_set_entry(tmp_unit, val);
+			libapx_unit_cache_update(tmp_unit, "@descall", argv);
+		}
+
+	}
+
+}
+void libapx_define_desceall(string command_name) {
+	commands_guide_entry_set(
+		g_commands_guide_entry_unit, 
+		command_name, 
+		" This command sets the description of a unit-type(the text under the units name). It has a modifier called -add which, instead of overwriting the subtitle, adds to the subtitle. <br> @subtitle [modifier] [subtitle.. <br> Examples: <br> @subtitle Bob ross is a cool guy <br> @subtitle -add and most agree that he is that cool. "
+	);
+}
+
+
+
+//libapx_command_desc
+//===================
+//Renames a unit (Setting datatable entry)
+void libapx_command_desctitle(int user, unitgroup u, string argv, int spawningCount, string bracketText) {
+	string val;
+	unitgroup g = u;
+	unit tmp_unit;
+	int i;
+	bool add;
+
+	val = argv;
+	val = StringSub( val, StringFind(val, " ", c_stringCase)+1, StringLength(val)); // The remainder of the chat message.
+	
+	if (StringWord(argv, 2) == "+add" || StringWord(argv, 2) == "-add" ) {
+		val = StringSub( val, StringFind(val, " ", c_stringCase)+1, StringLength(val));
+		add = true;
+	}
+
+	for (i = 1; i <= UnitGroupCount(g, c_unitCountAll); i += 1) {
+		tmp_unit = UnitGroupUnit(g, i);
+		if(add) {
+			libapx_unitdesctitle_set_entry(tmp_unit,libapx_unitdesctitle_get_entry(tmp_unit) + " " + val);
+			libapx_unit_cache_update(tmp_unit, "@desctitle", argv);
+		} 
+		else {
+			libapx_unitdesctitle_set_entry(tmp_unit, val);
+			libapx_unit_cache_update(tmp_unit, "@desctitle", argv);
+		}
+
+	}
+}
+void libapx_define_desctitle(string command_name) {
+	commands_guide_entry_set(
+		g_commands_guide_entry_unit, 
+		command_name, 
+		" This command sets the description title of a unit. It takes the modifier -add, which adds onto the current subtitle. <br> @subtitle [desired desc.. <br> Examples: <br> @subtitle Bob R <br> @subtitle -add was a very cool man. "
+	);
+}
+
+
+// libapx_command_subtitle
+// =================
+// sets a unit's subtitle (underneath a unit name)
+void libapx_command_desctitleall(int user, unitgroup u, string argv, int spawningCount, string bracketText) {
+	string val;
+	unitgroup g = u;
+	unit tmp_unit;
+	int i;
+	bool add;
+
+	val = argv;
+	val = StringSub( val, StringFind(val, " ", c_stringCase)+1, StringLength(val)); // The remainder of the chat message.
+	
+	if (StringWord(argv, 2) == "+add" || StringWord(argv, 2) == "-add" ) {
+		val = StringSub( val, StringFind(val, " ", c_stringCase)+1, StringLength(val));
+		add = true;
+	}
+
+	for (i = 1; i <= UnitGroupCount(g, c_unitCountAll); i += 1) {
+		tmp_unit = UnitGroupUnit(g, i);
+		if(add) {
+			libapx_unitdesctitleall_set_entry(tmp_unit,libapx_unitdesctitleall_get_entry(tmp_unit) + " " + val);
+			libapx_unit_cache_update(tmp_unit, "@desctitleall", argv);
+		} 
+		else {
+			libapx_unitdesctitleall_set_entry(tmp_unit, val);
+			libapx_unit_cache_update(tmp_unit, "@desctitleall", argv);
+		}
+
+	}
+
+}
+void libapx_define_desctitleall(string command_name) {
+	commands_guide_entry_set(
+		g_commands_guide_entry_unit, 
+		command_name, 
+		" This command sets the description title of a unit-type(the text under the units name). It has a modifier called -add which, instead of overwriting the subtitle, adds to the subtitle. <br> @subtitle [modifier] [subtitle.. <br> Examples: <br> @subtitle Bob ross is a cool guy <br> @subtitle -add and most agree that he is that cool. "
+	);
+}
+
 
 // libapx_command_tooltip
 // =====================
@@ -2621,6 +2810,8 @@ void libapx_command_radius(int user, unitgroup u, string argv, int spawningCount
 	string val = StringWord( argv, 2 );
 	fixed radius;
 	unitgroup g = u;
+	int i;
+	unit tmpu;
 
 	if(val == "") {
 		libapx_print_error(user, "Usage: @radius collision_radius[%]");
@@ -2629,29 +2820,27 @@ void libapx_command_radius(int user, unitgroup u, string argv, int spawningCount
 		radius = StringToFixed(StringSub(val, 1, StringLength(val) - 1));
 		radius = radius / 100;
 
-		UnitGroupLoopBegin(g);
-		while(!UnitGroupLoopDone()) {
-			val = CatalogFieldValueGet(c_gameCatalogUnit, UnitGetType(UnitGroupLoopCurrent()), "Radius", UnitGetOwner(UnitGroupLoopCurrent()));
+		for (i = 1; i <= UnitGroupCount(u, c_unitCountAll); i += 1) {
+			tmpu = UnitGroupUnit(u, i);
+			val = CatalogFieldValueGet(c_gameCatalogUnit, UnitGetType(tmpu), "Radius", UnitGetOwner(tmpu));
 			val = FixedToString(StringToFixed(val) * radius, 8);
-			CatalogFieldValueSet(c_gameCatalogUnit, UnitGetType(UnitGroupLoopCurrent()), "Radius", UnitGetOwner(UnitGroupLoopCurrent()), val);
+			CatalogFieldValueSet(c_gameCatalogUnit, UnitGetType(tmpu), "Radius", UnitGetOwner(tmpu), val);
 
-			val = CatalogFieldValueGet(c_gameCatalogUnit, UnitGetType(UnitGroupLoopCurrent()), "InnerRadius", UnitGetOwner(UnitGroupLoopCurrent()));
+			val = CatalogFieldValueGet(c_gameCatalogUnit, UnitGetType(tmpu), "InnerRadius", UnitGetOwner(tmpu));
 			val = FixedToString(StringToFixed(val) * radius, 8);
-			CatalogFieldValueSet(c_gameCatalogUnit, UnitGetType(UnitGroupLoopCurrent()), "InnerRadius", UnitGetOwner(UnitGroupLoopCurrent()), val);
+			CatalogFieldValueSet(c_gameCatalogUnit, UnitGetType(tmpu), "InnerRadius", UnitGetOwner(tmpu), val);
 			UnitGroupLoopStep();
-			libapx_unit_cache_update(UnitGroupLoopCurrent(), "@radius", argv);
+			libapx_unit_cache_update(tmpu, "@radius", argv);
 		}
-		UnitGroupLoopEnd();
 	}
 	else {
-		UnitGroupLoopBegin(g);
-		while(!UnitGroupLoopDone()) {
-			CatalogFieldValueSet(c_gameCatalogUnit, UnitGetType(UnitGroupLoopCurrent()), "Radius", UnitGetOwner(UnitGroupLoopCurrent()), val);
-			CatalogFieldValueSet(c_gameCatalogUnit, UnitGetType(UnitGroupLoopCurrent()), "InnerRadius", UnitGetOwner(UnitGroupLoopCurrent()), val);
-			UnitGroupLoopStep();
-			libapx_unit_cache_update(UnitGroupLoopCurrent(), "@radius", argv);
+
+		for (i = 1; i <= UnitGroupCount(u, c_unitCountAll); i += 1) {
+			tmpu = UnitGroupUnit(u, i);
+			CatalogFieldValueSet(c_gameCatalogUnit, UnitGetType(tmpu), "Radius", UnitGetOwner(tmpu), val);
+			CatalogFieldValueSet(c_gameCatalogUnit, UnitGetType(tmpu), "InnerRadius", UnitGetOwner(tmpu), val);
+			libapx_unit_cache_update(tmpu, "@radius", argv);
 		}
-		UnitGroupLoopEnd();
 	}
 
 	return;

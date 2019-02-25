@@ -76,6 +76,8 @@ void libapx_commands_initialize() {
 
 
 	// unit commands - done in cmd guide
+	
+	libapx_chat_command_create("@wireframe", libapx_command_wireframe, libapx_define_wireframe);
 	libapx_chat_command_create("@unitswap", libapx_command_unitswap, libapx_define_unitswap);
 	libapx_chat_command_create("@unitmimic", libapx_command_unitmimic, libapx_define_unitmimic);
 	libapx_chat_command_create("@unitvar", libapx_command_unitvar, libapx_define_unitvar);
@@ -93,6 +95,10 @@ void libapx_commands_initialize() {
 	libapx_chat_command_create("@face", libapx_command_face, libapx_define_face);
 	libapx_chat_command_create("@subtitle", libapx_command_subtitle, libapx_define_subtitle);
 	libapx_chat_command_create("@subtitleall", libapx_command_subtitleall, libapx_define_subtitleall);
+	libapx_chat_command_create("@desc", libapx_command_desc, libapx_define_desc);
+	libapx_chat_command_create("@descall", libapx_command_descall, libapx_define_desceall);
+	libapx_chat_command_create("@desctitle", libapx_command_desctitle, libapx_define_desctitle);
+	libapx_chat_command_create("@desctitleall", libapx_command_desctitleall, libapx_define_desctitleall);
 	libapx_chat_command_create("@tooltip", libapx_command_tooltip, libapx_define_tooltip);
 	libapx_chat_command_create("@copy", libapx_command_copy, libapx_define_copy);
 	libapx_chat_command_create("@kills", libapx_command_kills, libapx_define_kills);

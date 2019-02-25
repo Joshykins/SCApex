@@ -17,6 +17,17 @@ const int libapx_PLAYER_NEUTRAL = 0;
 const int libapx_PLAYER_HOSTILE = 15;
 const int libapx_UI_PANEL_NONE = -1;
 
+
+//DEBUG
+//Sets the bank for the wireframe
+void libapx_wireframe_bank_layer_set(
+    //Not wireframe attr
+    int p, string wireframe, bool create, int layer, 
+    //Wireframe attrs
+    string path, int r, int g, int b, bool saturation, int render_priority, int OffsetX, int OffsetY, int width, int height, int rotation, int alpha
+);
+
+
 // libapx_player_struct
 // =======================
 // contains all player properties
@@ -29,6 +40,8 @@ struct libapx_player_properties {
 	point mouse_position_ui;	// x,y position in the game UI
 	point mouse_position_lasttick_ui;
 
+	//Wireframe specifics.
+	string wireframe;
 
 	// keys + mouse flags
 	// ================
@@ -39,6 +52,7 @@ struct libapx_player_properties {
 	bool key_ctrl;
 	bool key_ctrl_lasttick;
 	bool key_alt;
+	bool key_tab;
 
 	//new keys
 	bool key_0;
@@ -100,7 +114,6 @@ struct libapx_player_properties {
 	bool key_numPadDivide;
 	bool key_numPadDecimal;
 	bool key_grave;
-	bool key_grave_lasttick;
 
 
 	bool mouse_right;
@@ -185,6 +198,20 @@ struct libapx_player_properties {
 	// resorting player's alias list multiple times
 	string aliases;
 
+	//wireframes
+	// ====================
+	// A list of a players current wireframes.
+	string wireframes;
+	//Current displayed wireframe layer count and dialogs
+	int wireframe_layer_count;
+	int[100] wireframe_layers;
+	string previous_wireframe;
+
+	//Current displayed wireframe layer count and dialogs
+	int fakewireframe_layer_count;
+	int[100] fakewireframe_layers;
+	string previous_fakewireframe;
+	
 	// map_revealer
 	// ===============
 	// map revealer for entire map (revealers player specific)
@@ -217,18 +244,17 @@ struct libapx_player_properties {
 
 	//delay for Attach
 	fixed delay;
+	
+	//Custom props for >super
 	string clan_tag;
+	string name;
 
 	//Editor mouse wheel trigger;
 	trigger editor_mouse_wheel;
-	//Editor camera unit
-	unitgroup camera_unit;
 	//Editor camera toggle
 	bool editor_toggled;
 	//Height
 	fixed editor_heightoffset;
-	//Disabled units
-	unitgroup editor_pausedunits;
 	//Rotating still,
 	bool editor_rotating;
 
@@ -243,6 +269,14 @@ struct libapx_player_properties {
 	//Name and subtitle displays when selectingn units
 	int unit_display_name;
 	int unit_display_subtitle;
+
+	//Description open toggle
+	bool description_open;
+	string last_rendered_desc;
+	string last_rendered_desc_name;
+
+	//CAmera stuff
+	point camera_position;
 };
 
 // libapx_player_parser_properties
@@ -277,6 +311,10 @@ libapx_player_parser_properties[libapx_MAX_PLAYERS][libapx_PARSER_THREAD_COUNT] 
 string libapx_sort_aliases(int player);
 
 
+//Retrieves the name of all the wireframes.
+string libapx_wireframes_get_all(int player);
+
+
 // libapx_initialize_player
 // ==============================
 // initialize players (default settings)
@@ -296,24 +334,18 @@ void libapx_player_initialize(int player) {
 	libapx_player[player].delay =  0.08;
 	libapx_player[player].waygate_dialog = 0;
 	libapx_player[player].clan_tag = "";
+	libapx_player[player].name = "";
 	libapx_player[player].editor_heightoffset = 0.0;
-	libapx_player[player].editor_pausedunits = UnitGroupEmpty();
-
+	libapx_player[player].wireframe = g_default_wireframe;
 	libapx_player[player].active_ui_panel = libapx_UI_PANEL_NONE;
 
 
 	// create alphabetized alias list
 	libapx_player[player].aliases = libapx_sort_aliases(player);
-	
-
+	libapx_player[player].wireframes = libapx_wireframes_get_all(player);
 
 	libapx_chk_all_aliases(player);
-
-	
 	CameraPan( player, RegionGetCenter(RegionEntireMap()), 0.0, 10.0, 10.0, false );
-
-	//Ui
-
 }
 
 // libapx_player_name_colored
@@ -328,8 +360,6 @@ text libapx_player_name_colored(int player) {
 	else {
 		return TextWithColor( StringToText( "<"+libapx_player[player].clan_tag+"> " ) + PlayerName(player), ColorFromIndex( PlayerGetColorIndex(player, false), c_teamColorDiffuse) );
 	}
-
-
 }
 
 

@@ -1,0 +1,123 @@
+//=========================================================
+//		Apex Roleplaying Engine
+//		Copyright (c) 2019, Apex Group
+//=========================================================
+// This software is distributed under the MIT License:
+// <http://opensource.org/licenses/MIT>
+//=========================================================
+
+const string g_wireframe_identifier =  "libapx_wireframe_";
+const string g_libapx_bank_section_wireframe = "wireframes";
+
+//Sets the bank for the wireframe
+void libapx_wireframe_bank_layer_set(
+    //Not wireframe attr
+    int p, string wireframe, bool create, int layer, 
+    //Wireframe attrs
+    string path, int r, int g, int b, bool saturation, int render_priority, int OffsetX, int OffsetY, int width, int height, int rotation, int alpha
+) {
+    string settings = 
+    path + " " +
+    IntToString(r) + " " +
+    IntToString(g) + " " +
+    IntToString(b) + " " +
+    IntToString(BoolToInt(saturation)) + " " +
+    IntToString(render_priority) + " " +
+    IntToString(OffsetX) + " " +
+    IntToString(OffsetY) + " " +
+    IntToString(width) + " " +
+    IntToString(height) + " " +
+    IntToString(rotation) + " " +
+    IntToString(alpha);
+
+    if(create) {
+        libapx_bank_create("WF_"+wireframe, "WFL_"+IntToString(layer), settings, p);
+    }
+}
+void libapx_wireframe_remove(int p, string wireframe) {
+    if(BankSectionExists(libapx_player[p].bank_storage, "WF_"+wireframe)) {
+        libapx_bank_section_remove_all("WF_"+wireframe, p);
+    }
+    //Ez
+}
+
+//Removes the specified layer and remaps the bank
+void libapx_wireframe_layer_remove(string wireframe, string layer, int p) {
+    int layer_count;
+    int i;
+    string[100] keys;
+    string[200] values;
+    //Remove specified layer
+    libapx_bank_remove("WF_"+wireframe, "WFL_"+layer,p);
+    layer_count = BankKeyCount(libapx_player[p].bank_storage, "WF_"+wireframe);
+    for (i = 0; i < layer_count; i += 1) {
+        keys[i] = BankKeyName(libapx_player[p].bank_storage, "WF_"+wireframe,i);
+        values[i] = BankValueGetAsString(libapx_player[p].bank_storage, "WF_"+wireframe, keys[i]);
+    }
+    libapx_bank_section_remove_all("WF_"+wireframe, p);
+    for (i = 0; i < layer_count; i += 1) {
+        libapx_bank_create("WF_"+wireframe, "WFL_"+IntToString(i+1), values[i], p);
+    }
+}
+void libapx_wireframe_layer_update(string wireframe, int layer, int p, string settings) {
+    libapx_bank_create("WF_"+wireframe, "WFL_"+IntToString(layer), settings, p);
+    libapx_player[p].previous_wireframe = "a_string_That_no_one_will_use";
+}
+void libapx_wireframe_layer_add(string wireframe, int p, string settings) {
+    int layer_count;
+    int i;
+    layer_count = BankKeyCount(libapx_player[p].bank_storage, "WF_"+wireframe);
+    libapx_bank_create("WF_"+wireframe, "WFL_"+IntToString(layer_count+1), settings, p);
+}
+
+
+int libapx_wireframe_get_layercount(int p, string wireframe) {
+    int layers;
+    layers = BankKeyCount(libapx_player[p].bank_storage, "WF_"+wireframe);
+    return layers;
+};
+
+//Retrieves the name of all the wireframes.
+string libapx_wireframes_get_all(int p) {
+    int i = BankSectionCount(libapx_player[p].bank_storage) - 1;
+    string wireframe_name;
+    string wireframe_list;
+    while(i >= 0) {
+        if( StringContains(BankSectionName(libapx_player[p].bank_storage, i), "WF_", c_stringBegin, c_stringNoCase) ) {
+            wireframe_name = BankSectionName(libapx_player[p].bank_storage, i);
+            wireframe_list = wireframe_list + " " + StringSub(wireframe_name, 4, StringLength(wireframe_name));
+        }
+        i -= 1;
+    }
+    return wireframe_list;
+}
+
+// libapx_wireframe_set
+// ==================
+//This sets a unit's wireframe name
+//(checks if valid beforehand)
+void libapx_wireframe_set_entry(unit u, string name) {
+    string id = libapx_unit_id(u);
+    int p = UnitGetOwner(u);
+    if(BankSectionExists(libapx_player[p].bank_storage, "WF_" + name)) {
+        DataTableSetString(true, g_wireframe_identifier + id, name);
+    }
+    else {
+        libapx_print_error(p, " The wireframe " + name + " does not exist.");
+    }
+}
+
+// libapx_wireframe_get
+// ==================
+//This gets a unit's wireframe name to be used to retrieve the unit's wireframe properties when rendering
+string libapx_wireframe_get_entry(unit u) {
+    string id = libapx_unit_id(u);
+    int p = UnitGetOwner(u);
+    if(DataTableValueExists(true, g_wireframe_identifier + id)) {
+        return DataTableGetString(true, g_wireframe_identifier + id);
+    }
+    //This'll occur if wireframe not set, or doesnt exist.
+    //In that event use default frame.
+    return g_default_wireframe;
+
+}

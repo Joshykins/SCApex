@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<Desc>
+	<!-- Menu Being moved over -->
+	<Frame type="MenuBar" name="GameUI/UIContainer/FullscreenUpperContainer/MenuBar" file="GameUI">
+		<Height val="60"/>
+		<Width val="259"/>
+		<Frame type="Image" name="MenuBarBackgroundImage">
+			<Visible val="false"/>
+		</Frame>
+	</Frame>
+
+
+	<Frame type="Frame" name="GameUI/UIContainer/FullscreenUpperContainer/MenuBarConsoleAnchor" file="GameUI">
+		<Anchor side="Left" relative="$parent" pos="Min" offset="10"/>
+		<Anchor side="Bottom" relative="$parent" pos="Max" offset="-295"/>
+		<Anchor side="Right" relative="$parent" pos="min" offset="210"/>
+		<Height val="60"/>
+		<Width val="200"/>
+    </Frame>
+</Desc>

@@ -35,6 +35,6 @@ void libapx_ui_info_init_player(int player) {
 bool libapx_ui_info_help(bool testConds, bool runActions) {
   int p = EventPlayer();
   //Set Active Layout to References
-  libapx_ui_switchto_panel(libapx_ui_panels[6].btn, p);
+  libapx_ui_switchto_panel(libapx_ui_panels[7].btn, p);
   return true;
 }

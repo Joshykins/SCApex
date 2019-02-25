@@ -81,6 +81,13 @@ include "apex/engine/unit.galaxy"
 // Stores name and subtitle to datatable to be used in ui.
 include "apex/engine/unit_rename"
 
+// unit_wireframe
+//===============
+// functions to handle unit's wireframe
+// Stores wireframe parameters to datatable to be used in ui.
+include "apex/engine/unit_wireframe"
+
+
 // scaler
 // =============
 // Contains various utility functions used throughout engine
@@ -131,8 +138,8 @@ include "apex/engine/debug.galaxy"
 
 // engine version
 const int libapx_BUILD_VERSION = 2;
-const int libapx_BUILD_SUB_VERSION = 0;
-const string libapx_BUILD_VERSION_MODIFIER = ".35";
+const int libapx_BUILD_SUB_VERSION = 1;
+const string libapx_BUILD_VERSION_MODIFIER = ".18";
 
 void libapx_engine_initialize() {
 	int player = 1;
@@ -142,7 +149,6 @@ void libapx_engine_initialize() {
 	libapx_scripts_init();				// scripts and dependencies
 	libapx_settings_initialize();		// initializes map settings
 	libapx_preplaced_unit_initialize();	// assigns unit IDs to preplaced units
-	libapx_events_initialize();			// creates global event triggers
 
 
 	// initialize players
@@ -161,5 +167,7 @@ void libapx_engine_initialize() {
 		}
 		player += 1;
 	}
+	
+	libapx_events_initialize();			// creates global event triggers
 
 }

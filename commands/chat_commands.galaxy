@@ -7,10 +7,6 @@
 //=========================================================
 
 
-//test
-void testfunc(string command_name) {
-	
-}
 
 // libapx_command_narrate
 // ====================

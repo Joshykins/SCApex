@@ -24,6 +24,7 @@ const int libapx_UNIT_INDEX_FLAG_ANIMSPEED = 6;	// flag for @animspeed has been 
 const int libapx_UNIT_INDEX_FLAG_PLAY = 7;			// flag for @play has been used
 const int libapx_UNIT_INDEX_FLAG_STATBARS = 8;		// flag for @statbars has been used
 const int libapx_UNIT_INDEX_FLAG_ROTATE = 9;		// flag for @rotate has been used
+const int libapx_UNIT_INDEX_FLAG_DECAL = 10;		// flag for @rotate has been used
 
 
 const int libapx_UNIT_INDEX_WAYGATE = 15;			// region ID for waygates
@@ -160,7 +161,6 @@ unitgroup libapx_unit_create(string type, int player, point p, fixed facing, int
 	if(StringFind(type, "colossus", c_stringNoCase) != -1 ) {
 		key = FixedToString(UnitGetCustomValue(u, libapx_UNIT_INDEX_ID), 0) + ".COLOSSUS";
 		DataTableSetString(true, key, "HASCOLOSSUS"); //Sets the flag
-		//libapx_print_output(EventPlayer(), "DEBUG: Unit flagged with colossus");
 	}
 
 
@@ -316,11 +316,9 @@ void libapx_unit_colossus_remove(unit u) {
 // libapx_unit_flag_colossus
 // ===================
 // Flags a unit that has colossus
-
 void libapx_unit_flag_colossus(unit u) {
 	string key = FixedToString(UnitGetCustomValue(u, libapx_UNIT_INDEX_ID), 0) + ".COLOSSUS";
 	DataTableSetString(true, key, "HASCOLOSSUS"); //Sets the flag
-	//libapx_print_output(EventPlayer(), "DEBUG: Unit flagged with colossus");
 	libapx_unit_colossus_remove(u);
 }
 //Predone string to determine if it's a threat
@@ -329,43 +327,10 @@ void libapx_unit_flag_colossus(unit u) {
 //The height 123 would flag this before a colossus is even detected
 
 void libapx_unit_flag_col_crashable(unit u) {
-
 	string key = FixedToString(UnitGetCustomValue(u, libapx_UNIT_INDEX_ID), 0) + ".COLOSSUSDED";
 	DataTableSetString(true, key, "HASCOLOSSUSDED"); //Sets the flag
-	//libapx_print_output(EventPlayer(), "DEBUG: Unit flagged with colossus crash");
 	libapx_unit_colossus_remove(u);
 }
-
-
-// Index to use
-// -- To flag colossus call this --
-// libapx_unit_flag_colossus(UnitGroupLoopCurrent());
-//
-// -- To flag colossus death call this --
-//	libapx_unit_flag_col_crashable(UnitGroupLoopCurrent());
-//
-// --To return flag--
-// libapx_unit_flag_get_colossus(UnitGroupLoopCurrent());
-//
-//
-// Will return boolean whether to kill or not
-//
-// --To find colossus it--
-//
-//unitgroup p = u;
-//int colcheker = 1;
-//bool colFlag = false;
-//while (StringWord(argv, colcheker) != "") {
-//	if(StringFind(StringWord(argv, colcheker), "colossus", c_stringNoCase) != -1 ) {
-//			UnitGroupLoopBegin(p);
-//			while(!UnitGroupLoopDone()) {
-//				libapx_unit_flag_colossus(UnitGroupLoopCurrent());
-//				UnitGroupLoopStep();
-//			}
-//			UnitGroupLoopEnd();
-//	}
-//	colcheker = colcheker + 1;
-//}
 
 
 
@@ -727,6 +692,86 @@ string libapx_unit_cache_reformatsubtitle(unit u, string argv) {
 
 	return "@subtitle " + description;
 }
+string libapx_unitdesc_get_entry(unit u);
+
+//This formats desc when @desc -add is used to include the new text.
+string libapx_unit_cache_reformatdesc(unit u, string argv) {
+	string description;
+	description = libapx_unitdesc_get_entry(u);
+
+	while(
+		StringContains(description, "-add",c_stringAnywhere, false) ||
+		StringContains(description, "+add",c_stringAnywhere, false) ||
+		StringContains(description, "@desc",c_stringAnywhere, false)
+	)	{
+		description = StringReplaceWord(description, "-add", "", 1, c_stringNoCase);
+		description = StringReplaceWord(description, "+add", "", 1, c_stringNoCase);
+		description = StringReplaceWord(description, "@desc", "", 1, c_stringNoCase);
+	}
+
+	return "@desc " + description;
+}
+
+string libapx_unitdescall_get_entry(unit u);
+
+//This formats descall when @descall -add is used to include the new text.
+string libapx_unit_cache_reformatdescall(unit u, string argv) {
+	string description;
+	description = libapx_unitdescall_get_entry(u);
+
+	while(
+		StringContains(description, "-add",c_stringAnywhere, false) ||
+		StringContains(description, "+add",c_stringAnywhere, false) ||
+		StringContains(description, "@descall",c_stringAnywhere, false)
+	)	{
+		description = StringReplaceWord(description, "-add", "", 1, c_stringNoCase);
+		description = StringReplaceWord(description, "+add", "", 1, c_stringNoCase);
+		description = StringReplaceWord(description, "@descall", "", 1, c_stringNoCase);
+	}
+	return "@descall " + description;
+}
+
+string libapx_unitdesctitle_get_entry(unit u);
+
+//This formats desctitle when @desctitle -add is used to include the new text.
+string libapx_unit_cache_reformatdesctitle(unit u, string argv) {
+	string description;
+	description = libapx_unitdesctitle_get_entry(u);
+
+	while(
+		StringContains(description, "-add",c_stringAnywhere, false) ||
+		StringContains(description, "+add",c_stringAnywhere, false) ||
+		StringContains(description, "@desc",c_stringAnywhere, false)
+	)	{
+		description = StringReplaceWord(description, "-add", "", 1, c_stringNoCase);
+		description = StringReplaceWord(description, "+add", "", 1, c_stringNoCase);
+		description = StringReplaceWord(description, "@desctitle", "", 1, c_stringNoCase);
+	}
+
+	return "@desctitle " + description;
+}
+
+string libapx_unitdesctitleall_get_entry(unit u);
+
+//This formats desctitleall when @desctitleall -add is used to include the new text.
+string libapx_unit_cache_reformatdesctitleall(unit u, string argv) {
+	string description;
+	description = libapx_unitdesctitleall_get_entry(u);
+
+	while(
+		StringContains(description, "-add",c_stringAnywhere, false) ||
+		StringContains(description, "+add",c_stringAnywhere, false) ||
+		StringContains(description, "@desctitleall",c_stringAnywhere, false)
+	)	{
+		description = StringReplaceWord(description, "-add", "", 1, c_stringNoCase);
+		description = StringReplaceWord(description, "+add", "", 1, c_stringNoCase);
+		description = StringReplaceWord(description, "@desctitleall", "", 1, c_stringNoCase);
+	}
+	return "@desctitleall " + description;
+}
+
+
+
 
 // libapx_unit_cache_update
 // =====================
@@ -753,6 +798,7 @@ void libapx_unit_cache_update(unit subject, string command, string user_command)
 		UnitSetCustomValue(subject, libapx_UNIT_INDEX_FLAG_PLAY, 0); //"reset" play
 		UnitSetCustomValue(subject, libapx_UNIT_INDEX_FLAG_STATBARS, 0); //"reset" statbars
 		UnitSetCustomValue(subject, libapx_UNIT_INDEX_FLAG_ROTATE, 0); //"reset" rotate
+		UnitSetCustomValue(subject, libapx_UNIT_INDEX_FLAG_DECAL, 0); //"reset" rotate
 		return;
 	}
 	else if(command == "@attach-") {
@@ -764,6 +810,7 @@ void libapx_unit_cache_update(unit subject, string command, string user_command)
 		UnitSetCustomValue(subject, libapx_UNIT_INDEX_FLAG_PLAY, 0); //"reset" play
 		UnitSetCustomValue(subject, libapx_UNIT_INDEX_FLAG_STATBARS, 0); //"reset" statbars
 		UnitSetCustomValue(subject, libapx_UNIT_INDEX_FLAG_ROTATE, 0); //"reset" rotate
+		UnitSetCustomValue(subject, libapx_UNIT_INDEX_FLAG_DECAL, 0); //"reset" rotate
 		return;
 	}
 
@@ -844,6 +891,17 @@ void libapx_unit_cache_update(unit subject, string command, string user_command)
 			return;
 		}
 	}
+	else if(command == "@decal") {
+		if(UnitGetCustomValue(subject, libapx_UNIT_INDEX_FLAG_ROTATE) != 1) {
+			libapx_unit_cache_update_add(subject, unit_id, user_command);
+			UnitSetCustomValue(subject, libapx_UNIT_INDEX_FLAG_ROTATE, 1);
+			return;
+		}
+		else {
+			libapx_unit_cache_update_overwrite(subject, unit_id, command, user_command);
+			return;
+		}
+	}
 	// Never overwrite these commands: always add a new command to cache
 	else if( command == "@actrmsg" ||
 			 command == "@addbehavior" ||
@@ -872,6 +930,7 @@ void libapx_unit_cache_update(unit subject, string command, string user_command)
 			 command == "@radius" ||
 			 command == "@renameall" ||
 			 command == "@rename" ||
+			 command == "@wireframe" ||
 			 command == "@shieldsarmor" ) {
 		libapx_unit_cache_update_overwrite(subject, unit_id, command, user_command);
 		return;
@@ -887,6 +946,48 @@ void libapx_unit_cache_update(unit subject, string command, string user_command)
 			}
 			else {
 				user_command = libapx_unit_cache_reformatsubtitle_all(subject, user_command);
+				libapx_unit_cache_update_overwrite(subject, unit_id, command, user_command);
+			}
+			return;
+		}
+		else {
+			//Won't really work, o well.
+			libapx_unit_cache_update_overwrite(subject, unit_id, command, user_command);
+		}
+		return;
+	}
+	else if (
+		command == "@desc" ||
+		command == "@descall"
+	) {
+		if (StringWord(user_command, 2) == "+add" || StringWord(user_command, 2) == "-add" ) {
+			if(command == "@desc") {
+				user_command = libapx_unit_cache_reformatdesc(subject, user_command);
+				libapx_unit_cache_update_overwrite(subject, unit_id, command, user_command);
+			}
+			else {
+				user_command = libapx_unit_cache_reformatdescall(subject, user_command);
+				libapx_unit_cache_update_overwrite(subject, unit_id, command, user_command);
+			}
+			return;
+		}
+		else {
+			//Won't really work, o well.
+			libapx_unit_cache_update_overwrite(subject, unit_id, command, user_command);
+		}
+		return;
+	}
+	else if (
+		command == "@desctitle" ||
+		command == "@desctitleall"
+	) {
+		if (StringWord(user_command, 2) == "+add" || StringWord(user_command, 2) == "-add" ) {
+			if(command == "@desctitle") {
+				user_command = libapx_unit_cache_reformatdesctitle(subject, user_command);
+				libapx_unit_cache_update_overwrite(subject, unit_id, command, user_command);
+			}
+			else {
+				user_command = libapx_unit_cache_reformatdesctitleall(subject, user_command);
 				libapx_unit_cache_update_overwrite(subject, unit_id, command, user_command);
 			}
 			return;

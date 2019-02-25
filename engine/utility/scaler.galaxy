@@ -78,7 +78,7 @@ if (category == "scale") {
 	y2 = FixedToString(y, 4);
 	z2 = FixedToString(z, 4);
 
-//	libapx_print_output(EventPlayer(), x2 + " " + y2 + " " + z2);
+	
 	moddedOffSet = x2+","+y2+","+z2;
 
 	return moddedOffSet;

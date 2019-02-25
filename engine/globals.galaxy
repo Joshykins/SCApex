@@ -23,6 +23,27 @@ int g_commands_guide_entry_actor = 3; //@attach
 int g_commands_guide_entry_region = 4; //#create
 int g_commands_guide_entry_stats = 5; //@maxlife
 
+//Wireframe
+//Definition of each layer
+struct wireframe_layer_sig {
+    string path;
+    int r;
+    int g;
+	int b;
+	bool saturation;
+	int render_priority;
+	int OffsetX;
+	int OffsetY;
+	int width;
+	int height;
+	int rotation;
+	int alpha;
+};
+wireframe_layer_sig default_wireframe;
+string g_default_wireframe = "default_wireframe_x1235asdAZSw";
+
+
+
 
 //gets a units set name
 string libapx_unitname_get_entry(unit u);
@@ -31,7 +52,63 @@ string libapx_unitname_get_entry(unit u);
 void libapx_respawn_camera_unit(int p);
 
 //Dialog for name
-int g_libapx_ui_name;
+int g_libapx_ui_name = DialogControlHookupStandard(c_triggerControlTypeLabel, "UIContainer/ConsoleUIContainer/InfoPanel/InfoPaneUnit/ApexNameLabel");
+int g_libapx_ui_subtitle = DialogControlHookupStandard(c_triggerControlTypeLabel, "UIContainer/ConsoleUIContainer/InfoPanel/InfoPaneUnit/ApexSubtitle");	
+int g_libapx_ui_heroname =  DialogControlHookupStandard(c_triggerControlTypeLabel, "UIContainer/ConsoleUIContainer/InfoPanel/InfoPaneHero/ApexNameLabel");
+int g_libapx_ui_transportname =  DialogControlHookupStandard(c_triggerControlTypeLabel, "UIContainer/ConsoleUIContainer/InfoPanel/InfoPaneCargo/ApexNameLabel");
+
+
+
+//Image frame(tmp)
+int g_libapx_ui_wireframeIMG = DialogControlHookupStandard(c_triggerControlTypeImage, "UIContainer/ConsoleUIContainer/ApexUnitImageAndStatsPanel/ApexWireframe");
+
+//Dialogs for stats
+int[3] g_libapx_ui_stats_label;
+int[3] g_libapx_ui_stats_bar;
+int[3] g_libapx_ui_stats_barbg;
+int g_libapx_ui_statsparrent = DialogControlHookupStandard(c_triggerControlTypePanel, "UIContainer/ConsoleUIContainer/ApexUnitImageAndStatsPanel");
+int g_libapx_ui_wireframe_btn = DialogControlHookupStandard(c_triggerControlTypeButton, "UIContainer/ConsoleUIContainer/ApexUnitImageAndStatsPanel/ApexWireframe/ApexWireFrameBtn");
+int g_libapx_ui_wireframe = DialogControlHookupStandard(c_triggerControlTypePanel, "UIContainer/ConsoleUIContainer/ApexUnitImageAndStatsPanel/ApexWireframe");
+int g_libapx_ui_fakewireframe = DialogControlHookupStandard(c_triggerControlTypePanel, "UIContainer/ConsoleUIContainer/FakeApexUnitImageAndStatsPanel");
+
+//Description listbox
+int g_libapx_ui_description_parrent = DialogControlHookupStandard(c_triggerControlTypePanel, "UIContainer/ConsoleUIContainer/ApexDescriptionFrame");
+int g_libapx_ui_description = DialogControlHookupStandard(c_triggerControlTypeListBox, "UIContainer/ConsoleUIContainer/ApexDescriptionFrame/ApexDescription");
+
+//Additional Beautiful Lines
+int g_libapx_ui_line1 = DialogControlHookupStandard(c_triggerControlTypePanel, "UIContainer/ConsoleUIContainer/BeautifyingFrame/LeftBar1");
+int g_libapx_ui_line2 = DialogControlHookupStandard(c_triggerControlTypePanel, "UIContainer/ConsoleUIContainer/BeautifyingFrame/LeftBar2");
+int g_libapx_ui_line3 = DialogControlHookupStandard(c_triggerControlTypePanel, "UIContainer/ConsoleUIContainer/BeautifyingFrame/LeftBar3");
+int g_libapx_ui_line4 = DialogControlHookupStandard(c_triggerControlTypePanel, "UIContainer/ConsoleUIContainer/BeautifyingFrame/LeftBar4");
+
+
+void libapx_globals_init() {
+    default_wireframe.path = "Apex/Assets/Textures/Info.png";
+    default_wireframe.r = 255;
+    default_wireframe.g = 255;
+    default_wireframe.b = 255;
+    default_wireframe.saturation = true;
+    default_wireframe.render_priority = 2;
+    default_wireframe.OffsetX = 20;
+    default_wireframe.OffsetY = 20;
+    default_wireframe.width = 160;
+    default_wireframe.height = 160;
+    default_wireframe.rotation = 0;
+    default_wireframe.alpha = 255;
+    
+    default_wireframe.rotation = 0;
+    g_libapx_ui_stats_label[0] = DialogControlHookupStandard(c_triggerControlTypeLabel, "UIContainer/ConsoleUIContainer/ApexUnitImageAndStatsPanel/ApexStats/ShieldLabel");
+    g_libapx_ui_stats_bar[0] = DialogControlHookupStandard(c_triggerControlTypeProgressBar, "UIContainer/ConsoleUIContainer/ApexUnitImageAndStatsPanel/ApexStats/ApexShieldBar");
+    g_libapx_ui_stats_barbg[0] = DialogControlHookupStandard(c_triggerControlTypeProgressBar, "UIContainer/ConsoleUIContainer/ApexUnitImageAndStatsPanel/ApexStats/ApexShieldBarBackground");
+    g_libapx_ui_stats_label[1] = DialogControlHookupStandard(c_triggerControlTypeLabel, "UIContainer/ConsoleUIContainer/ApexUnitImageAndStatsPanel/ApexStats/LifeLabel");
+    g_libapx_ui_stats_bar[1] = DialogControlHookupStandard(c_triggerControlTypeProgressBar, "UIContainer/ConsoleUIContainer/ApexUnitImageAndStatsPanel/ApexStats/ApexLifeBar");
+    g_libapx_ui_stats_barbg[1] = DialogControlHookupStandard(c_triggerControlTypeProgressBar, "UIContainer/ConsoleUIContainer/ApexUnitImageAndStatsPanel/ApexStats/ApexLifeBarBackground");
+    g_libapx_ui_stats_label[2] = DialogControlHookupStandard(c_triggerControlTypeLabel, "UIContainer/ConsoleUIContainer/ApexUnitImageAndStatsPanel/ApexStats/EnergyLabel");
+    g_libapx_ui_stats_bar[2] = DialogControlHookupStandard(c_triggerControlTypeProgressBar, "UIContainer/ConsoleUIContainer/ApexUnitImageAndStatsPanel/ApexStats/ApexEnergyBar");
+    g_libapx_ui_stats_barbg[2] = DialogControlHookupStandard(c_triggerControlTypeProgressBar, "UIContainer/ConsoleUIContainer/ApexUnitImageAndStatsPanel/ApexStats/ApexEnergyBarBackground");
+    
+
+}
 
 string commands_guide_get_entry(int entryType) {
     if(entryType == g_commands_guide_entry_admin) {

@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<Desc>
+    <Frame type="Image" name="WireframeLayerTemplate">
+        <Anchor side="Top" relative="$parent" pos="Min" offset="20"/>
+        <Anchor side="Left" relative="$parent" pos="Min" offset="20"/>
+        <Texture val="Apex/Assets/Textures/Info.png"/>
+        <TextureType val="Normal"/>
+        <Width val="160"/>
+        <Height val="160"/>
+    </Frame>
+</Desc>

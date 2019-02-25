@@ -1,0 +1,305 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<Desc>
+
+    <!--Resizes all units selected images-->
+    <Include path="Apex/Layout/UnitPanels/SelectedPages.SC2Layout"/>
+		<!--Apex Wireframe And StatsBars-->
+		<Include path="Apex/Layout/UnitPanels/Wireframe.SC2Layout"/>
+
+		<!--False Apex Wireframe And StatsBars-->
+		<Include path="Apex/Layout/UnitPanels/FalseWireframe.SC2Layout"/>
+
+
+    <Frame type="Frame" name="GameUI/UIContainer/ConsoleUIContainer" file="GameUI">
+
+		<!-- Unit name-->
+		<Frame type="InfoPanel" name="InfoPanel">
+			<Anchor side="Right" relative="$parent" pos="1" offset="-322"/>
+			<Anchor side="Left" relative="$parent" pos="1" offset="-920"/>
+			<Anchor side="Bottom" relative="$parent" pos="Max" offset="-20"/>
+			<Height val="250"/>
+			<Frame name="background" type="Image">
+				<IgnoreParentAlpha val="true"/>
+				<RenderPriority val="2"/>
+				<DisabledAlpha val="0"/>
+				<Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+				<Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
+				<Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+				<Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
+				<Texture val="Assets\Textures\border-protoss-transportslot-filled.dds"/>
+				<TextureType val="Border"/>
+				<Tiled val="true"/>
+			</Frame>
+			<Frame name="backgroundGrey" type="Image">
+					<IgnoreParentAlpha val="true"/>
+					<RenderPriority val="2"/>
+					<DisabledAlpha val="0"/>
+					<Anchor side="Left" relative="$parent" pos="Min" offset="-100"/>
+					<Anchor side="Right" relative="$parent" pos="Max" offset="100"/>
+					<Anchor side="Top" relative="$parent" pos="Min" offset="-100"/>
+					<Anchor side="Bottom" relative="$parent" pos="Max" offset="100"/>
+					<Texture val="Apex\Assets\Textures\ApexUI.dds"/>
+					<TextureType val="Border"/>
+					<Tiled val="true"/>
+			</Frame>
+			<!--Stats positioning-->
+			<Frame type="Frame" name="UnitPanel">
+					<Visible val="true"/>
+					<Width val="200"/>
+					<Height val="200"/>
+					<Anchor side="Left" relative="$parent" pos="Max" offset="20000"/>
+					<Anchor side="Top" relative="$parent" pos="Max" offset="20000"/>
+					<Frame type="BehaviorBar" name="BehaviorBar">
+						<Anchor side="Top" relative="$parent/$parent" pos="Min" offset="10"/>
+						<Anchor side="Left" relative="$parent/$parent" pos="Min" offset="10"/>
+						<Alpha val="130"/>	
+					</Frame>
+					<Frame type="UnitWireframe" name="UnitWireframe">
+							<Anchor side="Left" relative="$parent" pos="Max" offset="20000"/>
+							<Anchor side="Top" relative="$parent" pos="Max" offset="20000"/>
+							
+					</Frame>
+			</Frame>
+			<!--Normal unit-->
+			<Frame type="InfoPaneUnit" name="InfoPaneUnit">
+				<Width val="450"/>
+
+				<Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+				<Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+				
+				<Height val="250"/>
+				<Frame type="Label" name="NameLabel">
+					<Visible val="false"/>
+					<Anchor side="Top" relative="$parent" pos="Max" offset="100"/>
+					<Anchor side="Bottom" relative="$parent" pos="Max" offset="100"/>
+				</Frame>
+				<Frame type="EquipmentIcon" name="EquipmentIconTemplate">
+					<Frame type="Image" name="EquipmentIconBorder">
+						<Texture val="Assets\Textures\btn-border-equipment_help.dds"/>
+						<Color val="255,255,255"/>
+						<Desaturated val="true"/>
+					</Frame>
+				</Frame>
+				<Frame type="Label" name="ApexNameLabel">
+					<Style val="@@@InfoPaneUnitName"/>
+					<Text val="Nametest"/>
+					<Anchor side="Top" relative="$parent" pos="Min" offset="10"/>
+					<Anchor side="Left" relative="$parent" pos="Min" offset="6"/>
+					<Anchor side="Bottom" relative="" pos="Max" offset="0"/>
+					<Anchor side="Right" relative="$parent" pos="1" offset="0"/>
+				</Frame>
+				<Frame type="Label" name="Subtitle">
+					<Visible val="false"/>
+					<Anchor side="Top" relative="$parent" pos="Max" offset="100"/>
+					<Anchor side="Bottom" relative="$parent" pos="Max" offset="100"/>
+				</Frame>
+				<Frame type="Label" name="ApexSubtitle">
+					<Anchor side="Top" relative="$parent/ApexNameLabel" pos="Max" offset="0"/>
+					<Text val="helpme! I am a big subtitle"/>
+					<Style val="@@@InfoPaneUnitSubtitle"/>
+					<Anchor side="Left" relative="$parent" pos="Min" offset="6"/>
+					<Anchor side="Bottom" relative="" pos="Max" offset="0"/>
+					<Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
+				</Frame>
+				<Frame type="Label" name="InfoLabel">
+						<Visible val="false"/>
+						<Anchor side="Top" relative="$parent" pos="Max" offset="100"/>
+						<Anchor side="Bottom" relative="$parent" pos="Max" offset="100"/>
+				</Frame>
+				<Frame type="Frame" name="EquipmentPanel">
+						<Anchor side="Top" relative="$parent/ApexSubtitle" pos="Max" offset="10"/>
+
+				</Frame>
+				<Frame type="Label" name="TypeLabel">
+						<Visible val="false"/>
+						<Anchor side="Top" relative="$parent" pos="Max" offset="100"/>
+						<Anchor side="Bottom" relative="$parent" pos="Max" offset="100"/>
+				</Frame>
+			</Frame>
+			<!-- Hero Unit -->
+			<Frame type="InfoPaneHero" name="InfoPaneHero">
+				<Width val="450"/>
+				<Anchor side="Left" relative="$parent" pos="Min" offset="6"/>
+				<Anchor side="Bottom" relative="$parent" pos="Max" offset="6"/>
+				<Height val="250"/>
+				<Frame type="Label" name="NameLabel">
+					<Visible val="false"/>
+					<Anchor side="Top" relative="$parent" pos="Max" offset="100"/>
+					<Anchor side="Bottom" relative="$parent" pos="Max" offset="100"/>
+				</Frame>
+				<Frame type="Label" name="ApexNameLabel">
+					<Style val="@@@InfoPaneUnitName"/>
+					<Text val="Nametest"/>
+					<Anchor side="Top" relative="$parent" pos="Min" offset="10"/>
+					<Anchor side="Left" relative="$parent" pos="Min" offset="6"/>
+					<Anchor side="Bottom" relative="" pos="Max" offset="0"/>
+					<Anchor side="Right" relative="$parent" pos="1" offset="0"/>
+				</Frame>
+				<Frame type="ProgressBar" name="ExperienceBar">
+					<Anchor side="Top" relative="$parent/ApexNameLabel" pos="Min" offset="100"/>
+				</Frame>
+				<Frame type="Label" name="InfoLabel">
+					<Visible val="false"/>
+					<Anchor side="Top" relative="$parent" pos="Max" offset="100"/>
+					<Anchor side="Bottom" relative="$parent" pos="Max" offset="100"/>
+				</Frame>
+				<Frame type="Label" name="TypeLabel">
+					<Visible val="false"/>
+					<Anchor side="Top" relative="$parent" pos="Max" offset="100"/>
+					<Anchor side="Bottom" relative="$parent" pos="Max" offset="100"/>
+				</Frame>
+			</Frame>
+
+			<!--transporting shit-->
+			<Frame type="InfoPaneCargo" name="InfoPaneCargo">
+				<Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+				<Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+				<Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
+				<Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
+				<Height val="250"/>
+				<Width val="600"/>
+				<Frame type="Label" name="CurrentCargoLabel">
+					<Anchor side="Top" relative="$parent/ApexNameLabel" pos="Max" offset="0"/>
+					<Visible val="false"/>
+				</Frame>
+				<Frame type="Frame" name="CargoContainer">
+					<Anchor side="Top" relative="$parent/CurrentCargoLabel" pos="Max" offset="0"/>
+				</Frame>
+				<Frame type="Label" name="ApexNameLabel">
+					<Style val="@@@InfoPaneUnitName"/>
+					<Text val=""/>
+					<Anchor side="Top" relative="$parent" pos="Min" offset="10"/>
+					<Anchor side="Left" relative="$parent" pos="Min" offset="6"/>
+					<Anchor side="Right" relative="$parent" pos="1" offset="-6"/>
+				</Frame>
+				<Frame type="Label" name="NameLabel">
+						<Visible val="false"/>
+				</Frame>
+			</Frame>
+		</Frame>
+		<!-- name Button container -->
+		<Frame type="Frame" name="CommandPanelHelper">
+				<Anchor side="Right" relative="$parent" pos="1" offset="-20"/>
+				<Height val="68.5"/>
+				<Width val="302"/>
+				<Anchor side="Bottom" relative="$parent" pos="Max" offset="-201"/>
+				<Frame name="background" type="Image">
+						<IgnoreParentAlpha val="true"/>
+						<RenderPriority val="1"/>
+						<DisabledAlpha val="0"/>
+						<Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+						<Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
+						<Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+						<Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
+						<Texture val="Assets\Textures\border-protoss-transportslot-filled.dds"/>
+						<TextureType val="Border"/>
+						<Tiled val="true"/>
+					</Frame>
+					<Frame name="backgroundGrey" type="Image">
+							<IgnoreParentAlpha val="true"/>
+							<RenderPriority val="2"/>
+							<DisabledAlpha val="0"/>
+							<Anchor side="Left" relative="$parent" pos="Min" offset="-100"/>
+							<Anchor side="Right" relative="$parent" pos="Max" offset="100"/>
+							<Anchor side="Top" relative="$parent" pos="Min" offset="-100"/>
+							<Anchor side="Bottom" relative="$parent" pos="Max" offset="100"/>
+							<Texture val="Apex\Assets\Textures\ApexUI.dds"/>
+							<TextureType val="Border"/>
+							<Tiled val="true"/>
+					</Frame>
+		</Frame>
+		<!-- Unit abilities/command panel -->
+		<Frame type="CommandPanel" name="CommandPanel">
+			<Anchor side="Right" relative="$parent" pos="1" offset="-20"/> <!-- Offset is 300+width -->
+			<Height val="181.5"/>
+			<Width val="302"/>
+			<Anchor side="Bottom" relative="$parent" pos="Max" offset="-20"/>
+			<Frame name="background" type="Image">
+				<IgnoreParentAlpha val="true"/>
+				<RenderPriority val="1"/>
+				<DisabledAlpha val="0"/>
+				<Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+				<Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
+				<Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+				<Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
+				<Texture val="Assets\Textures\border-protoss-transportslot-filled.dds"/>
+				<TextureType val="Border"/>
+				<Tiled val="true"/>
+			</Frame>
+			<Frame name="backgroundGrey" type="Image">
+					<IgnoreParentAlpha val="true"/>
+					<RenderPriority val="2"/>
+					<DisabledAlpha val="0"/>
+					<Anchor side="Left" relative="$parent" pos="Min" offset="-100"/>
+					<Anchor side="Right" relative="$parent" pos="Max" offset="100"/>
+					<Anchor side="Top" relative="$parent" pos="Min" offset="-100"/>
+					<Anchor side="Bottom" relative="$parent" pos="Max" offset="100"/>
+					<Texture val="Apex\Assets\Textures\ApexUI.dds"/>
+					<TextureType val="Border"/>
+					<Tiled val="true"/>
+			</Frame>
+			<Frame type="CommandButton" name="CommandButton00">
+				<Height val="57"/> <!--Default size is 76 x 76-->
+				<Width val="57"/>
+				<Anchor side="Top" relative="$parent" pos="Min" offset="4"/>
+				<Anchor side="Left" relative="$parent" pos="Min" offset="6"/>
+			</Frame>
+			<Frame type="CommandButton" name="CommandButton01">
+					<Height val="57"/>
+					<Width val="57"/>
+			</Frame>
+			<Frame type="CommandButton" name="CommandButton02">
+					<Height val="57"/>
+					<Width val="57"/>
+			</Frame>
+			<Frame type="CommandButton" name="CommandButton03">
+					<Height val="57"/>
+					<Width val="57"/>
+			</Frame>
+			<Frame type="CommandButton" name="CommandButton04">
+					<Height val="57"/>
+					<Width val="57"/>
+			</Frame>
+			<Frame type="CommandButton" name="CommandButton05">
+					<Height val="57"/>
+					<Width val="57"/>
+			</Frame>
+			<Frame type="CommandButton" name="CommandButton06">
+					<Height val="57"/>
+					<Width val="57"/>
+			</Frame>
+			<Frame type="CommandButton" name="CommandButton07">
+					<Height val="57"/>
+					<Width val="57"/>
+			</Frame>
+			<Frame type="CommandButton" name="CommandButton08">
+					<Height val="57"/>
+					<Width val="57"/>
+			</Frame>
+			<Frame type="CommandButton" name="CommandButton09">
+					<Height val="57"/>
+					<Width val="57"/>
+			</Frame>
+			<Frame type="CommandButton" name="CommandButton10">
+					<Height val="57"/>
+					<Width val="57"/>
+			</Frame>
+			<Frame type="CommandButton" name="CommandButton11">
+					<Height val="57"/>
+					<Width val="57"/>
+			</Frame>
+			<Frame type="CommandButton" name="CommandButton12">
+					<Height val="57"/>
+					<Width val="57"/>
+			</Frame>
+			<Frame type="CommandButton" name="CommandButton13">
+					<Height val="57"/>
+					<Width val="57"/>
+			</Frame>
+			<Frame type="CommandButton" name="CommandButton14">
+					<Height val="57"/>
+					<Width val="57"/>
+			</Frame>
+		</Frame>
+    </Frame>
+</Desc>

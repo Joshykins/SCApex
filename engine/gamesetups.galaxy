@@ -34,6 +34,8 @@ bool libapx_gamesetup_remove(int player, string gamesetup_name) {
 	return false;
 }
 
+
+
 // libapx_gamesetup_save
 // ==================
 // saves all units (in region rgn) and their command caches into a
@@ -206,6 +208,7 @@ string libapx_gamesetup_alias_commands(string s) {
 	aliased = StringReplaceWord(aliased, "@adddamage", "@ad", c_stringReplaceAll, false);
 	aliased = StringReplaceWord(aliased, "@addrange", "@ar", c_stringReplaceAll, false);
 	aliased = StringReplaceWord(aliased, "@height", "@ht", c_stringReplaceAll, false);
+	aliased = StringReplaceWord(aliased, "@state", "@se", c_stringReplaceAll, false);
 	aliased = StringReplaceWord(aliased, "@invulnerable", "@inv", c_stringReplaceAll, false);
 	aliased = StringReplaceWord(aliased, "@setname", "@snm", c_stringReplaceAll, false);
 	aliased = StringReplaceWord(aliased, "@setnamecolor", "@snc", c_stringReplaceAll, false);
@@ -214,7 +217,7 @@ string libapx_gamesetup_alias_commands(string s) {
 	aliased = StringReplaceWord(aliased, "@tooltip", "@tt", c_stringReplaceAll, false);
 	aliased = StringReplaceWord(aliased, "@weaponspeedall", "@wpa", c_stringReplaceAll, false);
 	aliased = StringReplaceWord(aliased, "@weaponspeed", "@wp", c_stringReplaceAll, false);
-	aliased = StringReplaceWord(aliased, "@state", "@se", c_stringReplaceAll, false);
+	
 	return aliased;
 }
 
@@ -242,6 +245,7 @@ string libapx_gamesetup_alias_commands_unpack(string aliased) {
 	unpacked = StringReplaceWord(unpacked, "@rw", "@removeweapon", c_stringReplaceAll, false);
 	unpacked = StringReplaceWord(unpacked, "@ef", "@effect", c_stringReplaceAll, false);
 	unpacked = StringReplaceWord(unpacked, "@ht", "@height", c_stringReplaceAll, false);
+	unpacked = StringReplaceWord(unpacked, "@se", "@state", c_stringReplaceAll, false);
 	unpacked = StringReplaceWord(unpacked, "@inv", "@invulnerable", c_stringReplaceAll, false);
 	unpacked = StringReplaceWord(unpacked, "@snm", "@setname", c_stringReplaceAll, false);
 	unpacked = StringReplaceWord(unpacked, "@snc", "@setnamecolor", c_stringReplaceAll, false);
@@ -250,6 +254,6 @@ string libapx_gamesetup_alias_commands_unpack(string aliased) {
 	unpacked = StringReplaceWord(unpacked, "@tt", "@tooltip", c_stringReplaceAll, false);
 	unpacked = StringReplaceWord(unpacked, "@wpa", "@weaponspeedall", c_stringReplaceAll, false);
 	unpacked = StringReplaceWord(unpacked, "@wp", "@weaponspeed", c_stringReplaceAll, false);
-	unpacked = StringReplaceWord(unpacked, "@se", "@state", c_stringReplaceAll, false);
+	
 	return unpacked;
 }

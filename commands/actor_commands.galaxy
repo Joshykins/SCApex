@@ -431,8 +431,6 @@ void libapx_command_decal(int user, unitgroup u, string argv, int spawningCount,
 	}
 
 	amsg = "TextureSelectById {" + decal + "}";
-
-
 	libapx_apply_actormsg(u, target, argv, "@decal", amsg);
 
 	return;
@@ -715,8 +713,7 @@ void libapx_command_statbars(int user, unitgroup u, string argv, int spawningCou
 	}
 
 	// apply the statbars actor msgs
-	libapx_apply_actormsg(u, target, argv, "@statbars",
-						  "SetShowStatusBar" + state);
+	libapx_apply_actormsg(u, target, argv, "@statbars", "SetShowStatusBar" + state);
 	return;
 }
 void libapx_define_statbars(string command_name) {
@@ -1147,6 +1144,7 @@ void libapx_command_attach_rotation(int user, unitgroup u, string argv, int spaw
 	int j;
 	string temp;
 	bool nocache;
+	unit tmp_unit;
 	if(StringFind( argv, "-nocache",c_stringNoCase) != -1) {
 		argv =  StringReplaceWord(argv, "-nocache", "", 1, c_stringNoCase);
 		nocache = true;
@@ -1171,9 +1169,8 @@ void libapx_command_attach_rotation(int user, unitgroup u, string argv, int spaw
 		temp = StringWord(argv, i);
 		if(mod_ypr) {
 			if (StringFind(temp, "y", c_stringNoCase) != -1) {
-
 				temp = StringReplace(temp, "", StringFind(temp, "y", c_stringNoCase), StringFind(temp, "y", c_stringNoCase) );
-	
+
 				for (j = 1; j <= UnitGroupCount(u, c_unitCountAll); j += 1) {
 					 attach_rotation_z(StringToInt(temp), !mod_b, UnitGroupUnit(u, j));
 				}
@@ -1222,18 +1219,22 @@ void libapx_command_attach_rotation(int user, unitgroup u, string argv, int spaw
 			   }
 			}
 		}
-		for (j = 1; j <= UnitGroupCount(u, c_unitCountAll); j += 1) {
-			if(!nocache) {
-				libapx_unit_cache_update(UnitGroupUnit(u, j), "@rotation", argv);
-			}
-
-		}
-
-
 		i += 1;
 	}
 
+	//Reform argv
+	if(mod_ypr) {
+		argv = argv + " -ypr";
+	}
+	if(mod_b) {
+		argv = argv + " -b";
+	}
+	for (j = 1; j <= UnitGroupCount(u, c_unitCountAll); j += 1) {
+		if(!nocache) {
+			libapx_unit_cache_update(UnitGroupUnit(u, j), "@rotation", argv);
+		}
 
+	}
 
 }
 void libapx_define_rotation(string command_name) {
@@ -1253,7 +1254,9 @@ void attach_rotation_x(int degrees, bool abs_scale, unit u) {
 	//Z is Hardpoint_01-08
 	string actor_name = "Beacon_Apex";
 	int degreesAbs = AbsI(degrees);
-
+	if(abs_scale) {
+		actor_name = "Apex_Actor";
+	}
 	while(degreesAbs > 360 || degreesAbs == 360) {
 		degreesAbs -= 360;
 	}
@@ -1299,7 +1302,9 @@ void attach_rotation_z(int degrees, bool abs_scale, unit u) {
 	//Z is Hardpoint_01-08
 	string actor_name = "Beacon_Apex";
 	int degreesAbs = AbsI(degrees);
-
+	if(abs_scale) {
+		actor_name = "Apex_Actor";
+	}
 	while(degreesAbs > 360 || degreesAbs == 360) {
 		degreesAbs -= 360;
 	}
@@ -1345,7 +1350,9 @@ void attach_rotation_y(int degrees, bool abs_scale, unit u) {
 	//Z is Hardpoint_01-08
 	string actor_name = "Beacon_Apex";
 	int degreesAbs = AbsI(degrees);
-
+	if(abs_scale) {
+		actor_name = "Apex_Actor";
+	}
 	while(degreesAbs > 360 || degreesAbs == 360) {
 		degreesAbs -= 360;
 	}

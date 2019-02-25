@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<Desc>
+	
+	<!-- Hide default Blizzard chat area, since we use it for commands -->
+	<Frame type="MessageDisplay" name="GameUI/UIContainer/FullscreenUpperContainer/ChatDisplay" file="GameUI">
+		<Visible val="false"/>
+	</Frame>
+
+	<!-- Hide replay chat area so that viewers don't have to see all the commands there -->
+	<Frame type="MessageDisplay" name="GameUI/UIContainer/FullscreenUpperContainer/ReplayChatDisplay" file="GameUI">
+		<Visible val="false"/>
+	</Frame>
+
+
+	<!-- Use DebugDisplay chat area as our new main chat area for Apex. We can output to this through triggers as needed. -->
+	<Frame type="MessageDisplay" name="GameUI/UIContainer/FullscreenUpperContainer/DebugDisplay" file="GameUI">
+        <MaxMessages val="64"/>
+        <MessageDuration val="25000"/>
+		<FadeDuration val="5000"/>
+		<Style val="ChatDisplay"/>
+        <AcceptsMouse val="false"/>
+		<BatchText val="true"/>
+		<Anchor side="Bottom" relative="$parent" pos="Max" offset="-335"/>
+		<Anchor side="Left" relative="$parent" pos="Mid" offset="0"/>
+		<Anchor side="Right" relative="$parent" pos="Mid" offset="0"/>
+		<Width val="720"/>
+		<Height val="700"/>
+    </Frame>
+</Desc>

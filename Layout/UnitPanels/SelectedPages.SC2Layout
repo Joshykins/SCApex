@@ -1,0 +1,595 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<Desc>
+    <Frame type="Frame" name="GameUI/UIContainer/ConsoleUIContainer" file="GameUI">
+		<!-- Grouped units -->
+		<Frame type="Frame" name="InfoPanel/InfoPaneGroup/PageFrame0" file="InfoPaneGroup">
+			<Frame type="UnitButton" name="GroupUnitButton0">
+				<Width val="45"/>
+				<Height val="45"/>
+			</Frame>
+			<Frame type="UnitButton" name="GroupUnitButton1">
+					<Width val="45"/>
+					<Height val="45"/>
+			</Frame>
+			<Frame type="UnitButton" name="GroupUnitButton2">
+					<Width val="45"/>
+					<Height val="45"/>
+			</Frame>
+			<Frame type="UnitButton" name="GroupUnitButton3">
+					<Width val="45"/>
+					<Height val="45"/>
+			</Frame>
+			<Frame type="UnitButton" name="GroupUnitButton4">
+					<Width val="45"/>
+					<Height val="45"/>
+			</Frame>
+			<Frame type="UnitButton" name="GroupUnitButton5">
+					<Width val="45"/>
+					<Height val="45"/>
+			</Frame>
+			<Frame type="UnitButton" name="GroupUnitButton6">
+					<Width val="45"/>
+					<Height val="45"/>
+			</Frame>
+			<Frame type="UnitButton" name="GroupUnitButton7">
+					<Width val="45"/>
+					<Height val="45"/>
+			</Frame>
+			<Frame type="UnitButton" name="GroupUnitButton8">
+					<Width val="45"/>
+					<Height val="45"/>
+			</Frame>
+			<Frame type="UnitButton" name="GroupUnitButton9">
+					<Width val="45"/>
+					<Height val="45"/>
+			</Frame>
+			<Frame type="UnitButton" name="GroupUnitButton10">
+					<Width val="45"/>
+					<Height val="45"/>
+			</Frame>
+			<Frame type="UnitButton" name="GroupUnitButton11">
+					<Width val="45"/>
+					<Height val="45"/>
+			</Frame>
+			<Frame type="UnitButton" name="GroupUnitButton12">
+					<Width val="45"/>
+					<Height val="45"/>
+			</Frame>
+			<Frame type="UnitButton" name="GroupUnitButton13">
+					<Width val="45"/>
+					<Height val="45"/>
+			</Frame>
+			<Frame type="UnitButton" name="GroupUnitButton14">
+					<Width val="45"/>
+					<Height val="45"/>
+			</Frame>
+			<Frame type="UnitButton" name="GroupUnitButton15">
+					<Width val="45"/>
+					<Height val="45"/>
+			</Frame>
+			<Frame type="UnitButton" name="GroupUnitButton16">
+					<Width val="45"/>
+					<Height val="45"/>
+			</Frame>
+			<Frame type="UnitButton" name="GroupUnitButton17">
+					<Width val="45"/>
+					<Height val="45"/>
+			</Frame>
+			<Frame type="UnitButton" name="GroupUnitButton18">
+					<Width val="45"/>
+					<Height val="45"/>
+			</Frame>
+			<Frame type="UnitButton" name="GroupUnitButton19">
+					<Width val="45"/>
+					<Height val="45"/>
+			</Frame>
+			<Frame type="UnitButton" name="GroupUnitButton20">
+					<Width val="45"/>
+					<Height val="45"/>
+			</Frame>
+			<Frame type="UnitButton" name="GroupUnitButton21">
+					<Width val="45"/>
+					<Height val="45"/>
+			</Frame>
+			<Frame type="UnitButton" name="GroupUnitButton22">
+					<Width val="45"/>
+					<Height val="45"/>
+			</Frame>
+			<Frame type="UnitButton" name="GroupUnitButton23">
+					<Width val="45"/>
+					<Height val="45"/>
+			</Frame>
+		</Frame>
+		<Frame type="Frame" name="InfoPanel/InfoPaneGroup/PageFrame1" file="InfoPaneGroup">
+
+			<Frame type="UnitButton" name="GroupUnitButton0">
+				<Width val="45"/>
+				<Height val="45"/>
+			</Frame>
+			<Frame type="UnitButton" name="GroupUnitButton1">
+					<Width val="45"/>
+					<Height val="45"/>
+			</Frame>
+			<Frame type="UnitButton" name="GroupUnitButton2">
+					<Width val="45"/>
+					<Height val="45"/>
+			</Frame>
+			<Frame type="UnitButton" name="GroupUnitButton3">
+					<Width val="45"/>
+					<Height val="45"/>
+			</Frame>
+			<Frame type="UnitButton" name="GroupUnitButton4">
+					<Width val="45"/>
+					<Height val="45"/>
+			</Frame>
+			<Frame type="UnitButton" name="GroupUnitButton5">
+					<Width val="45"/>
+					<Height val="45"/>
+			</Frame>
+			<Frame type="UnitButton" name="GroupUnitButton6">
+					<Width val="45"/>
+					<Height val="45"/>
+			</Frame>
+			<Frame type="UnitButton" name="GroupUnitButton7">
+					<Width val="45"/>
+					<Height val="45"/>
+			</Frame>
+			<Frame type="UnitButton" name="GroupUnitButton8">
+					<Width val="45"/>
+					<Height val="45"/>
+			</Frame>
+			<Frame type="UnitButton" name="GroupUnitButton9">
+					<Width val="45"/>
+					<Height val="45"/>
+			</Frame>
+			<Frame type="UnitButton" name="GroupUnitButton10">
+					<Width val="45"/>
+					<Height val="45"/>
+			</Frame>
+			<Frame type="UnitButton" name="GroupUnitButton11">
+					<Width val="45"/>
+					<Height val="45"/>
+			</Frame>
+			<Frame type="UnitButton" name="GroupUnitButton12">
+					<Width val="45"/>
+					<Height val="45"/>
+			</Frame>
+			<Frame type="UnitButton" name="GroupUnitButton13">
+					<Width val="45"/>
+					<Height val="45"/>
+			</Frame>
+			<Frame type="UnitButton" name="GroupUnitButton14">
+					<Width val="45"/>
+					<Height val="45"/>
+			</Frame>
+			<Frame type="UnitButton" name="GroupUnitButton15">
+					<Width val="45"/>
+					<Height val="45"/>
+			</Frame>
+			<Frame type="UnitButton" name="GroupUnitButton16">
+					<Width val="45"/>
+					<Height val="45"/>
+			</Frame>
+			<Frame type="UnitButton" name="GroupUnitButton17">
+					<Width val="45"/>
+					<Height val="45"/>
+			</Frame>
+			<Frame type="UnitButton" name="GroupUnitButton18">
+					<Width val="45"/>
+					<Height val="45"/>
+			</Frame>
+			<Frame type="UnitButton" name="GroupUnitButton19">
+					<Width val="45"/>
+					<Height val="45"/>
+			</Frame>
+			<Frame type="UnitButton" name="GroupUnitButton20">
+					<Width val="45"/>
+					<Height val="45"/>
+			</Frame>
+			<Frame type="UnitButton" name="GroupUnitButton21">
+					<Width val="45"/>
+					<Height val="45"/>
+			</Frame>
+			<Frame type="UnitButton" name="GroupUnitButton22">
+					<Width val="45"/>
+					<Height val="45"/>
+			</Frame>
+			<Frame type="UnitButton" name="GroupUnitButton23">
+					<Width val="45"/>
+					<Height val="45"/>
+			</Frame>
+		</Frame>
+		<Frame type="Frame" name="InfoPanel/InfoPaneGroup/PageFrame2" file="InfoPaneGroup">
+			<Frame type="UnitButton" name="GroupUnitButton0">
+				<Width val="45"/>
+				<Height val="45"/>
+			</Frame>
+			<Frame type="UnitButton" name="GroupUnitButton1">
+					<Width val="45"/>
+					<Height val="45"/>
+			</Frame>
+			<Frame type="UnitButton" name="GroupUnitButton2">
+					<Width val="45"/>
+					<Height val="45"/>
+			</Frame>
+			<Frame type="UnitButton" name="GroupUnitButton3">
+					<Width val="45"/>
+					<Height val="45"/>
+			</Frame>
+			<Frame type="UnitButton" name="GroupUnitButton4">
+					<Width val="45"/>
+					<Height val="45"/>
+			</Frame>
+			<Frame type="UnitButton" name="GroupUnitButton5">
+					<Width val="45"/>
+					<Height val="45"/>
+			</Frame>
+			<Frame type="UnitButton" name="GroupUnitButton6">
+					<Width val="45"/>
+					<Height val="45"/>
+			</Frame>
+			<Frame type="UnitButton" name="GroupUnitButton7">
+					<Width val="45"/>
+					<Height val="45"/>
+			</Frame>
+			<Frame type="UnitButton" name="GroupUnitButton8">
+					<Width val="45"/>
+					<Height val="45"/>
+			</Frame>
+			<Frame type="UnitButton" name="GroupUnitButton9">
+					<Width val="45"/>
+					<Height val="45"/>
+			</Frame>
+			<Frame type="UnitButton" name="GroupUnitButton10">
+					<Width val="45"/>
+					<Height val="45"/>
+			</Frame>
+			<Frame type="UnitButton" name="GroupUnitButton11">
+					<Width val="45"/>
+					<Height val="45"/>
+			</Frame>
+			<Frame type="UnitButton" name="GroupUnitButton12">
+					<Width val="45"/>
+					<Height val="45"/>
+			</Frame>
+			<Frame type="UnitButton" name="GroupUnitButton13">
+					<Width val="45"/>
+					<Height val="45"/>
+			</Frame>
+			<Frame type="UnitButton" name="GroupUnitButton14">
+					<Width val="45"/>
+					<Height val="45"/>
+			</Frame>
+			<Frame type="UnitButton" name="GroupUnitButton15">
+					<Width val="45"/>
+					<Height val="45"/>
+			</Frame>
+			<Frame type="UnitButton" name="GroupUnitButton16">
+					<Width val="45"/>
+					<Height val="45"/>
+			</Frame>
+			<Frame type="UnitButton" name="GroupUnitButton17">
+					<Width val="45"/>
+					<Height val="45"/>
+			</Frame>
+			<Frame type="UnitButton" name="GroupUnitButton18">
+					<Width val="45"/>
+					<Height val="45"/>
+			</Frame>
+			<Frame type="UnitButton" name="GroupUnitButton19">
+					<Width val="45"/>
+					<Height val="45"/>
+			</Frame>
+			<Frame type="UnitButton" name="GroupUnitButton20">
+					<Width val="45"/>
+					<Height val="45"/>
+			</Frame>
+			<Frame type="UnitButton" name="GroupUnitButton21">
+					<Width val="45"/>
+					<Height val="45"/>
+			</Frame>
+			<Frame type="UnitButton" name="GroupUnitButton22">
+					<Width val="45"/>
+					<Height val="45"/>
+			</Frame>
+			<Frame type="UnitButton" name="GroupUnitButton23">
+					<Width val="45"/>
+					<Height val="45"/>
+			</Frame>
+		</Frame>
+		<Frame type="Frame" name="InfoPanel/InfoPaneGroup/PageFrame3" file="InfoPaneGroup">
+			<Frame type="UnitButton" name="GroupUnitButton0">
+				<Width val="45"/>
+				<Height val="45"/>
+			</Frame>
+			<Frame type="UnitButton" name="GroupUnitButton1">
+					<Width val="45"/>
+					<Height val="45"/>
+			</Frame>
+			<Frame type="UnitButton" name="GroupUnitButton2">
+					<Width val="45"/>
+					<Height val="45"/>
+			</Frame>
+			<Frame type="UnitButton" name="GroupUnitButton3">
+					<Width val="45"/>
+					<Height val="45"/>
+			</Frame>
+			<Frame type="UnitButton" name="GroupUnitButton4">
+					<Width val="45"/>
+					<Height val="45"/>
+			</Frame>
+			<Frame type="UnitButton" name="GroupUnitButton5">
+					<Width val="45"/>
+					<Height val="45"/>
+			</Frame>
+			<Frame type="UnitButton" name="GroupUnitButton6">
+					<Width val="45"/>
+					<Height val="45"/>
+			</Frame>
+			<Frame type="UnitButton" name="GroupUnitButton7">
+					<Width val="45"/>
+					<Height val="45"/>
+			</Frame>
+			<Frame type="UnitButton" name="GroupUnitButton8">
+					<Width val="45"/>
+					<Height val="45"/>
+			</Frame>
+			<Frame type="UnitButton" name="GroupUnitButton9">
+					<Width val="45"/>
+					<Height val="45"/>
+			</Frame>
+			<Frame type="UnitButton" name="GroupUnitButton10">
+					<Width val="45"/>
+					<Height val="45"/>
+			</Frame>
+			<Frame type="UnitButton" name="GroupUnitButton11">
+					<Width val="45"/>
+					<Height val="45"/>
+			</Frame>
+			<Frame type="UnitButton" name="GroupUnitButton12">
+					<Width val="45"/>
+					<Height val="45"/>
+			</Frame>
+			<Frame type="UnitButton" name="GroupUnitButton13">
+					<Width val="45"/>
+					<Height val="45"/>
+			</Frame>
+			<Frame type="UnitButton" name="GroupUnitButton14">
+					<Width val="45"/>
+					<Height val="45"/>
+			</Frame>
+			<Frame type="UnitButton" name="GroupUnitButton15">
+					<Width val="45"/>
+					<Height val="45"/>
+			</Frame>
+			<Frame type="UnitButton" name="GroupUnitButton16">
+					<Width val="45"/>
+					<Height val="45"/>
+			</Frame>
+			<Frame type="UnitButton" name="GroupUnitButton17">
+					<Width val="45"/>
+					<Height val="45"/>
+			</Frame>
+			<Frame type="UnitButton" name="GroupUnitButton18">
+					<Width val="45"/>
+					<Height val="45"/>
+			</Frame>
+			<Frame type="UnitButton" name="GroupUnitButton19">
+					<Width val="45"/>
+					<Height val="45"/>
+			</Frame>
+			<Frame type="UnitButton" name="GroupUnitButton20">
+					<Width val="45"/>
+					<Height val="45"/>
+			</Frame>
+			<Frame type="UnitButton" name="GroupUnitButton21">
+					<Width val="45"/>
+					<Height val="45"/>
+			</Frame>
+			<Frame type="UnitButton" name="GroupUnitButton22">
+					<Width val="45"/>
+					<Height val="45"/>
+			</Frame>
+			<Frame type="UnitButton" name="GroupUnitButton23">
+					<Width val="45"/>
+					<Height val="45"/>
+			</Frame>
+		</Frame>
+		<Frame type="Frame" name="InfoPanel/InfoPaneGroup/PageFrame4" file="InfoPaneGroup">
+			<Frame type="UnitButton" name="GroupUnitButton0">
+				<Width val="45"/>
+				<Height val="45"/>
+			</Frame>
+			<Frame type="UnitButton" name="GroupUnitButton1">
+					<Width val="45"/>
+					<Height val="45"/>
+			</Frame>
+			<Frame type="UnitButton" name="GroupUnitButton2">
+					<Width val="45"/>
+					<Height val="45"/>
+			</Frame>
+			<Frame type="UnitButton" name="GroupUnitButton3">
+					<Width val="45"/>
+					<Height val="45"/>
+			</Frame>
+			<Frame type="UnitButton" name="GroupUnitButton4">
+					<Width val="45"/>
+					<Height val="45"/>
+			</Frame>
+			<Frame type="UnitButton" name="GroupUnitButton5">
+					<Width val="45"/>
+					<Height val="45"/>
+			</Frame>
+			<Frame type="UnitButton" name="GroupUnitButton6">
+					<Width val="45"/>
+					<Height val="45"/>
+			</Frame>
+			<Frame type="UnitButton" name="GroupUnitButton7">
+					<Width val="45"/>
+					<Height val="45"/>
+			</Frame>
+			<Frame type="UnitButton" name="GroupUnitButton8">
+					<Width val="45"/>
+					<Height val="45"/>
+			</Frame>
+			<Frame type="UnitButton" name="GroupUnitButton9">
+					<Width val="45"/>
+					<Height val="45"/>
+			</Frame>
+			<Frame type="UnitButton" name="GroupUnitButton10">
+					<Width val="45"/>
+					<Height val="45"/>
+			</Frame>
+			<Frame type="UnitButton" name="GroupUnitButton11">
+					<Width val="45"/>
+					<Height val="45"/>
+			</Frame>
+			<Frame type="UnitButton" name="GroupUnitButton12">
+					<Width val="45"/>
+					<Height val="45"/>
+			</Frame>
+			<Frame type="UnitButton" name="GroupUnitButton13">
+					<Width val="45"/>
+					<Height val="45"/>
+			</Frame>
+			<Frame type="UnitButton" name="GroupUnitButton14">
+					<Width val="45"/>
+					<Height val="45"/>
+			</Frame>
+			<Frame type="UnitButton" name="GroupUnitButton15">
+					<Width val="45"/>
+					<Height val="45"/>
+			</Frame>
+			<Frame type="UnitButton" name="GroupUnitButton16">
+					<Width val="45"/>
+					<Height val="45"/>
+			</Frame>
+			<Frame type="UnitButton" name="GroupUnitButton17">
+					<Width val="45"/>
+					<Height val="45"/>
+			</Frame>
+			<Frame type="UnitButton" name="GroupUnitButton18">
+					<Width val="45"/>
+					<Height val="45"/>
+			</Frame>
+			<Frame type="UnitButton" name="GroupUnitButton19">
+					<Width val="45"/>
+					<Height val="45"/>
+			</Frame>
+			<Frame type="UnitButton" name="GroupUnitButton20">
+					<Width val="45"/>
+					<Height val="45"/>
+			</Frame>
+			<Frame type="UnitButton" name="GroupUnitButton21">
+					<Width val="45"/>
+					<Height val="45"/>
+			</Frame>
+			<Frame type="UnitButton" name="GroupUnitButton22">
+					<Width val="45"/>
+					<Height val="45"/>
+			</Frame>
+			<Frame type="UnitButton" name="GroupUnitButton23">
+					<Width val="45"/>
+					<Height val="45"/>
+			</Frame>
+		</Frame>
+		<Frame type="Frame" name="InfoPanel/InfoPaneGroup/PageFrame5" file="InfoPaneGroup">
+			<Frame type="UnitButton" name="GroupUnitButton0">
+				<Width val="45"/>
+				<Height val="45"/>
+			</Frame>
+			<Frame type="UnitButton" name="GroupUnitButton1">
+					<Width val="45"/>
+					<Height val="45"/>
+			</Frame>
+			<Frame type="UnitButton" name="GroupUnitButton2">
+					<Width val="45"/>
+					<Height val="45"/>
+			</Frame>
+			<Frame type="UnitButton" name="GroupUnitButton3">
+					<Width val="45"/>
+					<Height val="45"/>
+			</Frame>
+			<Frame type="UnitButton" name="GroupUnitButton4">
+					<Width val="45"/>
+					<Height val="45"/>
+			</Frame>
+			<Frame type="UnitButton" name="GroupUnitButton5">
+					<Width val="45"/>
+					<Height val="45"/>
+			</Frame>
+			<Frame type="UnitButton" name="GroupUnitButton6">
+					<Width val="45"/>
+					<Height val="45"/>
+			</Frame>
+			<Frame type="UnitButton" name="GroupUnitButton7">
+					<Width val="45"/>
+					<Height val="45"/>
+			</Frame>
+			<Frame type="UnitButton" name="GroupUnitButton8">
+					<Width val="45"/>
+					<Height val="45"/>
+			</Frame>
+			<Frame type="UnitButton" name="GroupUnitButton9">
+					<Width val="45"/>
+					<Height val="45"/>
+			</Frame>
+			<Frame type="UnitButton" name="GroupUnitButton10">
+					<Width val="45"/>
+					<Height val="45"/>
+			</Frame>
+			<Frame type="UnitButton" name="GroupUnitButton11">
+					<Width val="45"/>
+					<Height val="45"/>
+			</Frame>
+			<Frame type="UnitButton" name="GroupUnitButton12">
+					<Width val="45"/>
+					<Height val="45"/>
+			</Frame>
+			<Frame type="UnitButton" name="GroupUnitButton13">
+					<Width val="45"/>
+					<Height val="45"/>
+			</Frame>
+			<Frame type="UnitButton" name="GroupUnitButton14">
+					<Width val="45"/>
+					<Height val="45"/>
+			</Frame>
+			<Frame type="UnitButton" name="GroupUnitButton15">
+					<Width val="45"/>
+					<Height val="45"/>
+			</Frame>
+			<Frame type="UnitButton" name="GroupUnitButton16">
+					<Width val="45"/>
+					<Height val="45"/>
+			</Frame>
+			<Frame type="UnitButton" name="GroupUnitButton17">
+					<Width val="45"/>
+					<Height val="45"/>
+			</Frame>
+			<Frame type="UnitButton" name="GroupUnitButton18">
+					<Width val="45"/>
+					<Height val="45"/>
+			</Frame>
+			<Frame type="UnitButton" name="GroupUnitButton19">
+					<Width val="45"/>
+					<Height val="45"/>
+			</Frame>
+			<Frame type="UnitButton" name="GroupUnitButton20">
+					<Width val="45"/>
+					<Height val="45"/>
+			</Frame>
+			<Frame type="UnitButton" name="GroupUnitButton21">
+					<Width val="45"/>
+					<Height val="45"/>
+			</Frame>
+			<Frame type="UnitButton" name="GroupUnitButton22">
+					<Width val="45"/>
+					<Height val="45"/>
+			</Frame>
+			<Frame type="UnitButton" name="GroupUnitButton23">
+					<Width val="45"/>
+					<Height val="45"/>
+			</Frame>
+		</Frame> 
+    </Frame>
+</Desc>

@@ -1,0 +1,226 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<Desc>
+    <Frame type="Frame" name="GameUI/UIContainer/ConsoleUIContainer" file="GameUI">
+        <Frame type="ControlGroupPanel" name="ControlGroupPanel">
+            <Anchor side="Right" relative="$parent" pos="Mid" offset="0"/>
+            <Anchor side="Left" relative="$parent" pos="1" offset="277"/>
+            <Anchor side="Bottom" relative="$parent" pos="Max" offset="-270"/>
+            <Width val="750"/>
+            <Frame name="background" type="Image">
+                <IgnoreParentAlpha val="true"/>
+                <RenderPriority val="1"/>
+                <DisabledAlpha val="0"/>
+                <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+                <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
+                <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+                <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
+                <Texture val="Assets\Textures\border-protoss-transportslot-filled.dds"/>
+                <TextureType val="Border"/>
+                <Tiled val="true"/>
+            </Frame>
+            <Frame name="backgroundGrey" type="Image">
+                <IgnoreParentAlpha val="true"/>
+                <RenderPriority val="2"/>
+                <DisabledAlpha val="0"/>
+                <Anchor side="Left" relative="$parent" pos="Min" offset="-100"/>
+                <Anchor side="Right" relative="$parent" pos="Max" offset="100"/>
+                <Anchor side="Top" relative="$parent" pos="Min" offset="-100"/>
+                <Anchor side="Bottom" relative="$parent" pos="Max" offset="100"/>
+                <Texture val="Apex\Assets\Textures\ApexUI.dds"/>
+                <TextureType val="Border"/>
+                <Tiled val="true"/>
+            </Frame>
+            
+            <Frame type="ControlGroupButton" name="ControlGroupButton0">
+                <Width val="81"/>
+                <Anchor side="Left" relative="$parent" pos="Min" offset="-3"/>
+                <Frame type="Image" name="NormalImage">
+                    <IgnoreParentAlpha val="true"/>
+                    <Width val="75"/>
+                    <RenderPriority val="1"/>
+                    <DisabledAlpha val="0"/>
+                    <LayerCount val="1"/>
+                    <Anchor side="Top" relative="$parent" pos="Min" offset="10"/>
+                    <Anchor side="Bottom" relative="$parent" pos="Max" offset="-10"/>
+                    <Texture val="Assets\Textures\border-protoss-transportslot-filled.dds"/>
+                    <TextureType val="Border"/>
+                    <Tiled val="true"/>
+                </Frame>
+                <Frame type="Image" name="HoverImage">
+                    <Alpha val="0"/>
+                </Frame>
+            </Frame>
+
+            <Frame type="ControlGroupButton" name="ControlGroupButton1">
+                <Width val="81"/>
+                <Frame type="Image" name="NormalImage">
+                    <IgnoreParentAlpha val="true"/>
+                    <RenderPriority val="1"/>
+                    <DisabledAlpha val="0"/>
+                    <LayerCount val="1"/>
+                    <Width val="75"/>
+                    <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+                    <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
+                    <Texture val="Assets\Textures\border-protoss-transportslot-filled.dds"/>
+                    <TextureType val="Border"/>
+                    <Tiled val="true"/>
+                </Frame>
+                <Frame type="Image" name="HoverImage">
+                    <Alpha val="0"/>
+                </Frame>
+            </Frame>
+            
+            <Frame type="ControlGroupButton" name="ControlGroupButton2">
+                <Width val="81"/>
+                <Frame type="Image" name="NormalImage">
+                    <IgnoreParentAlpha val="true"/>
+                    <RenderPriority val="1"/>
+                    <DisabledAlpha val="0"/>
+                    <LayerCount val="1"/>
+                    <Width val="75"/>
+                    <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+                    <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
+                    <Texture val="Assets\Textures\border-protoss-transportslot-filled.dds"/>
+                    <TextureType val="Border"/>
+                    <Tiled val="true"/>
+                </Frame>
+                <Frame type="Image" name="HoverImage">
+                    <Alpha val="0"/>
+                </Frame>
+            </Frame>
+
+            <Frame type="ControlGroupButton" name="ControlGroupButton3">
+                <Width val="81"/>
+                <Frame type="Image" name="NormalImage">
+                    <IgnoreParentAlpha val="true"/>
+                    <RenderPriority val="1"/>
+                    <DisabledAlpha val="0"/>
+                    <LayerCount val="1"/>
+                    <Width val="75"/>
+                    <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+                    <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
+                    <Texture val="Assets\Textures\border-protoss-transportslot-filled.dds"/>
+                    <TextureType val="Border"/>
+                    <Tiled val="true"/>
+                </Frame>
+                <Frame type="Image" name="HoverImage">
+                    <Alpha val="0"/>
+                </Frame>
+            </Frame>
+
+            <Frame type="ControlGroupButton" name="ControlGroupButton4">
+                <Width val="81"/>
+                <Frame type="Image" name="NormalImage">
+                    <IgnoreParentAlpha val="true"/>
+                    <RenderPriority val="1"/>
+                    <DisabledAlpha val="0"/>
+                    <LayerCount val="1"/>
+                    <Width val="75"/>
+                    <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+                    <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
+                    <Texture val="Assets\Textures\border-protoss-transportslot-filled.dds"/>
+                    <TextureType val="Border"/>
+                    <Tiled val="true"/>
+                </Frame>
+                <Frame type="Image" name="HoverImage">
+                    <Alpha val="0"/>
+                </Frame>
+            </Frame>
+
+            <Frame type="ControlGroupButton" name="ControlGroupButton5">
+                <Width val="81"/>
+                <Frame type="Image" name="NormalImage">
+                    <IgnoreParentAlpha val="true"/>
+                    <RenderPriority val="1"/>
+                    <DisabledAlpha val="0"/>
+                    <LayerCount val="1"/>
+                    <Width val="75"/>
+                    <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+                    <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
+                    <Texture val="Assets\Textures\border-protoss-transportslot-filled.dds"/>
+                    <TextureType val="Border"/>
+                    <Tiled val="true"/>
+                </Frame>
+                <Frame type="Image" name="HoverImage">
+                    <Alpha val="0"/>
+                </Frame>
+            </Frame>
+
+            <Frame type="ControlGroupButton" name="ControlGroupButton6">
+                <Width val="81"/>
+                <Frame type="Image" name="NormalImage">
+                    <IgnoreParentAlpha val="true"/>
+                    <RenderPriority val="1"/>
+                    <DisabledAlpha val="0"/>
+                    <LayerCount val="1"/>
+                    <Width val="75"/>
+                    <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+                    <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
+                    <Texture val="Assets\Textures\border-protoss-transportslot-filled.dds"/>
+                    <TextureType val="Border"/>
+                    <Tiled val="true"/>
+                </Frame>
+                <Frame type="Image" name="HoverImage">
+                    <Alpha val="0"/>
+                </Frame>
+            </Frame>
+
+            <Frame type="ControlGroupButton" name="ControlGroupButton7">
+                <Width val="81"/>
+                <Frame type="Image" name="NormalImage">
+                    <IgnoreParentAlpha val="true"/>
+                    <RenderPriority val="1"/>
+                    <DisabledAlpha val="0"/>
+                    <LayerCount val="1"/>
+                    <Width val="75"/>
+                    <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+                    <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
+                    <Texture val="Assets\Textures\border-protoss-transportslot-filled.dds"/>
+                    <TextureType val="Border"/>
+                    <Tiled val="true"/>
+                </Frame>
+                <Frame type="Image" name="HoverImage">
+                    <Alpha val="0"/>
+                </Frame>
+            </Frame>
+
+            <Frame type="ControlGroupButton" name="ControlGroupButton8">
+                <Width val="81"/>
+                <Frame type="Image" name="NormalImage">
+                    <IgnoreParentAlpha val="true"/>
+                    <RenderPriority val="1"/>
+                    <DisabledAlpha val="0"/>
+                    <LayerCount val="1"/>
+                    <Width val="75"/>
+                    <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+                    <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
+                    <Texture val="Assets\Textures\border-protoss-transportslot-filled.dds"/>
+                    <TextureType val="Border"/>
+                    <Tiled val="true"/>
+                </Frame>
+                <Frame type="Image" name="HoverImage">
+                    <Alpha val="0"/>
+                </Frame>
+            </Frame>
+    
+            <Frame type="ControlGroupButton" name="ControlGroupButton9">
+                <Width val="81"/>
+                <Frame type="Image" name="NormalImage">
+                    <IgnoreParentAlpha val="true"/>
+                    <RenderPriority val="1"/>
+                    <DisabledAlpha val="0"/>
+                    <LayerCount val="1"/>
+                    <Width val="75"/>
+                    <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+                    <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
+                    <Texture val="Assets\Textures\border-protoss-transportslot-filled.dds"/>
+                    <TextureType val="Border"/>
+                    <Tiled val="true"/>
+                </Frame>
+                <Frame type="Image" name="HoverImage">
+                    <Alpha val="0"/>
+                </Frame>
+            </Frame>
+        </Frame>
+    </Frame>
+</Desc>

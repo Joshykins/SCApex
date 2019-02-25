@@ -1,0 +1,351 @@
+//=========================================================
+//		Apex Roleplaying Engine
+//		Copyright (c) 2019, Apex Group
+//=========================================================
+// This software is distributed under the MIT License:
+// <http://opensource.org/licenses/MIT>
+//=========================================================
+
+struct statbar_color {
+    fixed red;
+    fixed green;
+    fixed blue;
+};
+
+static statbar_color life_color;
+static statbar_color shields_color;
+static statbar_color energy_color;
+static fixed[16] mod_life;
+static fixed[16] mod_shields;
+static fixed[16] mod_energy;
+static fixed[16] lasttick_life;
+static fixed[16] lasttick_shields;
+static fixed[16] lasttick_energy;
+
+void libapx_statbars_init() {
+    int i;
+    int tmp_player;
+    life_color.red = 0;
+    life_color.green = 60;
+    life_color.blue = 10;
+
+    shields_color.red = 0;
+    shields_color.green = 50;
+    shields_color.blue = 105;
+
+    energy_color.red = 75;
+    energy_color.green = 0;
+    energy_color.blue = 150;
+    for (i = 1; i <= PlayerGroupCount(PlayerGroupActive()); i += 1) {
+        tmp_player = PlayerGroupPlayer(PlayerGroupActive(), i);
+        TriggerAddEventDialogControl(TriggerCreate("libapx_unit_wire_frame_clicked"), tmp_player, g_libapx_ui_wireframe_btn, c_triggerControlEventTypeClick);
+    }
+}
+
+bool libapx_unit_wire_frame_clicked(bool testConds, bool runActions) {
+    int p = EventPlayer();
+    unitgroup ug = UnitGroupSelected(p);
+    unit u;
+    point target;
+    if(UnitGroupCount(ug, c_unitCountAlive) == 1) {
+        u = UnitGroupUnit(ug, 1);
+        target = UnitGetPosition(u);
+        CameraPan(p, target, .4, 0, 1, false);
+    }
+    return true;
+}
+
+static void set_stat(int barnumb, int p, fixed min, fixed max, fixed value, color statcolor) {
+    DialogControlSetPropertyAsFixed(g_libapx_ui_stats_bar[barnumb], c_triggerControlPropertyMinValue, PlayerGroupSingle(p), min);
+    DialogControlSetPropertyAsFixed(g_libapx_ui_stats_bar[barnumb], c_triggerControlPropertyMaxValue, PlayerGroupSingle(p), max);
+    DialogControlSetPropertyAsFixed(g_libapx_ui_stats_bar[barnumb], c_triggerControlPropertyValue, PlayerGroupSingle(p), value);
+    DialogControlSetPropertyAsText(g_libapx_ui_stats_label[barnumb], c_triggerControlPropertyText, PlayerGroupSingle(p), StringToText(FixedToString(value, 1) + " / " +FixedToString(max, 1)));
+    DialogControlSetPropertyAsColor(g_libapx_ui_stats_bar[barnumb], c_triggerControlPropertyColor, PlayerGroupSingle(p), statcolor);
+}
+
+static void enable_stat(int barnumb, int p, bool state) {
+    DialogControlSetPropertyAsBool(g_libapx_ui_stats_bar[barnumb], c_triggerControlPropertyVisible, PlayerGroupSingle(p), state);
+    DialogControlSetPropertyAsBool(g_libapx_ui_stats_label[barnumb], c_triggerControlPropertyVisible, PlayerGroupSingle(p), state);
+    DialogControlSetPropertyAsBool(g_libapx_ui_stats_barbg[barnumb], c_triggerControlPropertyVisible, PlayerGroupSingle(p), state);
+}
+static bool has_stat(unit u, int prop) {
+    fixed statmax;
+    statmax = UnitGetPropertyFixed(u, prop, true);
+    if(statmax <= 0) {
+        return false;
+    }
+    return true;
+}
+
+static void update_mods(int p, unit u) {
+    fixed modifier_sub = .1;
+    fixed modifier_bottomlimit = .8;
+    if(mod_energy[p] > modifier_bottomlimit) {
+        mod_energy[p] -= modifier_sub;
+    } 
+    else {
+        mod_energy[p] = modifier_bottomlimit;
+    }
+    if(mod_shields[p] > modifier_bottomlimit) {
+        mod_shields[p] -= modifier_sub;
+    } 
+    else {
+        mod_shields[p] = modifier_bottomlimit;
+    }
+    if(mod_life[p] > modifier_bottomlimit) {
+        mod_life[p] -= modifier_sub;
+    } 
+    else {
+        mod_life[p] = modifier_bottomlimit;
+    }
+
+    //Sets the color multipliers only if the stat is less than it was last tick.
+    if(lasttick_shields[p] > UnitGetPropertyFixed(u, c_unitPropShields, true)) {
+        mod_shields[p] = 1.6;
+    }
+    if(lasttick_life[p] > UnitGetPropertyFixed(u, c_unitPropLife, true)) {
+        mod_life[p] = 1.6;
+    }
+    if(lasttick_energy[p] > UnitGetPropertyFixed(u, c_unitPropEnergy, true)) {
+        mod_energy[p] = 1.6;
+    }
+}
+
+static color get_statcolor(fixed r, fixed g, fixed b, fixed mod) {
+    r += 20;
+    r *= mod;
+    r -= 20;
+    g += 20;
+    g *= mod;
+    g -= 20;
+    b += 20;
+    b *= mod;
+    b -= 20;
+    
+    return Color(r,g,b);
+}
+//Generates the stat bars of a unit
+static void generate_bars(int p, unit u) {
+    int number_of_bars = 0;
+    bool done_shields;
+    bool done_life;
+    bool done_energy;
+    int i;
+    fixed stat;
+    fixed statmax;
+    fixed statmin;
+    color statcolor;
+
+    if(has_stat(u, c_unitPropLifeMax)) {
+        lasttick_life[p] = UnitGetPropertyFixed(u, c_unitPropLife, true);
+        number_of_bars += 1;
+    }
+    if(has_stat(u, c_unitPropEnergyMax)) {
+        lasttick_energy[p] = UnitGetPropertyFixed(u, c_unitPropEnergy, true);
+        number_of_bars += 1;
+    }
+    if(has_stat(u, c_unitPropShieldsMax)) {
+        lasttick_shields[p] = UnitGetPropertyFixed(u, c_unitPropShields, true);
+        number_of_bars += 1;
+    }
+    for(i = 0; i < 3; i += 1) {
+        enable_stat(i, p, false);
+    }
+    
+    for (i = number_of_bars-1; i >= 0; i -= 1) {
+        if(has_stat(u, c_unitPropEnergyMax) && !done_shields) {
+            statmax = UnitGetPropertyFixed(u, c_unitPropEnergyMax, true);
+            stat = UnitGetPropertyFixed(u, c_unitPropEnergy, true);
+            statmin = 0;
+            statcolor = get_statcolor(energy_color.red, energy_color.green, energy_color.blue, mod_energy[p]);
+            set_stat(i, p, statmin, statmax, stat, statcolor);
+            enable_stat(i, p, true);
+
+            done_shields = true;
+            continue;
+        }
+        if(has_stat(u, c_unitPropLifeMax) && !done_life) {
+            statmax = UnitGetPropertyFixed(u, c_unitPropLifeMax, true);
+            stat = UnitGetPropertyFixed(u, c_unitPropLife, true);
+            statmin = 0;
+            statcolor = get_statcolor(life_color.red, life_color.green, life_color.blue, mod_life[p]);
+            set_stat(i, p, statmin, statmax, stat, statcolor);
+            enable_stat(i, p, true);
+            
+            done_life = true;
+            continue;
+        }
+        if(has_stat(u, c_unitPropShieldsMax) && !done_energy) {
+            statmax = UnitGetPropertyFixed(u, c_unitPropShieldsMax, true);
+            stat = UnitGetPropertyFixed(u, c_unitPropShields, true);
+            statmin = 0;
+            statcolor = get_statcolor(shields_color.red, shields_color.green, shields_color.blue, mod_shields[p]);
+            set_stat(i, p, statmin, statmax, stat, statcolor);
+            enable_stat(i, p, true);
+
+            done_energy = true;
+            continue;
+        }
+    }
+
+}
+static void render_wireframe_layer(int p, int base, int layer,
+    //Properties
+    string path,
+    int r,
+    int g,
+    int b,
+    int saturation,
+    int render_priority,
+    int offsetX,
+    int offsetY,
+    int width,
+    int height,
+    int rotation,
+    int alpha
+) {
+    int image;
+    base = g_libapx_ui_statsparrent;
+    image = DialogControlCreateInPanel(g_libapx_ui_statsparrent, c_triggerControlTypeImage);
+    libapx_player[p].wireframe_layers[layer-1] = image;
+    //Path
+    DialogControlSetPropertyAsString(image, c_triggerControlPropertyImage, PlayerGroupSingle(p), path);
+    //Saturation and color
+    //Wait(1,c_timeReal);
+    if(saturation == 1) {
+        DialogControlSetPropertyAsColor(image, c_triggerControlPropertyColor, PlayerGroupSingle(p), Color(r, g, b));
+    }
+    else {
+        DialogControlSetPropertyAsBool(image, c_triggerControlPropertyDesaturated, PlayerGroupSingle(p), true);
+        DialogControlSetPropertyAsColor(image, c_triggerControlPropertyDesaturationColor, PlayerGroupSingle(p), Color(r, g, b));
+    }
+    //Render Priority
+    DialogControlSetPropertyAsInt(image, c_triggerControlPropertyRenderPriority, PlayerGroupSingle(p), render_priority);
+    //Offset
+    DialogControlSetPosition(image, PlayerGroupSingle(p), c_anchorTopLeft, offsetX, offsetY);
+    
+    //Width
+    DialogControlSetSize(image, PlayerGroupSingle(p), width, height);
+
+    //Rotation
+    DialogControlSetPropertyAsInt(image, c_triggerControlPropertyRotation, PlayerGroupSingle(p), rotation);
+    //Alpha
+    DialogControlSetPropertyAsInt(image, c_triggerControlPropertyAlpha, PlayerGroupSingle(p), alpha);
+    
+}
+
+static void update_wireframe(int p, unit u, int owner) {
+    string wireframe = libapx_wireframe_get_entry(u);
+    int i;
+    string params;
+    if(wireframe != libapx_player[p].previous_wireframe) {  
+        
+        //Remove previous wf
+        for (i = 0; i < libapx_player[p].wireframe_layer_count; i += 1) {
+            DialogControlDestroy(libapx_player[p].wireframe_layers[i]);
+        }
+        libapx_player[p].wireframe_layer_count = 0;
+
+        //Generate new wf
+        if(wireframe == g_default_wireframe || !BankSectionExists(libapx_player[owner].bank_storage, "WF_"+wireframe)) {
+            libapx_player[p].previous_wireframe = g_default_wireframe;  
+            //Default properties
+            //Generate WF basewd on default properties
+            libapx_player[p].wireframe_layer_count = 1;
+            //Render
+            render_wireframe_layer(p, g_libapx_ui_wireframe, 1, 
+                default_wireframe.path,
+                default_wireframe.r,
+                default_wireframe.g,
+                default_wireframe.b,
+                BoolToInt(default_wireframe.saturation),
+                default_wireframe.render_priority,
+                default_wireframe.OffsetX,
+                default_wireframe.OffsetY,
+                default_wireframe.width,
+                default_wireframe.height,
+                default_wireframe.rotation,
+                default_wireframe.alpha
+            );
+
+        } else {
+            libapx_player[p].previous_wireframe = wireframe;  
+            i = 1;
+            while(BankKeyExists(libapx_player[owner].bank_storage, "WF_"+wireframe, "WFL_"+IntToString(i))) {
+                params = BankValueGetAsString(libapx_player[owner].bank_storage, "WF_"+wireframe, "WFL_"+IntToString(i));
+
+                render_wireframe_layer(p, g_libapx_ui_wireframe, i+1, 
+                    StringWord(params, 1),
+                    StringToInt(StringWord(params, 2)),
+                    StringToInt(StringWord(params, 3)),
+                    StringToInt(StringWord(params, 4)),
+                    StringToInt(StringWord(params, 5)),
+                    StringToInt(StringWord(params, 6)),
+                    StringToInt(StringWord(params, 7)),
+                    StringToInt(StringWord(params, 8)),
+                    StringToInt(StringWord(params, 9)),
+                    StringToInt(StringWord(params, 10)),
+                    StringToInt(StringWord(params, 11)),
+                    StringToInt(StringWord(params, 12)) 
+                );
+  
+                i+=1; 
+            };
+            libapx_player[p].wireframe_layer_count = i;
+          
+        }
+    }
+}
+void libapx_update_statdisplay(int p) {
+    unitgroup ug = UnitGroupSelected(p);
+    unit u;
+    int i;
+    int owner;
+    UnitGroupUnit(ug, 1);
+
+    if(UnitGroupCount(ug, c_unitCountAlive) >= 1) {
+        u = UnitGroupUnit(ug, 1);
+        owner = UnitGetOwner(u);
+        
+        //Ticks down the color multipliers
+        update_mods(p, u);
+
+        //Checks if vulnerable
+        if(libNtve_gf_UnitIsInvulnerable(u)) {
+            for(i = 0; i < 3; i += 1) {
+                enable_stat(i, p, false);
+            }
+            update_wireframe(p, u, owner);
+            DialogControlSetPropertyAsBool(g_libapx_ui_line1, c_triggerControlPropertyVisible, PlayerGroupSingle(p), false);
+            DialogControlSetPropertyAsBool(g_libapx_ui_line2, c_triggerControlPropertyVisible, PlayerGroupSingle(p), false);
+            DialogControlSetPropertyAsBool(g_libapx_ui_line3, c_triggerControlPropertyVisible, PlayerGroupSingle(p), true);
+            DialogControlSetPropertyAsBool(g_libapx_ui_line4, c_triggerControlPropertyVisible, PlayerGroupSingle(p), true);
+            DialogControlSetPropertyAsBool(g_libapx_ui_statsparrent, c_triggerControlPropertyVisible, PlayerGroupSingle(p), true);
+            return;
+        }
+
+        //Generates the statbars
+        generate_bars(p, u);
+
+        //Wireframe stuff
+        
+        //Retrieve Units Wireframe
+        update_wireframe(p, u, owner);
+
+        //Show Parrent Dialog
+        DialogControlSetPropertyAsBool(g_libapx_ui_line1, c_triggerControlPropertyVisible, PlayerGroupSingle(p), false);
+        DialogControlSetPropertyAsBool(g_libapx_ui_line2, c_triggerControlPropertyVisible, PlayerGroupSingle(p), false);
+        DialogControlSetPropertyAsBool(g_libapx_ui_line3, c_triggerControlPropertyVisible, PlayerGroupSingle(p), true);
+        DialogControlSetPropertyAsBool(g_libapx_ui_line4, c_triggerControlPropertyVisible, PlayerGroupSingle(p), true);
+        DialogControlSetPropertyAsBool(g_libapx_ui_statsparrent, c_triggerControlPropertyVisible, PlayerGroupSingle(p), true);
+    }
+    else {
+        DialogControlSetPropertyAsBool(g_libapx_ui_line1, c_triggerControlPropertyVisible, PlayerGroupSingle(p), true);
+        DialogControlSetPropertyAsBool(g_libapx_ui_line2, c_triggerControlPropertyVisible, PlayerGroupSingle(p), true);
+        DialogControlSetPropertyAsBool(g_libapx_ui_line3, c_triggerControlPropertyVisible, PlayerGroupSingle(p), false);
+        DialogControlSetPropertyAsBool(g_libapx_ui_line4, c_triggerControlPropertyVisible, PlayerGroupSingle(p), false);
+        //Hide parrent dialog
+        DialogControlSetPropertyAsBool(g_libapx_ui_statsparrent, c_triggerControlPropertyVisible, PlayerGroupSingle(p), false);
+    }
+};
+       

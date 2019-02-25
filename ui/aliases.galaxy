@@ -99,7 +99,6 @@ void libapx_ui_aliases_init() {
 
 }
 static void libapx_ui_aliases_list_populate(int player) {
-
     int count = 1;	// counter
   	text msg;
     string alias;

@@ -120,7 +120,6 @@ static void libapx_ui_colorpicker_apply_tint(int p) {
     
     for (i = 1; i <= UnitGroupCount(ug, c_unitCountAll); i += 1) {
         u = UnitGroupUnit(ug, i);
-        libapx_print_output(p, "Hello this unit belongs to " + IntToString(UnitGetOwner(u)) + " and checked by " + IntToString(p));
         if(UnitGetOwner(u) == p) {
             UnitGroupAdd(applyGroup, u);
         };

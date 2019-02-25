@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<Desc>
+    <Frame type="Frame" name="GameUI/UIContainer/ConsoleUIContainer" file="GameUI">
+        <!--Asthetics-->
+		<Frame type="Frame" name="BeautifyingFrame">
+            <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
+            <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+            <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+            <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
+            <Frame name="leftBar1" type="Image">
+                <IgnoreParentAlpha val="true"/>
+                <RenderPriority val="2"/>
+                <DisabledAlpha val="0"/>
+                <Anchor side="Left" relative="$parent" pos="Min" offset="325"/>
+                <Anchor side="Right" relative="$parent" pos="Max" offset="-940"/>
+                <Anchor side="Top" relative="$parent" pos="Max" offset="-30"/>
+                <Anchor side="Bottom" relative="$parent" pos="Max" offset="-28"/>
+                <Texture val="Assets/Textures/flare_aiurcompletenebula01_dirtlylensflare_whitebox.dds"/>
+                <TextureType val="Normal"/>
+                <Visible val="false"/>
+            </Frame>
+            <Frame name="leftBar2" type="Image">
+                <IgnoreParentAlpha val="true"/>
+                <RenderPriority val="2"/>
+                <DisabledAlpha val="0"/>
+                <Anchor side="Left" relative="$parent" pos="Min" offset="325"/>
+                <Anchor side="Right" relative="$parent" pos="Max" offset="-940"/>
+                <Anchor side="Top" relative="$parent" pos="Max" offset="-35"/>
+                <Anchor side="Bottom" relative="$parent" pos="Max" offset="-33"/>
+                <Texture val="Assets/Textures/flare_aiurcompletenebula01_dirtlylensflare_whitebox.dds"/>
+                <TextureType val="Normal"/>
+                <Visible val="false"/>
+            </Frame>
+
+            <Frame name="leftBar3" type="Image">
+                <IgnoreParentAlpha val="true"/>
+                <RenderPriority val="2"/>
+                <DisabledAlpha val="0"/>
+                <Anchor side="Left" relative="$parent" pos="Min" offset="325"/>
+                <Anchor side="Right" relative="$parent" pos="Max" offset="-1140"/>
+                <Anchor side="Top" relative="$parent" pos="Max" offset="-30"/>
+                <Anchor side="Bottom" relative="$parent" pos="Max" offset="-28"/>
+                <Texture val="Assets/Textures/flare_aiurcompletenebula01_dirtlylensflare_whitebox.dds"/>
+                <TextureType val="Normal"/>
+                <Visible val="false"/>
+            </Frame>
+            <Frame name="leftBar4" type="Image">
+                <IgnoreParentAlpha val="true"/>
+                <RenderPriority val="2"/>
+                <DisabledAlpha val="0"/>
+                <Anchor side="Left" relative="$parent" pos="Min" offset="325"/>
+                <Anchor side="Right" relative="$parent" pos="Max" offset="-1140"/>
+                <Anchor side="Top" relative="$parent" pos="Max" offset="-35"/>
+                <Anchor side="Bottom" relative="$parent" pos="Max" offset="-33"/>
+                <Texture val="Assets/Textures/flare_aiurcompletenebula01_dirtlylensflare_whitebox.dds"/>
+                <TextureType val="Normal"/>
+                <Visible val="false"/>
+            </Frame>
+        </Frame>
+    </Frame>
+</Desc>

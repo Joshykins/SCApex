@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<Desc>
+	<!--Getting rid of hero panel, uneeded-->
+	<Frame type="HeroPanel" name="GameUI/UIContainer/FullscreenUpperContainer/HeroPanel">
+		<Anchor side="Bottom" relative="$parent" pos="Max" offset="-200"/>
+	</Frame>
+	
+</Desc>

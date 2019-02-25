@@ -21,6 +21,9 @@ bool libapx_key_pressed_down(bool testConds, bool runActions) {
 	if( EventKeyPressed() == c_keyAlt ) {
 		libapx_player[EventPlayer()].key_alt = true;
 	}
+	if( EventKeyPressed() == c_keyTab ) {
+		libapx_player[EventPlayer()].key_tab = true;
+	}
 	if( EventKeyPressed() == c_keyShift ) {
 		libapx_player[EventPlayer()].key_shift = true;
 	}
@@ -206,6 +209,9 @@ bool libapx_key_pressed_up(bool testConds, bool runActions) {
 	}
 	if( EventKeyPressed() == c_keyAlt ) {
 		libapx_player[EventPlayer()].key_alt = false;
+	}
+	if( EventKeyPressed() == c_keyTab ) {
+		libapx_player[EventPlayer()].key_tab = false;
 	}
 	if( EventKeyPressed() == c_keyShift ) {
 		libapx_player[EventPlayer()].key_shift = false;

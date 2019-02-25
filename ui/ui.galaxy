@@ -9,7 +9,7 @@
 const int libapx_ui_panel_spacing = 85;
 
 // number of ui pa nels for the ui utility toolbar
-static const int libapx_UI_NPANELS = 8;
+static const int libapx_UI_NPANELS = 9;
 
 //Size of buttons
 static const int libapx_ui_btn_size = 65;
@@ -19,7 +19,6 @@ static const int libapx_ui_btn_size = 65;
 static const string libapx_UI_PANEL_DTABLE_PREFIX = "ui_panel_";
 
 static bool[16] player_patchnotes_vis;
-static bool[16] player_unitname_vis;
 
 // Type: libapx_ui_panel
 // ===============
@@ -42,10 +41,10 @@ include "apex/ui/colorPicker.galaxy"
 include "apex/ui/commandsGuide.galaxy"
 include "apex/ui/catalog.galaxy"
 include "apex/ui/patchnotes.galaxy"
-include "apex/ui/unitname.galaxy"
 include "apex/ui/info.galaxy"
 include "apex/ui/attachchecker.galaxy"
 include "apex/ui/references.galaxy"
+include "apex/ui/decal.galaxy"
 
 
 
@@ -65,69 +64,75 @@ static void libapx_ui_toolbar_init();
 // Sets array list of each dialog panel info struct.
 // These must be manually declared for each panel.
 static void libapx_ui_initialize_panels() {
-	libapx_ui_panels[0].dialog = libapx_ui_commands;
-	libapx_ui_panels[0].exit_btn = libapx_ui_commands_exit;
-	libapx_ui_panels[0].name = "Commands Guide";
-	libapx_ui_panels[0].icon = "Apex\\Assets\\Textures\\CommandsGuide.png";
+
+	libapx_ui_panels[0].dialog = libapx_ui_decal;
+	libapx_ui_panels[0].exit_btn = libapx_ui_decal_exit;
+	libapx_ui_panels[0].name = "Decals";
+	libapx_ui_panels[0].icon = "Assets\\Textures\\decal_terran_0047_01.dds";
 	libapx_ui_panels[0].col = Color(100,100,100);
+
+	libapx_ui_panels[1].dialog = libapx_ui_commands;
+	libapx_ui_panels[1].exit_btn = libapx_ui_commands_exit;
+	libapx_ui_panels[1].name = "Commands Guide";
+	libapx_ui_panels[1].icon = "Apex\\Assets\\Textures\\CommandsGuide.png";
+	libapx_ui_panels[1].col = Color(100,100,100);
 
 
 //	libapx_ui_panels[1].dialog = libapx_ui_modelpreviewer;
 //	libapx_ui_panels[1].name = "Model Previewer";
 //	libapx_ui_panels[1].icon = "Assets\\Textures\\btn-ability-protoss-phaseshift.dds";
 
-	libapx_ui_panels[1].dialog = libapx_ui_chatlog;
-	libapx_ui_panels[1].exit_btn = libapx_ui_chatlog_exit;
-	libapx_ui_panels[1].name = "Chat Log";
-	libapx_ui_panels[1].icon = "Apex\\Assets\\Textures\\ChatLog.png";
-	libapx_ui_panels[1].col = Color(100,100,100);
-
-	libapx_ui_panels[2].dialog = libapx_ui_aliases;
-	libapx_ui_panels[2].exit_btn = libapx_ui_aliases_exit;
-	libapx_ui_panels[2].name = "Aliases";
-	libapx_ui_panels[2].icon = "Apex\\Assets\\Textures\\Aliases.png";
+	libapx_ui_panels[2].dialog = libapx_ui_chatlog;
+	libapx_ui_panels[2].exit_btn = libapx_ui_chatlog_exit;
+	libapx_ui_panels[2].name = "Chat Log";
+	libapx_ui_panels[2].icon = "Apex\\Assets\\Textures\\ChatLog.png";
 	libapx_ui_panels[2].col = Color(100,100,100);
 
-	libapx_ui_panels[3].dialog = libapx_ui_color_picker;
-	libapx_ui_panels[3].exit_btn = libapx_ui_color_picker_exit;
-	libapx_ui_panels[3].name = "Color Picker";
-	libapx_ui_panels[3].icon = "Apex\\Assets\\Textures\\ColorPicker.png";
+	libapx_ui_panels[3].dialog = libapx_ui_aliases;
+	libapx_ui_panels[3].exit_btn = libapx_ui_aliases_exit;
+	libapx_ui_panels[3].name = "Aliases";
+	libapx_ui_panels[3].icon = "Apex\\Assets\\Textures\\Aliases.png";
 	libapx_ui_panels[3].col = Color(100,100,100);
 
-	libapx_ui_panels[4].dialog = libapx_ui_catalog;
-	libapx_ui_panels[4].exit_btn = libapx_ui_catalog_exit;
-	libapx_ui_panels[4].name = "Catalog";
-	libapx_ui_panels[4].icon = "Apex\\Assets\\Textures\\Catalog.png";
+	libapx_ui_panels[4].dialog = libapx_ui_color_picker;
+	libapx_ui_panels[4].exit_btn = libapx_ui_color_picker_exit;
+	libapx_ui_panels[4].name = "Color Picker";
+	libapx_ui_panels[4].icon = "Apex\\Assets\\Textures\\ColorPicker.png";
 	libapx_ui_panels[4].col = Color(100,100,100);
+
+	libapx_ui_panels[5].dialog = libapx_ui_catalog;
+	libapx_ui_panels[5].exit_btn = libapx_ui_catalog_exit;
+	libapx_ui_panels[5].name = "Catalog";
+	libapx_ui_panels[5].icon = "Apex\\Assets\\Textures\\Catalog.png";
+	libapx_ui_panels[5].col = Color(100,100,100);
 
 	//libapx_ui_panels[5].dialog = libapx_ui_color_picker;
 	//libapx_ui_panels[5].name = "Terrain Editor";
 	//libapx_ui_panels[5].icon = "Apex\\Assets\\Textures\\TerrainEditor.png";
 	//libapx_ui_panels[5].col = Color(100,100,100);
 
-	libapx_ui_panels[5].dialog = libapx_ui_attachchk;
-	libapx_ui_panels[5].exit_btn = libapx_ui_attachchk_exit;
-	libapx_ui_panels[5].name = "Attachpoint Checker";
-	libapx_ui_panels[5].icon = "Apex\\Assets\\Textures\\AttachChecker.png";
-	libapx_ui_panels[5].col = Color(100,100,100);
+	libapx_ui_panels[6].dialog = libapx_ui_attachchk;
+	libapx_ui_panels[6].exit_btn = libapx_ui_attachchk_exit;
+	libapx_ui_panels[6].name = "Attachpoint Checker";
+	libapx_ui_panels[6].icon = "Apex\\Assets\\Textures\\AttachChecker.png";
+	libapx_ui_panels[6].col = Color(100,100,100);
 
 	//libapx_ui_panels[6].dialog = libapx_ui_settings;
 	//libapx_ui_panels[6].name = "Settings";
 	//libapx_ui_panels[6].icon = "Apex\\Assets\\Textures\\Settings.png";
 	//libapx_ui_panels[6].col = Color(100,100,100);
 
-	libapx_ui_panels[6].dialog = libapx_ui_references;
-	libapx_ui_panels[6].exit_btn = libapx_ui_references_exit;
-	libapx_ui_panels[6].name = "References";
-	libapx_ui_panels[6].icon = "Apex\\Assets\\Textures\\References.png";
-	libapx_ui_panels[6].col = Color(100,100,100);
-
-	libapx_ui_panels[7].dialog = libapx_ui_info;
-	libapx_ui_panels[7].exit_btn = libapx_ui_info_exit;
-	libapx_ui_panels[7].name = "Info";
-	libapx_ui_panels[7].icon = "Apex\\Assets\\Textures\\Info.png";
+	libapx_ui_panels[7].dialog = libapx_ui_references;
+	libapx_ui_panels[7].exit_btn = libapx_ui_references_exit;
+	libapx_ui_panels[7].name = "References";
+	libapx_ui_panels[7].icon = "Apex\\Assets\\Textures\\References.png";
 	libapx_ui_panels[7].col = Color(100,100,100);
 
+	libapx_ui_panels[8].dialog = libapx_ui_info;
+	libapx_ui_panels[8].exit_btn = libapx_ui_info_exit;
+	libapx_ui_panels[8].name = "Info";
+	libapx_ui_panels[8].icon = "Apex\\Assets\\Textures\\Info.png";
+	libapx_ui_panels[8].col = Color(100,100,100);
 	//test <img path="Assets\Textures\smx1_leviathandoorglow_white.dds" color="255,255,255" height="1"/>
 }
 // libapx_ui_initialize
@@ -169,10 +174,10 @@ void libapx_ui_initialize() {
 	libapx_ui_color_picker_init();
 	libapx_ui_catalog_init();
 	libapx_ui_patchnotes_init();
-	libapx_ui_unitname_init();
 	libapx_ui_info_init();
 	libapx_ui_attachchk_init();
 	libapx_ui_references_init();
+	libapx_ui_decal_init();
 
 	// perform player unique panel initialization
 	for( player = 1; player < libapx_MAX_PLAYERS; player += 1 ) {
@@ -184,10 +189,10 @@ void libapx_ui_initialize() {
 			libapx_ui_color_picker_init_player(player);
 			libapx_ui_catalog_init_player(player);
 			libapx_ui_patchnotes_init_player(player);
-			libapx_ui_unitname_unit_player(player);
 			libapx_ui_info_init_player(player);
 			libapx_ui_attachchk_init_player(player);
 			libapx_ui_references_init_player(player);
+			libapx_ui_decal_init_player(player);
 		}
 	}
 
@@ -197,13 +202,6 @@ void libapx_ui_initialize() {
 	// create the Apex ui toolbar
 	libapx_ui_toolbar_init();
 
-	//Init for display names, needs dialog created in ui toolbar.
-	for( player = 1; player < libapx_MAX_PLAYERS; player += 1 ) {
-		if( PlayerType(player) == c_playerTypeUser && PlayerStatus(player) == c_playerStatusActive ) {
-			libapx_player[player].unit_display_name = libapx_create_dialog_label(g_libapx_ui_name , 420, 40, c_anchorTop, 00, 10, "", libapx_UI_HEADER1);
-			libapx_player[player].unit_display_subtitle = libapx_create_dialog_label(g_libapx_ui_name , 420, 60, c_anchorTop, 00, 50, "", libapx_UI_HEADER4);
-		}
-	}
 
 }
 
@@ -222,17 +220,32 @@ static void libapx_ui_toolbar_init() {
 	tmp = libapx_create_dialog_btn(libapx_ui_version , 170, 40, c_anchorTop, 00, 35,"","<s><c val=\"c0392b\">Patch Notes</c></s>");
 	TriggerAddEventDialogControl(TriggerCreate("libapx_patchnotes_toggle"), c_playerAny, tmp, c_triggerControlEventTypeClick);
 	DialogSetVisible(libapx_ui_version, PlayerGroupAll(), true);
-	
-	libapx_ui_unitname_toggle = libapx_create_dialog_invis(302, 68, c_anchorBottom, 374, 200);
-	tmp = libapx_create_dialog_btn(libapx_ui_unitname_toggle , 300, 100, c_anchorCenter, 00, 00,"View Character Information","<s><c val=\"c0392b\">View Unit Description</c></s>");
-	TriggerAddEventDialogControl(TriggerCreate("libapx_unitname_toggle"), c_playerAny, tmp, c_triggerControlEventTypeClick);
-	DialogSetVisible(libapx_ui_unitname_toggle, PlayerGroupAll(), true);
 
-	g_libapx_ui_name = libapx_create_dialog_invis(450, 130, c_anchorBottom, 0, 140);
-	DialogSetVisible(g_libapx_ui_name, PlayerGroupActive(), true);
+	libapx_ui_unitname_toggle = libapx_create_dialog_invis(302, 68, c_anchorBottomRight, 20, 200);
+	tmp = libapx_create_dialog_btn(libapx_ui_unitname_toggle , 300, 100, c_anchorCenter, 00, 00,"View Character Information","<s><c val=\"ffffff\">View Unit Description</c></s>");
+	DialogSetVisible(libapx_ui_unitname_toggle, PlayerGroupAll(), true);
+	TriggerAddEventDialogControl(TriggerCreate("libapx_description_toggle"), c_playerAny, tmp, c_triggerControlEventTypeClick);
+	
 
 	libapx_ui_panel_toolbar = libapx_create_dialog(200, 136 + libapx_ui_btn_size*libapx_UI_NPANELS, c_anchorTopLeft, -100, -100);
 	DialogSetVisible(libapx_ui_panel_toolbar, PlayerGroupAll(), true);
+
+
+	//x Fix editor camera pause
+	//x Look at editor camera scroll bug
+	//X Name emulation of blank namespace
+	//Move chat to bottom left
+	//IC to mid
+	//X Character picture/wf emulation
+	//X UI integration of controlgroups maybe.
+	//x Colorpicker bar clientside
+	//X Colorpicker Print statement
+	//Patreon stuff
+	//Tooltip
+	//X transport ui
+	//building ui
+	//S-val
+	//Ui off
 
 
 	// initialize toolbar buttons
@@ -251,7 +264,7 @@ static void libapx_ui_toolbar_init() {
 	}
 	for (i = 1; i <= PlayerGroupCount(PlayerGroupActive()); i += 1) {
 		tmp = PlayerGroupPlayer(PlayerGroupActive(), i);
-		libapx_ui_switchto_panel(libapx_ui_panels[7].btn, tmp); //6 is info panel
+		libapx_ui_switchto_panel(libapx_ui_panels[8].btn, tmp); //8 is info panel
 	}
 	
 	// add event triggers for ui dialog controls
@@ -259,32 +272,12 @@ static void libapx_ui_toolbar_init() {
 
 }
 
-
-//libapx_unitname_toggle
-bool libapx_unitname_toggle(bool testConds, bool runActions) {
-	int p = EventPlayer();
-	int active_panel = libapx_player[p].active_ui_panel;
-	player_unitname_vis[p] = !player_unitname_vis[p];
-	DialogSetVisible(libapx_ui_unitname,PlayerGroupSingle(p), player_unitname_vis[p]);
-
-	// turn off existing active panel (if any)
-	if( active_panel != libapx_UI_PANEL_NONE) {
-		DialogSetVisible(libapx_ui_panels[active_panel].dialog, PlayerGroupSingle(p), false);
-		DialogSetVisible(libapx_ui_panels[active_panel].exit_btn, PlayerGroupSingle(p), false);
-		// toggle off toolbar button
-		libNtve_gf_SetDialogItemToggled(libapx_ui_panels[active_panel].btn, false, PlayerGroupSingle(p));
-	
-		player_patchnotes_vis[p] = false;
-		DialogSetVisible(libapx_ui_patchnotes,PlayerGroupSingle(p), false);
-	}
-	return true;
-}
-
 //libapx_patchnotes_toggle
 bool libapx_patchnotes_toggle(bool testConds, bool runActions) {
 	int p = EventPlayer();
 	int active_panel = libapx_player[p].active_ui_panel;
 	player_patchnotes_vis[p] = !player_patchnotes_vis[p];
+	libapx_player[p].description_open = false;
 	DialogSetVisible(libapx_ui_patchnotes,PlayerGroupSingle(p), player_patchnotes_vis[p]);
 
 	// turn off existing active panel (if any)
@@ -293,9 +286,28 @@ bool libapx_patchnotes_toggle(bool testConds, bool runActions) {
 		DialogSetVisible(libapx_ui_panels[active_panel].exit_btn, PlayerGroupSingle(p), false);
 		// toggle off toolbar button
 		libNtve_gf_SetDialogItemToggled(libapx_ui_panels[active_panel].btn, false, PlayerGroupSingle(p));
+		DialogControlSetPropertyAsBool(g_libapx_ui_fakewireframe, c_triggerControlPropertyVisible, PlayerGroupSingle(p), false);
+	}
+	return true;
+}
+
+
+//libapx_patchnotes_toggle
+bool libapx_description_toggle(bool testConds, bool runActions) {
+	int p = EventPlayer();
+	int active_panel = libapx_player[p].active_ui_panel;
+	libapx_player[p].description_open = !libapx_player[p].description_open;
+	DialogControlSetPropertyAsBool(g_libapx_ui_description_parrent, c_triggerControlPropertyVisible, PlayerGroupSingle(p), libapx_player[p].description_open);
+	player_patchnotes_vis[p] = false;
+	// turn off existing active panel (if any)
+	if( active_panel != libapx_UI_PANEL_NONE) {
+		DialogSetVisible(libapx_ui_panels[active_panel].dialog, PlayerGroupSingle(p), false);
+		DialogSetVisible(libapx_ui_panels[active_panel].exit_btn, PlayerGroupSingle(p), false);
+		// toggle off toolbar button
+		libNtve_gf_SetDialogItemToggled(libapx_ui_panels[active_panel].btn, false, PlayerGroupSingle(p));
+		DialogControlSetPropertyAsBool(g_libapx_ui_fakewireframe, c_triggerControlPropertyVisible, PlayerGroupSingle(p), false);
+		DialogSetVisible(libapx_ui_patchnotes,PlayerGroupSingle(p), player_patchnotes_vis[p]);
 	
-		player_unitname_vis[p] = false;
-		DialogSetVisible(libapx_ui_unitname,PlayerGroupSingle(p), false);
 	}
 	return true;
 }
@@ -307,19 +319,21 @@ void libapx_ui_switchto_panel(int panelIndex, int player) {
 	int panel;
 	int active_panel = libapx_player[p].active_ui_panel;
 	player_patchnotes_vis[p] = false;
-	player_unitname_vis[p] = false;
+
 
 	DialogSetVisible(libapx_ui_patchnotes,PlayerGroupSingle(p), player_patchnotes_vis[p]);
-	DialogSetVisible(libapx_ui_unitname,PlayerGroupSingle(p), player_unitname_vis[p]);
 	// toggle the ui panel if the dialog control button is linked to a panel
 	if( DataTableValueExists(true, panel_identifier) ) {
 		panel = DataTableGetInt(true, panel_identifier);
+
 		// turn off existing active panel (if any)
 		if( active_panel != libapx_UI_PANEL_NONE) {
 			DialogSetVisible(libapx_ui_panels[active_panel].exit_btn, PlayerGroupSingle(p), false); //Button
 			DialogSetVisible(libapx_ui_panels[active_panel].dialog, PlayerGroupSingle(p), false);	//Dialog
 			// toggle off toolbar button
 			libNtve_gf_SetDialogItemToggled(libapx_ui_panels[active_panel].btn, false, PlayerGroupSingle(p));
+			DialogControlSetPropertyAsBool(g_libapx_ui_fakewireframe, c_triggerControlPropertyVisible, PlayerGroupSingle(p), false);
+
 		}
 
 		// toggle ui panel visibility and set the active panel
@@ -327,10 +341,13 @@ void libapx_ui_switchto_panel(int panelIndex, int player) {
 			DialogSetVisible(libapx_ui_panels[panel].dialog, PlayerGroupSingle(p), true);
 			DialogSetVisible(libapx_ui_panels[panel].exit_btn, PlayerGroupSingle(p), true);
 			libapx_player[p].active_ui_panel = panel;
-			// toggle on toolbar button
-			libNtve_gf_SetDialogItemToggled(libapx_ui_panels[panel].btn, true, PlayerGroupSingle(p));
+			if(panel == 0) {
+				DialogControlSetPropertyAsBool(g_libapx_ui_fakewireframe, c_triggerControlPropertyVisible, PlayerGroupSingle(p), true);
+			}
+
 		} else { // same dialog just turned off, so set active panel to none
 			libapx_player[p].active_ui_panel = libapx_UI_PANEL_NONE;
+
 		}
 	}
 	//This occurs if exit button clicked

@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<Desc>
+					<!--Templates-->
+	<Include path="Apex/Layout/Templates/WireframeTemplate.SC2Layout"/>
+
+
+					<!--Actual Layouts-->
+	<!--Hides default chat and restyles debug area for use in apex-->
+	<Include path="Apex/Layout/Chat.SC2Layout"/>
+	<!--Layout to move sc2 menu, chat, and social buttons over to LHS-->
+	<Include path="Apex/Layout/Menu.SC2Layout"/>
+	<!--Default Layout Removals-->
+	<Include path="Apex/Layout/DefaultRemovals.SC2Layout"/>
+	<!--Additional Fluff(Logo, bars on bottom)-->
+	<Include path="Apex/Layout/ApexAdditions.SC2Layout"/>
+	<!--Default Layout Edits-->
+	<Include path="Apex/Layout/DefaultEdits.SC2Layout"/>
+	<!--Unit Panel-->
+	<Include path="Apex/Layout/UnitPanels/UnitPanel.SC2Layout"/>
+	<!--Control Groups-->
+	<Include path="Apex/Layout/UnitPanels/ControlGroups.SC2Layout"/>
+	<!--Description-->
+	<Include path="Apex/Layout/Description.SC2Layout"/>
+
+	
+	<Frame type="Frame" name="GameUI/UIContainer/ConsoleUIContainer" file="GameUI">
+	
+	</Frame>
+	<Frame type="Image" name="GameButtonBaseTemplate/GameButtonBorderImage" file="GameButton">
+		<Desaturated val="true"/>
+	</Frame>
+</Desc>

@@ -107,31 +107,10 @@ void libapx_camera_reset (int player)
 	CameraInfoSetValue(cam[player], c_cameraValueShadowClip, val);
 }
 
-void libapx_respawn_camera_unit(int p) {
-	unitgroup ug = libapx_player[p].camera_unit;
-	unit tmp_unit;
-	int i;
-	unit u;
-	
-	for (i = 1; i <= UnitGroupCount(ug, c_unitCountAll); i += 1) {
-		tmp_unit = UnitGroupUnit(ug, i);
-		UnitRemove(tmp_unit);
-	}
-	libapx_player[p].camera_unit = UnitGroupEmpty();
-	libapx_player[p].camera_unit = UnitCreate(1, "ScienceVessel", c_unitCreateIgnorePlacement, p, CameraGetTarget(p), 270);
-	u = UnitGroupUnit(libapx_player[p].camera_unit,1 );
-	UnitSetState(u, c_unitStateInvulnerable, true);
-	UnitSetHeight(u, 500,0);
-	ActorSendTo(libNtve_gf_MainActorofUnit(u), "::Main", "MinimapIcon 0");
-	ActorSendTo(libNtve_gf_MainActorofUnit(u), "::Main", "ModelAllowHitTest 0");
-	ActorSendTo(libNtve_gf_MainActorofUnit(u), "::Main", "SetScale 0.0005");
-	return;
-}
-
 bool libapx_editor_mouse_wheel(bool testConds,bool runActions) {
 	int p = EventPlayer();
 	fixed wheelspin = EventMouseWheelSpin();
-	if(!libapx_player[p].mouse_right && !libapx_player[p].key_ctrl && !libapx_player[p].key_alt) {
+	if(!libapx_player[p].key_tab && !libapx_player[p].key_ctrl && !libapx_player[p].key_alt) {
 		CameraSetValue(EventPlayer(), c_cameraValueDistance, CameraGetDistance(p)-(wheelspin*2), 0, 0, 0);
 	}
 	else if(libapx_player[p].key_alt) {
@@ -152,32 +131,40 @@ void libapx_update_camera() {
 	fixed p2y;
 	fixed absy;
 	fixed absx;
-	point upos;
+	point pos;
 	fixed orientation;
-	unit u;
+	fixed dist;
 	point newUnitPos;
 	for (i = 1; i <= PlayerGroupCount(PlayerGroupActive()); i += 1) {
 		p = PlayerGroupPlayer(PlayerGroupActive(), i);
 		if(libapx_player[p].editor_toggled) {
-			if(libapx_player[p].mouse_right && !libapx_player[p].key_ctrl && !libapx_player[p].key_alt && !libapx_player[p].key_grave) {
-				u = UnitGroupUnit(libapx_player[p].camera_unit,1);
-				UnitSetFacing(u, CameraGetYaw(p), 0);
-				orientation = UnitGetFacing(u);
-				upos = UnitGetPosition(u);
+			if(libapx_player[p].key_tab && !libapx_player[p].key_ctrl && !libapx_player[p].key_alt) {
+				dist = CameraGetDistance(p);
+				dist = dist/65;
+				if(dist > 1) {
+					dist = 1;
+				}
+				//Panning
+				orientation = CameraGetYaw(p);
+				pos = libapx_player[p].camera_position;
 				p1x = PointGetX(libapx_player[p].mouse_position_lasttick_ui);
 				p1y = PointGetY(libapx_player[p].mouse_position_lasttick_ui);
 				p2x = PointGetX(libapx_player[p].mouse_position_ui);
 				p2y = PointGetY(libapx_player[p].mouse_position_ui);
 				absx = p1x-p2x;
 				absy = p1y-p2y;
-				absx *= -.025;
-				absy *= -.025;
-				upos = PointWithOffsetPolar(upos, absy, orientation);
-				upos = PointWithOffsetPolar(upos, absx, orientation+90);
-				UnitSetPosition(u, upos, false);
-				CameraPan(p, upos, 0, 0, 0 , false);
+				absx *= -.05*dist;
+				absy *= -.05*dist;
+				if(absx != 0 || absy != 0) {
+					pos = PointWithOffsetPolar(pos, absy, orientation);
+					pos = PointWithOffsetPolar(pos, absx, orientation+90);
+					libapx_player[p].camera_position = pos;	
+					CameraPan(p, PointInterpolate(pos,pos, .1 ), 0, 0, 0 , false);
+				} 
+
 			}
 			else if (libapx_player[p].key_ctrl != libapx_player[p].key_ctrl_lasttick) {
+				//Oribting
 				if( libapx_player[p].key_ctrl) {
 					CameraForceMouseRelative(p, true);
 					CameraSetMouseRotates(p, true);
@@ -192,27 +179,13 @@ void libapx_update_camera() {
 				}
 			}
 			else if (libapx_player[p].editor_rotating && !libapx_player[p].key_ctrl) {
-
 				//Catch if keypress misses it.
 				CameraForceMouseRelative(p, false);
 				CameraSetMouseRotates(p, false);
 				CameraLockInput(p, true);
 				libapx_player[p].editor_rotating = false;
 			}
-			if(libapx_player[p].key_grave) {
-				UnitGroupAddUnitGroup(libapx_player[p].editor_pausedunits, UnitGroupSelected(p));
-				UnitGroupPauseAll(libapx_player[p].editor_pausedunits, false);
-				if(libapx_player[p].key_grave != libapx_player[p].key_grave_lasttick) {
-					UnitGroupIssueOrder(libapx_player[p].editor_pausedunits, Order(AbilityCommand("stop", 0)), c_orderQueueReplace);
-				}
-				
-			}
-			else if(!libapx_player[p].key_grave) {
-				UnitGroupAddUnitGroup(libapx_player[p].editor_pausedunits, UnitGroupSelected(p));
-				UnitGroupPauseAll(libapx_player[p].editor_pausedunits, true);
-			}
 
-			libapx_player[p].key_grave_lasttick = libapx_player[p].key_grave;
 			libapx_player[p].key_ctrl_lasttick = libapx_player[p].key_ctrl;
 			libapx_player[p].mouse_position_lasttick_ui = libapx_player[p].mouse_position_ui;
 		}
@@ -226,7 +199,7 @@ void libapx_enable_editor_camera(int p, bool state) {
 	libapx_camera_reset(p);
 	if(state) {
 			libapx_player[p].editor_toggled = true;
-
+			libapx_player[p].camera_position = CameraGetTarget(p);
 		//Enable Camera
 		//When nothing held
 		//When ctrl held
@@ -260,9 +233,7 @@ void libapx_enable_editor_camera(int p, bool state) {
 
 		cam[p] = CameraInfoDefault();
 		libapx_camera_reset(p);
-
 		CameraLockInput(p, true);
-		UnitSetPosition( UnitGroupUnit(libapx_player[p].camera_unit,1), CameraGetTarget(p), false);
 		libapx_player[p].editor_mouse_wheel = TriggerCreate("libapx_editor_mouse_wheel");
 		TriggerAddEventMouseWheel(libapx_player[p].editor_mouse_wheel,p);
 	}
@@ -298,11 +269,6 @@ void libapx_enable_editor_camera(int p, bool state) {
 		cam[p] = CameraInfoDefault();
 		libapx_camera_reset(p);
 
-		//Clearing UG
-		UnitGroupAddUnitGroup(libapx_player[p].editor_pausedunits, UnitGroupSelected(p));
-		UnitGroupPauseAll(libapx_player[p].editor_pausedunits, false);
-		UnitGroupIssueOrder(libapx_player[p].editor_pausedunits, Order(AbilityCommand("stop", 0)), c_orderQueueReplace);
-		libapx_player[p].editor_pausedunits = UnitGroupEmpty();
 
 		//Disable Editor Camera
 		CameraLockInput(p, false);
@@ -336,7 +302,7 @@ void libapx_command_camera(int user, unitgroup u, string argv, int spawningCount
 		if(paremVal == "on") {
 			libapx_enable_editor_camera(user, true);
 			libapx_print_output(user, "<c val=\"00ff00\">Enabling Editor Camera</c><n/>");
-			libapx_print_output(user, "Use the [RightMouseButton]+[Mouse] to pan the camera. Use [Ctrl]+[Mouse] to orbit the camera. Use [Alt]+[MouseWheel] to change the height of the camera. Use [MouseWheel] to zoom the camera.  The camera disable your ability to control units unless you hold [Tilde].");
+			libapx_print_output(user, "Use the [Tab]+[Mouse] to pan the camera. Use [Ctrl]+[Mouse] to orbit the camera. Use [Alt]+[MouseWheel] to change the height of the camera. Use [MouseWheel] to zoom the camera.");
 		}
 		else {
 			libapx_enable_editor_camera(user, false);
