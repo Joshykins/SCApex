@@ -508,7 +508,7 @@ void libapx_waitDelay(int player) {
 
 void libapx_waitDelayGS(int player) {
 	fixed time = libapx_player[player].delay;
-	fixed compare_time = .3 * g_gamesetups_loading;
+	fixed compare_time = .2 * g_gamesetups_loading;
 	if(time < compare_time) {
 		time = compare_time;
 	}
