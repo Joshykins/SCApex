@@ -24,10 +24,8 @@ After logging in to Battle.net, change the "Source" of files to
 **Map/Mod Name** and search for "apex". You should be able to find the
 **Apex RP Engine** mod published by Serobliss. Select this mod and hit OK.  
 
-More preferably I recommend getting the **Serobliss Group Dependency** located in the
-area as the Apex RP Engine, this dependency comes with all the dependencies most
-modern maps use. Be sure to check **"latest"** on the top left so you get automated
-updates. :) 
+More preferably I recommend getting the **Serobliss Group Dependency**, this dependency comes with all the dependencies most
+modern maps use including the engine itself. Therefore it is the only dependency you need. Also be sure to check **"latest"** on the top left so you get automated updates. :) 
 
 This mod should now be added to your "Document dependencies" list. Move this
 mod file to the top of the list by pressing the up arrow button in the
