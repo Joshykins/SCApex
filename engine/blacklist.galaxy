@@ -79,7 +79,7 @@ void libapx_blacklist_update(int player) {
 	}
 
 	if (updates != 0) {
-		libapx_print_output(EventPlayer(), "Updated " + IntToString(updates) + " blacklist entries");
+		libapx_print_output(player, "Updated " + IntToString(updates) + " blacklist entries");
 	}
 }
 

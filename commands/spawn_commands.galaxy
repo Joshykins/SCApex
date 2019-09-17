@@ -12,14 +12,6 @@
 // all actual unit creation is handled in engine/unit.galaxy
 //libapx_command_spawn
 
-//void libapx_command_spawn_resetinstance()
-//{
-//	libapx_command_spawn_instances[EventPlayer()].unitType = "";
-//	libapx_command_spawn_instances[EventPlayer()].count = 1;
-//	libapx_command_spawn_instances[EventPlayer()].player = EventPlayer();
-//	libapx_command_spawn_instances[EventPlayer()].loc = null;
-//}
-
 void libapx_command_spawn(int user, unitgroup u, string argv, int spawningCount, string bracketText) {
   point spawn_point = libapx_player[user].mouse_position;
 	int count = StringToInt( StringWord(argv, 2) );
@@ -104,7 +96,7 @@ void libapx_command_spawn(int user, unitgroup u, string argv, int spawningCount,
 		}
 		else if( StringContains( StringWord(argv, 4), "@", c_stringBegin, c_stringNoCase) ) {
 			parameter = StringWord(argv, 4);
-			player = libapx_color_to_player( StringSub(parameter, 2, StringLength(parameter)) );
+			player = libapx_color_to_player( StringSub(parameter, 2, StringLength(parameter)), user );
 			if( player == -1 ) {
 				player = user;
 				libapx_print_error(user, "Invalid player color, defaulting to self");
@@ -125,7 +117,7 @@ void libapx_command_spawn(int user, unitgroup u, string argv, int spawningCount,
 		}
 		else if( StringContains( StringWord(argv, 5), "@", c_stringBegin, c_stringNoCase) ) {
 			parameter = StringWord(argv, 5);
-			player = libapx_color_to_player( StringSub(parameter, 2, StringLength(parameter)) );
+			player = libapx_color_to_player( StringSub(parameter, 2, StringLength(parameter)), user );
 			if( player == -1 ) {
 				player = user;
 				libapx_print_error(user, "Invalid player color, defaulting to self");
@@ -223,7 +215,7 @@ void libapx_command_spawn_plus(int user, unitgroup u, string argv, int spawningC
 	// if count is <= 0, then turn on mouse-click spawning
 	if( count <= 0 ) {
     if(StringFind(type, "colossus", c_stringNoCase) != -1 ) {
-  		libapx_print_output(EventPlayer(), "Spawn+ can't be used with colossus");
+  		libapx_print_output(user, "Spawn+ can't be used with colossus");
       return;
   	} else {
       libapx_print_output(user, "SPAWNING: " + type + "\n(Press [Left Mouse] to place, [ESC] key to cancel.\n" +
@@ -257,7 +249,7 @@ void libapx_command_spawn_plus(int user, unitgroup u, string argv, int spawningC
 		}
 		else if( StringContains( StringWord(argv, 4), "@", c_stringBegin, c_stringNoCase) ) {
 			parameter = StringWord(argv, 4);
-			player = libapx_color_to_player( StringSub(parameter, 2, StringLength(parameter)) );
+			player = libapx_color_to_player( StringSub(parameter, 2, StringLength(parameter)), user );
 			if( player == -1 ) {
 				player = user;
 				libapx_print_error(user, "Invalid player color, defaulting to self");
@@ -278,7 +270,7 @@ void libapx_command_spawn_plus(int user, unitgroup u, string argv, int spawningC
 		}
 		else if( StringContains( StringWord(argv, 5), "@", c_stringBegin, c_stringNoCase) ) {
 			parameter = StringWord(argv, 5);
-			player = libapx_color_to_player( StringSub(parameter, 2, StringLength(parameter)) );
+			player = libapx_color_to_player( StringSub(parameter, 2, StringLength(parameter)), user );
 			if( player == -1 ) {
 				player = user;
 				libapx_print_error(user, "Invalid player color, defaulting to self");

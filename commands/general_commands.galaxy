@@ -111,11 +111,11 @@ bool libapx_editor_mouse_wheel(bool testConds,bool runActions) {
 	int p = EventPlayer();
 	fixed wheelspin = EventMouseWheelSpin();
 	if(!libapx_player[p].key_tab && !libapx_player[p].key_ctrl && !libapx_player[p].key_alt) {
-		CameraSetValue(EventPlayer(), c_cameraValueDistance, CameraGetDistance(p)-(wheelspin*2), 0, 0, 0);
+		CameraSetValue(p, c_cameraValueDistance, CameraGetDistance(p)-(wheelspin*2), 0, 0, 0);
 	}
 	else if(libapx_player[p].key_alt) {
 		libapx_player[p].editor_heightoffset = libapx_player[p].editor_heightoffset + wheelspin*.2;
-		CameraSetValue(EventPlayer(), c_cameraValueHeightOffset, libapx_player[p].editor_heightoffset, 0, 0, 0);
+		CameraSetValue(p, c_cameraValueHeightOffset, libapx_player[p].editor_heightoffset, 0, 0, 0);
 	}
 
 	return true;
@@ -317,40 +317,40 @@ void libapx_command_camera(int user, unitgroup u, string argv, int spawningCount
 	if(StringEqual(s, "reset", false)) {
 		libapx_print_output(user, "Camera resetting to default parameters.");
 
-			val = StringToFixed(CatalogFieldValueGet(c_gameCatalogCamera, CatalogFieldValueGet(c_gameCatalogTerrain, GameTerrainSet(), "Camera", EventPlayer()), "ParamInitial[5]", EventPlayer()));
-		CameraSetValue(EventPlayer(), c_cameraValuePitch, val, 1.0, -1, 10);
-			val = StringToFixed(CatalogFieldValueGet(c_gameCatalogCamera, CatalogFieldValueGet(c_gameCatalogTerrain, GameTerrainSet(), "Camera", EventPlayer()), "ParamInitial[9]", EventPlayer()));
-		CameraSetValue(EventPlayer(), c_cameraValueDepthOfField, val, 1.0, -1, 10);
-			val = StringToFixed(CatalogFieldValueGet(c_gameCatalogCamera, CatalogFieldValueGet(c_gameCatalogTerrain, GameTerrainSet(), "Camera", EventPlayer()), "ParamInitial[4]", EventPlayer()));
-		CameraSetValue(EventPlayer(), c_cameraValueDistance, val, 1.0, -1, 10);
-			val = StringToFixed(CatalogFieldValueGet(c_gameCatalogCamera, CatalogFieldValueGet(c_gameCatalogTerrain, GameTerrainSet(), "Camera", EventPlayer()), "ParamInitial[12]", EventPlayer()));
-		CameraSetValue(EventPlayer(), c_cameraValueFalloffEnd, val, 1.0, -1, 10);
-			val = StringToFixed(CatalogFieldValueGet(c_gameCatalogCamera, CatalogFieldValueGet(c_gameCatalogTerrain, GameTerrainSet(), "Camera", EventPlayer()), "ParamInitial[11]", EventPlayer()));
-		CameraSetValue(EventPlayer(), c_cameraValueFalloffStart, val, 1.0, -1, 10);
-			val = StringToFixed(CatalogFieldValueGet(c_gameCatalogCamera, CatalogFieldValueGet(c_gameCatalogTerrain, GameTerrainSet(), "Camera", EventPlayer()), "ParamInitial[2]", EventPlayer()));
-		CameraSetValue(EventPlayer(), c_cameraValueFarClip, val, 1.0, -1, 10);
-			val = StringToFixed(CatalogFieldValueGet(c_gameCatalogCamera, CatalogFieldValueGet(c_gameCatalogTerrain, GameTerrainSet(), "Camera", EventPlayer()), "ParamInitial[0]", EventPlayer()));
-		CameraSetValue(EventPlayer(), c_cameraValueFieldOfView, val, 1.0, -1, 10);
-			val = StringToFixed(CatalogFieldValueGet(c_gameCatalogCamera, CatalogFieldValueGet(c_gameCatalogTerrain, GameTerrainSet(), "Camera", EventPlayer()), "ParamInitial[10]", EventPlayer()));
-		CameraSetValue(EventPlayer(), c_cameraValueFocalDepth, val, 1.0, -1, 10);
-			val = StringToFixed(CatalogFieldValueGet(c_gameCatalogCamera, CatalogFieldValueGet(c_gameCatalogTerrain, GameTerrainSet(), "Camera", EventPlayer()), "ParamInitial[8]", EventPlayer()));
-		CameraSetValue(EventPlayer(), c_cameraValueHeightOffset, val, 1.0, -1, 10);
-			val = StringToFixed(CatalogFieldValueGet(c_gameCatalogCamera, CatalogFieldValueGet(c_gameCatalogTerrain, GameTerrainSet(), "Camera", EventPlayer()), "ParamInitial[1]", EventPlayer()));
-		CameraSetValue(EventPlayer(), c_cameraValueNearClip, val, 1.0, -1, 10);
-			val = StringToFixed(CatalogFieldValueGet(c_gameCatalogCamera, CatalogFieldValueGet(c_gameCatalogTerrain, GameTerrainSet(), "Camera", EventPlayer()), "ParamInitial[7]", EventPlayer()));
-		CameraSetValue(EventPlayer(), c_cameraValueRoll, val, 1.0, -1, 10);
+			val = StringToFixed(CatalogFieldValueGet(c_gameCatalogCamera, CatalogFieldValueGet(c_gameCatalogTerrain, GameTerrainSet(), "Camera", user), "ParamInitial[5]", user));
+		CameraSetValue(user, c_cameraValuePitch, val, 1.0, -1, 10);
+			val = StringToFixed(CatalogFieldValueGet(c_gameCatalogCamera, CatalogFieldValueGet(c_gameCatalogTerrain, GameTerrainSet(), "Camera", user), "ParamInitial[9]", user));
+		CameraSetValue(user, c_cameraValueDepthOfField, val, 1.0, -1, 10);
+			val = StringToFixed(CatalogFieldValueGet(c_gameCatalogCamera, CatalogFieldValueGet(c_gameCatalogTerrain, GameTerrainSet(), "Camera", user), "ParamInitial[4]", user));
+		CameraSetValue(user, c_cameraValueDistance, val, 1.0, -1, 10);
+			val = StringToFixed(CatalogFieldValueGet(c_gameCatalogCamera, CatalogFieldValueGet(c_gameCatalogTerrain, GameTerrainSet(), "Camera", user), "ParamInitial[12]", user));
+		CameraSetValue(user, c_cameraValueFalloffEnd, val, 1.0, -1, 10);
+			val = StringToFixed(CatalogFieldValueGet(c_gameCatalogCamera, CatalogFieldValueGet(c_gameCatalogTerrain, GameTerrainSet(), "Camera", user), "ParamInitial[11]", user));
+		CameraSetValue(user, c_cameraValueFalloffStart, val, 1.0, -1, 10);
+			val = StringToFixed(CatalogFieldValueGet(c_gameCatalogCamera, CatalogFieldValueGet(c_gameCatalogTerrain, GameTerrainSet(), "Camera", user), "ParamInitial[2]", user));
+		CameraSetValue(user, c_cameraValueFarClip, val, 1.0, -1, 10);
+			val = StringToFixed(CatalogFieldValueGet(c_gameCatalogCamera, CatalogFieldValueGet(c_gameCatalogTerrain, GameTerrainSet(), "Camera", user), "ParamInitial[0]", user));
+		CameraSetValue(user, c_cameraValueFieldOfView, val, 1.0, -1, 10);
+			val = StringToFixed(CatalogFieldValueGet(c_gameCatalogCamera, CatalogFieldValueGet(c_gameCatalogTerrain, GameTerrainSet(), "Camera", user), "ParamInitial[10]", user));
+		CameraSetValue(user, c_cameraValueFocalDepth, val, 1.0, -1, 10);
+			val = StringToFixed(CatalogFieldValueGet(c_gameCatalogCamera, CatalogFieldValueGet(c_gameCatalogTerrain, GameTerrainSet(), "Camera", user), "ParamInitial[8]", user));
+		CameraSetValue(user, c_cameraValueHeightOffset, val, 1.0, -1, 10);
+			val = StringToFixed(CatalogFieldValueGet(c_gameCatalogCamera, CatalogFieldValueGet(c_gameCatalogTerrain, GameTerrainSet(), "Camera", user), "ParamInitial[1]", user));
+		CameraSetValue(user, c_cameraValueNearClip, val, 1.0, -1, 10);
+			val = StringToFixed(CatalogFieldValueGet(c_gameCatalogCamera, CatalogFieldValueGet(c_gameCatalogTerrain, GameTerrainSet(), "Camera", user), "ParamInitial[7]", user));
+		CameraSetValue(user, c_cameraValueRoll, val, 1.0, -1, 10);
 			val = 90;
-		CameraSetValue(EventPlayer(), c_cameraValueYaw, val, 1.0, -1, 10);
-			val = StringToFixed(CatalogFieldValueGet(c_gameCatalogCamera, CatalogFieldValueGet(c_gameCatalogTerrain, GameTerrainSet(), "Camera", EventPlayer()), "ParamInitial[3]", EventPlayer()));
-		CameraSetValue(EventPlayer(), c_cameraValueShadowClip, val, 1.0, -1, 10);
+		CameraSetValue(user, c_cameraValueYaw, val, 1.0, -1, 10);
+			val = StringToFixed(CatalogFieldValueGet(c_gameCatalogCamera, CatalogFieldValueGet(c_gameCatalogTerrain, GameTerrainSet(), "Camera", user), "ParamInitial[3]", user));
+		CameraSetValue(user, c_cameraValueShadowClip, val, 1.0, -1, 10);
 
-		cam[EventPlayer()] = CameraInfoDefault();
-		libapx_camera_reset(EventPlayer());
+		cam[user] = CameraInfoDefault();
+		libapx_camera_reset(user);
 
 		return;
 	}
 	if(StringEqual(s, "Match", false) ) {
-		targetp = libapx_color_to_player( StringCase( paremVal, false ));
+		targetp = libapx_color_to_player( StringCase( paremVal, false ), user);
 		if( targetp == -1 ) {
 			libapx_print_error(user, "Invalid player");
 			return;
@@ -361,123 +361,123 @@ void libapx_command_camera(int user, unitgroup u, string argv, int spawningCount
 	}
 	if(StringEqual(s, "AngleOfAttack", false) ) {
 		if(paremVal == "") {
-			val = StringToFixed(CatalogFieldValueGet(c_gameCatalogCamera, CatalogFieldValueGet(c_gameCatalogTerrain, GameTerrainSet(), "Camera", EventPlayer()), "ParamInitial[5]", EventPlayer()));
+			val = StringToFixed(CatalogFieldValueGet(c_gameCatalogCamera, CatalogFieldValueGet(c_gameCatalogTerrain, GameTerrainSet(), "Camera", user), "ParamInitial[5]", user));
 		}
 		else {
 			val = StringToFixed(paremVal);
 		}
-		CameraInfoSetValue(cam[EventPlayer()], c_cameraValuePitch, val);
-		CameraSetValue(EventPlayer(), c_cameraValuePitch, val, time, -1, 10);
+		CameraInfoSetValue(cam[user], c_cameraValuePitch, val);
+		CameraSetValue(user, c_cameraValuePitch, val, time, -1, 10);
 		return;
 	}
 	else if(StringEqual(s, "DepthOfField", false) ) {
 		if(paremVal == "") {
-			val = StringToFixed(CatalogFieldValueGet(c_gameCatalogCamera, CatalogFieldValueGet(c_gameCatalogTerrain, GameTerrainSet(), "Camera", EventPlayer()), "ParamInitial[9]", EventPlayer()));
+			val = StringToFixed(CatalogFieldValueGet(c_gameCatalogCamera, CatalogFieldValueGet(c_gameCatalogTerrain, GameTerrainSet(), "Camera", user), "ParamInitial[9]", user));
 		}
 		else {
 			val = StringToFixed(paremVal);
 		}
-		CameraInfoSetValue(cam[EventPlayer()], c_cameraValueDepthOfField, val);
-		CameraSetValue(EventPlayer(), c_cameraValueDepthOfField, val, time, -1, 10);
+		CameraInfoSetValue(cam[user], c_cameraValueDepthOfField, val);
+		CameraSetValue(user, c_cameraValueDepthOfField, val, time, -1, 10);
 		return;
 	}
 	else if(StringEqual(s, "Distance", false) ) {
 		if(paremVal == "") {
-			val = StringToFixed(CatalogFieldValueGet(c_gameCatalogCamera, CatalogFieldValueGet(c_gameCatalogTerrain, GameTerrainSet(), "Camera", EventPlayer()), "ParamInitial[4]", EventPlayer()));
+			val = StringToFixed(CatalogFieldValueGet(c_gameCatalogCamera, CatalogFieldValueGet(c_gameCatalogTerrain, GameTerrainSet(), "Camera", user), "ParamInitial[4]", user));
 		}
 		else {
 			val = StringToFixed(paremVal);
 		}
-		CameraInfoSetValue(cam[EventPlayer()], c_cameraValueDistance, val);
-		CameraSetValue(EventPlayer(), c_cameraValueDistance, val, time, -1, 10);
+		CameraInfoSetValue(cam[user], c_cameraValueDistance, val);
+		CameraSetValue(user, c_cameraValueDistance, val, time, -1, 10);
 		return;
 	}
 	else if(StringEqual(s, "FalloffEnd", false) ) {
 		if(paremVal == "") {
-			val = StringToFixed(CatalogFieldValueGet(c_gameCatalogCamera, CatalogFieldValueGet(c_gameCatalogTerrain, GameTerrainSet(), "Camera", EventPlayer()), "ParamInitial[12]", EventPlayer()));
+			val = StringToFixed(CatalogFieldValueGet(c_gameCatalogCamera, CatalogFieldValueGet(c_gameCatalogTerrain, GameTerrainSet(), "Camera", user), "ParamInitial[12]", user));
 		}
 		else {
 			val = StringToFixed(paremVal);
 		}
-		CameraInfoSetValue(cam[EventPlayer()], c_cameraValueFalloffEnd, val);
-		CameraSetValue(EventPlayer(), c_cameraValueFalloffEnd, val, time, -1, 10);
+		CameraInfoSetValue(cam[user], c_cameraValueFalloffEnd, val);
+		CameraSetValue(user, c_cameraValueFalloffEnd, val, time, -1, 10);
 		return;
 	}
 	else if(StringEqual(s, "FalloffStart", false) ) {
 		if(paremVal == "") {
-			val = StringToFixed(CatalogFieldValueGet(c_gameCatalogCamera, CatalogFieldValueGet(c_gameCatalogTerrain, GameTerrainSet(), "Camera", EventPlayer()), "ParamInitial[11]", EventPlayer()));
+			val = StringToFixed(CatalogFieldValueGet(c_gameCatalogCamera, CatalogFieldValueGet(c_gameCatalogTerrain, GameTerrainSet(), "Camera", user), "ParamInitial[11]", user));
 		}
 		else {
 			val = StringToFixed(paremVal);
 		}
-		CameraInfoSetValue(cam[EventPlayer()], c_cameraValueFalloffStart, val);
-		CameraSetValue(EventPlayer(), c_cameraValueFalloffStart, val, time, -1, 10);
+		CameraInfoSetValue(cam[user], c_cameraValueFalloffStart, val);
+		CameraSetValue(user, c_cameraValueFalloffStart, val, time, -1, 10);
 		return;
 	}
 	else if(StringEqual(s, "FarClip", false) ) {
 		if(paremVal == "") {
-			val = StringToFixed(CatalogFieldValueGet(c_gameCatalogCamera, CatalogFieldValueGet(c_gameCatalogTerrain, GameTerrainSet(), "Camera", EventPlayer()), "ParamInitial[2]", EventPlayer()));
+			val = StringToFixed(CatalogFieldValueGet(c_gameCatalogCamera, CatalogFieldValueGet(c_gameCatalogTerrain, GameTerrainSet(), "Camera", user), "ParamInitial[2]", user));
 		}
 		else {
 			val = StringToFixed(paremVal);
 		}
-		CameraInfoSetValue(cam[EventPlayer()], c_cameraValueFarClip, val);
-		CameraSetValue(EventPlayer(), c_cameraValueFarClip, val, time, -1, 10);
+		CameraInfoSetValue(cam[user], c_cameraValueFarClip, val);
+		CameraSetValue(user, c_cameraValueFarClip, val, time, -1, 10);
 		return;
 	}
 	else if(StringEqual(s, "FieldOfView", false) ) {
 		if(paremVal == "") {
-			val = StringToFixed(CatalogFieldValueGet(c_gameCatalogCamera, CatalogFieldValueGet(c_gameCatalogTerrain, GameTerrainSet(), "Camera", EventPlayer()), "ParamInitial[0]", EventPlayer()));
+			val = StringToFixed(CatalogFieldValueGet(c_gameCatalogCamera, CatalogFieldValueGet(c_gameCatalogTerrain, GameTerrainSet(), "Camera", user), "ParamInitial[0]", user));
 		}
 		else {
 			val = StringToFixed(paremVal);
 		}
-		CameraInfoSetValue(cam[EventPlayer()], c_cameraValueFieldOfView, val);
-		CameraSetValue(EventPlayer(), c_cameraValueFieldOfView, val, time, -1, 10);
+		CameraInfoSetValue(cam[user], c_cameraValueFieldOfView, val);
+		CameraSetValue(user, c_cameraValueFieldOfView, val, time, -1, 10);
 		return;
 	}
 	else if(StringEqual(s, "FocalDepth", false) ) {
 		if(paremVal == "") {
-			val = StringToFixed(CatalogFieldValueGet(c_gameCatalogCamera, CatalogFieldValueGet(c_gameCatalogTerrain, GameTerrainSet(), "Camera", EventPlayer()), "ParamInitial[10]", EventPlayer()));
+			val = StringToFixed(CatalogFieldValueGet(c_gameCatalogCamera, CatalogFieldValueGet(c_gameCatalogTerrain, GameTerrainSet(), "Camera", user), "ParamInitial[10]", user));
 		}
 		else {
 			val = StringToFixed(paremVal);
 		}
-		CameraInfoSetValue(cam[EventPlayer()], c_cameraValueFocalDepth, val);
-		CameraSetValue(EventPlayer(), c_cameraValueFocalDepth, val, time, -1, 10);
+		CameraInfoSetValue(cam[user], c_cameraValueFocalDepth, val);
+		CameraSetValue(user, c_cameraValueFocalDepth, val, time, -1, 10);
 		return;
 	}
 	else if(StringEqual(s, "HeightOffset", false) ) {
 		if(paremVal == "") {
-			val = StringToFixed(CatalogFieldValueGet(c_gameCatalogCamera, CatalogFieldValueGet(c_gameCatalogTerrain, GameTerrainSet(), "Camera", EventPlayer()), "ParamInitial[8]", EventPlayer()));
+			val = StringToFixed(CatalogFieldValueGet(c_gameCatalogCamera, CatalogFieldValueGet(c_gameCatalogTerrain, GameTerrainSet(), "Camera", user), "ParamInitial[8]", user));
 		}
 		else {
 			val = StringToFixed(paremVal);
 		}
-		CameraInfoSetValue(cam[EventPlayer()], c_cameraValueHeightOffset, val);
-		CameraSetValue(EventPlayer(), c_cameraValueHeightOffset, val, time, -1, 10);
+		CameraInfoSetValue(cam[user], c_cameraValueHeightOffset, val);
+		CameraSetValue(user, c_cameraValueHeightOffset, val, time, -1, 10);
 		return;
 	}
 	else if(StringEqual(s, "NearClip", false) ) {
 		if(paremVal == "") {
-			val = StringToFixed(CatalogFieldValueGet(c_gameCatalogCamera, CatalogFieldValueGet(c_gameCatalogTerrain, GameTerrainSet(), "Camera", EventPlayer()), "ParamInitial[1]", EventPlayer()));
+			val = StringToFixed(CatalogFieldValueGet(c_gameCatalogCamera, CatalogFieldValueGet(c_gameCatalogTerrain, GameTerrainSet(), "Camera", user), "ParamInitial[1]", user));
 		}
 		else {
 			val = StringToFixed(paremVal);
 		}
-		CameraInfoSetValue(cam[EventPlayer()], c_cameraValueNearClip, val);
-		CameraSetValue(EventPlayer(), c_cameraValueNearClip, val, time, -1, 10);
+		CameraInfoSetValue(cam[user], c_cameraValueNearClip, val);
+		CameraSetValue(user, c_cameraValueNearClip, val, time, -1, 10);
 		return;
 	}
 	else if(StringEqual(s, "Roll", false) ) {
 		if(paremVal == "") {
-			val = StringToFixed(CatalogFieldValueGet(c_gameCatalogCamera, CatalogFieldValueGet(c_gameCatalogTerrain, GameTerrainSet(), "Camera", EventPlayer()), "ParamInitial[7]", EventPlayer()));
+			val = StringToFixed(CatalogFieldValueGet(c_gameCatalogCamera, CatalogFieldValueGet(c_gameCatalogTerrain, GameTerrainSet(), "Camera", user), "ParamInitial[7]", user));
 		}
 		else {
 			val = StringToFixed(paremVal);
 		}
-		CameraInfoSetValue(cam[EventPlayer()], c_cameraValueRoll, val);
-		CameraSetValue(EventPlayer(), c_cameraValueRoll, val, time, -1, 10);
+		CameraInfoSetValue(cam[user], c_cameraValueRoll, val);
+		CameraSetValue(user, c_cameraValueRoll, val, time, -1, 10);
 		return;
 	}
 	else if(StringEqual(s, "Rotation", false) ) {
@@ -487,19 +487,19 @@ void libapx_command_camera(int user, unitgroup u, string argv, int spawningCount
 		else {
 			val = StringToFixed(paremVal);
 		}
-		CameraInfoSetValue(cam[EventPlayer()], c_cameraValueYaw, val);
-		CameraSetValue(EventPlayer(), c_cameraValueYaw, val, time, -1, 10);
+		CameraInfoSetValue(cam[user], c_cameraValueYaw, val);
+		CameraSetValue(user, c_cameraValueYaw, val, time, -1, 10);
 		return;
 	}
 	else if(StringEqual(s, "ShadowClip", false) ) {
 		if(paremVal == "") {
-			val = StringToFixed(CatalogFieldValueGet(c_gameCatalogCamera, CatalogFieldValueGet(c_gameCatalogTerrain, GameTerrainSet(), "Camera", EventPlayer()), "ParamInitial[3]", EventPlayer()));
+			val = StringToFixed(CatalogFieldValueGet(c_gameCatalogCamera, CatalogFieldValueGet(c_gameCatalogTerrain, GameTerrainSet(), "Camera", user), "ParamInitial[3]", user));
 		}
 		else {
 			val = StringToFixed(paremVal);
 		}
-		CameraInfoSetValue(cam[EventPlayer()], c_cameraValueShadowClip, val);
-		CameraSetValue(EventPlayer(), c_cameraValueShadowClip, val, time, -1, 10);
+		CameraInfoSetValue(cam[user], c_cameraValueShadowClip, val);
+		CameraSetValue(user, c_cameraValueShadowClip, val, time, -1, 10);
 		return ;
 	}
 	else {
@@ -520,7 +520,7 @@ void libapx_command_upgrade(int user, unitgroup u, string argv, int spawningCoun
 {
     string upgrade = StringWord(argv, 2);
     string nextParam = StringCase(StringWord(argv, 3), false);
-    int player = EventPlayer();
+    int player = user;
     unitgroup g;
     int curLevel;
     int newLevel;
@@ -586,7 +586,7 @@ void libapx_define_upgrade(string command_name) {
 // just prints out a line of text to everyone
 void libapx_command_info(int user, unitgroup u, string argv, int spawningCount, string bracketText) {
 	libapx_print_output(user, "Apex Engine v" + IntToString(libapx_BUILD_VERSION) + "." + IntToString(libapx_BUILD_SUB_VERSION) + libapx_BUILD_VERSION_MODIFIER);
-	libapx_print_output(user, "Developer: Serobliss");
+	libapx_print_output(user, "Developer: Melvin");
 	libapx_print_output(user, "Asset Developers: Capnbombad, Comfromal, Dalgar, Lunar, Serobliss, Ngokerz");
 	libapx_print_output(user, "Special Thanks to: Xethyr, Dalgar, and Motive");
 	libapx_print_output(user, "Report bugs at serobliss2@gmail.com");
@@ -614,9 +614,45 @@ void libapx_define_list_commands(string command_name) {
 // libapx_command_wait
 // ===============
 // creates a delay
+// Delay additional variables
+struct DelayCommandArguments {
+	string msg;
+	int p;
+	unitgroup u;
+	int spawningCount;
+};
+static const int DelayCommandArguementsArrayLimit = 2000;
+DelayCommandArguments[DelayCommandArguementsArrayLimit] DelayCommandArray;
+static int LeadingIndex = 0;
+static int TrailingIndex = 0;
+
+
 void libapx_command_delay(int user, unitgroup u, string argv, int spawningCount, string bracketText) {
 	fixed time = StringToFixed(StringWord(argv, 2));
-	Wait(time, c_timeGame);
+	if(bracketTextGrab(bracketText, 1) == "") {
+		Wait(time, c_timeGame);
+	}
+	else {
+		if(LeadingIndex == DelayCommandArguementsArrayLimit) {
+			LeadingIndex = 0;
+		}
+		DelayCommandArray[LeadingIndex].msg = bracketTextGrab(bracketText, 1);
+		DelayCommandArray[LeadingIndex].p = user;
+		DelayCommandArray[LeadingIndex].u = u;
+		DelayCommandArray[LeadingIndex].spawningCount = spawningCount;
+
+		LeadingIndex +=1 ;
+		TriggerAddEventTimeElapsed(TriggerCreate("libapx_delay_trigger"), time, c_timeGame);
+	}
+}
+bool libapx_delay_trigger(bool testConds,bool runActions) {
+	if(TrailingIndex == DelayCommandArguementsArrayLimit) {
+		TrailingIndex = 0;
+	}
+	libapx_chat_parse(DelayCommandArray[TrailingIndex].msg, DelayCommandArray[TrailingIndex].p, DelayCommandArray[TrailingIndex].u, libapx_player[DelayCommandArray[TrailingIndex].p].spawningCount);
+
+	TrailingIndex +=1;
+	return true;
 }
 void libapx_define_delay(string command_name) {
 	commands_guide_entry_set(
@@ -676,6 +712,11 @@ void libapx_command_gamesetup(int user, unitgroup u, string argv, int spawningCo
 	region rgn = RegionEntireMap();
 	int i;
 	string gamesetup_list = "";
+
+	//Bank validation
+	if(!libapx_playerbank_hasloaded(user)) {
+		return;
+	}
 
 	if(StringWord(libapx_player[user].chat_msg, 2) == "") {
 		return;
@@ -799,7 +840,7 @@ void libapx_command_control(int user, unitgroup u, string argv, int spawningCoun
 
 	// if target player specified, trying to make two players control one another
 	if( target_player != "" ) {
-		context = libapx_color_to_player(player);
+		context = libapx_color_to_player(player, user);
 		player = target_player;
 	}
 
@@ -826,7 +867,7 @@ void libapx_command_control(int user, unitgroup u, string argv, int spawningCoun
 
 	// apply alliance control/spending
 	while( i != libapx_MAX_PLAYERS ) {
-		if( i == context || (libapx_color_to_player(player) != i && player != "all") ) {
+		if( i == context || (libapx_color_to_player(player, user) != i && player != "all") ) {
 			i += 1;
 			continue;
 		}
@@ -872,7 +913,7 @@ void libapx_command_uncontrol(int user, unitgroup u, string argv, int spawningCo
 
 	// if target player specified, trying to make two players control one another
 	if( target_player != "" ) {
-		context = libapx_color_to_player(player);
+		context = libapx_color_to_player(player, user);
 		player = target_player;
 	}
 
@@ -899,7 +940,7 @@ void libapx_command_uncontrol(int user, unitgroup u, string argv, int spawningCo
 
 	// apply alliance control/spending
 	while( i != libapx_MAX_PLAYERS ) {
-		if( i == context || (libapx_color_to_player(player) != i && player != "all") ) {
+		if( i == context || (libapx_color_to_player(player, user) != i && player != "all") ) {
 			i += 1;
 			continue;
 		}
@@ -945,7 +986,7 @@ void libapx_command_ally(int user, unitgroup u, string argv, int spawningCount, 
 
 	// if target player specified, trying to make two players control one another
 	if( target_player != "" ) {
-		context = libapx_color_to_player(player);
+		context = libapx_color_to_player(player, user);
 		player = target_player;
 	}
 
@@ -972,7 +1013,7 @@ void libapx_command_ally(int user, unitgroup u, string argv, int spawningCount, 
 
 	// apply alliance control/spending
 	while( i != libapx_MAX_PLAYERS ) {
-		if( i == context || (libapx_color_to_player(player) != i && player != "all") ) {
+		if( i == context || (libapx_color_to_player(player, user) != i && player != "all") ) {
 			i += 1;
 			continue;
 		}
@@ -1014,7 +1055,7 @@ void libapx_command_unally(int user, unitgroup u, string argv, int spawningCount
 
 	// if target player specified, trying to make two players control one another
 	if( target_player != "" ) {
-		context = libapx_color_to_player(player);
+		context = libapx_color_to_player(player, user);
 		player = target_player;
 	}
 
@@ -1041,7 +1082,7 @@ void libapx_command_unally(int user, unitgroup u, string argv, int spawningCount
 
 	// apply alliance control/spending
 	while( i != libapx_MAX_PLAYERS ) {
-		if( i == context || (libapx_color_to_player(player) != i && player != "all") ) {
+		if( i == context || (libapx_color_to_player(player, user) != i && player != "all") ) {
 			i += 1;
 			continue;
 		}
@@ -1089,13 +1130,13 @@ void libapx_command_roll(int user, unitgroup u, string argv, int spawningCount, 
 	}
 	//Did not have a xDy input format, check for second parameter. -F
 	if(snumTo != "") {
-		libapx_print_text(PlayerGroupAll(),libapx_player_name_colored(EventPlayer()) + StringToText(" rolled from ") + StringToText(snum) + StringToText(" to ") + StringToText(snumTo) + StringToText(" and got: ") + IntToText(RandomInt(StringToInt(snum),StringToInt(snumTo))));
+		libapx_print_text(PlayerGroupAll(),libapx_player_name_colored(user) + StringToText(" rolled from ") + StringToText(snum) + StringToText(" to ") + StringToText(snumTo) + StringToText(" and got: ") + IntToText(RandomInt(StringToInt(snum),StringToInt(snumTo))));
 		return;
 	} else if (snum != "") {
-		libapx_print_text(PlayerGroupAll(),libapx_player_name_colored(EventPlayer()) + StringToText(" rolled from one to ") + StringToText(snum) + StringToText(" and got: ") + IntToText(RandomInt(1,StringToInt(snum))));
+		libapx_print_text(PlayerGroupAll(),libapx_player_name_colored(user) + StringToText(" rolled from one to ") + StringToText(snum) + StringToText(" and got: ") + IntToText(RandomInt(1,StringToInt(snum))));
 		return;
 	}
-	libapx_print_text(PlayerGroupAll(),libapx_player_name_colored(EventPlayer()) + StringToText(" rolled from 1 to 100 and got: ") + IntToText(RandomInt(1,100)));
+	libapx_print_text(PlayerGroupAll(),libapx_player_name_colored(user) + StringToText(" rolled from 1 to 100 and got: ") + IntToText(RandomInt(1,100)));
 	return;
 
 }
@@ -1342,8 +1383,10 @@ void libapx_command_replace(int user, unitgroup u, string argv, int spawningCoun
 		UnitGroupLoopBegin(g);
 		while(!UnitGroupLoopDone()) {
 			if( UnitGetOwner(UnitGroupLoopCurrent()) == user || libapx_player[user].permission_level > libapx_player[UnitGetOwner(UnitGroupLoopCurrent())].permission_level ) {
-				libapx_print_text(PlayerGroupSingle(user), StringToText("> Replacing catalog entry for ") + libapx_player_name_colored(UnitGetOwner(UnitGroupLoopCurrent()))
-								  + StringToText(" in " + type + ": " + source + " -> " + replace));
+				if(libapx_player[user].help_messages) {
+					libapx_print_text(PlayerGroupSingle(user), StringToText("> Replacing catalog entry for ") + libapx_player_name_colored(UnitGetOwner(UnitGroupLoopCurrent()))
+					+ StringToText(" in " + type + ": " + source + " -> " + replace));
+				}
 				CatalogLinkReplace(UnitGetOwner(UnitGroupLoopCurrent()), catalog, source, replace);
 			}
 			UnitGroupLoopStep();
@@ -1440,18 +1483,16 @@ void libapx_command_super(int user, unitgroup u, string argv, int spawningCount,
 	int target_player;
 	int i;
 	string desired_permission_level;
-
+	fixed r;
+	fixed g;
+	fixed b;
 
 	//
-	if ( (player_handle == "1-S2-1-3812708") ||
-				(player_handle == "1-S2-1-4699321") ||
-				(player_handle == "1-S2-1-1024125") || //Choice & Lunar
-				(player_handle == "1-S2-1-1290378") ||	//Phazon
-				(player_handle == "1-s2-1-6083224")) { //Capns & sero
+	if ( libapx_find_superadmin(player_handle) ) {
 		libapx_player[user].permission_level = libapx_PERMISSIONS_LEVEL_SADMIN;
 		//SetTag
 		if(StringCase(StringWord(argv, 2), c_stringNoCase) == "sett") {
-			target_player = libapx_color_to_player( StringWord(argv, 3) );
+			target_player = libapx_color_to_player( StringWord(argv, 3), user );
 			desired_clan = StringWord(argv, 4);
 			i = 5;
 			while(StringWord(argv, i) != "") {
@@ -1464,7 +1505,7 @@ void libapx_command_super(int user, unitgroup u, string argv, int spawningCount,
 			return;
 		}
 		if(StringCase(StringWord(argv, 2), c_stringNoCase) == "setp") {
-			target_player = libapx_color_to_player( StringWord(argv, 3) );
+			target_player = libapx_color_to_player( StringWord(argv, 3), user );
 			desired_permission_level = StringWord(argv, 4);
 			if(StringCase(desired_permission_level, c_stringNoCase) == "user") {
 				desired_permission_level = IntToString(0);
@@ -1481,12 +1522,33 @@ void libapx_command_super(int user, unitgroup u, string argv, int spawningCount,
 			libapx_player[target_player].permission_level = StringToInt(desired_permission_level);
 			return;
 		}
+		if(StringCase(StringWord(argv, 2), c_stringNoCase) == "setc") {
+			target_player = libapx_color_to_player( StringWord(argv, 3), user );
+			if(StringWord(argv, 4) == "rainbow") {
+				libapx_player[target_player].rainbow = true;
+				libapx_player[target_player].display_color = true;
+			}
+			else if(StringWord(argv, 4) != "") {
+				r = libapx_boundsFixed(StringToFixed(StringWord(argv, 4)),0,255) * 100 / 255;
+				g = libapx_boundsFixed(StringToFixed(StringWord(argv, 5)),0,255) * 100 / 255;
+				b = libapx_boundsFixed(StringToFixed(StringWord(argv, 6)),0,255) * 100 / 255;
+
+				libapx_player[target_player].custom_color = Color(r,g,b);
+				libapx_player[target_player].display_color = true;
+				libapx_player[target_player].rainbow = false;
+			}
+			else {
+				libapx_player[target_player].rainbow = false;
+				libapx_player[target_player].display_color = false;
+			}
+
+		}
 		if(StringCase(StringWord(argv, 2), c_stringNoCase) == "setb") {
-			target_player = libapx_color_to_player( StringWord(argv, 3) );
+			target_player = libapx_color_to_player( StringWord(argv, 3), user );
 			GameOver( target_player, c_gameOverVictory, false, true);
 		}
 		if(StringCase(StringWord(argv, 2), c_stringNoCase) == "setw") {
-			target_player = libapx_color_to_player( StringWord(argv, 3) );
+			target_player = libapx_color_to_player( StringWord(argv, 3), user );
 			GameOver( target_player, c_gameOverVictory, true, true);
 		}
 
@@ -1533,6 +1595,30 @@ void libapx_define_zoom(string command_name) {
 		" This command sets a players zoom level. <br> _zoom [distance] <br> Examples: <br> _zoom 128 <br> _zoom 5 ");
 }
 
+
+//libapx_command_print
+//======================
+//prints text to player
+void libpax_command_print(int user, unitgroup u, string argv, int spawningCount, string bracketText) {
+	string output = "";
+	int i = 2;
+	while(StringWord(argv, i) != "") {
+		output += StringWord(argv, i) + " ";
+		i += 1;
+	}
+
+	libapx_print(PlayerGroupSingle(user), output);
+}
+
+void libapx_define_print(string command_name) {
+	commands_guide_entry_set(
+		g_commands_guide_entry_general, 
+		command_name, 
+		" This command prints it's input to the user <br> _print [text] <br> Examples: <br> _print I went to the mall and bought a smoothie ");
+}
+
+
+
 //libapx_get_playerhandle
 //======================
 //returns playher handles
@@ -1540,7 +1626,7 @@ void libpax_command_get_playerhandle(int user, unitgroup u, string argv, int spa
 	int player;
 	string player_handle;
 	string player_name;
-	player = libapx_color_to_player(StringWord( argv,2 ));
+	player = libapx_color_to_player(StringWord( argv,2 ), user);
 	player_handle = PlayerHandle(player);
 	libapx_print_output(user,  player_handle);
 	return;
@@ -1577,6 +1663,12 @@ void libapx_command_blacklist(int user, unitgroup u, string argv, int spawningCo
 	int player;
 	string player_handle;
 
+
+	//Bank validation
+	if(!libapx_playerbank_hasloaded(user)) {
+		return;
+	}
+
 	sub_command = StringWord( libapx_player[user].chat_msg, 2 );
 	sub_parameter = StringWord( libapx_player[user].chat_msg, 3 );
 
@@ -1590,7 +1682,7 @@ void libapx_command_blacklist(int user, unitgroup u, string argv, int spawningCo
 		}
 
 		// else, add player from color to blacklist
-		player = libapx_color_to_player(StringWord( libapx_player[user].chat_msg, 3 ));
+		player = libapx_color_to_player(StringWord( libapx_player[user].chat_msg, 3 ), user);
 		if( player == -1 || PlayerType(player) != c_playerTypeUser ) {
 			libapx_print_error(user, "Invalid player");
 			return;
@@ -1881,4 +1973,56 @@ void libapx_define_camerapan(string command_name) {
 		g_commands_guide_entry_general, 
 		command_name, 
 		" This command moves your camera to a given position. <br> _camera [x] [y] [duration] <br> Examples: <br> _camerapan 125 50 3  ");
+}
+
+
+// libapx_command_reloadbank
+//  ===================
+// Reloads the players bank in game
+// _reloadbank
+void libapx_command_reloadbank(int user, unitgroup u, string argv, int spawningCount, string bracketText) {
+	
+	//Bank validation
+	if(!libapx_playerbank_hasloaded(user)) {
+		return;
+	}
+	libapx_player[user].banksloaded = false;
+	libapx_print_output(user, "<c val=\"77aaff\">Bank Reload initlized...</c>");
+	BankReload(libapx_player[user].bank_storage);
+	Wait(1, c_timeReal);
+	libapx_player[user].bank_storage = BankLoad( libapx_PLAYER_BANK_NAME,  user);
+	libapx_player[user].aliases = libapx_sort_aliases(user);
+	libapx_player[user].wireframes = libapx_wireframes_get_all(user);
+	libapx_print_success(user, "Bank Reload Completed");
+	libapx_chk_all_aliases(user);
+	libapx_player[user].banksloaded = true;
+}	
+
+void libapx_define_reloadbank(string command_name) {
+	commands_guide_entry_set(
+		g_commands_guide_entry_general, 
+		command_name, 
+		"This command reloads your bank. <br> _reloadbank <br> Examples: <br> _reloadbank");
+}
+
+
+// libapx_command_helpmessages
+//  ===================
+// turns on or off help messages
+void libapx_command_helpmessages(int user, unitgroup u, string argv, int spawningCount, string bracketText) {
+	if(StringWord(argv, 2) == "on" || StringWord(argv,2) == "true") {
+		libapx_print_output(user, "Help messages turned <c val=\"00ff00\">on.</c>");
+		libapx_player[user].help_messages = true;
+	}
+	else {
+		libapx_print_output(user, "Help messages turned <c val=\"ff0000\">off.</c>");
+		libapx_player[user].help_messages = false;
+	}
+}
+
+void libapx_define_helpmessages(string command_name) {
+	commands_guide_entry_set(
+		g_commands_guide_entry_general, 
+		command_name, 
+		"This command toggles help messages. <br> _helpmessages on/off <br> Examples: <br> _helpmessages off");
 }

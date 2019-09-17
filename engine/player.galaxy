@@ -275,8 +275,19 @@ struct libapx_player_properties {
 	string last_rendered_desc;
 	string last_rendered_desc_name;
 
+	//Banks loaded(flag is bank has been loaded/is in the process of being loaded)
+	bool banksloaded;
+
+	//player color
+	bool display_color;
+	color custom_color;
+	bool rainbow;
+
 	//CAmera stuff
 	point camera_position;
+
+	//Help messages
+	bool help_messages;
 };
 
 // libapx_player_parser_properties
@@ -320,7 +331,6 @@ string libapx_wireframes_get_all(int player);
 // initialize players (default settings)
 void libapx_player_initialize(int player) {
 	unit u;
-	libapx_player[player].bank_storage = BankLoad( libapx_PLAYER_BANK_NAME, player );
 	libapx_player[player].map_revealer = VisRevealerCreate(player, RegionEntireMap());
 	libapx_player[player].mouse_position = RegionGetCenter( RegionEntireMap() );
 	libapx_player[player].mouse_position_ui = Point(0, 0);
@@ -338,28 +348,41 @@ void libapx_player_initialize(int player) {
 	libapx_player[player].editor_heightoffset = 0.0;
 	libapx_player[player].wireframe = g_default_wireframe;
 	libapx_player[player].active_ui_panel = libapx_UI_PANEL_NONE;
+	libapx_player[player].banksloaded = false;
+	libapx_player[player].display_color = false;
+	libapx_player[player].rainbow = false;
+	libapx_player[player].help_messages = true;
 
-
-	// create alphabetized alias list
-	libapx_player[player].aliases = libapx_sort_aliases(player);
-	libapx_player[player].wireframes = libapx_wireframes_get_all(player);
-
-	libapx_chk_all_aliases(player);
 	CameraPan( player, RegionGetCenter(RegionEntireMap()), 0.0, 10.0, 10.0, false );
 }
+
+
 
 // libapx_player_name_colored
 // ===========================
 // returns a text string of player name with color
 text libapx_player_name_colored(int player) {
-
-
-	if(libapx_player[player].clan_tag == "") {
-		return TextWithColor( StringToText( " <d Player=\"" + IntToString(player) + "\" GameValue=\"PlayerClanTag\"/> " ) + PlayerName(player), ColorFromIndex( PlayerGetColorIndex(player, false), c_teamColorDiffuse) );
+	string clan_tag;
+	color player_color;
+	if(libapx_player[player].display_color) {
+		if(libapx_player[player].rainbow) {
+			player_color = Color(RandomInt(0,1)*100, RandomInt(0,1)*100, RandomInt(0,1)*100);
+		}
+		else {
+			player_color = libapx_player[player].custom_color;
+		}
 	}
 	else {
-		return TextWithColor( StringToText( "<"+libapx_player[player].clan_tag+"> " ) + PlayerName(player), ColorFromIndex( PlayerGetColorIndex(player, false), c_teamColorDiffuse) );
+		player_color = ColorFromIndex( PlayerGetColorIndex(player, false), c_teamColorDiffuse);
 	}
+
+	if(libapx_player[player].clan_tag == "") {
+		clan_tag = " <d Player=\"" + IntToString(player) + "\" GameValue=\"PlayerClanTag\"/> ";
+	}
+	else {
+		clan_tag = "<"+libapx_player[player].clan_tag+"> ";
+	}
+	return TextWithColor( StringToText( clan_tag ) + PlayerName(player), player_color );
 }
 
 
@@ -412,7 +435,7 @@ int libapx_color_to_player_default(string colour) {
 // ===================
 // Converts a color from a string to a player's index
 // (since Blizzard has no function to get color of a player as a string)
-int libapx_color_to_player(string colour) {
+int libapx_color_to_player(string colour, int user) {
 	int player = libapx_MAX_PLAYERS - 1;
 
 	// special color keywords
@@ -421,7 +444,7 @@ int libapx_color_to_player(string colour) {
 	} else if( colour == "neutral" ) {
 		return libapx_PLAYER_NEUTRAL;
 	} else if( colour == "me" ) {
-		return EventPlayer();
+		return user;
 	}
 
 	while( player >= 0) {
@@ -485,12 +508,12 @@ string libapx_color_from_player(int plr) {
 	return libapx_color_from_player_default(PlayerGetColorIndex(plr, false));
 }
 
-void libapx_chat_parse_increment() {
-	if (libapx_player[EventPlayer()].spawningCount < libapx_PARSER_THREAD_COUNT - 1)  {
-		libapx_player[EventPlayer()].spawningCount = libapx_player[EventPlayer()].spawningCount + 1;
+void libapx_chat_parse_increment(int p) {
+	if (libapx_player[p].spawningCount < libapx_PARSER_THREAD_COUNT - 1)  {
+		libapx_player[p].spawningCount = libapx_player[p].spawningCount + 1;
 	}
 	else {
-		libapx_player[EventPlayer()].spawningCount = 1;
+		libapx_player[p].spawningCount = 1;
 	}
 }
 

@@ -74,8 +74,12 @@ void libapx_ui_patchnotes_init_player(int player) {
     int j;
     //Populate with types
     i = 0;
-    patch_notes[player][0].version = "2.1.18";
+    patch_notes[player][0].version = "2.1.20";
     patch_notes[player][0].patches[i] = "<c val=\"3498db\">CMD: @decal</c> cached";
+    i+=1;patch_notes[player][0].patches[i] = "<c val=\"3498db\">CMD: _helpmessages </c> You can toggle the display of some help messages now.";
+    i+=1;patch_notes[player][0].patches[i] = "<c val=\"3498db\">CMD: _reloadbank </c> Banks can now be reloaded in game.";
+    i+=1;patch_notes[player][0].patches[i] = "<c val=\"2ecc71\">UI: Chat </c> font size was changed. ";
+    i+=1;patch_notes[player][0].patches[i] = "<c val=\"9b59b6\">ENG: Bank initilization is now staggered.";
     i+=1;patch_notes[player][0].patches[i] = "<c val=\"2ecc71\">UI: Wireframes </c> added. If you click the wireframe it focuses on the unit selected. ";
     i+=1;patch_notes[player][0].patches[i] = "<c val=\"3498db\">CMD: @wireframe</c> added. ";
     i+=1;patch_notes[player][0].patches[i] = "<c val=\"2ecc71\">UI: Names </c> All names, and subtitles now push related objects, such as the equipment panel, transport panel, or other information traditionally listed below the name/subtitle";

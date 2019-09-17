@@ -38,13 +38,7 @@ void libapx_initialize() {
 		libapx_print(PlayerGroupAll(), "Welcome to the <c val=\"ff0000\"> Apex Roleplaying Engine</c> created by Serobliss. hE'S kInDa a bIg dEaL. SeRoBliSs Is GaY ");
 	}
 	
-
-
-
-
-
-
-
+	libapx_bank_load();
 	//libapx_print(PlayerGroupAll(), "apex Engine: v" + IntToString(libapx_BUILD_VERSION) + "." + IntToString(libapx_BUILD_SUB_VERSION) + libapx_BUILD_VERSION_MODIFIER);
 	//libapx_print(PlayerGroupAll(), libapx_SPLASH_MESSAGE);
 }

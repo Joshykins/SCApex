@@ -139,11 +139,12 @@ include "apex/engine/debug.galaxy"
 // engine version
 const int libapx_BUILD_VERSION = 2;
 const int libapx_BUILD_SUB_VERSION = 1;
-const string libapx_BUILD_VERSION_MODIFIER = ".18";
+const string libapx_BUILD_VERSION_MODIFIER = ".20";
 
 void libapx_engine_initialize() {
 	int player = 1;
 	bool admin_set = false;
+	int i;
 
 	// intialize engine
 	libapx_scripts_init();				// scripts and dependencies
@@ -169,5 +170,4 @@ void libapx_engine_initialize() {
 	}
 	
 	libapx_events_initialize();			// creates global event triggers
-
 }

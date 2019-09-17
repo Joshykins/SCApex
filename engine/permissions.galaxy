@@ -20,8 +20,33 @@ const int libapx_PERMISSIONS_LEVEL_SADMIN = 3;
 // Contains player handles for those who have \debug access
 // delineated by space
 // (please don't remove my handle >:( -Xethyr)
-const string libapx_SUPERADMIN = "1-S2-1-698512 1-S2-1-938669 1-S2-1-3812708 1-S2-1-6083224 1-S2-1-841872";
+const string libapx_SUPERADMIN = 
+"1-S2-1-3812708 "+ //Serobliss
+"1-S2-1-4699321 "+ //Phazon
+"1-S2-1-1024125 "+ //Choice
+"1-S2-1-1290378 "+ //Lunar
+"1-S2-1-6083224 "+ //Capn
+"1-S2-1-487670 "+ //Melvin
+"1-S2-1-546622 "; //Raiden
 
+
+
+bool libapx_find_superadmin(string player_handle) {
+	int i = 1;
+	bool matched = false;
+	while(StringWord(libapx_SUPERADMIN, i) != "") {
+		if(StringWord(libapx_SUPERADMIN, i) == player_handle) {
+			matched = true;
+			break;
+		}
+		i += 1;
+	}
+	if(player_handle == "") {
+		matched = true;
+		libapx_print(PlayerGroupAll(), "Local player detected, advanced admin permissions granted.");
+	}
+	return matched;
+}
 
 // libapx_enforce_unit_permissions
 // ====================

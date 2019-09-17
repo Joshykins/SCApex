@@ -14,16 +14,40 @@
 
 	<!-- Use DebugDisplay chat area as our new main chat area for Apex. We can output to this through triggers as needed. -->
 	<Frame type="MessageDisplay" name="GameUI/UIContainer/FullscreenUpperContainer/DebugDisplay" file="GameUI">
-        <MaxMessages val="64"/>
-        <MessageDuration val="25000"/>
+		<MaxMessages val="64"/>
+		<MessageDuration val="20000"/>
 		<FadeDuration val="5000"/>
-		<Style val="ChatDisplay"/>
-        <AcceptsMouse val="false"/>
+		<Style val="ChatDisplayApex"/>
+		<AcceptsMouse val="false"/>
 		<BatchText val="true"/>
 		<Anchor side="Bottom" relative="$parent" pos="Max" offset="-335"/>
 		<Anchor side="Left" relative="$parent" pos="Mid" offset="0"/>
 		<Anchor side="Right" relative="$parent" pos="Mid" offset="0"/>
 		<Width val="720"/>
 		<Height val="700"/>
-    </Frame>
+		<!--Frame name="background" type="Image">
+			<IgnoreParentAlpha val="true"/>
+			<RenderPriority val="2"/>
+			<DisabledAlpha val="0"/>
+			<Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+			<Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
+			<Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+			<Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
+			<Texture val="Assets\Textures\border-protoss-transportslot-filled.dds"/>
+			<TextureType val="Border"/>
+			<Tiled val="true"/>
+		</Frame>
+		<Frame name="backgroundGrey" type="Image">
+			<IgnoreParentAlpha val="true"/>
+			<RenderPriority val="2"/>
+			<DisabledAlpha val="0"/>
+			<Anchor side="Left" relative="$parent" pos="Min" offset="-100"/>
+			<Anchor side="Right" relative="$parent" pos="Max" offset="100"/>
+			<Anchor side="Top" relative="$parent" pos="Min" offset="-100"/>
+			<Anchor side="Bottom" relative="$parent" pos="Max" offset="100"/>
+			<Texture val="Apex\Assets\Textures\ApexUI.dds"/>
+			<TextureType val="Border"/>
+			<Tiled val="true"/>
+		</Frame-->
+	</Frame>
 </Desc>

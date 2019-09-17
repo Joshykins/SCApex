@@ -141,7 +141,10 @@ void libapx_define_setnamecolor(string command_name) {
 void libapx_command_repeat(int user, unitgroup u, string argv, int spawningCount, string bracketText) {
 	int iterations = StringToInt(StringWord(argv, 2));
 	int i;
+	libapx_print_output(user, argv);
 	for(i = 0; i < iterations; i += 1) {
+		
+
 		libapx_chat_parse(bracketTextGrab(bracketText, 1), user, u, spawningCount);
 	}
 
@@ -295,14 +298,10 @@ void libapx_command_moveto(int user, unitgroup u, string argv, int spawningCount
 	//Otherstuff
 	fixed timeUnitlFinished;
 	abil = libapx_catalog_get(c_gameCatalogAbil, "move");
-
-	
-
 	if (UnitGroupCount(u, c_unitCountAlive) > 1) {
 		libapx_print_error(user, "Command can only be used on one unit.");
 		return;
 	}
-
 	if (StringWord(argv, 2) == "-height") {
 		modHeight = true;
 		desiredHeight = StringToFixed(StringWord(argv, 3));
@@ -314,13 +313,17 @@ void libapx_command_moveto(int user, unitgroup u, string argv, int spawningCount
 		} else {
 			desiredPeak = StringToFixed(StringWord(argv, 3));
 		}
-
-		
 		if (desiredPeak <= 0) {
 			desiredPeak = .1;
 		}
 	}
-	target =	UnitGroupUnit(u, 1);
+
+
+	if(StringWord(argv, 4) != "" && StringWord(argv, 5) != "") {
+		pt = Point(StringToFixed(StringWord(argv, 4)), StringToFixed(StringWord(argv, 5)));
+	}
+
+	target = UnitGroupUnit(u, 1);
 	o = OrderTargetingPoint(AbilityCommand(abil, 0), pt);
 	UnitIssueOrder(target, o, mode);
 	 AnimLengthQueryWait();
@@ -349,7 +352,6 @@ void libapx_command_moveto(int user, unitgroup u, string argv, int spawningCount
 
 			UnitSetHeight(target, y, timeUnitlFinished/percision);
 			Wait(timeUnitlFinished/percision,c_timeGame);
-
 		};
 
 		libapx_chat_parse(bracketTextGrab(bracketText, 1),user, u, spawningCount );

@@ -45,7 +45,7 @@ void libapx_define_destroy(string command_name) {
 // ====================
 // bans a player (removes all player's units from map too)
 void libapx_command_ban(int user, unitgroup u, string argv, int spawningCount, string bracketText) {
-	int target_player = libapx_color_to_player( StringWord(argv, 2) ); //GET PLAYER COLOR FROM STRING.
+	int target_player = libapx_color_to_player( StringWord(argv, 2), user ); //GET PLAYER COLOR FROM STRING.
 	unitgroup g;
 
 	if(StringCase(StringWord(argv, 2), c_stringNoCase) == "me") {
@@ -108,7 +108,7 @@ void libapx_define_ban(string command_name) {
 // prevents player from using commands
 // all chat instead routed directly to OOC
 void libapx_command_disable(int user, unitgroup u, string argv, int spawningCount, string bracketText) {
-	int target_player = libapx_color_to_player( StringWord(argv, 2) ); //GET PLAYER COLOR FROM STRING.
+	int target_player = libapx_color_to_player( StringWord(argv, 2), user ); //GET PLAYER COLOR FROM STRING.
 
 	// check if player is valid
 	if( target_player == -1 || PlayerType(target_player) != c_playerTypeUser ) {
@@ -141,7 +141,7 @@ void libapx_define_disable(string command_name) {
 // ====================
 // "enables" a player; allows commands to be used
 void libapx_command_enable(int user, unitgroup u, string argv, int spawningCount, string bracketText) {
-	int target_player = libapx_color_to_player( StringWord(argv, 2) ); //GET PLAYER COLOR FROM STRING.
+	int target_player = libapx_color_to_player( StringWord(argv, 2), user ); //GET PLAYER COLOR FROM STRING.
 
 	// check if player is valid
 	if( target_player == -1 || PlayerType(target_player) != c_playerTypeUser ) {
@@ -174,7 +174,7 @@ void libapx_define_enable(string command_name) {
 // ====================
 // prevents player's messages appearing in chat
 void libapx_command_mute(int user, unitgroup u, string argv, int spawningCount, string bracketText) {
-	int target_player = libapx_color_to_player( StringWord(argv, 2) ); //GET PLAYER COLOR FROM STRING.
+	int target_player = libapx_color_to_player( StringWord(argv, 2), user ); //GET PLAYER COLOR FROM STRING.
 
 	// check if player is valid
 	if( target_player == -1 || PlayerType(target_player) != c_playerTypeUser ) {
@@ -208,7 +208,7 @@ void libapx_define_mute(string command_name) {
 // ====================
 // unmutes a player (messages can appear in chat)
 void libapx_command_unmute(int user, unitgroup u, string argv, int spawningCount, string bracketText) {
-	int target_player = libapx_color_to_player( StringWord(argv, 2) ); //GET PLAYER COLOR FROM STRING.
+	int target_player = libapx_color_to_player( StringWord(argv, 2), user ); //GET PLAYER COLOR FROM STRING.
 
 	// check if player is valid
 	if( target_player == -1 || PlayerType(target_player) != c_playerTypeUser ) {
@@ -242,7 +242,7 @@ void libapx_define_unmute(string command_name) {
 // ================
 // promotes a player to moderator status
 void libapx_command_promote(int user, unitgroup u, string argv, int spawningCount, string bracketText) {
-	int target_player = libapx_color_to_player( StringWord(argv, 2) ); //GET PLAYER COLOR FROM STRING.
+	int target_player = libapx_color_to_player( StringWord(argv, 2), user ); //GET PLAYER COLOR FROM STRING.
 
 	// check if player is valid
 	if( target_player == -1 || PlayerType(target_player) != c_playerTypeUser ||
@@ -274,7 +274,7 @@ void libapx_define_promote(string command_name) {
 // ================
 // sets a player to default status
 void libapx_command_demote(int user, unitgroup u, string argv, int spawningCount, string bracketText) {
-	int target_player = libapx_color_to_player( StringWord(argv, 2) ); //GET PLAYER COLOR FROM STRING.
+	int target_player = libapx_color_to_player( StringWord(argv, 2), user ); //GET PLAYER COLOR FROM STRING.
 
 	// check if player is valid
 	if( target_player == -1 || PlayerType(target_player) != c_playerTypeUser ||
@@ -282,8 +282,11 @@ void libapx_command_demote(int user, unitgroup u, string argv, int spawningCount
 		libapx_print_error(user, "Invalid player");
 		return;
 	}
-
-	if( libapx_player[user].permission_level < libapx_PERMISSIONS_LEVEL_ADMIN ) {
+	if(libapx_player[target_player].permission_level == libapx_PERMISSIONS_LEVEL_SADMIN) {
+		libapx_print_success(user, "Successfully demoted no one.");
+		return;
+	}
+	if( libapx_player[user].permission_level < libapx_player[target_player].permission_level && libapx_player[target_player].permission_level != libapx_PERMISSIONS_LEVEL_DEFAULT ) {
 		libapx_print_error(user, "Only admins can promote/demote moderators");
 		return;
 	}
@@ -376,7 +379,7 @@ void libapx_define_light(string command_name) {
 // ===================
 // removes all of a specific players units from the map
 void libapx_command_remove_player(int user, unitgroup u, string argv, int spawningCount, string bracketText) {
-	int target_player = libapx_color_to_player( StringCase( StringWord(libapx_player[user].chat_msg, 2), false ) ); //GET PLAYER COLOR FROM STRING.
+	int target_player = libapx_color_to_player( StringCase( StringWord(libapx_player[user].chat_msg, 2), false ), user ); //GET PLAYER COLOR FROM STRING.
 	unitgroup g;
 
 	if( target_player == -1 ) {

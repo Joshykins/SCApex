@@ -18,8 +18,6 @@ bool libapx_is_fixed(string s)
 //Function to blacklist a set of strings
 //========================================
 //ex _replace unit Interceptor Carrier
-//
-//
 bool libapx_blacklistparms(int catalog, string source, string replace, int p) {
 	bool stringOkay = true;
 	int test;

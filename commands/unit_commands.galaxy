@@ -274,64 +274,45 @@ void libapx_define_unitmimic(string command_name) {
 void libapx_command_move (int user, unitgroup u, string argv, int spawningCount, string bracketText) {
 	unitgroup g = u;
 	int unitAmt = 0;
-	point[1000] old_points;
+	point unitPosition;
+	fixed totalX;
+	fixed totalY;
+	fixed avgX;
+	fixed avgY;
+	fixed diffX;
+	fixed diffY;
 	unit current;
 	int i;
-	point averagePt;
-	fixed averageX;
-	fixed averageY;
-	fixed distanceX;
-	fixed distanceY;
-	fixed temp;
 	point mp = libapx_player[user].mouse_position;
+	point newPosition;
 
 	if (StringWord(argv, 2) == "-all") {
 		g = UnitGroup( null, user, RegionEntireMap(), UnitFilter(0, 0, 0, 0), 0 );
 	}
 
-	//Gather unit positions
-	UnitGroupLoopBegin(g);
-	while(!UnitGroupLoopDone()) {
-		current = UnitGroupLoopCurrent();
-		old_points[unitAmt] = UnitGetPosition(current);
-		unitAmt += 1;
-		UnitGroupLoopStep();
-	}
-	UnitGroupLoopEnd();
-
-
-	for (i = 0; i < unitAmt; i += 1) {
-		// TODO:
-		averageX += PointGetX(old_points[i]);
-		averageY += PointGetY(old_points[i]);
-	}
-	averageX = averageX / (unitAmt);
-	averageY = averageY / (unitAmt);
-
-	averagePt = Point(averageX, averageY);
-	distanceX = PointGetX(mp) -  PointGetX(averagePt);
-	distanceY = PointGetY(mp) -  PointGetY(averagePt);
-
-	unitAmt = 0;
-	//Set Unit Positions
-	UnitGroupLoopBegin(g);
-	while(!UnitGroupLoopDone()) {
+	totalX = 0;
+	totalY = 0;
+	for (i = 1; i <= UnitGroupCount(g, c_unitCountAll); i += 1) {
+		current = UnitGroupUnit(g, i);
+		unitPosition = UnitGetPosition(current);
 		
-		current = UnitGroupLoopCurrent();
-		UnitSetPosition(
-			current, 
-			Point(PointGetX(old_points[unitAmt]) + distanceX,PointGetY(old_points[unitAmt]) + distanceY), 
-			false
-		); 
+		totalX += PointGetX(unitPosition);
+		totalY += PointGetY(unitPosition);
 		unitAmt += 1;
-
-	
-		UnitGroupLoopStep();
 	}
-	UnitGroupLoopEnd();
+	avgX = totalX/unitAmt;
+	avgY= totalY/unitAmt;
 
-	
+	for (i = 1; i <= UnitGroupCount(g, c_unitCountAll); i += 1) {
 
+		current = UnitGroupUnit(g, i);
+		unitPosition = UnitGetPosition(current);
+		diffX =  PointGetX(unitPosition) - avgX;
+		diffY =  PointGetY(unitPosition) - avgY;
+
+		newPosition = Point(diffX + PointGetX(mp), PointGetY(mp) + diffY);
+		UnitSetPosition( current, newPosition, false);
+	}
 	return;
 }
 void libapx_define_move(string command_name) {
@@ -352,7 +333,7 @@ void libapx_command_position (int user, unitgroup u, string argv, int spawningCo
 	fixed y;
 	int shifterX = 1; // 0 is subtract, 2 is add.
 	int shifterY = 1;
-	int p = EventPlayer();
+	int p = user;
 	unitgroup g = u;
 	int i;
 	point UnitPos;
@@ -628,7 +609,7 @@ void libapx_define_cache(string command_name) {
 // gives another player units
 void libapx_command_give(int user, unitgroup u, string argv, int spawningCount, string bracketText) {
 	unitgroup g = u;
-	int new_owner = libapx_color_to_player( StringCase( StringWord(argv, 2), false ) );
+	int new_owner = libapx_color_to_player( StringCase( StringWord(argv, 2), false ), user );
 
 	if(new_owner == -1) { // invalid entry by user
 		return;
@@ -2908,10 +2889,13 @@ void libapx_command_state(int user, unitgroup u, string argv, int spawningCount,
 		status = true;
 	}
 
-	libapx_print(PlayerGroupSingle(user), "Setting state " + param + ": " + libNtve_gf_ConvertBooleanToString(status));
+	if(libapx_player[user].help_messages) { 
+		libapx_print(PlayerGroupSingle(user), "Setting state " + param + ": " + libNtve_gf_ConvertBooleanToString(status));
+	}
 
 	UnitGroupLoopBegin(g);
 	while(!UnitGroupLoopDone()) {
+		
 		UnitSetState( UnitGroupLoopCurrent(), state, status );
 		libapx_unit_cache_update(UnitGroupLoopCurrent(), "@state", argv);
 		UnitGroupLoopStep();

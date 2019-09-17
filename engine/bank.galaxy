@@ -56,3 +56,22 @@ void libapx_bank_section_dump(string section, int player) {
 		libapx_print_output(player, "You have no " + section);
 	}
 }
+
+
+void libapx_bank_load() {
+	int i;
+	int player;
+
+	for (i = 1; i <= PlayerGroupCount(PlayerGroupActive()); i += 1) {
+		player = PlayerGroupPlayer(PlayerGroupActive(), i);
+		libapx_print_text(PlayerGroupActive(), StringToText("<c val=\"77aaff\">Bank loading for ")+ TextWithColor(PlayerName(player), ColorFromIndex( PlayerGetColorIndex(player, false), c_teamColorDiffuse)));
+		libapx_player[player].bank_storage = BankLoad( libapx_PLAYER_BANK_NAME,  player);
+		Wait(1, c_timeReal);
+		libapx_player[player].aliases = libapx_sort_aliases(player);
+		libapx_player[player].wireframes = libapx_wireframes_get_all(player);
+		libapx_player[player].banksloaded = true;
+		libapx_print(PlayerGroupAll(), "Bank load completed for player.");
+		libapx_chk_all_aliases(player);
+	}
+	libapx_print_text(PlayerGroupActive(), StringToText("<c val=\"00ff00\">All banks loaded :)</c>"));
+}

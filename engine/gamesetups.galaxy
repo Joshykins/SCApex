@@ -168,7 +168,7 @@ void libapx_gamesetup_load(int player, string gamesetup_name) {
 		UnitGroupAdd(g, UnitLastCreated());
 		while(BankKeyExists(libapx_player[player].bank_storage, gamesetup_section, id + "." + IntToString(index))) {
 			commands = BankValueGetAsString(libapx_player[player].bank_storage, gamesetup_section, id + "." + IntToString(index));
-			libapx_chat_parse( libapx_gamesetup_alias_commands_unpack(commands), player, g, libapx_player[EventPlayer()].spawningCount);
+			libapx_chat_parse( libapx_gamesetup_alias_commands_unpack(commands), player, g, libapx_player[player].spawningCount);
 			index += 1;
 		}
 

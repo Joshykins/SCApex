@@ -49,11 +49,16 @@ void libapx_commands_initialize() {
 	libapx_chat_command_create("_relink",libpax_command_relink, libapx_define_relink);
 	libapx_chat_command_create("_sound", libapx_command_sound, libapx_define_sound);
 	libapx_chat_command_create("_camerapan", libapx_command_camerapan, libapx_define_camerapan);
+	libapx_chat_command_create("_print", libpax_command_print, libapx_define_print);
+
 
 
 	//Permissions - done in cmd guide
 	libapx_chat_command_create("_blacklist", libapx_command_blacklist, libapx_define_blacklist);
 
+	//Bank Commands
+	libapx_chat_command_create("_reloadbank", libapx_command_reloadbank, libapx_define_reloadbank);
+	libapx_chat_command_create("_helpmessages", libapx_command_helpmessages, libapx_define_helpmessages);
 
 	// admin commands - done in cmd guide
 	libapx_chat_command_create("!light", libapx_command_light, libapx_define_light);
@@ -76,7 +81,6 @@ void libapx_commands_initialize() {
 
 
 	// unit commands - done in cmd guide
-	
 	libapx_chat_command_create("@wireframe", libapx_command_wireframe, libapx_define_wireframe);
 	libapx_chat_command_create("@unitswap", libapx_command_unitswap, libapx_define_unitswap);
 	libapx_chat_command_create("@unitmimic", libapx_command_unitmimic, libapx_define_unitmimic);

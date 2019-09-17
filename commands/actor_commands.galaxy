@@ -133,7 +133,7 @@ void libapx_command_actormessage(int user, unitgroup u, string argv, int spawnin
 
 	if (StringWord(amsg,1) == "SetScale" || StringWord(amsg,1) == "SetScaleAbsolute") {
 
-		amsg = StringWord(amsg,1) +  " " + libapx_scalerapply(StringWord(amsg,2), u, "scale") + " " + StringWord(amsg,3);
+		amsg = StringWord(amsg,1) +  " " + libapx_scalerapply(StringWord(amsg,2), u, "scale", user) + " " + StringWord(amsg,3);
 	}
 	//libapx_scalerapply(offset)
 
@@ -254,7 +254,7 @@ void libapx_command_scale(int user, unitgroup u, string argv, int spawningCount,
 		time = StringToFixed(param_time);
 	}
 	scale = FixedToString(x, 4) + "," + FixedToString(y, 4)  + "," + FixedToString(z, 4);
-	scale = libapx_scalerapply(scale, u, "scale"); //Applies scaler
+	scale = libapx_scalerapply(scale, u, "scale", user); //Applies scaler
 
 
 	libapx_apply_actormsg(u, target, argv, "@scale",
@@ -743,7 +743,7 @@ void libapx_command_setscaler(int user, unitgroup u, string argv, int spawningCo
 	else {
 		libapx_print(PlayerGroupSingle(user),"Scaler set to "+StringWord(argv,2));
 		scaler = StringToFixed(StringWord(argv,2));
-		libapx_player[EventPlayer()].scaler = scaler;
+		libapx_player[user].scaler = scaler;
 	}
 
 
@@ -775,7 +775,7 @@ void libapx_command_setdelay(int user, unitgroup u, string argv, int spawningCou
 	else {
 		libapx_print(PlayerGroupSingle(user),"Delay set to "+StringWord(argv,2));
 		delay = StringToFixed(StringWord(argv,2));
-		libapx_player[EventPlayer()].delay = delay;
+		libapx_player[user].delay = delay;
 	}
 
 
@@ -845,7 +845,7 @@ void libapx_command_attach_minus(int user, unitgroup u, string argv, int spawnin
 
 	if( i != -1 ) {
 		apoint = "Origin";
-		libapx_print_output(EventPlayer(), "Attachpoint was invalid, defaulting to origin");
+		libapx_print_output(user, "Attachpoint was invalid, defaulting to origin");
 	}
 
  // do catalog check for actor
@@ -1076,7 +1076,7 @@ void libapx_command_attach(int user, unitgroup u, string argv, int spawningCount
 	actormsg = "AttachModelOffset " + actr + " " + model + " " + apoint;
 	if(offset != null) {
 
-		offset = libapx_scalerapply(offset, u, "");
+		offset = libapx_scalerapply(offset, u, "", user);
 		actormsg = actormsg + " " + offset;
 	}
 	if(rotation != null) {

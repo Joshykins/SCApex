@@ -16,37 +16,38 @@
 
 bool libapx_process_chat_event(bool testConds, bool runActions) {
 
+	int user = EventPlayer();
 
 	unitgroup target = UnitGroupEmpty();
-	libapx_player[EventPlayer()].chat_msg = libapx_string_trim(EventChatMessage(false)); //Where injection of chat occurs
+	libapx_player[user].chat_msg = libapx_string_trim(EventChatMessage(false)); //Where injection of chat occurs
 	// "<<" directly dumps message to OOC (if player not muted)
-	if ( StringWord( libapx_player[EventPlayer()].chat_msg, 1) == "<<" &&  !libapx_player[EventPlayer()].muted ) {
-		libapx_player[EventPlayer()].chat_msg = libapx_string_trim( StringSub(libapx_player[EventPlayer()].chat_msg, 3, StringLength(libapx_player[EventPlayer()].chat_msg)) );
-		libapx_chat_print_OOC(EventPlayer(), libapx_player[EventPlayer()].chat_msg);
+	if ( StringWord( libapx_player[user].chat_msg, 1) == "<<" &&  !libapx_player[user].muted ) {
+		libapx_player[user].chat_msg = libapx_string_trim( StringSub(libapx_player[user].chat_msg, 3, StringLength(libapx_player[user].chat_msg)) );
+		libapx_chat_print_OOC(user, libapx_player[user].chat_msg);
 	}
 
 
-	else if( !libapx_player[EventPlayer()].disabled ) {
+	else if( !libapx_player[user].disabled ) {
 
 
 		// if player is mouse-click spawning, set context to spawn splat
-		if( libapx_player[EventPlayer()].is_placing_unit ) {
-			UnitGroupAdd(target, libapx_player[EventPlayer()].spawn_splat);
+		if( libapx_player[user].is_placing_unit ) {
+			UnitGroupAdd(target, libapx_player[user].spawn_splat);
 		}
 		else {
-			target = UnitGroupSelected(EventPlayer());
-			target = libapx_enforce_unit_permissions(target, EventPlayer());
+			target = UnitGroupSelected(user);
+			target = libapx_enforce_unit_permissions(target, user);
 		}
 
-		libapx_chat_parse(libapx_player[EventPlayer()].chat_msg, EventPlayer(), target, libapx_player[EventPlayer()].spawningCount);
+		libapx_chat_parse(libapx_player[user].chat_msg, user, target, libapx_player[user].spawningCount);
 
 
 
 
 
 	}
-	else if( !libapx_player[EventPlayer()].muted ){
-		libapx_chat_print_OOC(EventPlayer(), libapx_player[EventPlayer()].chat_msg);
+	else if( !libapx_player[user].muted ){
+		libapx_chat_print_OOC(user, libapx_player[user].chat_msg);
 	}
 
 	// TODO: chat message logging
