@@ -106,7 +106,6 @@ Now test the map and see if the Apex engine works!
 **Github repo:** https://github.com/Joshykins/SCApex
 **Lead developer:** @Joshykins / Serobliss (serobliss2@gmail.com)  
 **SC2 Handle:** Serobliss  
-** Developers:** @GPhazon / GPhazon (gphazon@gmail.com) 
 
 
 # Acknowledgements
