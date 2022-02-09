@@ -138,17 +138,38 @@ void libapx_log(int author, text unitname, string msg) {
 	text timestamp = StringToText("[" + IntToString( time / 3600 ) + ":" + IntToString( ( time % 3600 ) / 60 ) + ":" + IntToString( time % 60 ) + "] ");
 	string chunk;
 	int idx;
+	int i = 0;
 
 		libapx_chatlog_add(libapx_chatlog_counter, author, timestamp, unitname + StringToText(":"), false);
 
 		while( msg != "" ) {
-			if( StringLength(msg) > libapx_LOG_MSG_LENGTH ) {
-				chunk = libapx_string_space_sub(msg, 1, libapx_LOG_MSG_LENGTH);
-				idx = libapx_string_space_sub_i(msg, 1, libapx_LOG_MSG_LENGTH);
-				msg = libapx_string_space_sub(msg, idx, StringLength(msg) + 10);
-				libapx_chatlog_add(libapx_chatlog_counter, author, timestamp, StringToText(chunk), true);
-			} else {
+			i +=1;
+			if( StringFind(msg, " ", c_stringNoCase) == -1 ) {
 				libapx_chatlog_add(libapx_chatlog_counter, author, timestamp, StringToText(msg), true);
+				break;
+			}
+			else if( StringLength(msg) > libapx_LOG_MSG_LENGTH ) {
+				chunk = libapx_string_space_sub(msg, 1, libapx_LOG_MSG_LENGTH);
+				if(chunk == " ") {
+					chunk = msg;
+					msg = "";
+					libapx_chatlog_add(libapx_chatlog_counter, author, timestamp, StringToText(chunk), true);
+					break;
+				}
+				else {
+					idx = libapx_string_space_sub_i(msg, 1, libapx_LOG_MSG_LENGTH);
+					msg = libapx_string_space_sub(msg, idx, StringLength(msg) + 10);
+					libapx_chatlog_add(libapx_chatlog_counter, author, timestamp, StringToText(chunk), true);
+				}
+				
+			} 
+
+			else {
+				libapx_chatlog_add(libapx_chatlog_counter, author, timestamp, StringToText(msg), true);
+				break;
+			}
+			if(i > 1000) {
+				libapx_print(PlayerGroupAll(), "Log function error, report to Serobliss on the discord or #engine-discussion");
 				break;
 			}
 		}

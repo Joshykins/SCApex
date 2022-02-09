@@ -113,7 +113,7 @@ bool within_brackets(string string_to_check, int player, int semicolon_index) {
 }
 
 
-string bracketSeperater = " --||&&||-- ";//Spaces around it are critical
+string bracketSeperater = " --||&&||-- "; //Spaces around it are critical
 
 //Grabs bracket text from specialized format
 string bracketTextGrab(string bracketText, int arg) {

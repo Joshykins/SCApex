@@ -9,8 +9,6 @@
 // libapx_command_camera
 // ====================
 // camera manipulation
-
-
 camerainfo[libapx_MAX_PLAYERS] cam;
 
 //Catalog validator
@@ -120,6 +118,7 @@ bool libapx_editor_mouse_wheel(bool testConds,bool runActions) {
 
 	return true;
 }
+
 void libapx_update_camera() {
 	int i;
 	int p;

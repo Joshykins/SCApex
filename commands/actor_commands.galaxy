@@ -68,6 +68,7 @@ static void libapx_apply_actormsg(unitgroup g, string target, string argv, strin
 		UnitGroupLoopEnd();
 	}
 }
+
 // libapx_command_actormessage
 // =======================
 // Sends an ActorMessage to a unit (main or a actor reference) or to a global reference
@@ -1287,7 +1288,8 @@ void attach_rotation_x(int degrees, bool abs_scale, unit u) {
 
 
 	ActorSendTo(libNtve_gf_MainActorofUnit(u),"::Main", "ModelSwap Apex_Rotator");
-	ActorSendTo(libNtve_gf_MainActorofUnit(u),"::Main", "SetScale 1");
+	ActorSendTo(libNtve_gf_MainActorofUnit(u),"::Main", "SetScaleAbsolute 1");
+	ActorSendTo(libNtve_gf_MainActorofUnit(u),"::Main", "ModelAllowHitTest 0");
 	//AttachModelOffset " +attachment + " {} " + attachPoint + " " + offset + " " + rotation + " " + siteops
 	ActorSendTo(libNtve_gf_MainActorofUnit(u),"::Main", "AttachModelOffset "+actor_name+" {} " + attach_point + " 0,0,0 " + rotation);
 	attach_rotation_z(270, abs_scale, u);
@@ -1337,7 +1339,8 @@ void attach_rotation_z(int degrees, bool abs_scale, unit u) {
 
 
 	ActorSendTo(libNtve_gf_MainActorofUnit(u),"::Main", "ModelSwap Apex_Rotator");
-	ActorSendTo(libNtve_gf_MainActorofUnit(u),"::Main", "SetScale 1");
+	ActorSendTo(libNtve_gf_MainActorofUnit(u),"::Main", "SetScaleAbsolute 1");
+	ActorSendTo(libNtve_gf_MainActorofUnit(u),"::Main", "ModelAllowHitTest 0");
 	//AttachModelOffset " +attachment + " {} " + attachPoint + " " + offset + " " + rotation + " " + siteops
 	ActorSendTo(libNtve_gf_MainActorofUnit(u),"::Main", "AttachModelOffset "+actor_name+" {} " + attach_point + " 0,0,0 " + rotation);
 }
@@ -1385,7 +1388,8 @@ void attach_rotation_y(int degrees, bool abs_scale, unit u) {
 
 
 	ActorSendTo(libNtve_gf_MainActorofUnit(u),"::Main", "ModelSwap Apex_Rotator");
-	ActorSendTo(libNtve_gf_MainActorofUnit(u),"::Main", "SetScale 1");
+	ActorSendTo(libNtve_gf_MainActorofUnit(u),"::Main", "SetScaleAbsolute 1");
+	ActorSendTo(libNtve_gf_MainActorofUnit(u),"::Main", "ModelAllowHitTest 0");
 	//AttachModelOffset " +attachment + " {} " + attachPoint + " " + offset + " " + rotation + " " + siteops
 	ActorSendTo(libNtve_gf_MainActorofUnit(u),"::Main", "AttachModelOffset "+actor_name+" {} " + attach_point + " 0,0,0 " + rotation);
 }

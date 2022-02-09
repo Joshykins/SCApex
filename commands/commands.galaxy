@@ -25,6 +25,7 @@ void libapx_commands_initialize() {
 	command_guide_preset_descriptions();
 	// general commands - done in cmd guide
 	libapx_chat_command_create("_info", libapx_command_info, libapx_define_info);
+	libapx_chat_command_create("_ngocommand", libapx_command_info, libapx_define_info);
 	libapx_chat_command_create("_commands", libapx_command_list_commands, libapx_define_list_commands);
 	libapx_chat_command_create("_delay", libapx_command_delay, libapx_define_delay);
 	libapx_chat_command_create("_players", libapx_command_players, libapx_define_players);
