@@ -233,7 +233,7 @@ bool libapx_ui_category_select_field(bool testConds, bool runActions) {
             libapx_chat_parse("@decal "+selected, p, ug, libapx_player[p].spawningCount);
         }
         if(catalog == "Behavior") {
-            if(libapx[p]["prevbehavior"]){
+            if(libapx_player[p]["prevbehavior"]){
                 libapx_chat_parse("@removebehavior "+libapx_player[p]["prevbehavior"], p, ug, libapx_player[p].spawningCount);
             }
             libapx_chat_parse("@addbehavior "+selected, p, ug, libapx_player[p].spawningCount);
