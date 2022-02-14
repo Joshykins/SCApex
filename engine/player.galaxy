@@ -335,6 +335,7 @@ string libapx_wireframes_get_all(int player);
 // initialize players (default settings)
 void libapx_player_initialize(int player) {
 	unit u;
+	libapx_player[player].prevbehavior = " ";
 	libapx_player[player].map_revealer = VisRevealerCreate(player, RegionEntireMap());
 	libapx_player[player].mouse_position = RegionGetCenter( RegionEntireMap() );
 	libapx_player[player].mouse_position_ui = Point(0, 0);
