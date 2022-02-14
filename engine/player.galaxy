@@ -197,6 +197,10 @@ struct libapx_player_properties {
 	// alphebetized list of player's aliases as a cache to avoid
 	// resorting player's alias list multiple times
 	string aliases;
+	// previous behavior
+	// ====================
+	// The previously selected behvaior
+	string prevbehavior;
 
 	//wireframes
 	// ====================
