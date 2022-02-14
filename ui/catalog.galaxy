@@ -232,6 +232,15 @@ bool libapx_ui_category_select_field(bool testConds, bool runActions) {
         if(catalog == "Decal") {
             libapx_chat_parse("@decal "+selected, p, ug, libapx_player[p].spawningCount);
         }
+        if(catalog == "Effect") {
+            libapx_chat_parse("@effect "+selected, p, ug, libapx_player[p].spawningCount);
+        }
+        if(catalog == "Weapon") {
+            libapx_chat_parse("@addweapon "+selected, p, ug, libapx_player[p].spawningCount);
+        }
+        if(catalog == "Upgrade") {
+            libapx_chat_parse("_upgrade "+selected, p, ug, libapx_player[p].spawningCount);
+        }
     }
 
     return true;
