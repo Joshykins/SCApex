@@ -2025,3 +2025,151 @@ void libapx_define_helpmessages(string command_name) {
 		command_name, 
 		"This command toggles help messages. <br> _helpmessages on/off <br> Examples: <br> _helpmessages off");
 }
+// libapx_command_dataedit
+//  ===================
+// changes field values in data catalog entries
+void libapx_command_dataedit(int user, unitgroup u, string argv, int spawningCount, string bracketText) {
+    string msg1= StringWord(argv,3);
+    string msg2= StringWord(argv,4);
+    string msg3= StringWord(argv,5);
+	unitgroup g = libapx_player_parser[user][spawningCount].context;
+//Because CatalogFieldValueSet was being uncooperative with strings, I had to improvise with repetitive lists.
+if( UnitGroupCount(g, c_unitCountAlive) == 0 ) {//When not selecting a unit
+	if(StringWord(argv, 2) == "unit" || StringWord(argv, 2) == "Unit") {
+		CatalogFieldValueSet(c_gameCatalogUnit, msg1, msg2, user, msg3);
+	}
+	else if(StringWord(argv, 2) == "effect" || StringWord(argv, 2) == "Effect") {
+		CatalogFieldValueSet(c_gameCatalogEffect, msg1, msg2, user, msg3);
+	}
+	else if(StringWord(argv, 2) == "behavior" || StringWord(argv, 2) == "Behavior") {
+		CatalogFieldValueSet(c_gameCatalogBehavior, msg1, msg2, user, msg3);
+	}
+	else if(StringWord(argv, 2) == "ability" || StringWord(argv, 2) == "Ability") {
+		CatalogFieldValueSet(c_gameCatalogAbil, msg1, msg2, user, msg3);
+	}
+	else if(StringWord(argv, 2) == "actor" || StringWord(argv, 2) == "Actor") {
+		CatalogFieldValueSet(c_gameCatalogActor, msg1, msg2, user, msg3);
+	}
+	else if(StringWord(argv, 2) == "button" || StringWord(argv, 2) == "Button") {
+		CatalogFieldValueSet(c_gameCatalogButton, msg1, msg2, user, msg3);
+	}
+	else if(StringWord(argv, 2) == "upgrade" || StringWord(argv, 2) == "Upgrade") {
+		CatalogFieldValueSet(c_gameCatalogUpgrade, msg1, msg2, user, msg3);
+	}
+	else if(StringWord(argv, 2) == "weapon" || StringWord(argv, 2) == "Weapon") {
+		CatalogFieldValueSet(c_gameCatalogWeapon, msg1, msg2, user, msg3);
+	}
+	else if(StringWord(argv, 2) == "model" || StringWord(argv, 2) == "Model") {
+		CatalogFieldValueSet(c_gameCatalogModel, msg1, msg2, user, msg3);
+	}
+	else if(StringWord(argv, 2) == "validator" || StringWord(argv, 2) == "Validator") {
+		CatalogFieldValueSet(c_gameCatalogValidator, msg1, msg2, user, msg3);
+	}
+	else if(StringWord(argv, 2) == "accumulator" || StringWord(argv, 2) == "Accumulator") {
+		CatalogFieldValueSet(c_gameCatalogAccumulator, msg1, msg2, user, msg3);
+	}
+	else if(StringWord(argv, 2) == "sound" || StringWord(argv, 2) == "Sound") {
+		CatalogFieldValueSet(c_gameCatalogSound, msg1, msg2, user, msg3);
+	}
+	else if(StringWord(argv, 2) == "turret" || StringWord(argv, 2) == "Turret") {
+		CatalogFieldValueSet(c_gameCatalogTurret, msg1, msg2, user, msg3);
+	}
+	else if(StringWord(argv, 2) == "texture" || StringWord(argv, 2) == "Texture") {
+		CatalogFieldValueSet(c_gameCatalogTexture, msg1, msg2, user, msg3);
+	}
+	else if(StringWord(argv, 2) == "sort" || StringWord(argv, 2) == "Sort") {
+		CatalogFieldValueSet(c_gameCatalogTargetSort, msg1, msg2, user, msg3);
+	}
+	else if(StringWord(argv, 2) == "footprint" || StringWord(argv, 2) == "Footprint") {
+		CatalogFieldValueSet(c_gameCatalogFootprint, msg1, msg2, user, msg3);
+	}
+
+
+	if(libapx_player[user].help_messages){//Will not print if _helpmessages are on
+		if( StringWord(argv,2) == "" || StringWord(argv,3) == "" || StringWord(argv,4) == "" || StringWord(argv,5) == "") { // no input params
+        
+        	libapx_print_output(user, "Command syntax: <c val=\"1abc9c\">_dataedit</c> [catalog] [CatalogEntry] [EntryField] [FieldValue]"); // returns correct syntax
+		}
+		else {//If you fill all entries, you'll get this. Disclaimer: just because it prints, may not mean that it actually worked.
+		libapx_print_output(user, "<c val=\"1abc9c\">Editing Data </c>><c val=\"1abc9c\"> catalog:</c>" +StringWord(argv,2)+" > <c val=\"1abc9c\">Catalog Entry:</c>"+StringWord(argv,3)+" > <c val=\"1abc9c\">Entry Field:</c>"+StringWord(argv,4)+ " > <c val=\"1abc9c\">New Field Value:</c>" +StringWord(argv,5));
+		}
+	}
+	return;
+return;
+}
+//Same as the first, just with UnitGetOwner so that it changes the data of the selected unit's owner.
+if( UnitGroupCount(g, c_unitCountAlive) > 0 ) {//While selecting a unit. 
+    UnitGroupLoopBegin(g);
+    while(!UnitGroupLoopDone()) {
+    if( UnitGetOwner(UnitGroupLoopCurrent()) == user || libapx_player[user].permission_level > libapx_player[UnitGetOwner(UnitGroupLoopCurrent())].permission_level ) {
+		if(StringWord(argv, 2) == "unit" || StringWord(argv, 2) == "Unit") {
+			CatalogFieldValueSet(c_gameCatalogUnit, msg1, msg2, UnitGetOwner(UnitGroupLoopCurrent()), msg3);
+		}
+		else if(StringWord(argv, 2) == "effect" || StringWord(argv, 2) == "Effect") {
+			CatalogFieldValueSet(c_gameCatalogEffect, msg1, msg2, UnitGetOwner(UnitGroupLoopCurrent()), msg3);
+		}
+		else if(StringWord(argv, 2) == "behavior" || StringWord(argv, 2) == "Behavior") {
+			CatalogFieldValueSet(c_gameCatalogBehavior, msg1, msg2, UnitGetOwner(UnitGroupLoopCurrent()), msg3);
+		}
+		else if(StringWord(argv, 2) == "ability" || StringWord(argv, 2) == "Ability") {
+			CatalogFieldValueSet(c_gameCatalogAbil, msg1, msg2, UnitGetOwner(UnitGroupLoopCurrent()), msg3);
+		}
+		else if(StringWord(argv, 2) == "actor" || StringWord(argv, 2) == "Actor") {
+			CatalogFieldValueSet(c_gameCatalogActor, msg1, msg2, UnitGetOwner(UnitGroupLoopCurrent()), msg3);
+		}
+		else if(StringWord(argv, 2) == "button" || StringWord(argv, 2) == "Button") {
+			CatalogFieldValueSet(c_gameCatalogButton, msg1, msg2, UnitGetOwner(UnitGroupLoopCurrent()), msg3);
+		}
+		else if(StringWord(argv, 2) == "upgrade" || StringWord(argv, 2) == "Upgrade") {
+				CatalogFieldValueSet(c_gameCatalogUpgrade, msg1, msg2, UnitGetOwner(UnitGroupLoopCurrent()), msg3);
+		}
+		else if(StringWord(argv, 2) == "weapon" || StringWord(argv, 2) == "Weapon") {
+			CatalogFieldValueSet(c_gameCatalogWeapon, msg1, msg2, UnitGetOwner(UnitGroupLoopCurrent()), msg3);
+		}
+		else if(StringWord(argv, 2) == "model" || StringWord(argv, 2) == "Model") {
+			CatalogFieldValueSet(c_gameCatalogModel, msg1, msg2, UnitGetOwner(UnitGroupLoopCurrent()), msg3);
+		}
+		else if(StringWord(argv, 2) == "validator" || StringWord(argv, 2) == "Validator") {
+			CatalogFieldValueSet(c_gameCatalogValidator, msg1, msg2, UnitGetOwner(UnitGroupLoopCurrent()), msg3);
+		}
+		else if(StringWord(argv, 2) == "accumulator" || StringWord(argv, 2) == "Accumulator") {
+			CatalogFieldValueSet(c_gameCatalogAccumulator, msg1, msg2, UnitGetOwner(UnitGroupLoopCurrent()), msg3);
+		}
+		else if(StringWord(argv, 2) == "sound" || StringWord(argv, 2) == "Sound") {
+			CatalogFieldValueSet(c_gameCatalogSound, msg1, msg2, UnitGetOwner(UnitGroupLoopCurrent()), msg3);
+		}
+		else if(StringWord(argv, 2) == "turret" || StringWord(argv, 2) == "Turret") {
+			CatalogFieldValueSet(c_gameCatalogTurret, msg1, msg2, UnitGetOwner(UnitGroupLoopCurrent()), msg3);
+		}
+		else if(StringWord(argv, 2) == "texture" || StringWord(argv, 2) == "Texture") {
+			CatalogFieldValueSet(c_gameCatalogTexture, msg1, msg2, UnitGetOwner(UnitGroupLoopCurrent()), msg3);
+		}
+		else if(StringWord(argv, 2) == "sort" || StringWord(argv, 2) == "Sort") {
+			CatalogFieldValueSet(c_gameCatalogTargetSort, msg1, msg2, UnitGetOwner(UnitGroupLoopCurrent()), msg3);
+		}
+		else if(StringWord(argv, 2) == "footprint" || StringWord(argv, 2) == "Footprint") {
+			CatalogFieldValueSet(c_gameCatalogFootprint, msg1, msg2, UnitGetOwner(UnitGroupLoopCurrent()), msg3);
+		}
+	}
+    UnitGroupLoopStep();
+}
+UnitGroupLoopEnd();
+}
+		if(libapx_player[user].help_messages){//Will not print if _helpmessages are on
+			if( StringWord(argv,2) == "" || StringWord(argv,3) == "" || StringWord(argv,4) == "" || StringWord(argv,5) == "") { // no input params
+        
+        	libapx_print_output(user, "Command syntax: <c val=\"1abc9c\">_dataedit</c> [catalog] [CatalogEntry] [EntryField] [FieldValue]"); // returns correct syntax
+			}
+		else {//If you fill all entries, you'll get this. Disclaimer: just because it prints, may not mean that it actually worked.
+		libapx_print_output(user, "<c val=\"1abc9c\">Editing Data </c>><c val=\"1abc9c\"> catalog:</c>" +StringWord(argv,2)+" > <c val=\"1abc9c\">Catalog Entry:</c>"+StringWord(argv,3)+" > <c val=\"1abc9c\">Entry Field:</c>"+StringWord(argv,4)+ " > <c val=\"1abc9c\">New Field Value:</c>" +StringWord(argv,5));
+		}
+	}
+	return;
+return;
+}
+void libapx_define_dataedit(string command_name) {
+	commands_guide_entry_set(
+		g_commands_guide_entry_general, 
+		command_name, 
+		" This command is used to change player data's category field values. <br> _dataedit [Category] [CategoryEntry] [EntryField] [FieldValue] <br> Examples: <br> _dataedit Unit Marauder LifeMax 555  ");
+}
