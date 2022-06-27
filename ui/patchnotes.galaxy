@@ -72,6 +72,10 @@ static void patch_notes_format_description(int dialog, playergroup pg, string de
 void libapx_ui_patchnotes_init_player(int player) { 
     int i;
     int j;
+    i = 0;
+    patch_notes[player][0].version = "2.2.0";
+    patch_notes[player][0].patches[i] = "<c val=\"3498db\">CMD: _dataedut</c> added";
+    i+=1;patch_notes[player][0].patches[i] = "<c val=\"2ecc71\">UI: Ui Altered a bit </c> ";
     //Populate with types
     i = 0;
     patch_notes[player][0].version = "2.1.20";
