@@ -33,6 +33,12 @@ void libapx_wireframe_bank_layer_set(
 // contains all player properties
 struct libapx_player_properties {
 
+	// API 
+	// =========
+	// Variables for input data streaming
+	string api_string_input;
+	bool api_reading;
+
 	// mouse_position
 	// =================
 	// Location of player mouse
@@ -345,6 +351,7 @@ void libapx_player_initialize(int player) {
 	libapx_player[player].waygate_dialog = 0;
 	libapx_player[player].clan_tag = "";
 	libapx_player[player].name = "";
+	libapx_player[player].api_string_input = "";
 	libapx_player[player].editor_heightoffset = 0.0;
 	libapx_player[player].wireframe = g_default_wireframe;
 	libapx_player[player].active_ui_panel = libapx_UI_PANEL_NONE;

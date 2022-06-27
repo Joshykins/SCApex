@@ -17,6 +17,7 @@ bool libapx_trig_ticker(bool testConds, bool runActions) {
     unitgroup selected;
     unit u;
     int i;
+    int control_bar_ui;
     libapx_update_camera();
     for (i = 1; i <= PlayerGroupCount(PlayerGroupActive()); i += 1) {
         p = PlayerGroupPlayer(PlayerGroupActive(), i);

@@ -14,6 +14,7 @@ include "apex/engine/events/region_waygates.galaxy"
 include "apex/engine/events/unit_events.galaxy"
 include "apex/engine/events/custom.galaxy"
 include "apex/engine/stat_bars.galaxy"
+include "apex/engine/api.galaxy"
 include "apex/engine/events/ticker.galaxy"
 
 

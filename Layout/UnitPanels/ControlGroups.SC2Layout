@@ -2,26 +2,14 @@
 <Desc>
     <Frame type="Frame" name="GameUI/UIContainer/ConsoleUIContainer" file="GameUI">
         <Frame type="ControlGroupPanel" name="ControlGroupPanel">
-            <Anchor side="Right" relative="$parent" pos="Mid" offset="0"/>
-            <Anchor side="Left" relative="$parent" pos="1" offset="277"/>
-            <Anchor side="Bottom" relative="$parent" pos="Max" offset="-270"/>
-            <Width val="750"/>
-            <Frame name="background" type="Image">
-                <IgnoreParentAlpha val="true"/>
-                <RenderPriority val="1"/>
-                <DisabledAlpha val="0"/>
-                <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
-                <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
-                <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
-                <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
-                <Texture val="Assets\Textures\border-protoss-transportslot-filled.dds"/>
-                <TextureType val="Border"/>
-                <Tiled val="true"/>
-            </Frame>
+            <Width val="755"/>
+            <Anchor side="Left" relative="$this" pos="Max" offset="0"/>
+            <Anchor relative="$parent" side="Bottom" pos="Max" offset="-270"/>
+            <Anchor relative="$parent" side="Right" pos="Max" offset="-20"/>
+            <Width val="755"/>
+            
             <Frame name="backgroundGrey" type="Image">
-                <IgnoreParentAlpha val="true"/>
-                <RenderPriority val="2"/>
-                <DisabledAlpha val="0"/>
+                <RenderPriority val="0"/>
                 <Anchor side="Left" relative="$parent" pos="Min" offset="-100"/>
                 <Anchor side="Right" relative="$parent" pos="Max" offset="100"/>
                 <Anchor side="Top" relative="$parent" pos="Min" offset="-100"/>

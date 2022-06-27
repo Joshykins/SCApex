@@ -6,13 +6,19 @@
 // <http://opensource.org/licenses/MIT>
 //=========================================================
 
-const int libapx_ui_panel_spacing = 85;
 
-// number of ui pa nels for the ui utility toolbar
+// number of ui panels for the ui utility toolbar
 static const int libapx_UI_NPANELS = 9;
 
 //Size of buttons
-static const int libapx_ui_btn_size = 65;
+static const int libapx_ui_btn_size = 45;
+const int libapx_ui_btn_spacing = 15;
+const int libapx_ui_btn_inside_spacing_multi = 0;
+
+
+
+const int libapx_ui_panel_spacing = libapx_ui_btn_size+libapx_ui_btn_spacing*2;
+
 // data table identifier prefix for linking a toolbar button to its panel
 // Data table name is "ui_panel_[btn ID]", where the [btn ID] is the integer
 // value for the dialog control button on the toolbar for the panel
@@ -144,6 +150,7 @@ static void libapx_ui_initialize_panels() {
 void libapx_ui_initialize() {
 	int player;
 
+
 	UISetFrameVisible(PlayerGroupAll(), c_syncFrameTypeIdleWorkerButton, false);
 	UISetFrameVisible(PlayerGroupAll(), c_syncFrameTypeSupply, false);
 	UISetFrameVisible(PlayerGroupAll(), c_syncFrameTypeConsolePanel, false);
@@ -215,19 +222,33 @@ static void libapx_ui_toolbar_init() {
 	int libapx_ui_version;
 	int libapx_ui_unitname_toggle;
 	int tmp;
-    libapx_ui_version = libapx_create_dialog_invis(300, 100, c_anchorTop, 0, 0);
-    libapx_create_dialog_label(libapx_ui_version , 300, 40, c_anchorTop, 00, 0, "Apex Engine v" + IntToString(libapx_BUILD_VERSION) + "." + IntToString(libapx_BUILD_SUB_VERSION) + libapx_BUILD_VERSION_MODIFIER + "", libapx_UI_HEADER1);
-	tmp = libapx_create_dialog_btn(libapx_ui_version , 170, 40, c_anchorTop, 00, 35,"","<s><c val=\"c0392b\">Patch Notes</c></s>");
+	int patch_notes_width = 200;
+	int patch_notes_height = 27;
+    libapx_ui_version = libapx_create_dialog_invis(patch_notes_width, patch_notes_height, c_anchorTopRight, 20, 20);
+     libapx_create_dialog_label_with_color(
+		libapx_ui_version, 
+		patch_notes_width-20, 
+		patch_notes_height, 
+		c_anchorTopLeft, 
+		14, 
+		0, 
+		"Apex Engine v" + IntToString(libapx_BUILD_VERSION) + "." + IntToString(libapx_BUILD_SUB_VERSION) + libapx_BUILD_VERSION_MODIFIER + "", 
+		libapx_UI_HEADER4,
+		ColorWithAlpha(90,90,90,60));
+	tmp = libapx_create_dialog_btn_invis(libapx_ui_version , patch_notes_width, patch_notes_height, c_anchorTopRight, 00, 00,"Open Patch Notes","");
 	TriggerAddEventDialogControl(TriggerCreate("libapx_patchnotes_toggle"), c_playerAny, tmp, c_triggerControlEventTypeClick);
 	DialogSetVisible(libapx_ui_version, PlayerGroupAll(), true);
 
+	libapx_create_dialog_btn_icon_colored_anchor(libapx_ui_version, tmp, c_anchorRight, 20,20, libapx_UI_INFO_IMAGE, ColorWithAlpha(110,115,130,60));
 	libapx_ui_unitname_toggle = libapx_create_dialog_invis(302, 68, c_anchorBottomRight, 20, 200);
 	tmp = libapx_create_dialog_btn(libapx_ui_unitname_toggle , 300, 100, c_anchorCenter, 00, 00,"View Character Information","<s><c val=\"ffffff\">View Unit Description</c></s>");
 	DialogSetVisible(libapx_ui_unitname_toggle, PlayerGroupAll(), true);
 	TriggerAddEventDialogControl(TriggerCreate("libapx_description_toggle"), c_playerAny, tmp, c_triggerControlEventTypeClick);
 	
 
-	libapx_ui_panel_toolbar = libapx_create_dialog(200, 136 + libapx_ui_btn_size*libapx_UI_NPANELS, c_anchorTopLeft, -100, -100);
+	libapx_ui_panel_toolbar = libapx_create_dialog(
+		libapx_ui_btn_size+libapx_ui_btn_spacing*2, 
+		libapx_ui_btn_spacing*2 + (libapx_ui_btn_size+libapx_ui_btn_spacing*libapx_ui_btn_inside_spacing_multi)*libapx_UI_NPANELS, c_anchorTopLeft, 0, 0);
 	DialogSetVisible(libapx_ui_panel_toolbar, PlayerGroupAll(), true);
 
 
@@ -253,7 +274,14 @@ static void libapx_ui_toolbar_init() {
 		// initialize the button: link its dialog control number of the button
 		// to the panel index in the libapx_ui_panel array list through
 		// the data table
-		btn = libapx_create_dialog_btn(libapx_ui_panel_toolbar, libapx_ui_btn_size, libapx_ui_btn_size, c_anchorBottomRight, 28, 40 + i*libapx_ui_btn_size, libapx_ui_panels[i].name, "");
+		btn = libapx_create_dialog_btn(
+			libapx_ui_panel_toolbar, 
+			libapx_ui_btn_size, 
+			libapx_ui_btn_size, 
+			c_anchorBottomRight, 
+			libapx_ui_btn_spacing, 
+			libapx_ui_btn_spacing + i*(libapx_ui_btn_size+libapx_ui_btn_spacing*libapx_ui_btn_inside_spacing_multi), 
+			libapx_ui_panels[i].name, "");
 		libapx_ui_panels[i].btn = btn;
 		DataTableSetInt(true, libapx_UI_PANEL_DTABLE_PREFIX + IntToString(btn), i);
 
@@ -338,6 +366,9 @@ void libapx_ui_switchto_panel(int panelIndex, int player) {
 
 		// toggle ui panel visibility and set the active panel
 		if( panel != active_panel ) {
+			if(panel == 3) { // aliases
+				libapx_ui_aliases_open_player(p);
+			}
 			DialogSetVisible(libapx_ui_panels[panel].dialog, PlayerGroupSingle(p), true);
 			DialogSetVisible(libapx_ui_panels[panel].exit_btn, PlayerGroupSingle(p), true);
 			libapx_player[p].active_ui_panel = panel;
@@ -380,6 +411,7 @@ bool libapx_ui_panel_toggle(bool testConds, bool runActions) {
 bool libapx_ui_panel_toggle_btn(bool testConds, bool runActions) {
 	int p = EventPlayer();
 	string panel_identifier = libapx_UI_PANEL_DTABLE_PREFIX + IntToString(EventDialogControl());
+
 
 	libapx_ui_switchto_panel(-12, p);
 	return true;

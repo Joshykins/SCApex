@@ -141,10 +141,7 @@ void libapx_define_setnamecolor(string command_name) {
 void libapx_command_repeat(int user, unitgroup u, string argv, int spawningCount, string bracketText) {
 	int iterations = StringToInt(StringWord(argv, 2));
 	int i;
-	libapx_print_output(user, argv);
 	for(i = 0; i < iterations; i += 1) {
-		
-
 		libapx_chat_parse(bracketTextGrab(bracketText, 1), user, u, spawningCount);
 	}
 
@@ -245,9 +242,10 @@ void libapx_command_random(int user, unitgroup u, string argv, int spawningCount
 	int pickedEntry;
 	int i = 1;
 	int safe = 50;
-	while(bracketTextGrab(bracketText, i) != " ") {
+	while(bracketTextGrab(bracketText, i) != "") {
 		i = i + 1;
 		if (i>50) {
+			
 			return;
 			break;
 		}

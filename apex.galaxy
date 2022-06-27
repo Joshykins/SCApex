@@ -39,6 +39,7 @@ void libapx_initialize() {
 	}
 	
 	libapx_bank_load();
+	libapx_api_start();
 	//libapx_print(PlayerGroupAll(), "apex Engine: v" + IntToString(libapx_BUILD_VERSION) + "." + IntToString(libapx_BUILD_SUB_VERSION) + libapx_BUILD_VERSION_MODIFIER);
 	//libapx_print(PlayerGroupAll(), libapx_SPLASH_MESSAGE);
 }

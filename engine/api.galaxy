@@ -1,0 +1,112 @@
+//=========================================================
+//		Apex Roleplaying Engine
+//		Copyright (c) 2019, Apex Group
+//=========================================================
+// This software is distributed under the MIT License:
+// <http://opensource.org/licenses/MIT>
+//=========================================================
+
+
+
+void libapx_api_start_reading(int p) {
+    libapx_player[p].api_reading = true;
+    libapx_print_output(p, "<c val=\"00eeff\">API</c> | Listening");
+}
+
+void libapx_api_stop_reading(int p) {
+    string api_string = libapx_player[p].api_string_input;
+    libapx_player[p].api_reading = false;
+    libapx_player[p].api_string_input = "";
+    libapx_print_output(p, "<c val=\"00eeff\">API</c> | Running And Stopping Listening");
+    libapx_process_chat( api_string, p, UnitGroupSelected(p));
+}
+
+
+
+void libpax_api_update(int p) {
+    string stream;
+    string globalStream;
+    string desiredKey;
+    int i;
+    string api_string;
+
+    if(!libapx_player[p].banksloaded) {
+        return;
+    }
+
+    BankReload(libapx_player[p].bank_storage);
+    BankWait(libapx_player[p].bank_storage);
+
+    if(BankSectionExists(libapx_player[p].bank_storage, "Api")) {
+
+        desiredKey = "stream";
+        if(!BankKeyExists(libapx_player[p].bank_storage, "Api", desiredKey)) {
+            libapx_print_output(p, "<c val=\"00eeff\">API</c> | Stream Not Found");
+            BankValueSetFromString(libapx_player[p].bank_storage, "Api", desiredKey, "");
+            BankSave(libapx_player[p].bank_storage);
+            libapx_print_output(p, "<c val=\"00eeff\">API</c> | Creating Stream Key");
+            return;
+        }
+        
+
+    
+        stream = BankValueGetAsString(libapx_player[p].bank_storage, "Api", desiredKey);
+        BankValueSetFromString(libapx_player[p].bank_storage, "Api", desiredKey, "");
+
+        if(stream == "") {
+            return;
+        }
+
+        if(stream == "api_run") {
+            libapx_print_output(p, "<c val=\"ffee00\">API CMD</c> | Running Buffer");
+            api_string = libapx_player[p].api_string_input;
+            libapx_player[p].api_string_input = "";
+            
+            libapx_process_chat( api_string, p, UnitGroupSelected(p));
+            BankSave(libapx_player[p].bank_storage);
+            return;
+        } else if(stream == "api_stop") {
+            libapx_print_output(p, "<c val=\"ffee00\">API CMD</c> | Running Buffer and Stopping");
+            libapx_api_stop_reading(p);
+            BankSave(libapx_player[p].bank_storage);
+            return;
+        } else if(stream == "api_length") {
+            libapx_print_text(PlayerGroupSingle(p), StringToText("> <c val=\"ffee00\">API CMD</c> | Buffer length ") + FormatNumber(StringLength(libapx_player[p].api_string_input)));
+            
+            BankSave(libapx_player[p].bank_storage);
+            return;
+        }
+
+
+        
+        libapx_player[p].api_string_input += stream;
+    }
+    else {
+        libapx_print_output(p, "<c val=\"00eeff\">API</c> | API Section Not Found");
+        libapx_print_output(p, "<c val=\"00eeff\">API</c> | Creating API Section in <c val=\"ff0000\">ApexBank</c>");
+        BankSectionCreate(libapx_player[p].bank_storage, "Api");
+    }
+    BankSave(libapx_player[p].bank_storage);
+}
+
+
+
+void libapx_api_start() {
+    int i;
+    int p;
+
+
+    while(true) {
+        
+        for (i = 1; i <= PlayerGroupCount(PlayerGroupActive()); i += 1) {
+           
+            p = PlayerGroupPlayer(PlayerGroupActive(), i);
+            if(!PlayerIsUnderAIControl(p) && libapx_player[p].api_reading) {
+                libpax_api_update(p);
+            }
+        }
+
+        Wait(1, c_timeReal);
+    }
+
+}
