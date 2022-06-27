@@ -16,6 +16,8 @@ const string libapx_UI_DIALOG_BACKGROUND = "Apex\\Assets\\Textures\\apexUI.dds";
 const string libapx_UI_DIALOG_BUTTON = "Apex\\Assets\\Textures\\apexUIButtons.dds"; // for normal and hover
 const string libapx_UI_DIALOG_BUTTON_HOV = "Apex\\Assets\\Textures\\apexUIButtons.dds"; // for normal and hover
 const string libapx_UI_SUBPANEL_BACKGROUND = "Assets\\Textures\\ui_ingame_subpanel.dds";
+const string libapx_UI_INFO_IMAGE = "Assets\\Textures\\ui_glues_icons_largebutton_info_highlight.dds";
+const string libapx_UI_BLANK_IMAGE = "Assets\\Textures\\blank.dds";
 
 // text header styles
 const string libapx_UI_HEADER1 = "GlueButton";
@@ -134,6 +136,17 @@ int libapx_create_dialog_label(int dialog, int width, int height, int anchor, in
 	return label;
 }
 
+// libapx_create_dialog_label_with_color
+// =================
+// Creates a static label for a dialog with a given text style
+int libapx_create_dialog_label_with_color(int dialog, int width, int height, int anchor, int offset_x, int offset_y, string s, string style, color c ) {
+	int label = libNtve_gf_CreateDialogItemLabel(dialog, width, height, anchor, offset_x, offset_y, StringToText(s), c, false, 0);
+	libNtve_gf_SetDialogItemStyle(label, style, PlayerGroupAll());
+
+	return label;
+}
+
+
 // libapx_create_dialog_title
 // =================
 // Creates a title for a ui panel
@@ -170,8 +183,9 @@ int libapx_create_dialog_btn(int dialog, int width, int height, int anchor, int 
 	libNtve_gf_SetDialogItemRenderPriority(btn, 513, PlayerGroupAll());
 
 	// set background/border
-	libNtve_gf_SetDialogItemImage(btn, libapx_UI_DIALOG_BUTTON, PlayerGroupAll());
+	libNtve_gf_SetDialogItemImage(btn, libapx_UI_BLANK_IMAGE, PlayerGroupAll());
 	libNtve_gf_SetDialogItemImage2(btn, libapx_UI_DIALOG_BUTTON_HOV, PlayerGroupAll());
+
 	libNtve_gf_SetDialogItemImageType(btn, c_triggerImageTypeBorder, PlayerGroupAll());
 
 	return btn;
@@ -266,5 +280,22 @@ int libapx_create_dialog_btn_icon_colored(int dialog, int btn, int width, int he
 		  btnColor, 
 		  c_triggerBlendModeNormal);
 	DialogControlSetPositionRelative(img, PlayerGroupAll(), c_anchorCenter, btn, c_anchorCenter, 0, 0);
+	return img;
+}
+
+
+
+int libapx_create_dialog_btn_icon_colored_anchor(int dialog, int btn, int anchor, int width, int height, string icon, color btnColor) {
+	int img = libNtve_gf_CreateDialogItemImage(
+		dialog,
+		 width, height,
+		  anchor, 0, 0, 
+		  StringToText(""), 
+		  icon, c_triggerImageTypeNormal, false, 
+		  btnColor, 
+		  c_triggerBlendModeNormal);
+	libNtve_gf_SetDialogItemDesaturated(img, true, PlayerGroupAll());
+	libNtve_gf_SetDialogItemDesaturationColor(img, btnColor, PlayerGroupAll());
+	DialogControlSetPositionRelative(img, PlayerGroupAll(), anchor, btn, anchor, 0, 0);
 	return img;
 }
