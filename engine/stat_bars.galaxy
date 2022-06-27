@@ -231,7 +231,6 @@ static void render_wireframe_layer(int p, int base, int layer,
     DialogControlSetPropertyAsInt(image, c_triggerControlPropertyRotation, PlayerGroupSingle(p), rotation);
     //Alpha
     DialogControlSetPropertyAsInt(image, c_triggerControlPropertyAlpha, PlayerGroupSingle(p), alpha);
-    
 }
 
 static void update_wireframe(int p, unit u, int owner) {

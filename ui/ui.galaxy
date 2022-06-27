@@ -11,8 +11,8 @@
 static const int libapx_UI_NPANELS = 9;
 
 //Size of buttons
-static const int libapx_ui_btn_size = 50;
-const int libapx_ui_btn_spacing = 25;
+static const int libapx_ui_btn_size = 45;
+const int libapx_ui_btn_spacing = 15;
 const int libapx_ui_btn_inside_spacing_multi = 0;
 
 
@@ -149,6 +149,7 @@ static void libapx_ui_initialize_panels() {
 // Adds event triggers for the UI toolbar buttons.
 void libapx_ui_initialize() {
 	int player;
+
 
 	UISetFrameVisible(PlayerGroupAll(), c_syncFrameTypeIdleWorkerButton, false);
 	UISetFrameVisible(PlayerGroupAll(), c_syncFrameTypeSupply, false);
