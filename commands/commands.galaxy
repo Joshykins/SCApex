@@ -50,7 +50,8 @@ void libapx_commands_initialize() {
 	libapx_chat_command_create("_sound", libapx_command_sound, libapx_define_sound);
 	libapx_chat_command_create("_camerapan", libapx_command_camerapan, libapx_define_camerapan);
 	libapx_chat_command_create("_print", libpax_command_print, libapx_define_print);
-
+	libapx_chat_command_create("_dataedit", libapx_command_dataedit, libapx_define_dataedit);
+	
 	//API commands
 	libapx_chat_command_create("_api", libapx_command_api, libapx_define_api);
 

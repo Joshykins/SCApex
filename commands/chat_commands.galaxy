@@ -242,17 +242,14 @@ void libapx_command_random(int user, unitgroup u, string argv, int spawningCount
 	int pickedEntry;
 	int i = 1;
 	int safe = 50;
-	libapx_print(PlayerGroupAll(), bracketText+" | RUNNING RANDOM??");
 	while(bracketTextGrab(bracketText, i) != "") {
 		i = i + 1;
 		if (i>50) {
 			
-			libapx_print(PlayerGroupAll(), "broke");
 			return;
 			break;
 		}
 	} 
-	libapx_print(PlayerGroupAll(), IntToString(i) + " BRACKET COUNT FOR RANDOM");
 	pickedEntry = RandomInt(1,i);
 
 	libapx_chat_parse(bracketTextGrab(bracketText, pickedEntry), user, u, spawningCount);
