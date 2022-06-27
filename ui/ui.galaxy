@@ -338,6 +338,9 @@ void libapx_ui_switchto_panel(int panelIndex, int player) {
 
 		// toggle ui panel visibility and set the active panel
 		if( panel != active_panel ) {
+			if(panel == 3) { // aliases
+				libapx_ui_aliases_open_player(p);
+			}
 			DialogSetVisible(libapx_ui_panels[panel].dialog, PlayerGroupSingle(p), true);
 			DialogSetVisible(libapx_ui_panels[panel].exit_btn, PlayerGroupSingle(p), true);
 			libapx_player[p].active_ui_panel = panel;
@@ -380,6 +383,7 @@ bool libapx_ui_panel_toggle(bool testConds, bool runActions) {
 bool libapx_ui_panel_toggle_btn(bool testConds, bool runActions) {
 	int p = EventPlayer();
 	string panel_identifier = libapx_UI_PANEL_DTABLE_PREFIX + IntToString(EventDialogControl());
+
 
 	libapx_ui_switchto_panel(-12, p);
 	return true;

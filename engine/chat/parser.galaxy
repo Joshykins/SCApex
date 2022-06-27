@@ -126,7 +126,6 @@ string bracketTextGrab(string bracketText, int arg) {
 			//No other arguement given
 			return "";
 		}
-		libapx_print_output(0, bracketText);
 		seperaterPosition = StringFind(bracketText, bracketSeperater, c_stringCase);
 		bracketText = StringReplace(bracketText, "", 1, seperaterPosition + StringLength(bracketSeperater) - 1);
 		seperaterPosition = StringFind(bracketText, bracketSeperater, c_stringCase);
@@ -303,9 +302,10 @@ void libapx_chat_parse(string msg, int player, unitgroup target, int spawningCou
 
 		bracketText = "";
 		current_temp = current;
-		//if(StringSub(current_temp, 1, 1) == ">") {
+		current_temp = StringReplaceWord(current_temp, "\\;", "", c_stringReplaceAll, false);
 			while( StringFind(current_temp, "[", c_stringNoCase) != -1 ) {
 				pairStart = get_start_pair(current_temp, 0);
+
 
 				if(within_brackets( current_temp, player, pairStart+1)) {
 					pairEnd = get_end_pair(current_temp, 0);

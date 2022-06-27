@@ -2,10 +2,10 @@
 <Desc>
     <Frame type="Frame" name="GameUI/UIContainer/ConsoleUIContainer" file="GameUI">
         <Frame type="ControlGroupPanel" name="ControlGroupPanel">
-            <Anchor side="Right" relative="$parent" pos="Mid" offset="0"/>
+            <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
             <Anchor side="Left" relative="$parent" pos="1" offset="277"/>
             <Anchor side="Bottom" relative="$parent" pos="Max" offset="-270"/>
-            <Width val="750"/>
+            <Width val="350"/>
             <Frame name="background" type="Image">
                 <IgnoreParentAlpha val="true"/>
                 <RenderPriority val="1"/>

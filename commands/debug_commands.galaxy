@@ -13,15 +13,7 @@
 // =====================
 // test of new command system using func refs
 void libapx_command_experiment(int user, unitgroup u, string argv, int spawningCount, string bracketText) {
-	int i = 1;
-	string arg = libapx_arg(argv, 1);
-	libapx_print(PlayerGroupAll(), libapx_string_trim(argv));
-
-	while( arg != "" ) {
-		libapx_print(PlayerGroupAll(), IntToString(i) + ": " + arg);
-		i += 1;
-		arg = libapx_arg(argv, i);
-	}
+	
 }
 
 int strcmp(string k1, string k2) {

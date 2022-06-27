@@ -1576,7 +1576,7 @@ void libapx_command_face(int user, unitgroup u, string argv, int spawningCount, 
 			addition = true;
 			param = StringSub(param, 2, StringLength(param));
 		}
-		if( StringContains(param, "-", c_stringBegin, c_stringCase) ) {
+		else if( StringContains(param, "-", c_stringBegin, c_stringCase) ) {
 			subtraction = true;
 			param = StringSub(param, 2, StringLength(param));
 		}

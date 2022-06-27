@@ -121,6 +121,10 @@ void libapx_ui_aliases_init_player(int p) {
   libapx_ui_aliases_list_populate(p);
 }
 
+void libapx_ui_aliases_open_player(int p) {
+  libapx_ui_aliases_list_populate(p);
+}
+
 bool libapx_ui_aliases_filter(bool testConds, bool runActions) {
   int player = EventPlayer();
 	string filter = libNtve_gf_DialogItemEditValue(libapx_ui_aliases_search, player);
