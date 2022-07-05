@@ -11,6 +11,9 @@ include "apex/engine/chat/macro.galaxy"
 include "apex/engine/chat/variables.galaxy"
 
 const string libapx_CHAT_COMMAND_DATA_TABLE_PREFIX = "libapx_command_";
+ 
+static const string gv_bracket_commands = "@cache _delay _api >repeat >chance >random >keypress >moveto";
+
 
 // libapx_arg
 // ===============
@@ -220,7 +223,7 @@ void libapx_chat_parse(string msg, int player, unitgroup target, int spawningCou
 	bool test;
 	int i;
 	string current_temp;
-
+	bool matched_bracket_cmd = false;
 	
 	libapx_command_type func; // command ref test
 	libapx_chat_parse_increment(player);
@@ -299,11 +302,20 @@ void libapx_chat_parse(string msg, int player, unitgroup target, int spawningCou
 		//while there is another open bracket remianing, if so
 		//pull pairs and remove
 		i = 1;
-
 		bracketText = "";
 		current_temp = current;
+		
+		while(StringWord(gv_bracket_commands, i) != "") {
+			if(StringWord(current, 1) == StringWord(gv_bracket_commands, i)) {
+				matched_bracket_cmd = true;
+			}
+			i += 1;
+		}
+		
+
+		i = 1;
 		current_temp = StringReplaceWord(current_temp, "\\;", "", c_stringReplaceAll, false);
-			while( StringFind(current_temp, "[", c_stringNoCase) != -1 ) {
+			while( StringFind(current_temp, "[", c_stringNoCase) != -1 && matched_bracket_cmd) {
 				pairStart = get_start_pair(current_temp, 0);
 
 

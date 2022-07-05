@@ -5,6 +5,8 @@
         <Frame type="MissionTimePanel" name="MissionTimePanel">
             <Anchor side="Left" relative="$parent" pos="Min" offset="230"/>
             <Anchor side="Bottom" relative="$parent" pos="Max" offset="-305"/>
+            <Color val="235,235,235"/>
+		    <Desaturated val="true"/>
             <Frame type="Image" name="BackgroundImage">
                 <Visible val="false"/>
             </Frame>
@@ -68,14 +70,74 @@
             <Frame type="Button" name="PingButton">
                 <Anchor side="Bottom" relative="$parent" pos="Max" offset="-252"/> <!-- -10 + -height + buttonSize(42) -->
                 <Anchor side="Left" relative="$parent" pos="Min" offset="255"/> <!-- 10 + width - ButtonSize(42) -->
+                <Frame type="Image" name="NormalImage">
+                    <LayerCount val="1"/>
+                    <Texture val="Assets\Textures\white32.dds"/>
+                    <Alpha val="50"/>
+                    <Color val="0,0,0"/>
+                </Frame>
+                <Frame type="Image" name="HoverImage">
+                    <LayerCount val="1"/>
+                    <Texture val="Assets\Textures\white32.dds"/>
+                    <Alpha val="50"/>
+                    <Color val="50,50,50"/>
+                </Frame>
+                <Frame type="Image" name="Icon">
+                    <DesaturationColor val="255,255,255"/>
+                    <Desaturated val="true"/>
+                </Frame>
+                <Frame type="Image" name="Icon1">
+                    <DesaturationColor val="255,255,255"/>
+                    <Desaturated val="true"/>
+                </Frame>
             </Frame>
             <Frame type="Button" name="TerrainButton">
                 <Anchor side="Bottom" relative="$parent" pos="Max" offset="-210"/> <!-- -10 + -height + buttonSize(42) -->
                 <Anchor side="Left" relative="$parent" pos="Min" offset="255"/> <!-- 10 + width - ButtonSize(42) -->
+                <Frame type="Image" name="NormalImage">
+                    <LayerCount val="1"/>
+                    <Texture val="Assets\Textures\white32.dds"/>
+                    <Alpha val="50"/>
+                    <Color val="0,0,0"/>
+                </Frame>
+                <Frame type="Image" name="HoverImage">
+                    <LayerCount val="1"/>
+                    <Texture val="Assets\Textures\white32.dds"/>
+                    <Alpha val="50"/>
+                    <Color val="50,50,50"/>
+                </Frame>
+                <Frame type="Image" name="Icon">
+                    <DesaturationColor val="255,255,255"/>
+                    <Desaturated val="true"/>
+                </Frame>
+                <Frame type="Image" name="Icon1">
+                    <DesaturationColor val="255,255,255"/>
+                    <Desaturated val="true"/>
+                </Frame>
             </Frame>
             <Frame type="Button" name="ColorButton">
                 <Anchor side="Bottom" relative="$parent" pos="Max" offset="-168"/> <!-- -10 + -height + buttonSize(42) -->
                 <Anchor side="Left" relative="$parent" pos="Min" offset="255"/> <!-- 10 + width - ButtonSize(42) -->
+                <Frame type="Image" name="NormalImage">
+                    <LayerCount val="1"/>
+                    <Texture val="Assets\Textures\white32.dds"/>
+                    <Alpha val="50"/>
+                    <Color val="0,0,0"/>
+                </Frame>
+                <Frame type="Image" name="HoverImage">
+                    <LayerCount val="1"/>
+                    <Texture val="Assets\Textures\white32.dds"/>
+                    <Alpha val="50"/>
+                    <Color val="50,50,50"/>
+                </Frame>
+                <Frame type="Image" name="Icon">
+                    <DesaturationColor val="255,255,255"/>
+                    <Desaturated val="true"/>
+                </Frame>
+                <Frame type="Image" name="Icon1">
+                    <DesaturationColor val="255,255,255"/>
+                    <Desaturated val="true"/>
+                </Frame>
             </Frame>
         </Frame>
     </Frame>

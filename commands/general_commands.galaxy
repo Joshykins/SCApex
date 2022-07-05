@@ -584,7 +584,7 @@ void libapx_define_upgrade(string command_name) {
 // ====================
 // just prints out a line of text to everyone
 void libapx_command_info(int user, unitgroup u, string argv, int spawningCount, string bracketText) {
-	libapx_print_output(user, "Apex Engine v" + IntToString(libapx_BUILD_VERSION) + "." + IntToString(libapx_BUILD_SUB_VERSION) + libapx_BUILD_VERSION_MODIFIER);
+	libapx_print_output(user, "Apex Engine v" + IntToString(gv_LibapxBuildVersion) + "." + IntToString(gv_LibapxBuildSubVersion) + gv_LibapxBuildVersionModifier);
 	libapx_print_output(user, "Developer: Melvin");
 	libapx_print_output(user, "Asset Developers: Capnbombad, Comfromal, Dalgar, Lunar, Serobliss, Ngokerz");
 	libapx_print_output(user, "Special Thanks to: Xethyr, Dalgar, and Motive");

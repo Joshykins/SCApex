@@ -45,19 +45,13 @@
 			<!--Stats positioning-->
 			<Frame type="Frame" name="UnitPanel">
 					<Visible val="true"/>
-					<Width val="200"/>
-					<Height val="200"/>
-					<Anchor side="Left" relative="$parent" pos="Max" offset="20000"/>
-					<Anchor side="Top" relative="$parent" pos="Max" offset="20000"/>
 					<Frame type="BehaviorBar" name="BehaviorBar">
 						<Anchor side="Top" relative="$parent/$parent" pos="Min" offset="10"/>
 						<Anchor side="Left" relative="$parent/$parent" pos="Min" offset="10"/>
-						<Alpha val="130"/>	
 					</Frame>
 					<Frame type="UnitWireframe" name="UnitWireframe">
 							<Anchor side="Left" relative="$parent" pos="Max" offset="20000"/>
 							<Anchor side="Top" relative="$parent" pos="Max" offset="20000"/>
-							
 					</Frame>
 			</Frame>
 			<!--Normal unit-->

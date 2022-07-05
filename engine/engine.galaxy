@@ -134,12 +134,10 @@ include "apex/engine/blacklist.galaxy"
 // tools for debugging
 include "apex/engine/debug.galaxy"
 
-
-
 // engine version
-const int libapx_BUILD_VERSION = 2;
-const int libapx_BUILD_SUB_VERSION = 2;
-const string libapx_BUILD_VERSION_MODIFIER = ".0";
+const int gv_LibapxBuildVersion = 2;
+const int gv_LibapxBuildSubVersion = 2;
+const string gv_LibapxBuildVersionModifier = ".1";
 
 void libapx_engine_initialize() {
 	int player = 1;

@@ -156,6 +156,7 @@ void libapx_ui_initialize() {
 	UISetFrameVisible(PlayerGroupAll(), c_syncFrameTypeConsolePanel, false);
 	UISetFrameVisible(PlayerGroupAll(), c_syncFrameTypeArmyButton, false);
 	UISetFrameVisible(PlayerGroupAll(), c_syncFrameTypeResourcePanel, false);
+	UISetFrameVisible(PlayerGroupAll(), c_syncFrameTypeTeamResourceButton, false);
 	UISetFrameVisible(PlayerGroupAll(), c_syncFrameTypeAllianceButton, false);
 	UISetFrameVisible(PlayerGroupAll(), c_syncFrameTypeSupply, false);
 	UISetFrameVisible(PlayerGroupAll(), c_syncFrameTypeHelpMenuButton, false);
@@ -220,11 +221,13 @@ static void libapx_ui_toolbar_init() {
 	int i;
 	int btn;
 	int libapx_ui_version;
+	int libapxUiPermissions;
 	int libapx_ui_unitname_toggle;
 	int tmp;
 	int patch_notes_width = 200;
 	int patch_notes_height = 27;
-    libapx_ui_version = libapx_create_dialog_invis(patch_notes_width, patch_notes_height, c_anchorTopRight, 20, 20);
+
+    libapx_ui_version = libapx_create_dialog_invis(patch_notes_width, patch_notes_height*2, c_anchorTopRight, 20, 20);
      libapx_create_dialog_label_with_color(
 		libapx_ui_version, 
 		patch_notes_width-20, 
@@ -232,9 +235,11 @@ static void libapx_ui_toolbar_init() {
 		c_anchorTopLeft, 
 		14, 
 		0, 
-		"Apex Engine v" + IntToString(libapx_BUILD_VERSION) + "." + IntToString(libapx_BUILD_SUB_VERSION) + libapx_BUILD_VERSION_MODIFIER + "", 
+		"Apex Engine v" + IntToString(gv_LibapxBuildVersion) + "." + IntToString(gv_LibapxBuildSubVersion) + gv_LibapxBuildVersionModifier + "", 
 		libapx_UI_HEADER4,
 		ColorWithAlpha(90,90,90,60));
+	
+
 	tmp = libapx_create_dialog_btn_invis(libapx_ui_version , patch_notes_width, patch_notes_height, c_anchorTopRight, 00, 00,"Open Patch Notes","");
 	TriggerAddEventDialogControl(TriggerCreate("libapx_patchnotes_toggle"), c_playerAny, tmp, c_triggerControlEventTypeClick);
 	DialogSetVisible(libapx_ui_version, PlayerGroupAll(), true);
@@ -245,6 +250,7 @@ static void libapx_ui_toolbar_init() {
 	DialogSetVisible(libapx_ui_unitname_toggle, PlayerGroupAll(), true);
 	TriggerAddEventDialogControl(TriggerCreate("libapx_description_toggle"), c_playerAny, tmp, c_triggerControlEventTypeClick);
 	
+
 
 	libapx_ui_panel_toolbar = libapx_create_dialog(
 		libapx_ui_btn_size+libapx_ui_btn_spacing*2, 
@@ -267,6 +273,8 @@ static void libapx_ui_toolbar_init() {
 	//building ui
 	//S-val
 	//Ui off
+
+	
 
 
 	// initialize toolbar buttons
@@ -291,6 +299,22 @@ static void libapx_ui_toolbar_init() {
 		TriggerAddEventDialogControl(TriggerCreate("libapx_ui_panel_toggle"), c_playerAny, libapx_ui_panels[i].btn, c_triggerControlEventTypeClick);
 	}
 	for (i = 1; i <= PlayerGroupCount(PlayerGroupActive()); i += 1) {
+		libapxUiPermissions = libapx_create_dialog(200, 70, c_anchorBottomLeft, 10, 350);
+
+		//Create The Moderate/Admin Dialog
+		libapx_player[i].permissionLevelUi = libapx_create_dialog_label_with_color(
+			libapxUiPermissions, 
+			200, 
+			70, 
+			c_anchorCenter, 
+			30, 
+			23, 
+			"Unset Permission"+IntToString(i), 
+			libapx_UI_HEADER4,
+		ColorWithAlpha(90,90,90,100));
+
+
+		DialogSetVisible(libapxUiPermissions, PlayerGroupSingle(i), true);
 		tmp = PlayerGroupPlayer(PlayerGroupActive(), i);
 		libapx_ui_switchto_panel(libapx_ui_panels[8].btn, tmp); //8 is info panel
 	}

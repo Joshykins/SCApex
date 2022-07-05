@@ -17,7 +17,10 @@ const string libapx_UI_DIALOG_BUTTON = "Apex\\Assets\\Textures\\apexUIButtons.dd
 const string libapx_UI_DIALOG_BUTTON_HOV = "Apex\\Assets\\Textures\\apexUIButtons.dds"; // for normal and hover
 const string libapx_UI_SUBPANEL_BACKGROUND = "Assets\\Textures\\ui_ingame_subpanel.dds";
 const string libapx_UI_INFO_IMAGE = "Assets\\Textures\\ui_glues_icons_largebutton_info_highlight.dds";
-const string libapx_UI_BLANK_IMAGE = "Assets\\Textures\\blank.dds";
+const string gv_LibapxBlankImage = "Assets\\Textures\\blank.dds";
+static const string gv_WhiteBoxBackground = "Assets\\Textures\\white32.dds";
+static const string gv_ApexButtonBackground = "Apex\\Assets\\Textures\\Button.dds";
+static const string gv_ApexButtonBackgroundHov = "Apex\\Assets\\Textures\\ButtonHover.dds";
 
 // text header styles
 const string libapx_UI_HEADER1 = "GlueButton";
@@ -157,10 +160,10 @@ int libapx_create_dialog_title(int dialog, int width, int height, int offset_x, 
 	libNtve_gf_SetDialogItemStyle(label, style, PlayerGroupAll());
 
 	//Create Images near it.
-	imgl = libapx_create_dialog_btn_invis(dialog, 200, 0,c_anchorTop,offset_x-spread, offset_y-15, "","" );
-	imgr = libapx_create_dialog_btn_invis(dialog, 200, 0,c_anchorTop,offset_x+spread, offset_y-15, "","" );
-	libapx_create_dialog_btn_icon_colored_title(dialog, imgl, 200, 60,"Apex\\Assets\\Textures\\LeftHandSideTitle.png",Color(100,100,100));
-	libapx_create_dialog_btn_icon_colored_title(dialog, imgr, 200, 60,"Apex\\Assets\\Textures\\RightHandSideTitle.png",Color(100,100,100));
+	// imgl = libapx_create_dialog_btn_invis(dialog, 200, 0,c_anchorTop,offset_x-spread, offset_y-15, "","" );
+	// imgr = libapx_create_dialog_btn_invis(dialog, 200, 0,c_anchorTop,offset_x+spread, offset_y-15, "","" );
+	// libapx_create_dialog_btn_icon_colored_title(dialog, imgl, 200, 60,"Apex\\Assets\\Textures\\LeftHandSideTitle.png",Color(100,100,100));
+	// libapx_create_dialog_btn_icon_colored_title(dialog, imgr, 200, 60,"Apex\\Assets\\Textures\\RightHandSideTitle.png",Color(100,100,100));
 
 	return label;
 }
@@ -183,8 +186,8 @@ int libapx_create_dialog_btn(int dialog, int width, int height, int anchor, int 
 	libNtve_gf_SetDialogItemRenderPriority(btn, 513, PlayerGroupAll());
 
 	// set background/border
-	libNtve_gf_SetDialogItemImage(btn, libapx_UI_BLANK_IMAGE, PlayerGroupAll());
-	libNtve_gf_SetDialogItemImage2(btn, libapx_UI_DIALOG_BUTTON_HOV, PlayerGroupAll());
+	libNtve_gf_SetDialogItemImage(btn, gv_LibapxBlankImage, PlayerGroupAll());
+	libNtve_gf_SetDialogItemImage2(btn, gv_ApexButtonBackground, PlayerGroupAll());
 
 	libNtve_gf_SetDialogItemImageType(btn, c_triggerImageTypeBorder, PlayerGroupAll());
 

@@ -569,21 +569,44 @@ void libapx_define_selectarea(string command_name) {
 // displays unit command cache info or values
 void libapx_command_cache(int user, unitgroup u, string argv, int spawningCount, string bracketText) {
 	string cache;
-	string unit_caches;
+	string unitCaches;
 	unitgroup g = u;
+	string bracketCache;
+	unit tmp_unit;
+	int i;
+
 
 	cache = StringWord(argv, 2);
+
+
+	if(StringWord(argv, 2) == "-set") {
+		bracketCache = bracketTextGrab(bracketText, 1);
+		for (i = 1; i <= UnitGroupCount(u, c_unitCountAll); i += 1) {
+			tmp_unit = UnitGroupUnit(u, i);
+			LibapxUnitCacheSet(tmp_unit, bracketCache);
+		}
+		return;
+	}
+	
+	if(StringWord(argv, 2) == "-add") {
+		bracketCache = bracketTextGrab(bracketText, 1);
+		for (i = 1; i <= UnitGroupCount(u, c_unitCountAll); i += 1) {
+			tmp_unit = UnitGroupUnit(u, i);
+			LibapxUnitCacheAdd(tmp_unit, bracketCache);
+		}
+		return;
+	}
 
 	UnitGroupLoopBegin(g);
 	while(!UnitGroupLoopDone()) {
 		if(StringToInt(cache) == 0) { //display number of caches
 			if(UnitGetCustomValue(UnitGroupLoopCurrent(), libapx_UNIT_INDEX_CACHE_COUNT) == 1 && !DataTableValueExists(true, FixedToString(UnitGetCustomValue(UnitGroupLoopCurrent(), libapx_UNIT_INDEX_ID), 0) + ".1")) {
-				unit_caches = "0";
+				unitCaches = "0";
 			}
 			else {
-				unit_caches = FixedToString(UnitGetCustomValue(UnitGroupLoopCurrent(), libapx_UNIT_INDEX_CACHE_COUNT), 0);
+				unitCaches = FixedToString(UnitGetCustomValue(UnitGroupLoopCurrent(), libapx_UNIT_INDEX_CACHE_COUNT), 0);
 			}
-			libapx_print_output(user, "Unit " + UnitGetType(UnitGroupLoopCurrent()) + " has " + unit_caches + " command caches (type \"@cache #\" to view a cache)");
+			libapx_print_output(user, "Unit " + UnitGetType(UnitGroupLoopCurrent()) + " has " + unitCaches + " command caches (type \"@cache #\" to view a cache)");
 		}
 		else {
 			if(DataTableValueExists(true, FixedToString(UnitGetCustomValue(UnitGroupLoopCurrent(), libapx_UNIT_INDEX_ID), 0) + "." + cache)) {
@@ -599,7 +622,7 @@ void libapx_define_cache(string command_name) {
 	commands_guide_entry_set(
 		g_commands_guide_entry_unit, 
 		command_name, 
-		" This command prints out the number of caches the unit has or the content within those caches. <br> @cache [cachenumber] <br> Examples: <br> @cache (lists command cache amount) <br> @cache 1 (displays first cache) "
+		" This command prints out the number of caches the unit has or the content within those caches. It can also set the caches of, or add caches to a unit. <br> @cache [cachenumber] <br> @cache -set/-add [anything you want]  <br> Examples: <br> @cache (lists command cache amount) <br> @cache 1 (displays first cache) <br> @cache -add [_replace unit marine marauder] <br> @cache -set [myUnitAlias] "
 	);
 }
 
