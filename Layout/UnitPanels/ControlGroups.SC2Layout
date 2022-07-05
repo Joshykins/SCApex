@@ -2,7 +2,6 @@
 <Desc>
     <Frame type="Frame" name="GameUI/UIContainer/ConsoleUIContainer" file="GameUI">
         <Frame type="ControlGroupPanel" name="ControlGroupPanel">
-            <Width val="755"/>
             <Anchor side="Left" relative="$this" pos="Max" offset="0"/>
             <Anchor relative="$parent" side="Bottom" pos="Max" offset="-270"/>
             <Anchor relative="$parent" side="Right" pos="Max" offset="-20"/>

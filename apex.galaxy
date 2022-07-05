@@ -9,6 +9,7 @@ include "apex/engine/globals.galaxy"
 include "apex/engine/engine.galaxy"
 include "apex/commands/commands.galaxy"
 include "apex/ui/ui.galaxy"
+// include "apex/ui_lib/ui_library.galaxy"
 include "apex/toolkit/toolkit.galaxy"
 
 // welcome message
@@ -22,6 +23,8 @@ void libapx_initialize() {
 	libapx_ui_initialize();
 	libapx_globals_init();
 	libapx_statbars_init();
+	// Josh Testing Some new UI Lib, doesn't work yet :).
+	// libapx_initilize_ui_lib();
 	libapx_inspirational_quotes[0] = " Be inspired. This engine can do almost anything you could want! ";
 	libapx_inspirational_quotes[1] = " Don't always be a passive roleplayer. Have your character be proactive and go to people instead of waiting about for someone to come to you. ";
 	libapx_inspirational_quotes[2] = " Cooperate and be considerate of what others want while roleplaying. Try your best to make everyone in the roleplay satisfied with their experience. ";
@@ -40,6 +43,6 @@ void libapx_initialize() {
 	
 	libapx_bank_load();
 	libapx_api_start();
-	//libapx_print(PlayerGroupAll(), "apex Engine: v" + IntToString(libapx_BUILD_VERSION) + "." + IntToString(libapx_BUILD_SUB_VERSION) + libapx_BUILD_VERSION_MODIFIER);
+	//libapx_print(PlayerGroupAll(), "apex Engine: v" + IntToString(gv_LibapxBuildVersion) + "." + IntToString(gv_LibapxBuildSubVersion) + gv_LibapxBuildVersionModifier);
 	//libapx_print(PlayerGroupAll(), libapx_SPLASH_MESSAGE);
 }

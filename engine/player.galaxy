@@ -49,6 +49,9 @@ struct libapx_player_properties {
 	//Wireframe specifics.
 	string wireframe;
 
+	// Permission Level UI
+	int permissionLevelUi;
+
 	// keys + mouse flags
 	// ================
 	// flags for whether keys/mouse pressed up/down:

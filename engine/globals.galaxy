@@ -81,6 +81,9 @@ int g_libapx_ui_line2 = DialogControlHookupStandard(c_triggerControlTypePanel, "
 int g_libapx_ui_line3 = DialogControlHookupStandard(c_triggerControlTypePanel, "UIContainer/ConsoleUIContainer/BeautifyingFrame/LeftBar3");
 int g_libapx_ui_line4 = DialogControlHookupStandard(c_triggerControlTypePanel, "UIContainer/ConsoleUIContainer/BeautifyingFrame/LeftBar4");
 
+//New Ui
+int gv_libapx_uilib_fullscreen = DialogControlHookupStandard(c_triggerControlTypePanel, "UIContainer/ConsoleUIContainer/ApexUiLibParent");
+
 
 void libapx_globals_init() {
     default_wireframe.path = "Apex/Assets/Textures/Info.png";

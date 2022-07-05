@@ -23,8 +23,8 @@ struct patch_notes_design {
     string version;
     string[200] patches; //Max patches
 };
-static int patch_count = 7;
-static patch_notes_design[16][7] patch_notes;
+static const int patch_count = 9;
+static patch_notes_design[17][patch_count] patch_notes;
 
 
 
@@ -71,131 +71,140 @@ static void patch_notes_format_description(int dialog, playergroup pg, string de
 
 void libapx_ui_patchnotes_init_player(int player) { 
     int i;
-    int j;
+    int j = 0;
+
     i = 0;
-    patch_notes[player][0].version = "2.2.0";
-    patch_notes[player][0].patches[i] = "<c val=\"3498db\">CMD: _dataedut</c> added";
-    i+=1;patch_notes[player][0].patches[i] = "<c val=\"2ecc71\">UI: Ui Altered a bit </c> ";
+    patch_notes[player][j].version = "2.2.1";
+    patch_notes[player][j].patches[i] = "<c val=\"3498db\">CMD: @cache</c> -add [] added";
+    i+=1;patch_notes[player][j].patches[i] = "<c val=\"3498db\">CMD: @cache</c> -set [] added";
+    i+=1;patch_notes[player][j].patches[i] = "<c val=\"9b59b6\">ENG: Parser </c> Brackets limited to only bracket commands.";
+    i+=1;patch_notes[player][j].patches[i] = "<c val=\"2ecc71\">UI: Ui </c> Updated Ping/Terrain/Color Icons ";
+    i+=1;patch_notes[player][j].patches[i] = "<c val=\"2ecc71\">UI: Ui </c> Added Permission Level Viewer ";
+    i+=1;patch_notes[player][j].patches[i] = "<c val=\"2ecc71\">UI: Ui </c> Fixed Behavior Tooltip ";
+    i = 0;
+    j = j + 1;
+    patch_notes[player][j].version = "2.2.0";
+    patch_notes[player][j].patches[i] = "<c val=\"3498db\">CMD: _dataEdit</c> added";
+    i+=1;patch_notes[player][j].patches[i] = "<c val=\"2ecc71\">UI: Ui </c> Made Things Square, smaller, AKA its a bit more modern:tm: ";
     //Populate with types
     i = 0;
-    patch_notes[player][0].version = "2.1.20";
-    patch_notes[player][0].patches[i] = "<c val=\"3498db\">CMD: @decal</c> cached";
-    i+=1;patch_notes[player][0].patches[i] = "<c val=\"3498db\">CMD: _helpmessages </c> You can toggle the display of some help messages now.";
-    i+=1;patch_notes[player][0].patches[i] = "<c val=\"3498db\">CMD: _reloadbank </c> Banks can now be reloaded in game.";
-    i+=1;patch_notes[player][0].patches[i] = "<c val=\"2ecc71\">UI: Chat </c> font size was changed. ";
-    i+=1;patch_notes[player][0].patches[i] = "<c val=\"9b59b6\">ENG: Bank initilization is now staggered.";
-    i+=1;patch_notes[player][0].patches[i] = "<c val=\"2ecc71\">UI: Wireframes </c> added. If you click the wireframe it focuses on the unit selected. ";
-    i+=1;patch_notes[player][0].patches[i] = "<c val=\"3498db\">CMD: @wireframe</c> added. ";
-    i+=1;patch_notes[player][0].patches[i] = "<c val=\"2ecc71\">UI: Names </c> All names, and subtitles now push related objects, such as the equipment panel, transport panel, or other information traditionally listed below the name/subtitle";
-    i+=1;patch_notes[player][0].patches[i] = "<c val=\"2ecc71\">UI: Description </c> Description UI updated to have a scrollbar, and has been resized.";
-    i+=1;patch_notes[player][0].patches[i] = "<c val=\"2ecc71\">UI: Control Groups </c> Controlgroups now have a proper ui integration.";
-    i+=1;patch_notes[player][0].patches[i] = "<c val=\"2ecc71\">UI: Color picker </c> Prints removed.";
-    i+=1;patch_notes[player][0].patches[i] = "<c val=\"2ecc71\">UI: Transport UI </c> Transport UI updated to new style.";
-    i+=1;patch_notes[player][1].patches[i] = "<c val=\"3498db\">CMD: _camera Editor </c> science vessel smoothing removed/replaced by point.";
-    i+=1;patch_notes[player][1].patches[i] = "<c val=\"3498db\">CMD: _camera Editor </c> panning moved to [Tab] key.";
-    i+=1;patch_notes[player][1].patches[i] = "<c val=\"3498db\">CMD: _camera Editor </c> pause functionallity remove.";
-    i+=1;patch_notes[player][1].patches[i] = "<c val=\"3498db\">CMD: _camera Editor </c> made pan speed relative to camera distance.";
-    i+=1;patch_notes[player][1].patches[i] = "<c val=\"3498db\">CMD: @decal </c> saves in cache.";
-    i+=1;patch_notes[player][1].patches[i] = "<c val=\"3498db\">CMD: @rotation </c> saves in cache with -ypr and -b.";
-    i+=1;patch_notes[player][1].patches[i] = "<c val=\"3498db\">CMD: @radius </c> saves in cache.";
-    i+=1;patch_notes[player][1].patches[i] = "<c val=\"3498db\">CMD: @statetname/@statetnamecolor </c> gamesetup unpack buck fixed.";
-    i+=1;patch_notes[player][1].patches[i] = "<c val=\"3498db\">CMD: @desc </c> added.";
-    i+=1;patch_notes[player][1].patches[i] = "<c val=\"3498db\">CMD: @descall </c> added.";
-    //16
-	//Move chat to bottom left
-	//IC to mid
-	//x Colorpicker bar clientside
-	//Patreon stuff
-	//Tooltip
-	//building ui
-	//S-val
-	//Ui off
-
-
+    j = j + 1;
+    patch_notes[player][j].version = "2.1.20";
+    patch_notes[player][j].patches[i] = "<c val=\"3498db\">CMD: @decal</c> cached";
+    i+=1;patch_notes[player][j].patches[i] = "<c val=\"3498db\">CMD: _helpmessages </c> You can toggle the display of some help messages now.";
+    i+=1;patch_notes[player][j].patches[i] = "<c val=\"3498db\">CMD: _reloadbank </c> Banks can now be reloaded in game.";
+    i+=1;patch_notes[player][j].patches[i] = "<c val=\"2ecc71\">UI: Chat </c> font size was changed. ";
+    i+=1;patch_notes[player][j].patches[i] = "<c val=\"9b59b6\">ENG: Bank </c> initilization is now staggered.";
+    i+=1;patch_notes[player][j].patches[i] = "<c val=\"2ecc71\">UI: Wireframes </c> added. If you click the wireframe it focuses on the unit selected. ";
+    i+=1;patch_notes[player][j].patches[i] = "<c val=\"3498db\">CMD: @wireframe</c> added. ";
+    i+=1;patch_notes[player][j].patches[i] = "<c val=\"2ecc71\">UI: Names </c> All names, and subtitles now push related objects, such as the equipment panel, transport panel, or other information traditionally listed below the name/subtitle";
+    i+=1;patch_notes[player][j].patches[i] = "<c val=\"2ecc71\">UI: Description </c> Description UI updated to have a scrollbar, and has been resized.";
+    i+=1;patch_notes[player][j].patches[i] = "<c val=\"2ecc71\">UI: Control Groups </c> Controlgroups now have a proper ui integration.";
+    i+=1;patch_notes[player][j].patches[i] = "<c val=\"2ecc71\">UI: Color picker </c> Prints removed.";
+    i+=1;patch_notes[player][j].patches[i] = "<c val=\"2ecc71\">UI: Transport UI </c> Transport UI updated to new style.";
+    i+=1;patch_notes[player][j].patches[i] = "<c val=\"3498db\">CMD: _camera Editor </c> science vessel smoothing removed/replaced by point.";
+    i+=1;patch_notes[player][j].patches[i] = "<c val=\"3498db\">CMD: _camera Editor </c> panning moved to [Tab] key.";
+    i+=1;patch_notes[player][j].patches[i] = "<c val=\"3498db\">CMD: _camera Editor </c> pause functionallity remove.";
+    i+=1;patch_notes[player][j].patches[i] = "<c val=\"3498db\">CMD: _camera Editor </c> made pan speed relative to camera distance.";
+    i+=1;patch_notes[player][j].patches[i] = "<c val=\"3498db\">CMD: @decal </c> saves in cache.";
+    i+=1;patch_notes[player][j].patches[i] = "<c val=\"3498db\">CMD: @rotation </c> saves in cache with -ypr and -b.";
+    i+=1;patch_notes[player][j].patches[i] = "<c val=\"3498db\">CMD: @radius </c> saves in cache.";
+    i+=1;patch_notes[player][j].patches[i] = "<c val=\"3498db\">CMD: @statetname/@statetnamecolor </c> gamesetup unpack buck fixed.";
+    i+=1;patch_notes[player][j].patches[i] = "<c val=\"3498db\">CMD: @desc </c> added.";
+    i+=1;patch_notes[player][j].patches[i] = "<c val=\"3498db\">CMD: @descall </c> added.";
     
     i = 0;
-    patch_notes[player][1].version = "2.0.35";
-    patch_notes[player][1].patches[i] = "<c val=\"9b59b6\">ENG: Gamesetup Delay</c> The lowest gamesetup delay now multiplies by how many gamesetups are running. Meaning the max spawn rate for all gamesetups loading currently is now on a .3 second interval.";
-    i+=1;patch_notes[player][1].patches[i] = "<c val=\"3498db\">CMD: @maxenergy 0</c> sets stats to nothing now.";
-    i+=1;patch_notes[player][1].patches[i] = "<c val=\"3498db\">CMD: @maxshields 0</c> sets stats to nothing now.";
-    i+=1;patch_notes[player][1].patches[i] = "<c val=\"3498db\">CMD: @undo</c> added. It's still in works, I recommend not using it.";
-    i+=1;patch_notes[player][1].patches[i] = "<c val=\"3498db\">CMD: @rotation</c> cached.";
-    i+=1;patch_notes[player][1].patches[i] = "<c val=\"3498db\">CMD: @attach, @rotation</c> -nocache modifier added.";
-    i+=1;patch_notes[player][1].patches[i] = "<c val=\"3498db\">CMD: @face -rel</c> modifier added. Faces all selected units relative to one another.";
-    i+=1;patch_notes[player][1].patches[i] = "<c val=\"3498db\">CMD: @height Arithmetic</c> addition and subtraction support added in height. ";
-    i+=1;patch_notes[player][1].patches[i] = "<c val=\"3498db\">CMD: @removeweapon -all</c> modifier added. Removes all weapons a unit has. ";
-    i+=1;patch_notes[player][1].patches[i] = "<c val=\"3498db\">CMD: _doodads position</c> _doodads now supports x and y positions. ";
-    i+=1;patch_notes[player][1].patches[i] = "<c val=\"3498db\">CMD: _showterrain position</c> _showterrain now supports x and y positions. ";
-    i+=1;patch_notes[player][1].patches[i] = "<c val=\"3498db\">CMD: @face [delay]</c> @face now supports a new field for duration/delay. ";
-    i+=1;patch_notes[player][1].patches[i] = "<c val=\"3498db\">CMD: @radius</c> @radius now caches. ";
-    i+=1;patch_notes[player][1].patches[i] = "<c val=\"3498db\">CMD: !fog</c> added. ";
-    i+=1;patch_notes[player][1].patches[i] = "<c val=\"3498db\">CMD: !skybox</c> added. ";
-    i+=1;patch_notes[player][1].patches[i] = "<c val=\"3498db\">CMD: @subtitle</c> reworked. ";
-    i+=1;patch_notes[player][1].patches[i] = "<c val=\"3498db\">CMD: @subtitleall</c> replaced @subtitle. ";
-    i+=1;patch_notes[player][1].patches[i] = "<c val=\"3498db\">CMD: @rename</c> added. ";
-    i+=1;patch_notes[player][1].patches[i] = "<c val=\"3498db\">CMD: _camera editor on/off</c> added. Full fledged editor-like camera in game. ";
-    i+=1;patch_notes[player][1].patches[i] = "<c val=\"3498db\">CMD: >keypresses</c> ALOT more keyes added to keypress. Do >keypress help to look at them all. ";
-    i+=1;patch_notes[player][1].patches[i] = "<c val=\"2ecc71\">UI: Rework </c> All ui has been reworked and revised. New images and textures. ";
-    i+=1;patch_notes[player][1].patches[i] = "<c val=\"2ecc71\">UI: Updated Commands Guide</c> ";
-    i+=1;patch_notes[player][1].patches[i] = "<c val=\"2ecc71\">UI: Version Number </c> Version displays at the top of the screen. ";
-    i+=1;patch_notes[player][1].patches[i] = "<c val=\"2ecc71\">UI: Color Picker </c> added. ";
-    i+=1;patch_notes[player][1].patches[i] = "<c val=\"2ecc71\">UI: Patch Notes </c> added. ";
-    i+=1;patch_notes[player][1].patches[i] = "<c val=\"2ecc71\">UI: Attachpoint Checker </c> added. ";
-    i+=1;patch_notes[player][1].patches[i] = "<c val=\"2ecc71\">UI: Info </c> added. ";
-    i+=1;patch_notes[player][1].patches[i] = "<c val=\"2ecc71\">UI: Minimap </c> Reworked. ";
-    i+=1;patch_notes[player][1].patches[i] = "<c val=\"2ecc71\">UI: Unit Info Panel </c> reworked. ";
-    i+=1;patch_notes[player][1].patches[i] = "<c val=\"2ecc71\">UI: Unit Description </c> added. ";
-    i+=1;patch_notes[player][1].patches[i] = "<c val=\"2ecc71\">UI: False Names and Subtitles </c> added. ";
-    i+=1;patch_notes[player][1].patches[i] = "<c val=\"2ecc71\">UI: Command Panel </c> Reworked. ";
-    i+=1;patch_notes[player][1].patches[i] = "<c val=\"2ecc71\">UI: References </c> added. ";
-    i+=1;patch_notes[player][1].patches[i] = "<c val=\"2ecc71\">UI: General </c> an exit button has been added to all UIs. ";
-    i+=1;patch_notes[player][1].patches[i] = "<c val=\"2ecc71\">UI: Info </c> added a redirect to the getting started references. ";
+    j = j + 1;
+    patch_notes[player][j].version = "2.0.35";
+    patch_notes[player][j].patches[i] = "<c val=\"9b59b6\">ENG: Gamesetup Delay</c> The lowest gamesetup delay now multiplies by how many gamesetups are running. Meaning the max spawn rate for all gamesetups loading currently is now on a .3 second interval.";
+    i+=1;patch_notes[player][j].patches[i] = "<c val=\"3498db\">CMD: @maxenergy 0</c> sets stats to nothing now.";
+    i+=1;patch_notes[player][j].patches[i] = "<c val=\"3498db\">CMD: @maxshields 0</c> sets stats to nothing now.";
+    i+=1;patch_notes[player][j].patches[i] = "<c val=\"3498db\">CMD: @undo</c> added. It's still in works, I recommend not using it.";
+    i+=1;patch_notes[player][j].patches[i] = "<c val=\"3498db\">CMD: @rotation</c> cached.";
+    i+=1;patch_notes[player][j].patches[i] = "<c val=\"3498db\">CMD: @attach, @rotation</c> -nocache modifier added.";
+    i+=1;patch_notes[player][j].patches[i] = "<c val=\"3498db\">CMD: @face -rel</c> modifier added. Faces all selected units relative to one another.";
+    i+=1;patch_notes[player][j].patches[i] = "<c val=\"3498db\">CMD: @height Arithmetic</c> addition and subtraction support added in height. ";
+    i+=1;patch_notes[player][j].patches[i] = "<c val=\"3498db\">CMD: @removeweapon -all</c> modifier added. Removes all weapons a unit has. ";
+    i+=1;patch_notes[player][j].patches[i] = "<c val=\"3498db\">CMD: _doodads position</c> _doodads now supports x and y positions. ";
+    i+=1;patch_notes[player][j].patches[i] = "<c val=\"3498db\">CMD: _showterrain position</c> _showterrain now supports x and y positions. ";
+    i+=1;patch_notes[player][j].patches[i] = "<c val=\"3498db\">CMD: @face [delay]</c> @face now supports a new field for duration/delay. ";
+    i+=1;patch_notes[player][j].patches[i] = "<c val=\"3498db\">CMD: @radius</c> @radius now caches. ";
+    i+=1;patch_notes[player][j].patches[i] = "<c val=\"3498db\">CMD: !fog</c> added. ";
+    i+=1;patch_notes[player][j].patches[i] = "<c val=\"3498db\">CMD: !skybox</c> added. ";
+    i+=1;patch_notes[player][j].patches[i] = "<c val=\"3498db\">CMD: @subtitle</c> reworked. ";
+    i+=1;patch_notes[player][j].patches[i] = "<c val=\"3498db\">CMD: @subtitleall</c> replaced @subtitle. ";
+    i+=1;patch_notes[player][j].patches[i] = "<c val=\"3498db\">CMD: @rename</c> added. ";
+    i+=1;patch_notes[player][j].patches[i] = "<c val=\"3498db\">CMD: _camera editor on/off</c> added. Full fledged editor-like camera in game. ";
+    i+=1;patch_notes[player][j].patches[i] = "<c val=\"3498db\">CMD: >keypresses</c> ALOT more keyes added to keypress. Do >keypress help to look at them all. ";
+    i+=1;patch_notes[player][j].patches[i] = "<c val=\"2ecc71\">UI: Rework </c> All ui has been reworked and revised. New images and textures. ";
+    i+=1;patch_notes[player][j].patches[i] = "<c val=\"2ecc71\">UI: Updated Commands Guide</c> ";
+    i+=1;patch_notes[player][j].patches[i] = "<c val=\"2ecc71\">UI: Version Number </c> Version displays at the top of the screen. ";
+    i+=1;patch_notes[player][j].patches[i] = "<c val=\"2ecc71\">UI: Color Picker </c> added. ";
+    i+=1;patch_notes[player][j].patches[i] = "<c val=\"2ecc71\">UI: Patch Notes </c> added. ";
+    i+=1;patch_notes[player][j].patches[i] = "<c val=\"2ecc71\">UI: Attachpoint Checker </c> added. ";
+    i+=1;patch_notes[player][j].patches[i] = "<c val=\"2ecc71\">UI: Info </c> added. ";
+    i+=1;patch_notes[player][j].patches[i] = "<c val=\"2ecc71\">UI: Minimap </c> Reworked. ";
+    i+=1;patch_notes[player][j].patches[i] = "<c val=\"2ecc71\">UI: Unit Info Panel </c> reworked. ";
+    i+=1;patch_notes[player][j].patches[i] = "<c val=\"2ecc71\">UI: Unit Description </c> added. ";
+    i+=1;patch_notes[player][j].patches[i] = "<c val=\"2ecc71\">UI: False Names and Subtitles </c> added. ";
+    i+=1;patch_notes[player][j].patches[i] = "<c val=\"2ecc71\">UI: Command Panel </c> Reworked. ";
+    i+=1;patch_notes[player][j].patches[i] = "<c val=\"2ecc71\">UI: References </c> added. ";
+    i+=1;patch_notes[player][j].patches[i] = "<c val=\"2ecc71\">UI: General </c> an exit button has been added to all UIs. ";
+    i+=1;patch_notes[player][j].patches[i] = "<c val=\"2ecc71\">UI: Info </c> added a redirect to the getting started references. ";
     //<
-    patch_notes[player][2].version = "1.5.3";
-    patch_notes[player][2].patches[0] = "<c val=\"9b59b6\">ENG: Alias Recursion checking</c>, this checks if your aliases is recursive and prevents recursive aliases.";
-    patch_notes[player][2].patches[1] = "<c val=\"9b59b6\">ENG: Alias Syntax Checking</c>, this checks if your alias matches a command's key and prevents said keys from existing as aliases. ";
-    patch_notes[player][2].patches[2] = "<c val=\"3498db\">CMD: @move -all</c> was added, it moves all units on the map relative to your cursor.";
+    
+    i = 0;
+    j = j + 1;
+    patch_notes[player][j].version = "1.5.3";
+    i+=1;patch_notes[player][j].patches[i] = "<c val=\"9b59b6\">ENG: Alias Recursion checking</c>, this checks if your aliases is recursive and prevents recursive aliases.";
+    i+=1;patch_notes[player][j].patches[i] = "<c val=\"9b59b6\">ENG: Alias Syntax Checking</c>, this checks if your alias matches a command's key and prevents said keys from existing as aliases. ";
+    i+=1;patch_notes[player][j].patches[i] = "<c val=\"3498db\">CMD: @move -all</c> was added, it moves all units on the map relative to your cursor.";
+    
     i=0;
-    patch_notes[player][3].version = "1.4.5";
-    patch_notes[player][3].patches[i] = "<c val=\"9b59b6\">ENG: Bracket Parsing</c>, This allows commands to pre-parse input properly. Such as >repeat";
-    i+=1;patch_notes[player][3].patches[i] = "<c val=\"9b59b6\">ENG: Key Events Added</c>, This allows keys to be used in commands. ";
-    i+=1;patch_notes[player][3].patches[i] = "<c val=\"3498db\">CMD: >keypress</c> added. Which allows you to map keys to specified keys. ";
-    i+=1;patch_notes[player][3].patches[i] = "<c val=\"3498db\">CMD: >moveto</c> added. Moveto allows you to move units from a to b and run commands when they arrive.";
-    i+=1;patch_notes[player][3].patches[i] = "<c val=\"3498db\">CMD: >chance</c> finalized. Chance is a part of how randomizing outputs works in apex.";
-    i+=1;patch_notes[player][3].patches[i] = "<c val=\"3498db\">CMD: >random</c> debugged. Random is a part of how randomizing outputs works in apex. However it is not perfect, I recommend using >chance until further patches to it.";
+    j = j + 1;
+    patch_notes[player][j].version = "1.4.5";
+    patch_notes[player][j].patches[i] = "<c val=\"9b59b6\">ENG: Bracket Parsing</c>, This allows commands to pre-parse input properly. Such as >repeat";
+    i+=1;patch_notes[player][j].patches[i] = "<c val=\"9b59b6\">ENG: Key Events Added</c>, This allows keys to be used in commands. ";
+    i+=1;patch_notes[player][j].patches[i] = "<c val=\"3498db\">CMD: >keypress</c> added. Which allows you to map keys to specified keys. ";
+    i+=1;patch_notes[player][j].patches[i] = "<c val=\"3498db\">CMD: >moveto</c> added. Moveto allows you to move units from a to b and run commands when they arrive.";
+    i+=1;patch_notes[player][j].patches[i] = "<c val=\"3498db\">CMD: >chance</c> finalized. Chance is a part of how randomizing outputs works in apex.";
+    i+=1;patch_notes[player][j].patches[i] = "<c val=\"3498db\">CMD: >random</c> debugged. Random is a part of how randomizing outputs works in apex. However it is not perfect, I recommend using >chance until further patches to it.";
 
     i=0;
-    patch_notes[player][4].version = "1.3.4";
-    patch_notes[player][4].patches[i] = "<c val=\"9b59b6\">ENG: Prefix for pseudo pre-parsing change to ></c>";
-    i+=1;patch_notes[player][4].patches[i] = "<c val=\"9b59b6\">ENG: Parser bugs fixed </c> ";
-    i+=1;patch_notes[player][4].patches[i] = "<c val=\"3498db\">CMD: _repeat</c> First tested. ";
-    i+=1;patch_notes[player][4].patches[i] = "<c val=\"3498db\">CMD: _chance</c> First tested.";
-    i+=1;patch_notes[player][4].patches[i] = "<c val=\"3498db\">CMD: @unitmimic</c> added.";
-    i+=1;patch_notes[player][4].patches[i] = "<c val=\"3498db\">CMD: @position</c> updated.";
+    j = j + 1;
+    patch_notes[player][j].version = "1.3.4";
+    patch_notes[player][j].patches[i] = "<c val=\"9b59b6\">ENG: Prefix for pseudo pre-parsing change to ></c>";
+    i+=1;patch_notes[player][j].patches[i] = "<c val=\"9b59b6\">ENG: Parser bugs fixed </c> ";
+    i+=1;patch_notes[player][j].patches[i] = "<c val=\"3498db\">CMD: _repeat</c> First tested. ";
+    i+=1;patch_notes[player][j].patches[i] = "<c val=\"3498db\">CMD: _chance</c> First tested.";
+    i+=1;patch_notes[player][j].patches[i] = "<c val=\"3498db\">CMD: @unitmimic</c> added.";
+    i+=1;patch_notes[player][j].patches[i] = "<c val=\"3498db\">CMD: @position</c> updated.";
 
     i=0;
-    patch_notes[player][5].version = "1.2.12";
-    patch_notes[player][5].patches[i] = "<c val=\"9b59b6\">ENG: D8 Crashe</c> removed";
-    i+=1;patch_notes[player][5].patches[i] = "<c val=\"9b59b6\">ENG: Threaded Parser</c> made.";
-    i+=1;patch_notes[player][5].patches[i] = "<c val=\"9b59b6\">ENG: Carrier Crash</c> removed ";
-    i+=1;patch_notes[player][5].patches[i] = "<c val=\"9b59b6\">ENG: Broodlord Crash</c> removed ";
-    i+=1;patch_notes[player][5].patches[i] = "<c val=\"9b59b6\">ENG: Colossus Crash</c> removed ";
-    i+=1;patch_notes[player][5].patches[i] = "<c val=\"9b59b6\">ENG: Disable On Leave</c> added.(When player leaves they're disabled) ";
-    i+=1;patch_notes[player][5].patches[i] = "<c val=\"3498db\">CMD: @unitswap</c> added. ";
-    i+=1;patch_notes[player][5].patches[i] = "<c val=\"3498db\">CMD: @unitvar</c> added.";
-    i+=1;patch_notes[player][5].patches[i] = "<c val=\"3498db\">CMD: @context</c> added.";
-    i+=1;patch_notes[player][5].patches[i] = "<c val=\"3498db\">CMD: !destroy</c> added.";
-    i+=1;patch_notes[player][5].patches[i] = "<c val=\"3498db\">CMD: Improvements on @copy </c> Still broke.";
-    i+=1;patch_notes[player][5].patches[i] = "<c val=\"3498db\">CMD: SetScale/SetScale Absolute Actrmsg</c> Integrated with @setscaler.";
-    i+=1;patch_notes[player][5].patches[i] = "<c val=\"2ecc71\">UI: Model Previewer </c> removed. ";
+    j = j + 1;
+    patch_notes[player][j].version = "1.2.12";
+    patch_notes[player][j].patches[i] = "<c val=\"9b59b6\">ENG: D8 Crashe</c> removed";
+    i+=1;patch_notes[player][j].patches[i] = "<c val=\"9b59b6\">ENG: Threaded Parser</c> made.";
+    i+=1;patch_notes[player][j].patches[i] = "<c val=\"9b59b6\">ENG: Carrier Crash</c> removed ";
+    i+=1;patch_notes[player][j].patches[i] = "<c val=\"9b59b6\">ENG: Broodlord Crash</c> removed ";
+    i+=1;patch_notes[player][j].patches[i] = "<c val=\"9b59b6\">ENG: Colossus Crash</c> removed ";
+    i+=1;patch_notes[player][j].patches[i] = "<c val=\"9b59b6\">ENG: Disable On Leave</c> added.(When player leaves they're disabled) ";
+    i+=1;patch_notes[player][j].patches[i] = "<c val=\"3498db\">CMD: @unitswap</c> added. ";
+    i+=1;patch_notes[player][j].patches[i] = "<c val=\"3498db\">CMD: @unitvar</c> added.";
+    i+=1;patch_notes[player][j].patches[i] = "<c val=\"3498db\">CMD: @context</c> added.";
+    i+=1;patch_notes[player][j].patches[i] = "<c val=\"3498db\">CMD: !destroy</c> added.";
+    i+=1;patch_notes[player][j].patches[i] = "<c val=\"3498db\">CMD: Improvements on @copy </c> Still broke.";
+    i+=1;patch_notes[player][j].patches[i] = "<c val=\"3498db\">CMD: SetScale/SetScale Absolute Actrmsg</c> Integrated with @setscaler.";
+    i+=1;patch_notes[player][j].patches[i] = "<c val=\"2ecc71\">UI: Model Previewer </c> removed. ";
 
     i=0;
-    patch_notes[player][6].version = "1.1.5";
-    patch_notes[player][6].patches[i] = "<c val=\"9b59b6\">ENG: _alias</c> made equivalant to alias";
-    i+=1;patch_notes[player][6].patches[i] = "<c val=\"3498db\">CMD: @tint</c> now works properly.";
-    i+=1;patch_notes[player][6].patches[i] = "<c val=\"3498db\">CMD: _camera</c> added.";
-    i+=1;patch_notes[player][6].patches[i] = "<c val=\"3498db\">CMD: _info</c> added.";
-    i+=1;patch_notes[player][6].patches[i] = "<c val=\"3498db\">CMD: _upgrade</c> added.";
+    j = j + 1;
+    patch_notes[player][j].version = "1.1.5";
+    patch_notes[player][j].patches[i] = "<c val=\"9b59b6\">ENG: _alias</c> made equivalant to alias";
+    i+=1;patch_notes[player][j].patches[i] = "<c val=\"3498db\">CMD: @tint</c> now works properly.";
+    i+=1;patch_notes[player][j].patches[i] = "<c val=\"3498db\">CMD: _camera</c> added.";
+    i+=1;patch_notes[player][j].patches[i] = "<c val=\"3498db\">CMD: _info</c> added.";
+    i+=1;patch_notes[player][j].patches[i] = "<c val=\"3498db\">CMD: _upgrade</c> added.";
     for (i = 0; i < patch_count; i += 1) {
         // TODO:
         DialogControlAddItem(libapx_ui_patchnotes_list, PlayerGroupSingle(player), StringToText("<c val=\"ff0000\">Apex Patch </c> - "+patch_notes[player][i].version));

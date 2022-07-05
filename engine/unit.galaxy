@@ -9,7 +9,7 @@
 const string libapx_UNIT_NAME_DATA_TABLE_IDENTIFIER = ".NAME";
 const string libapx_UNIT_NAME_COLOR_DATA_TABLE_IDENTIFIER = ".NAME_COLOR";
 
-const int libapx_UNIT_CACHE_MAX_STRING_LENGTH = 500;
+const int gv_LibapxUnitCacheMaxStringLength = 500;
 const int libapx_UNIT_CACHE_OVERWRITE_CHECK_LIMIT = 10;
 const int libapx_UNIT_CACHE_LIMIT = -1;
 
@@ -376,6 +376,8 @@ text libapx_unit_get_name(unit u) {
 	return name;
 }
 
+
+
 // libapx_unit_data_remove
 // ======================
 // iterates through the unit's caches in data table and removes them
@@ -398,6 +400,9 @@ void libapx_unit_data_remove(unit u) {
 	}
 	if( DataTableValueExists(true, unit_id + libapx_UNIT_NAME_COLOR_DATA_TABLE_IDENTIFIER) ) {
 		DataTableValueRemove(true, unit_id + libapx_UNIT_NAME_COLOR_DATA_TABLE_IDENTIFIER);
+	}
+	if( DataTableValueExists(true, unit_id + libapx_UNIT_NAME_DATA_TABLE_IDENTIFIER) ) {
+		DataTableValueRemove(true, unit_id + libapx_UNIT_NAME_DATA_TABLE_IDENTIFIER);
 	}
 
 	// destroy any associated text tags
@@ -451,7 +456,7 @@ void libapx_unit_cache_update_add(unit subject, string unit_id, string user_comm
 		DataTableSetString(true, unit_id + "." + FixedToString(UnitGetCustomValue(subject, libapx_UNIT_INDEX_CACHE_COUNT), 0), cache);
 		return;
 	}
-	else if(StringLength(cache + "; " + user_command) <= libapx_UNIT_CACHE_MAX_STRING_LENGTH) {
+	else if(StringLength(cache + "; " + user_command) <= gv_LibapxUnitCacheMaxStringLength) {
 		
 		cache = cache + "; " + user_command;
 		DataTableSetString(true, unit_id + "." + FixedToString(UnitGetCustomValue(subject, libapx_UNIT_INDEX_CACHE_COUNT), 0), cache);
@@ -566,7 +571,7 @@ void libapx_unit_cache_update_overwrite(unit subject, string unit_id, string com
 		}
 	}
 
-	//otherwise update all proceeding caches to ensure they have max possible length < libapx_UNIT_CACHE_MAX_STRING_LENGTH
+	//otherwise update all proceeding caches to ensure they have max possible length < gv_LibapxUnitCacheMaxStringLength
 	while(i > 0) {
 		cache_next = DataTableGetString(true, unit_id + "." + IntToString(unit_caches - i + 1));
 
@@ -581,7 +586,7 @@ void libapx_unit_cache_update_overwrite(unit subject, string unit_id, string com
 		}
 
 		cmd_next = StringSub(cache_next, pos_start, pos_end);
-		if(StringLength(cache + "; " + cmd_next) <= libapx_UNIT_CACHE_MAX_STRING_LENGTH) { //remove comand from next cache, add to previous
+		if(StringLength(cache + "; " + cmd_next) <= gv_LibapxUnitCacheMaxStringLength) { //remove comand from next cache, add to previous
 			cache = cache + "; " + cmd_next;
 			cache_next = StringReplace(cache_next, "", pos_start, pos_end);
 
@@ -1002,6 +1007,58 @@ void libapx_unit_cache_update(unit subject, string command, string user_command)
 }
 
 
+
+//libapx_unit_cache_set
+//===========================================
+// Sets cache to input string
+// Removes all previous caches and sets cache to new cache
+void LibapxUnitCacheSet(unit u, string cache) {
+	string unit_id = FixedToString(UnitGetCustomValue(u, libapx_UNIT_INDEX_ID), 0);
+	int unit_caches = FixedToInt(UnitGetCustomValue(u, libapx_UNIT_INDEX_CACHE_COUNT));
+	int i = 1;
+	int owner;
+
+	if(!DataTableValueExists(true, unit_id + "." + IntToString(unit_caches))) {
+		UnitSetCustomValue(u, libapx_UNIT_INDEX_CACHE_COUNT, 1);
+		unit_caches = 1;
+	}
+
+	// remove caches:
+	while(i < unit_caches) {
+		DataTableValueRemove(true, unit_id + "." + IntToString(i));
+		i += 1;
+	}
+
+	UnitSetCustomValue(u, libapx_UNIT_INDEX_FLAG_TINT, 0); //"reset" tint
+	UnitSetCustomValue(u, libapx_UNIT_INDEX_FLAG_SCALE, 0); //"reset" scale
+	UnitSetCustomValue(u, libapx_UNIT_INDEX_FLAG_MS, 0); //"reset" modelswap
+	UnitSetCustomValue(u, libapx_UNIT_INDEX_FLAG_ANIMSPEED, 0); //"reset" animspeed
+	UnitSetCustomValue(u, libapx_UNIT_INDEX_FLAG_PLAY, 0); //"reset" play
+	UnitSetCustomValue(u, libapx_UNIT_INDEX_FLAG_STATBARS, 0); //"reset" statbars
+	UnitSetCustomValue(u, libapx_UNIT_INDEX_FLAG_ROTATE, 0); //"reset" rotate
+	UnitSetCustomValue(u, libapx_UNIT_INDEX_FLAG_DECAL, 0); //"reset" rotate
+
+	///Removed for now:tm:
+	UnitSetCustomValue(u, libapx_UNIT_INDEX_CACHE_COUNT, 1);
+	DataTableSetString(true, unit_id + "." + IntToString(1), cache);
+}
+
+//LibapxUnitCacheAdd
+//===========================================
+// Sets cache to input string
+// Removes all previous caches and sets cache to new cache
+void LibapxUnitCacheAdd(unit u, string cache) {
+	string unit_id = FixedToString(UnitGetCustomValue(u, libapx_UNIT_INDEX_ID), 0);
+	int unit_caches = FixedToInt(UnitGetCustomValue(u, libapx_UNIT_INDEX_CACHE_COUNT));
+	int i = 1;
+	int owner;
+	string currentCache = DataTableGetString(true, unit_id + "." + IntToString(unit_caches));
+
+
+
+	libapx_unit_cache_update_add(u, unit_id, cache);
+}
+
 void libapx_unit_keypress_check() {
 	int i;
 	unitgroup target;
@@ -1269,3 +1326,4 @@ void libapx_unit_keypress_check() {
 	}
 	return;
 }
+

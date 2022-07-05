@@ -10,7 +10,32 @@
 
 void libapx_update_camera();
 
+void LibApxManagePermissionUi(int p) { 
+    int permissionLevel = libapx_player[p].permission_level;
+    string permissionLevelText;
+    color permissionLevelColor;
+    if(permissionLevel == 0) {
+        permissionLevelText = "User";
+        permissionLevelColor = ColorWithAlpha(100,100,100,80);
+    }
+    
+    if(permissionLevel == 1) {
+        permissionLevelText = "Moderator";
+        permissionLevelColor = ColorWithAlpha(100,70,70,80);
+    }
+    
+    if(permissionLevel == 2) {
+        permissionLevelText = "Administrator";
+        permissionLevelColor = ColorWithAlpha(100,00,00,80);
+    }
+    if(permissionLevel == 3) {
+        permissionLevelText = "SadAdmin :'(";
+        permissionLevelColor = ColorWithAlpha(0,100,100,90);
+    }
 
+    libNtve_gf_SetDialogItemColor(libapx_player[p].permissionLevelUi, permissionLevelColor, PlayerGroupSingle(p));
+    libNtve_gf_SetDialogItemText(libapx_player[p].permissionLevelUi, StringToText(permissionLevelText), PlayerGroupSingle(p));
+}
 
 bool libapx_trig_ticker(bool testConds, bool runActions) {
     int p;
@@ -22,6 +47,8 @@ bool libapx_trig_ticker(bool testConds, bool runActions) {
     for (i = 1; i <= PlayerGroupCount(PlayerGroupActive()); i += 1) {
         p = PlayerGroupPlayer(PlayerGroupActive(), i);
         selected = UnitGroupSelected(p);
+
+        LibApxManagePermissionUi(p);
 
         if(UnitGroupCount(selected, c_unitCountAll) > 1 || UnitGroupCount(selected, c_unitCountAll) < 1) {
             libapx_player[p].name_display = false;

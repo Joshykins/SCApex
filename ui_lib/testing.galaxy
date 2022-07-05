@@ -1,0 +1,61 @@
+
+//.gxt
+struct example_struct {
+    int prop1;
+};
+
+example_struct modify_struct(example_struct input);
+
+
+
+void entry() {
+    example_struct my_struct;
+
+    my_struct = { prop1: 6 };
+
+    my_struct = modify_struct(my_struct);
+}
+
+example_struct modify_struct(example_struct input) {
+    input.prop1 = 15;
+
+    return input;
+}
+
+//Option1 translates to
+struct example_struct {
+    int prop1;
+};
+
+
+//We found example struct used from the transpilation
+const int TOTAL_EXAMPLE_STRUCT_USED = 1;
+const int CURRENT_EXAMPLE_STRUCT_USED = 0;
+int GET_EXAMPLE_STRUCT() {
+    int current = CURRENT_EXAMPLE_STRUCT_USED;
+    CURRENT_EXAMPLE_STRUCT_USED += 1;
+
+    return current;
+};
+
+example_struct[EXAMPLE_STRUCT_USED] gv_example_structs;
+
+
+
+void modify_struct(int input);
+
+void entry() {
+    my_struct = GET_EXAMPLE_STRUCT;
+    gv_example_structs[my_struct].prop1 = 6;
+
+    modify_struct(my_struct);
+    //Since implied return
+}
+
+
+void modify_struct(int input) {
+    example_struct local_example_struct;
+
+    //Since returning, just assign
+    gv_example_structs[input].prop1 = 15; 
+}
