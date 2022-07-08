@@ -2648,47 +2648,72 @@ void libapx_define_copy(string command_name) {
 // ===============
 // creates an effect at target units or at a point
 void libapx_command_effect(int user, unitgroup u, string argv, int spawningCount, string bracketText) {
-	unitgroup g = u;
-	string effect = StringWord( argv, 2 );
+    unitgroup g = u;
+    string effect = StringWord( argv, 2 );
+    bool usingcursor;
 
-	effect = libapx_catalog_get(c_gameCatalogEffect, effect);
-	if(effect == null) {
-		libapx_print_error(user, "<c val=\"ff0000\">Unable to create effect</c>: No such effect exists.");
-		return;
-	}
+    effect = libapx_catalog_get(c_gameCatalogEffect, effect);
+    if(effect == null) {
+        libapx_print_error(user, "<c val=\"ff0000\">Unable to create effect</c>: No such effect exists.");
+        return;
+    }
+    if(StringFind(argv, "-point" ,c_stringNoCase) != -1 ) {
+        argv =  StringReplaceWord(argv, "-point", "", 1, c_stringNoCase);
+        usingcursor = true;
+    }
 
-	if( UnitGroupCount(g, c_unitCountAll) != 0 ) {
-		UnitGroupLoopBegin(g);
-		while(!UnitGroupLoopDone()) {
-			if( libNtve_gf_PlayerCanCreateEffectOnUnit(user, effect, UnitGroupLoopCurrent()) ) {
-				PlayerCreateEffectUnit(user, effect, UnitGroupLoopCurrent());
-				libapx_unit_cache_update(UnitGroupLoopCurrent(), "@effect", argv);
-			}
-			else {
-				libapx_print_error(user, "<c val=\"ff0000\">Unable to create the effect.</c>");
-			}
-			UnitGroupLoopStep();
-		}
-		UnitGroupLoopEnd();
-	}
-	else {
-		if( libNtve_gf_PlayerCanCreateEffectAtPoint(user, StringWord(EventChatMessage(false), 2), libapx_player[user].mouse_position) ) {
-			PlayerCreateEffectPoint(user, effect, libapx_player[user].mouse_position);
-		}
-		else {
-			libapx_print_error(user, "<c val=\"ff0000\">Unable to create the effect.</c>");
-		}
-	}
+    if(usingcursor == true){
+        if( UnitGroupCount(g, c_unitCountAll) != 0 ) {
+            UnitGroupLoopBegin(g);
+            while(!UnitGroupLoopDone()) {
+                if( libNtve_gf_PlayerCanCreateEffectAtPoint(user, effect, libapx_player[user].mouse_position) ) {
+                    UnitCreateEffectPoint(UnitGroupLoopCurrent(), effect, libapx_player[user].mouse_position);
+                    libapx_unit_cache_update(UnitGroupLoopCurrent(), "@effect -point", argv);
+                }
+                else {
+                    libapx_print_error(user, "<c val=\"ff0000\">Unable to create the effect.</c>");
+                }
+                UnitGroupLoopStep();
+            }
+            UnitGroupLoopEnd();
+        }
+    }
 
-	return;
+    if(usingcursor == false){
+        if( UnitGroupCount(g, c_unitCountAll) != 0 ) {
+            UnitGroupLoopBegin(g);
+            while(!UnitGroupLoopDone()) {
+                if( libNtve_gf_PlayerCanCreateEffectOnUnit(user, effect, UnitGroupLoopCurrent()) ) {
+                    PlayerCreateEffectUnit(user, effect, UnitGroupLoopCurrent());
+                    libapx_unit_cache_update(UnitGroupLoopCurrent(), "@effect", argv);
+                }
+                else {
+                    libapx_print_error(user, "<c val=\"ff0000\">Unable to create the effect.</c>");
+                }
+                UnitGroupLoopStep();
+            }
+            UnitGroupLoopEnd();
+        }
+        else {
+            if( libNtve_gf_PlayerCanCreateEffectAtPoint(user, StringWord(EventChatMessage(false), 2), libapx_player[user].mouse_position) ) {
+                PlayerCreateEffectPoint(user, effect, libapx_player[user].mouse_position);
+            }
+            else {
+                libapx_print_error(user, "<c val=\"ff0000\">Unable to create the effect.</c>");
+            }
+        }
+    }
+
+    return;
 }
 void libapx_define_effect(string command_name) {
-	commands_guide_entry_set(
-		g_commands_guide_entry_unit, 
-		command_name, 
-		" This command creates an effect at a units position. <br> @effect [effectname] <br> Examples: <br> @effect MercenaryShield"
-	);
+    commands_guide_entry_set(
+        g_commands_guide_entry_unit, 
+        command_name, 
+        " This command creates an effect at a units position. <br> @effect [effectname] <br> Examples: <br> @effect MercenaryShield"
+    );
 }
+
 
 // libapx_command_kills
 // ==============
