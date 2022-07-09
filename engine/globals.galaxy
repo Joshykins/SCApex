@@ -113,7 +113,7 @@ void LibapxGlobalsInit() {
 
 }
 
-string LibapxCommandsGuideEntrySet(int entryType) {
+string LibapxCommandsGuideGetEntryType(int entryType) {
     if(entryType == gv_CommandsGuideEntryAdmin) {
         return "Admin";
     } 
@@ -193,12 +193,12 @@ void commandGuideFormatDescription(int dialog, playergroup pg, string descriptio
 
 commandGuideTypeCount gCommandGuideTypeCount;
 
-commandsGuideEntry[500] gCommandsGuideEntries;
+commandsGuideEntry[500] gv_CommandsGuideEntries;
 
-int commandsGuideEntryCount = 0;
+int gv_CommandsGuideEntryCount = 0;
 
 
-void commandsGuideEntrySet(int type, string name, string description) {
+void LibapxCommandsGuideEntrySet(int type, string name, string description) {
     if (type == gv_CommandsGuideEntryAdmin) {
         gCommandGuideTypeCount.Admin += 1;
     }
@@ -217,34 +217,34 @@ void commandsGuideEntrySet(int type, string name, string description) {
     if (type == gv_CommandsGuideEntryStats) {
         gCommandGuideTypeCount.Stats += 1;
     }
-    gCommandsGuideEntries[commandsGuideEntryCount].type = type;
-    gCommandsGuideEntries[commandsGuideEntryCount].name = name;
-    gCommandsGuideEntries[commandsGuideEntryCount].description = description;
-    commandsGuideEntryCount += 1;
+    gv_CommandsGuideEntries[gv_CommandsGuideEntryCount].type = type;
+    gv_CommandsGuideEntries[gv_CommandsGuideEntryCount].name = name;
+    gv_CommandsGuideEntries[gv_CommandsGuideEntryCount].description = description;
+    gv_CommandsGuideEntryCount += 1;
 }
 
-void commandGuidePresetDescriptions() {
-    commandsGuideEntrySet(
+void LibapxGuidePresetDescriptions() {
+    LibapxCommandsGuideEntrySet(
 		gv_CommandsGuideEntryActor, 
 		"What are actors?", 
         " Actors are essentially everything you attach to a unit. Anytime you spawn a unit the unit creates the respective units actor. Usually these things are named the same (@spawn marine = @attach marine). <br> <br> That means any command under the actor cateogry doesn't apply to the entire unit. It only applies to the \"main\" actor of the unit. Aka the last actor that was attached or created. Or the actor you target with @target. This is a critical piece of understanding to becoming a good modeler. <br> <br> Extra info: <br> The first actor of a unit carries some of it's commands onto the later actors of the unit. For instance if you do <br> @spawn marine;@tint 255;@attach marine head <br> The first marine will be tinted red aswell as the second marine. That is because the second marine copied the first marine's commands. "
     );
-    commandsGuideEntrySet(
+    LibapxCommandsGuideEntrySet(
 		gv_CommandsGuideEntryGeneral, 
 		"Alias", 
         " This command creates, removes an alias. It can also list all your aliases. <br> alias [aliasname] [commands.. <br> Examples: <br> alias create s @spawn <br> alias create orc1 @spawn marine;@renameall orc;@tint 0 255 <br> alias remove s <br> alias list <br> alias removeall   "
     ); 
-    commandsGuideEntrySet(
+    LibapxCommandsGuideEntrySet(
 		gv_CommandsGuideEntryGeneral, 
 		"<<", 
         " If you start typing with everything you type afterwards will be display. Regardless of if it's a command or an alias/macro/variable. <br> Examples: <br> << @spawn goat doesn't work man!; what do you mean son?;Idk!  "
     ); 
-    commandsGuideEntrySet(
+    LibapxCommandsGuideEntrySet(
 		gv_CommandsGuideEntryGeneral, 
 		"\\;", 
         " If you preceed a semicolen with a slash the colen will display reguarly and not break apart statements like it usually does.  "
     );
-    commandsGuideEntrySet(
+    LibapxCommandsGuideEntrySet(
 		gv_CommandsGuideEntryGeneral, 
 		";", 
         " Semicolens break apart statements and commands. It's is vital to entering more than one command at a time or creating complicated aliases.  "

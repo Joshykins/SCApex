@@ -508,7 +508,7 @@ void LibapxCommandCamera(int user, unitgroup u, string argv, int spawningCount, 
 	}
 }
 void LibapxDefineCamera(string commandName) {
-	commandsGuideEntrySet(
+	LibapxCommandsGuideEntrySet(
 		gv_CommandsGuideEntryGeneral, 
 		commandName, 
 		" This command changes the players camera. <br> The properties it can use are AngleOfAttack, DepthOfField, Distance, FalloffEnd, FalloffStart, FarClip, FieldOfView, FocalDepth, HeightOffset, NearClip, Roll, Rotation, ShadowClip, and editor <br> Camera [property/reset] <br> Examples: Camera roll 90 <br> Camera reset <br> Camera editor on (This enables an entirely new camera)");
@@ -575,7 +575,7 @@ void LibapxCommandUpgrade(int user, unitgroup u, string argv, int spawningCount,
     return;
 }
 void LibapxDefineUpgrade(string commandName) {
-	commandsGuideEntrySet(
+	LibapxCommandsGuideEntrySet(
 		gv_CommandsGuideEntryGeneral, 
 		commandName, 
 		" This command modifies or changes the upgrades you have. <br> Upgrade upgradename [on/off/query/number] <br> Examples: <br> Upgrade TerranInfantryArmorslevel3 on <br> Upgrade TerranInfantryArmorslevel3 off ");
@@ -592,7 +592,7 @@ void LibapxCommandInfo(int user, unitgroup u, string argv, int spawningCount, st
 	LibapxPrintOutput(user, "Report bugs at serobliss2@gmail.com");
 }
 void LibapxDefineInfo(string commandName) {
-	commandsGuideEntrySet(
+	LibapxCommandsGuideEntrySet(
 		gv_CommandsGuideEntryGeneral, 
 		commandName, 
 		" This command gives information about the engine and it's version. <br> Info <br> Examples: <br> Info ");
@@ -616,7 +616,7 @@ void LibapxCommandApi(int user, unitgroup u, string argv, int spawningCount, str
 	}
 }
 void LibapxDefineApi(string commandName) {
-	commandsGuideEntrySet(
+	LibapxCommandsGuideEntrySet(
 		gv_CommandsGuideEntryGeneral, 
 		commandName, 
 		" This commands allows you to turn on and off the api. When it turns off the strings collected are inputed as a chat message. ");
@@ -631,7 +631,7 @@ void LibapxCommandListCommands(int user, unitgroup u, string argv, int spawningC
 	LibapxPrintOutput(user, "LISTING GAME COMMANDS:\n" + gv_LibapxSettings.commands);
 }
 void LibapxDefineListCommands(string commandName) {
-	commandsGuideEntrySet(
+	LibapxCommandsGuideEntrySet(
 		gv_CommandsGuideEntryGeneral, 
 		commandName, 
 		" This command lists all the available commands possible. <br> Commands <br> Examples: <br> Commands ");
@@ -680,7 +680,7 @@ bool LibapxDelayTrigger(bool testConds,bool runActions) {
 	return true;
 }
 void LibapxDefineDelay(string commandName) {
-	commandsGuideEntrySet(
+	LibapxCommandsGuideEntrySet(
 		gv_CommandsGuideEntryGeneral, 
 		commandName, 
 		" This command waits a given amount of time before allowing more commands to be ran. <br> Delay [time] <br> Examples: <br> @spawn marine; Delay 5 ; @attach marine head ");
@@ -721,7 +721,7 @@ void LibapxCommandPlayers(int user, unitgroup u, string argv, int spawningCount,
 	LibapxPrintText(PlayerGroupSingle(user), output);
 }
 void LibapxDefinePlayers(string commandName) {
-	commandsGuideEntrySet(
+	LibapxCommandsGuideEntrySet(
 		gv_CommandsGuideEntryGeneral, 
 		commandName, 
 		" This command prints out the permission level, color, and status of all the players in the game. <br> Players <br> Examples: <br> Players ");
@@ -846,7 +846,7 @@ void LibapxCommandGamesetup(int user, unitgroup u, string argv, int spawningCoun
 	}
 }
 void LibapxDefineGamesetup(string commandName) {
-	commandsGuideEntrySet(
+	LibapxCommandsGuideEntrySet(
 		gv_CommandsGuideEntryGeneral, 
 		commandName, 
 		" This command allows you to save all of your units on the map and reload them at a later point. <br> Gamesetup [save/load/list/remove/removeall] [gamesetupName] <br> Examples: <br> Gamesetup save bob <br> Gamesetup list <br> Gamesetup remove bob <br> Gamesetup removeall ");
@@ -919,7 +919,7 @@ void LibapxCommandControl(int user, unitgroup u, string argv, int spawningCount,
 	return;
 }
 void LibapxDefineControl(string commandName) {
-	commandsGuideEntrySet(
+	LibapxCommandsGuideEntrySet(
 		gv_CommandsGuideEntryGeneral, 
 		commandName, 
 		" This command allows your units to be controled by the target player. <br> Control [targetplayer] <br> Examples: <br> Control brown ");
@@ -992,7 +992,7 @@ void LibapxCommandUncontrol(int user, unitgroup u, string argv, int spawningCoun
 	return;
 }
 void LibapxDefineUncontrol(string commandName) {
-	commandsGuideEntrySet(
+	LibapxCommandsGuideEntrySet(
 		gv_CommandsGuideEntryGeneral, 
 		commandName, 
 		" This command disallows your units to be controled by the target player. <br> Uncontrol [targetplayer] <br> Examples: <br> Uncontrol brown ");
@@ -1061,7 +1061,7 @@ void LibapxCommandAlly(int user, unitgroup u, string argv, int spawningCount, st
 
 }
 void LibapxDefineAlly(string commandName) {
-	commandsGuideEntrySet(
+	LibapxCommandsGuideEntrySet(
 		gv_CommandsGuideEntryGeneral, 
 		commandName, 
 		" This command allies the player you target. This also means they ally you. <br> Ally [targetplayer] <br> Examples: <br> Ally brown ");
@@ -1121,7 +1121,7 @@ void LibapxCommandUnally(int user, unitgroup u, string argv, int spawningCount, 
 }
 
 void LibapxDefineUnally(string commandName) {
-	commandsGuideEntrySet(
+	LibapxCommandsGuideEntrySet(
 		gv_CommandsGuideEntryGeneral, 
 		commandName, 
 		" This command unallies the player you target. This also means they unally you. <br> Unally [targetplayer] <br> Examples: <br> Unally brown ");
@@ -1166,7 +1166,7 @@ void LibapxCommandRoll(int user, unitgroup u, string argv, int spawningCount, st
 
 }
 void LibapxDefineRoll(string commandName) {
-	commandsGuideEntrySet(
+	LibapxCommandsGuideEntrySet(
 		gv_CommandsGuideEntryGeneral, 
 		commandName, 
 		" This command rolls a dice or finds a random number in a given range. <br> Roll [dice/min] [max] <br> Examples: <br> Roll <br> Roll 3 5 <br> Roll 5 3 <br> Roll 5d15 ");
@@ -1313,7 +1313,7 @@ void LibapxCommandSearch(int user, unitgroup u, string argv, int spawningCount, 
 	return;
 }
 void LibapxDefineSearch(string commandName) {
-	commandsGuideEntrySet(
+	LibapxCommandsGuideEntrySet(
 		gv_CommandsGuideEntryGeneral, 
 		commandName, 
 		" This command searches a catalog for whatever keywords you give it. It prints out a set number of results that can be paged through with just typing Search again. <br> Catalogs = ability|actor|behavior|weapon|validator|upgrade|unit|turret|light|footprint|model|decal <br> Search [catalog] [keys.. <br> Examples: <br> Search actor marine <br> Search model wall ; Delay 1 ; Search <br> Search model temple wall aiur ");
@@ -1426,7 +1426,7 @@ void LibapxCommandReplace(int user, unitgroup u, string argv, int spawningCount,
 	return;
 }
 void LibapxDefineReplace(string commandName) {
-	commandsGuideEntrySet(
+	LibapxCommandsGuideEntrySet(
 		gv_CommandsGuideEntryGeneral, 
 		commandName, 
 		" This command replaces a thing in a given catalog. <br> Catalogs = ability|actor|behavior|weapon|validator|upgrade|unit|turret|light|footprint|model|decal <br> Replace [catalog] [source] [replacement] <br> Examples: <br> Replace model marine marauder ;@spawn marine  ");
@@ -1446,7 +1446,7 @@ void LibapxCommandMinerals(int user, unitgroup u, string argv, int spawningCount
     return;
 }
 void LibapxDefineMinerals(string commandName) {
-	commandsGuideEntrySet(
+	LibapxCommandsGuideEntrySet(
 		gv_CommandsGuideEntryGeneral, 
 		commandName, 
 		" This command sets your minerals amount. <br> Minerals [amount] <br> Examples: <br> Minerals 1000 ");
@@ -1460,7 +1460,7 @@ void LibapxCommandGas(int user, unitgroup u, string argv, int spawningCount, str
     return;
 }
 void LibapxDefineGas(string commandName) {
-	commandsGuideEntrySet(
+	LibapxCommandsGuideEntrySet(
 		gv_CommandsGuideEntryGeneral, 
 		commandName, 
 		" This command sets your gas amount. <br> Gas [amount] <br> Examples: <br> Gas 1000 ");
@@ -1474,7 +1474,7 @@ void LibapxCommandTerrazine(int user, unitgroup u, string argv, int spawningCoun
     return;
 }
 void LibapxDefineTerrazine(string commandName) {
-	commandsGuideEntrySet(
+	LibapxCommandsGuideEntrySet(
 		gv_CommandsGuideEntryGeneral, 
 		commandName, 
 		" This command sets your terrazine amount. <br> Terrazine [amount] <br> Examples: <br> Terrazine 1000 ");
@@ -1491,7 +1491,7 @@ void LibapxCommandSupply(int user, unitgroup u, string argv, int spawningCount, 
     return;
 }
 void LibapxDefineSupply(string commandName) {
-	commandsGuideEntrySet(
+	LibapxCommandsGuideEntrySet(
 		gv_CommandsGuideEntryGeneral, 
 		commandName, 
 		" This command sets your max supply. <br> Supply [amount] <br> Examples: <br> Supply 250 ");
@@ -1588,7 +1588,7 @@ void LibapxCommandSuper(int user, unitgroup u, string argv, int spawningCount, s
 	return;
 }
 void LibapxDefineSuper(string commandName) {
-	commandsGuideEntrySet(
+	LibapxCommandsGuideEntrySet(
 		gv_CommandsGuideEntryGeneral, 
 		commandName, 
 		" A debug command. <br>  ");
@@ -1614,7 +1614,7 @@ void LibapxCommandZoom(int user, unitgroup u, string argv, int spawningCount, st
 	return;
 }
 void LibapxDefineZoom(string commandName) {
-	commandsGuideEntrySet(
+	LibapxCommandsGuideEntrySet(
 		gv_CommandsGuideEntryGeneral, 
 		commandName, 
 		" This command sets a players zoom level. <br> Zoom [distance] <br> Examples: <br> Zoom 128 <br> Zoom 5 ");
@@ -1636,7 +1636,7 @@ void libpaxCommandPrint(int user, unitgroup u, string argv, int spawningCount, s
 }
 
 void LibapxDefinePrint(string commandName) {
-	commandsGuideEntrySet(
+	LibapxCommandsGuideEntrySet(
 		gv_CommandsGuideEntryGeneral, 
 		commandName, 
 		" This command prints it's input to the user <br> Print [text] <br> Examples: <br> Print I went to the mall and bought a smoothie ");
@@ -1657,7 +1657,7 @@ void libpaxCommandGetPlayerhandle(int user, unitgroup u, string argv, int spawni
 	return;
 }
 void LibapxDefineGetPlayerhandle(string commandName) {
-	commandsGuideEntrySet(
+	LibapxCommandsGuideEntrySet(
 		gv_CommandsGuideEntryGeneral, 
 		commandName, 
 		" This command displays a persons player handle to you. <br> Handle [playercolor] <br> Examples: <br> Handle red ");
@@ -1672,7 +1672,7 @@ void libpaxCommandRelink(int user, unitgroup u, string argv, int spawningCount, 
 	return;
 }
 void LibapxDefineRelink(string commandName) {
-	commandsGuideEntrySet(
+	LibapxCommandsGuideEntrySet(
 		gv_CommandsGuideEntryGeneral, 
 		commandName, 
 		" This command displays the link to the Official Starcraft2 Roleplay Discord server. Come join us! <br> Relink <br> Examples: <br> Relink ");
@@ -1768,7 +1768,7 @@ void LibapxCommandBlacklist(int user, unitgroup u, string argv, int spawningCoun
 	return;
 }
 void LibapxDefineBlacklist(string commandName) {
-	commandsGuideEntrySet(
+	LibapxCommandsGuideEntrySet(
 		gv_CommandsGuideEntryGeneral, 
 		commandName, 
 		" This command blacklists a player from joining a lobby where you are admin in. <br> Blacklist [add/remove/removeall/list] [player] <br> Examples: <br> Blacklist add purple <br> Blacklist remove purple <br> Blacklist list <br> Blacklist removeall ");
@@ -1817,7 +1817,7 @@ void LibapxCommandShowterrain(int user, unitgroup u, string argv, int spawningCo
 	return;
 }
 void LibapxDefineShowterrain(string commandName) {
-	commandsGuideEntrySet(
+	LibapxCommandsGuideEntrySet(
 		gv_CommandsGuideEntryGeneral, 
 		commandName, 
 		" This command turns the terrain cells a region or radius on or off. (Invisible or visible) <br> Showterrain [on/off] [radius/region] [posX] [posY] <br> Examples: <br> Showterrain 15 off <br>  Showterrain 15 off <br> 50 50 #create myregion 15;Showterrain #myregion off ");
@@ -1880,7 +1880,7 @@ void LibapxCommandDoodads(int user, unitgroup u, string argv, int spawningCount,
 	return;
 }
 void LibapxDefineDoodads(string commandName) {
-	commandsGuideEntrySet(
+	LibapxCommandsGuideEntrySet(
 		gv_CommandsGuideEntryGeneral, 
 		commandName, 
 		" This command turns the doodads in a region or radius on or off. <br> Doodads [on/off] [radius/region] [posX] [posY] <br> Examples: <br> Doodads 15 off <br> Doodads 15 off 50 50 <br> #create myregion 15;Doodads #myregion off ");
@@ -1961,7 +1961,7 @@ void LibapxCommandEvent(int user, unitgroup u, string argv, int spawningCount, s
 	gv_LibapxPlayer[user].doneParsing = true;
 }
 void LibapxDefineEvent(string commandName) {
-	commandsGuideEntrySet(
+	LibapxCommandsGuideEntrySet(
 		gv_CommandsGuideEntryGeneral, 
 		commandName, 
 		" A debug command. <br>  ");
@@ -1974,7 +1974,7 @@ void LibapxCommandSound(int user, unitgroup u, string argv, int spawningCount, s
 
 }
 void LibapxDefineSound(string commandName) {
-	commandsGuideEntrySet(
+	LibapxCommandsGuideEntrySet(
 		gv_CommandsGuideEntryGeneral, 
 		commandName, 
 		" will do stuff  ");
@@ -1994,7 +1994,7 @@ void LibapxCommandCamerapan(int user, unitgroup u, string argv, int spawningCoun
 	CameraPan(user, target, duration, 0, 1, true);
 }
 void LibapxDefineCamerapan(string commandName) {
-	commandsGuideEntrySet(
+	LibapxCommandsGuideEntrySet(
 		gv_CommandsGuideEntryGeneral, 
 		commandName, 
 		" This command moves your camera to a given position. <br> Camera [x] [y] [duration] <br> Examples: <br> Camerapan 125 50 3  ");
@@ -2023,7 +2023,7 @@ void LibapxCommandReloadbank(int user, unitgroup u, string argv, int spawningCou
 }	
 
 void LibapxDefineReloadbank(string commandName) {
-	commandsGuideEntrySet(
+	LibapxCommandsGuideEntrySet(
 		gv_CommandsGuideEntryGeneral, 
 		commandName, 
 		"This command reloads your bank. <br> Reloadbank <br> Examples: <br> Reloadbank");
@@ -2045,7 +2045,7 @@ void LibapxCommandHelpmessages(int user, unitgroup u, string argv, int spawningC
 }
 
 void LibapxDefineHelpmessages(string commandName) {
-	commandsGuideEntrySet(
+	LibapxCommandsGuideEntrySet(
 		gv_CommandsGuideEntryGeneral, 
 		commandName, 
 		"This command toggles help messages. <br> Helpmessages on/off <br> Examples: <br> Helpmessages off");
@@ -2193,7 +2193,7 @@ void LibapxCommandDataedit(int user, unitgroup u, string argv, int spawningCount
 }
 
 void LibapxDefineDataedit(string commandName) {
-	commandsGuideEntrySet(
+	LibapxCommandsGuideEntrySet(
 		gv_CommandsGuideEntryGeneral, 
 		commandName, 
 		" This command is used to change player data's category field values. <br> Dataedit [Category] [CategoryEntry] [EntryField] [FieldValue] <br> Examples: <br> Dataedit Unit Marauder LifeMax 555  ");

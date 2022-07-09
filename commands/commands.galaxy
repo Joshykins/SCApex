@@ -22,7 +22,7 @@ void LibapxCommandsInitialize() {
 	// debug commands
 	// LibapxChatCommandCreate(">sort", LibapxCommandSort);
 
-	commandGuidePresetDescriptions();
+	LibapxGuidePresetDescriptions();
 	// general commands - done in cmd guide
 	LibapxChatCommandCreate("_info", LibapxCommandInfo, LibapxDefineInfo);
 	LibapxChatCommandCreate("_commands", LibapxCommandListCommands, LibapxDefineListCommands);

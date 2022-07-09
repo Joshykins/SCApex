@@ -20,7 +20,7 @@ void LibapxCommandKill(int user, unitgroup u, string argv, int spawningCount, st
 	UnitGroupLoopEnd();
 }
 void LibapxDefineKill(string commandName) {
-	commandsGuideEntrySet(
+	LibapxCommandsGuideEntrySet(
 		gv_CommandsGuideEntryUnit, 
 		commandName, 
 		" This command kills a unit, meaning all it's actors play their death animations. <br> @kill <br> Examples: <br> @kill "
@@ -40,7 +40,7 @@ void LibapxCommandRemove(int user, unitgroup u, string argv, int spawningCount, 
 	UnitGroupLoopEnd();
 }
 void LibapxDefineRemove(string commandName) {
-	commandsGuideEntrySet(
+	LibapxCommandsGuideEntrySet(
 		gv_CommandsGuideEntryUnit, 
 		commandName, 
 		" This command removess a unit, this means it and all it's actors are immediately removed. <br> @remove <br> Examples: <br> @remove "
@@ -82,7 +82,7 @@ void LibapxCommandUnitvar(int user, unitgroup u, string argv, int spawningCount,
 
 }
 void LibapxDefineUnitvar(string commandName) {
-	commandsGuideEntrySet(
+	LibapxCommandsGuideEntrySet(
 		gv_CommandsGuideEntryUnit, 
 		commandName, 
 		" This command makes the unit(s) have a name to be refered to later with @context. It does very little on it's own. <br> @unitvar [modifier] [name] <br> The modifier for this command is -add, this modifier changes the commands default behavior of replacing the variable with the new one you set, and instead adds it to the new one. <br> Examples: <br> @unitvar bob <br> @unitvar -add bobross <br> @spawn marauder;@unitvar bobross;@spawn marine;@context bobross;@scale 3  "
@@ -101,7 +101,7 @@ void LibapxCommandContext(int user, unitgroup u, string argv, int spawningCount,
 	// LibapxSetTarget(int player, unitgroup target, int spawningCount)
 }
 void LibapxDefineContext(string commandName) {
-	commandsGuideEntrySet(
+	LibapxCommandsGuideEntrySet(
 		gv_CommandsGuideEntryUnit, 
 		commandName, 
 		" This command changes what unit commands apply to by refering to the names set by @unitvar. It does very little on it's own. <br> @context [unitvariable] <br> Examples: <br> @context trevor <br> @spawn marauder;@unitvar bobross;@spawn marine;@context bobross;@scale 3 <br>   "
@@ -129,7 +129,7 @@ void LibapxCommandWireframe(int user, unitgroup u, string argv, int spawningCoun
 	}
 }
 void LibapxDefineWireframe(string commandName) {
-	commandsGuideEntrySet(
+	LibapxCommandsGuideEntrySet(
 		gv_CommandsGuideEntryUnit, 
 		commandName, 
 		" This command changes the wireframe of a unit. The wireframe specified must have been created in the wireframe editor in the UI on the left. <br> @wireframe [wireframe] <br> Examples: <br> @wireframe <br> @wireframe mywireframe <br> "
@@ -191,7 +191,7 @@ void LibapxCommandUnitswap(int user, unitgroup u, string argv, int spawningCount
 
 }
 void LibapxDefineUnitswap(string commandName) {
-	commandsGuideEntrySet(
+	LibapxCommandsGuideEntrySet(
 		gv_CommandsGuideEntryUnit, 
 		commandName, 
 		" This command swaps out the selected units with a new unit. By default the unit it swaps with is BeaconNova. <br> @unitswap [unitname] <br> Examples: <br> @unitswap <br> @unitswap marauder <br> @spawn marine 25;Delay 3;@unitswap;@modelswap dynamicgrass "
@@ -256,7 +256,7 @@ void LibapxCommandUnitmimic (int user, unitgroup u, string argv, int spawningCou
 }
 
 void LibapxDefineUnitmimic(string commandName) {
-	commandsGuideEntrySet(
+	LibapxCommandsGuideEntrySet(
 		gv_CommandsGuideEntryUnit, 
 		commandName, 
 		" This command spawns a new unit at the same position of the selected unit, by default this new unit is BeaconNova. <br> @unitmimic [unitname] <br> Examples: <br> @spawn marine;@unitmimic <br> @unitmimic marauder  "
@@ -316,7 +316,7 @@ void LibapxCommandMove (int user, unitgroup u, string argv, int spawningCount, s
 	return;
 }
 void LibapxDefineMove(string commandName) {
-	commandsGuideEntrySet(
+	LibapxCommandsGuideEntrySet(
 		gv_CommandsGuideEntryUnit, 
 		commandName, 
 		" This command moves units to your mousepoint. It has a modifier called -all which selects all units on the map to be moved. <br> @move [modifiers] <br> Examples: <br> @spawn marine 25;Delay 2;@move <br> @move -all <br> (@move -all will move all units on the map, be careful.) "
@@ -500,7 +500,7 @@ void LibapxCommandPosition (int user, unitgroup u, string argv, int spawningCoun
 }
 
 void LibapxDefinePosition(string commandName) {
-	commandsGuideEntrySet(
+	LibapxCommandsGuideEntrySet(
 		gv_CommandsGuideEntryUnit, 
 		commandName, 
 		" This command sets the position of a unit. It has a modifier called -rel which positions the units relative to where the unit is facing. <br> @position [modifiers] [x] [y] <br> Examples: <br> @position 125 125 <br> @position +0 +4 <br> @position -rel +0 -3 "
@@ -530,7 +530,7 @@ void LibapxCommandRemovearea(int user, unitgroup u, string argv, int spawningCou
 	libNtve_gf_RemoveDeathModelsinRegion( RegionCircle( gv_LibapxPlayer[user].mousePosition, radius) );
 }
 void LibapxDefineRemovearea(string commandName) {
-	commandsGuideEntrySet(
+	LibapxCommandsGuideEntrySet(
 		gv_CommandsGuideEntryUnit, 
 		commandName, 
 		" This command removes all units in a given radius. It only removes units that you own, or units owned by a player of an inferior permission level(admin>mod>user) <br> @removearea [radius] <br> Examples: <br> @removearea 3 "
@@ -556,7 +556,7 @@ void LibapxCommandSelectarea(int user, unitgroup u, string argv, int spawningCou
 	UnitGroupSelect(g, user, true);
 }
 void LibapxDefineSelectarea(string commandName) {
-	commandsGuideEntrySet(
+	LibapxCommandsGuideEntrySet(
 		gv_CommandsGuideEntryUnit, 
 		commandName, 
 		" This command selects all units you own in a given radius. <br> @selectarea [radius] <br> Examples: <br> @selectarea 3 "
@@ -619,7 +619,7 @@ void LibapxCommandCache(int user, unitgroup u, string argv, int spawningCount, s
 	return;
 }
 void LibapxDefineCache(string commandName) {
-	commandsGuideEntrySet(
+	LibapxCommandsGuideEntrySet(
 		gv_CommandsGuideEntryUnit, 
 		commandName, 
 		" This command prints out the number of caches the unit has or the content within those caches. It can also set the caches of, or add caches to a unit. <br> @cache [cachenumber] <br> @cache -set/-add [anything you want]  <br> Examples: <br> @cache (lists command cache amount) <br> @cache 1 (displays first cache) <br> @cache -add [Replace unit marine marauder] <br> @cache -set [myUnitAlias] "
@@ -649,7 +649,7 @@ void LibapxCommandGive(int user, unitgroup u, string argv, int spawningCount, st
 	return;
 }
 void LibapxDefineGive(string commandName) {
-	commandsGuideEntrySet(
+	LibapxCommandsGuideEntrySet(
 		gv_CommandsGuideEntryUnit, 
 		commandName, 
 		" This command gives selected units to the target player. <br> @give [TargetPlayerColor] <br> Examples: <br> @give purple "
@@ -676,7 +676,7 @@ void LibapxCommandRename(int user, unitgroup u, string argv, int spawningCount, 
 	}
 }
 void LibapxDefineRename(string commandName) {
-	commandsGuideEntrySet(
+	LibapxCommandsGuideEntrySet(
 		gv_CommandsGuideEntryUnit, 
 		commandName, 
 		" This command renames a unit to the desired name. <br> @rename [desired name.. <br> Examples: <br> @rename Bob R "
@@ -703,7 +703,7 @@ void LibapxCommandRenameall(int user, unitgroup u, string argv, int spawningCoun
 	return;
 }
 void LibapxDefineRenameall(string commandName) {
-	commandsGuideEntrySet(
+	LibapxCommandsGuideEntrySet(
 		gv_CommandsGuideEntryUnit, 
 		commandName, 
 		" This command renames an entire unit-types name to the target name. <br> @renameall [desired name.. <br> Examples: <br> @renameall Bob R "
@@ -740,7 +740,7 @@ void LibapxCommandBehaviors(int user, unitgroup u, string argv, int spawningCoun
 	return;
 }
 void LibapxDefineBehaviors(string commandName) {
-	commandsGuideEntrySet(
+	LibapxCommandsGuideEntrySet(
 		gv_CommandsGuideEntryUnit, 
 		commandName, 
 		" This command prints out a list of all of a unit's behaviors and their respective stack count.(behaviors can stack) <br> @behaviors (there are no parameters) <br> Examples: <br> @behaviors "
@@ -771,7 +771,7 @@ void LibapxCommandAddbehavior(int user, unitgroup u, string argv, int spawningCo
 	return;
 }
 void LibapxDefineAddbehavior(string commandName) {
-	commandsGuideEntrySet(
+	LibapxCommandsGuideEntrySet(
 		gv_CommandsGuideEntryUnit, 
 		commandName, 
 		" This command adds a behavior to the selected unit. <br> @addbehavior [behaviorname] <br> Examples: <br> @addbehavior DamageTakenNone <br> @addbehavior DamageDealtNone <br> @addbehavior BlankNameSpace "
@@ -802,7 +802,7 @@ void LibapxCommandRemovebehavior(int user, unitgroup u, string argv, int spawnin
 	return;
 }
 void LibapxDefineRemovebehavior(string commandName) {
-	commandsGuideEntrySet(
+	LibapxCommandsGuideEntrySet(
 		gv_CommandsGuideEntryUnit, 
 		commandName, 
 		" This command removes a behavior to the selected unit. <br> @removebehavior [behaviorname] <br> Examples: <br> @removebehavior DamageTakenNone <br> @removebehavior DamageDealtNone <br> @removebehavior BlankNameSpace "
@@ -836,7 +836,7 @@ void LibapxCommandWeapons(int user, unitgroup u, string argv, int spawningCount,
 	return;
 }
 void LibapxDefineWeapons(string commandName) {
-	commandsGuideEntrySet(
+	LibapxCommandsGuideEntrySet(
 		gv_CommandsGuideEntryUnit, 
 		commandName, 
 		" This command prints out a list of all of a unit's weapons. <br> @weapons (there are no parameters) <br> Examples: <br> @weapons "
@@ -882,7 +882,7 @@ void LibapxCommandAddweapon(int user, unitgroup u, string argv, int spawningCoun
 	return;
 }
 void LibapxDefineAddweapon(string commandName) {
-	commandsGuideEntrySet(
+	LibapxCommandsGuideEntrySet(
 		gv_CommandsGuideEntryUnit, 
 		commandName, 
 		" This command adds a weapon to a unit. You can specify which turret to give the weapon to with the second parameter though it is not needed. <br> @addweapon [weapon] [turret] <br> Examples: <br> @addweapon GuassRifle <br> @spawn SiegeTank;@addweapon GaussRifle SiegeTank(using the siegetank turret makes the turret rotate when it attacks) "
@@ -926,7 +926,7 @@ void LibapxCommandRemoveweapon(int user, unitgroup u, string argv, int spawningC
 	return;
 }
 void LibapxDefineRemoveweapon(string commandName) {
-	commandsGuideEntrySet(
+	LibapxCommandsGuideEntrySet(
 		gv_CommandsGuideEntryUnit, 
 		commandName, 
 		" This command removes a weapon from a unit. It has a modifier called -all which removes all weapons from the targeted unit <br> @removeweapon [modifier] [name] <br> Examples: <br> @removeweapon GuassRifle <br> @removeweapon -all "
@@ -983,7 +983,7 @@ void LibapxCommandLife(int user, unitgroup u, string argv, int spawningCount, st
 	return;
 }
 void LibapxDefineLife(string commandName) {
-	commandsGuideEntrySet(
+	LibapxCommandsGuideEntrySet(
 		gv_CommandsGuideEntryStats, 
 		commandName, 
 		" This commands sets a unit's life, not it's max amount of life. <br> @life [amount] <br> Examples: <br> @life 30 <br> @life 10% <br> @life +10 <br> @life +10% "
@@ -1036,7 +1036,7 @@ void LibapxCommandShields(int user, unitgroup u, string argv, int spawningCount,
 	return;
 }
 void LibapxDefineShields(string commandName) {
-	commandsGuideEntrySet(
+	LibapxCommandsGuideEntrySet(
 		gv_CommandsGuideEntryStats, 
 		commandName, 
 		" This commands sets a unit's shields, not it's max amount of shields. <br> @shields [amount] <br> Examples: <br> @shields 30 <br> @shields 10% <br> @shields +10 <br> @shields +10% "
@@ -1088,7 +1088,7 @@ void LibapxCommandEnergy(int user, unitgroup u, string argv, int spawningCount, 
 	return;
 }
 void LibapxDefineEnergy(string commandName) {
-	commandsGuideEntrySet(
+	LibapxCommandsGuideEntrySet(
 		gv_CommandsGuideEntryStats, 
 		commandName, 
 		" This commands sets a unit's energy, not it's max amount of energy. <br> @energy [amount] <br> Examples: <br> @energy 30 <br> @energy 10% <br> @energy +10 <br> @energy +10% "
@@ -1149,7 +1149,7 @@ void LibapxCommandMaxlife(int user, unitgroup u, string argv, int spawningCount,
 	return;
 }
 void LibapxDefineMaxlife(string commandName) {
-	commandsGuideEntrySet(
+	LibapxCommandsGuideEntrySet(
 		gv_CommandsGuideEntryStats, 
 		commandName, 
 		" This commands sets a unit's max life. <br> @maxlife [amount] <br> Examples: <br> @maxlife 30 <br> @maxlife 10% <br> @maxlife +10 <br> @maxlife +10% "
@@ -1204,7 +1204,7 @@ void LibapxCommandMaxshields(int user, unitgroup u, string argv, int spawningCou
 	return;
 }
 void LibapxDefineMaxshields(string commandName) {
-	commandsGuideEntrySet(
+	LibapxCommandsGuideEntrySet(
 		gv_CommandsGuideEntryStats, 
 		commandName, 
 		" This commands sets a unit's max shields. <br> @maxshields [amount] <br> Examples: <br> @maxshields 30 <br> @maxshields 10% <br> @maxshields +10 <br> @maxshields +10% "
@@ -1258,7 +1258,7 @@ void LibapxCommandMaxenergy(int user, unitgroup u, string argv, int spawningCoun
 	return;
 }
 void LibapxDefineMaxenergy(string commandName) {
-	commandsGuideEntrySet(
+	LibapxCommandsGuideEntrySet(
 		gv_CommandsGuideEntryStats, 
 		commandName, 
 		" This commands sets a unit's max energy. <br> @maxenergy [amount] <br> Examples: <br> @maxenergy 30 <br> @maxenergy 10% <br> @maxenergy +10 <br> @maxenergy +10% "
@@ -1299,7 +1299,7 @@ void LibapxCommandLiferegen(int user, unitgroup u, string argv, int spawningCoun
 	return;
 }
 void LibapxDefineLiferegen(string commandName) {
-	commandsGuideEntrySet(
+	LibapxCommandsGuideEntrySet(
 		gv_CommandsGuideEntryStats, 
 		commandName, 
 		" This commands sets a unit's life regen. <br> @liferegen [amount] <br> Examples: <br> @liferegen 30 <br> @liferegen 10% "
@@ -1335,7 +1335,7 @@ void LibapxCommandShieldsregen(int user, unitgroup u, string argv, int spawningC
 	return;
 }
 void LibapxDefineShieldsregen(string commandName) {
-	commandsGuideEntrySet(
+	LibapxCommandsGuideEntrySet(
 		gv_CommandsGuideEntryStats, 
 		commandName, 
 		" This commands sets a unit's shields regen. <br> @shieldsregen [amount] <br> Examples: <br> @shieldsregen 30 <br> @shieldsregen 10% "
@@ -1370,7 +1370,7 @@ void LibapxCommandEnergyregen(int user, unitgroup u, string argv, int spawningCo
 	return;
 }
 void LibapxDefineEnergyregen(string commandName) {
-	commandsGuideEntrySet(
+	LibapxCommandsGuideEntrySet(
 		gv_CommandsGuideEntryStats, 
 		commandName, 
 		" This commands sets a unit's energy regen. <br> @energyregen [amount] <br> Examples: <br> @energyregen 30 <br> @energyregen 10% "
@@ -1435,7 +1435,7 @@ void LibapxCommandSpeed(int user, unitgroup u, string argv, int spawningCount, s
 	return;
 }
 void LibapxDefineSpeed(string commandName) {
-	commandsGuideEntrySet(
+	LibapxCommandsGuideEntrySet(
 		gv_CommandsGuideEntryStats, 
 		commandName, 
 		" This command sets a unit's speed. It has a modifier, -all which changes the speed for all units of the same type. <br> @speed [modifier] [speed] <br> Examples: <br> @speed 1 <br> @speed -all 3 "
@@ -1491,7 +1491,7 @@ void LibapxCommandHeight(int user, unitgroup u, string argv, int spawningCount, 
 	return;
 }
 void LibapxDefineHeight(string commandName) {
-	commandsGuideEntrySet(
+	LibapxCommandsGuideEntrySet(
 		gv_CommandsGuideEntryUnit, 
 		commandName, 
 		" This command sets a unit's height. <br> @height [desiredHeight] [durationToGetToHeight] <br> Examples: <br> @height 3 <br> @height 5 7 <br> @height +3 5 <br> @height -3 5 "
@@ -1521,7 +1521,7 @@ void LibapxCommandColor(int user, unitgroup u, string argv, int spawningCount, s
 	return;
 }
 void LibapxDefineColor(string commandName) {
-	commandsGuideEntrySet(
+	LibapxCommandsGuideEntrySet(
 		gv_CommandsGuideEntryUnit, 
 		commandName, 
 		" This command sets the team-color of a unit. <br> @color [colorName] <br> Example: <br> @color red <br> @color violet  "
@@ -1543,7 +1543,7 @@ void LibapxCommandInvulnerable(int user, unitgroup u, string argv, int spawningC
 	return;
 }
 void LibapxDefineInvulnerable(string commandName) {
-	commandsGuideEntrySet(
+	LibapxCommandsGuideEntrySet(
 		gv_CommandsGuideEntryUnit, 
 		commandName, 
 		" This command makes a unit invulnerable. <br> @invulnerable(noparms) <br> Example: <br> @invulnerable  "
@@ -1560,7 +1560,7 @@ void LibapxCommandVulnerable(int user, unitgroup u, string argv, int spawningCou
 	return;
 }
 void LibapxDefineVulnerable(string commandName) {
-	commandsGuideEntrySet(
+	LibapxCommandsGuideEntrySet(
 		gv_CommandsGuideEntryUnit, 
 		commandName, 
 		" This command makes a unit vulnerable. <br> @vulnerable(noparms) <br> Example: <br> @vulnerable  "
@@ -1663,7 +1663,7 @@ void LibapxCommandFace(int user, unitgroup u, string argv, int spawningCount, st
 	return;
 }
 void LibapxDefineFace(string commandName) {
-	commandsGuideEntrySet(
+	LibapxCommandsGuideEntrySet(
 		gv_CommandsGuideEntryUnit, 
 		commandName, 
 		" This command faces a unit to a given point. It has a modifier called -rel which faces units relative to the other units you have selected. <br> @face [modifiers] [facing] [duration] <br> Examples: <br> @face (by itself just faces to mouse) <br> @face 360 <br> @face -131 <br> @face +255 <br> @face +90 3 <br> @face x 2 (X is stand in, this faces to mouse point) <br> @spawn marine 25 ; Delay 1 ; @face -rel 25 "
@@ -1745,14 +1745,14 @@ void LibapxCommandDamage(int user, unitgroup u, string argv, int spawningCount, 
 	return;
 }
 void LibapxDefineAdddamage(string commandName) {
-	commandsGuideEntrySet(
+	LibapxCommandsGuideEntrySet(
 		gv_CommandsGuideEntryStats, 
 		commandName, 
 		" This command adds damage to a unit. <br> @adddamage [damage] <br> Examples: <br> @adddamage 25 "
 	);
 }
 void LibapxDefineRemovedamage(string commandName) {
-	commandsGuideEntrySet(
+	LibapxCommandsGuideEntrySet(
 		gv_CommandsGuideEntryStats, 
 		commandName, 
 		" This command removes damage to a unit. <br> @removedamage [damage] <br> Examples: <br> @removedamage 25 "
@@ -1805,14 +1805,14 @@ void LibapxCommandRange(int user, unitgroup u, string argv, int spawningCount, s
 	return;
 }
 void LibapxDefineAddrange(string commandName) {
-	commandsGuideEntrySet(
+	LibapxCommandsGuideEntrySet(
 		gv_CommandsGuideEntryStats, 
 		commandName, 
 		" This command adds range to a unit. <br> @addrange [range] <br> Examples: <br> @addrange 25 "
 	);
 }
 void LibapxDefineRemoverange(string commandName) {
-	commandsGuideEntrySet(
+	LibapxCommandsGuideEntrySet(
 		gv_CommandsGuideEntryStats, 
 		commandName, 
 		" This command removes range to a unit. <br> @removerange [range] <br> Examples: <br> @removerange 25 "
@@ -1913,14 +1913,14 @@ void LibapxCommandArmor(int user, unitgroup u, string argv, int spawningCount, s
 	return;
 }
 void LibapxDefineArmor(string commandName) {
-	commandsGuideEntrySet(
+	LibapxCommandsGuideEntrySet(
 		gv_CommandsGuideEntryStats, 
 		commandName, 
 		" This command sets the armor of a unit. <br> @armor [amount] <br> Examples: <br> @armor 25 "
 	);
 }
 void LibapxDefineShieldsarmor(string commandName) {
-	commandsGuideEntrySet(
+	LibapxCommandsGuideEntrySet(
 		gv_CommandsGuideEntryStats, 
 		commandName, 
 		" This command sets the shield's armor of a unit. <br> @shieldsarmor [amount] <br> Examples: <br> @shieldsarmor 25 "
@@ -1991,7 +1991,7 @@ void LibapxCommandWeaponspeed(int user, unitgroup u, string argv, int spawningCo
 	return;
 }
 void LibapxDefineWeaponspeed(string commandName) {
-	commandsGuideEntrySet(
+	LibapxCommandsGuideEntrySet(
 		gv_CommandsGuideEntryStats, 
 		commandName, 
 		" This command sets the weaponspeed of a unit. <br> @weaponspeed [speed] <br> Examples: <br> @weaponspeed .25 <br> @weaponspeed .1 "
@@ -2038,7 +2038,7 @@ void LibapxCommandWeaponspeedall(int user, unitgroup u, string argv, int spawnin
 	return;
 }
 void LibapxDefineWeaponspeedall(string commandName) {
-	commandsGuideEntrySet(
+	LibapxCommandsGuideEntrySet(
 		gv_CommandsGuideEntryStats, 
 		commandName, 
 		" This command sets the weaponspeed of a unit type. <br> @weaponspeedall [speed] <br> Examples: <br> @weaponspeedall .25 <br> @weaponspeedall .1 "
@@ -2078,7 +2078,7 @@ void LibapxCommandSubtitle(int user, unitgroup u, string argv, int spawningCount
 	}
 }
 void LibapxDefineSubtitle(string commandName) {
-	commandsGuideEntrySet(
+	LibapxCommandsGuideEntrySet(
 		gv_CommandsGuideEntryUnit, 
 		commandName, 
 		" This command sets the subtitle of a unit. It takes the modifier -add, which adds onto the current subtitle. <br> @subtitle [desired desc.. <br> Examples: <br> @subtitle Bob R <br> @subtitle -add was a very cool man. "
@@ -2120,7 +2120,7 @@ void LibapxCommandSubtitleall(int user, unitgroup u, string argv, int spawningCo
 	return;
 }
 void LibapxDefineSubtitleall(string commandName) {
-	commandsGuideEntrySet(
+	LibapxCommandsGuideEntrySet(
 		gv_CommandsGuideEntryUnit, 
 		commandName, 
 		" This command sets the sbutitle of a unit-type(the text under the units name). It has a modifier called -add which, instead of overwriting the subtitle, adds to the subtitle. <br> @subtitle [modifier] [subtitle.. <br> Examples: <br> @subtitle Bob ross is a cool guy <br> @subtitle -add and most agree that he is that cool. "
@@ -2162,7 +2162,7 @@ void LibapxCommandDesc(int user, unitgroup u, string argv, int spawningCount, st
 	}
 }
 void LibapxDefineDesc(string commandName) {
-	commandsGuideEntrySet(
+	LibapxCommandsGuideEntrySet(
 		gv_CommandsGuideEntryUnit, 
 		commandName, 
 		" This command sets the description of a unit. It takes the modifier -add, which adds onto the current subtitle. <br> @subtitle [desired desc.. <br> Examples: <br> @subtitle Bob R <br> @subtitle -add was a very cool man. "
@@ -2203,7 +2203,7 @@ void LibapxCommandDescall(int user, unitgroup u, string argv, int spawningCount,
 
 }
 void LibapxDefineDesceall(string commandName) {
-	commandsGuideEntrySet(
+	LibapxCommandsGuideEntrySet(
 		gv_CommandsGuideEntryUnit, 
 		commandName, 
 		" This command sets the description of a unit-type(the text under the units name). It has a modifier called -add which, instead of overwriting the subtitle, adds to the subtitle. <br> @subtitle [modifier] [subtitle.. <br> Examples: <br> @subtitle Bob ross is a cool guy <br> @subtitle -add and most agree that he is that cool. "
@@ -2244,7 +2244,7 @@ void LibapxCommandDesctitle(int user, unitgroup u, string argv, int spawningCoun
 	}
 }
 void LibapxDefineDesctitle(string commandName) {
-	commandsGuideEntrySet(
+	LibapxCommandsGuideEntrySet(
 		gv_CommandsGuideEntryUnit, 
 		commandName, 
 		" This command sets the description title of a unit. It takes the modifier -add, which adds onto the current subtitle. <br> @subtitle [desired desc.. <br> Examples: <br> @subtitle Bob R <br> @subtitle -add was a very cool man. "
@@ -2285,7 +2285,7 @@ void LibapxCommandDesctitleall(int user, unitgroup u, string argv, int spawningC
 
 }
 void LibapxDefineDesctitleall(string commandName) {
-	commandsGuideEntrySet(
+	LibapxCommandsGuideEntrySet(
 		gv_CommandsGuideEntryUnit, 
 		commandName, 
 		" This command sets the description title of a unit-type(the text under the units name). It has a modifier called -add which, instead of overwriting the subtitle, adds to the subtitle. <br> @subtitle [modifier] [subtitle.. <br> Examples: <br> @subtitle Bob ross is a cool guy <br> @subtitle -add and most agree that he is that cool. "
@@ -2332,7 +2332,7 @@ void LibapxCommandTooltip(int user, unitgroup u, string argv, int spawningCount,
 	return;
 }
 void LibapxDefineTooltip(string commandName) {
-	commandsGuideEntrySet(
+	LibapxCommandsGuideEntrySet(
 		gv_CommandsGuideEntryUnit, 
 		commandName, 
 		" This command sets the tooltip of a unit. This is the text that displays when another player hovers over your unit. <br> @tooltip [name] <br> Examples: <br> @tooltip BobRoss is Serobliss <br> @state tooltips on;@tooltip test (This will allow you to see your own tooltip)  "
@@ -2489,7 +2489,7 @@ void LibapxCommandUndo(int user, unitgroup u, string argv, int spawningCount, st
 
 }
 void LibapxDefineUndo(string commandName) {
-	commandsGuideEntrySet(
+	LibapxCommandsGuideEntrySet(
 		gv_CommandsGuideEntryUnit, 
 		commandName, 
 		"  "
@@ -2637,7 +2637,7 @@ void LibapxCommandCopy(int user, unitgroup u, string argv, int spawningCount, st
 	return;
 }
 void LibapxDefineCopy(string commandName) {
-	commandsGuideEntrySet(
+	LibapxCommandsGuideEntrySet(
 		gv_CommandsGuideEntryUnit, 
 		commandName, 
 		" This command copies a unit. It can optionally copy the caches of a unit too with the modifier -visual. <br> @copy [modifiers] <br> Examples: <br> @copy <br> @copy -visual"
@@ -2683,7 +2683,7 @@ void LibapxCommandEffect(int user, unitgroup u, string argv, int spawningCount, 
 	return;
 }
 void LibapxDefineEffect(string commandName) {
-	commandsGuideEntrySet(
+	LibapxCommandsGuideEntrySet(
 		gv_CommandsGuideEntryUnit, 
 		commandName, 
 		" This command creates an effect at a units position. <br> @effect [effectname] <br> Examples: <br> @effect MercenaryShield"
@@ -2711,7 +2711,7 @@ void LibapxCommandKills(int user, unitgroup u, string argv, int spawningCount, s
 	return;
 }
 void LibapxDefineKills(string commandName) {
-	commandsGuideEntrySet(
+	LibapxCommandsGuideEntrySet(
 		gv_CommandsGuideEntryStats, 
 		commandName, 
 		" This command sets the kill-count of a unit, it's useful for changing a units kill rank. <br> @kills [amount] <br> Examples: <br> @kills 15 "
@@ -2751,7 +2751,7 @@ void LibapxCommandLevel(int user, unitgroup u, string argv, int spawningCount, s
 	return;
 }
 void LibapxDefineLevel(string commandName) {
-	commandsGuideEntrySet(
+	LibapxCommandsGuideEntrySet(
 		gv_CommandsGuideEntryStats, 
 		commandName, 
 		" This command sets a unit's level. <br> @level [levelnumber] <br> Examples: <br> @level 15 "
@@ -2800,7 +2800,7 @@ void LibapxCommandLabel(int user, unitgroup u, string argv, int spawningCount, s
 	return;
 }
 void LibapxDefineLabel(string commandName) {
-	commandsGuideEntrySet(
+	LibapxCommandsGuideEntrySet(
 		gv_CommandsGuideEntryUnit, 
 		commandName, 
 		" This command attaches a label to a unit that is constantly displayed to everyone. <br> @label [label name.. <br> Examples: <br> @label I am a cool unit! "
@@ -2850,7 +2850,7 @@ void LibapxCommandRadius(int user, unitgroup u, string argv, int spawningCount, 
 	return;
 }
 void LibapxDefineRadius(string commandName) {
-	commandsGuideEntrySet(
+	LibapxCommandsGuideEntrySet(
 		gv_CommandsGuideEntryStats, 
 		commandName, 
 		" This command sets a unit's radius. <br> @radius [radius] <br> Examples: <br> @radius 1 <br> @radius 3 <br> @radius .03%    "
@@ -2928,7 +2928,7 @@ void LibapxCommandState(int user, unitgroup u, string argv, int spawningCount, s
 	return;
 }
 void LibapxDefineState(string commandName) {
-	commandsGuideEntrySet(
+	LibapxCommandsGuideEntrySet(
 		gv_CommandsGuideEntryUnit, 
 		commandName, 
 		" This command sets a unit's state. You can find a list of states with just typing @state. Or refer to.. <br> States: fidget, highlightable, highlighted, ignoreterrainheight, invulnerable, hidden, paused, selectable, statusbar, targetable, tooltips, cursor, movable, turnable, usessupply <br> @state [state] [on/off] <br> Examples <br> @state fidget off <br> @state ignoreterrainheight on "

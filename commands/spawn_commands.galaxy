@@ -147,7 +147,7 @@ void LibapxCommandSpawn(int user, unitgroup u, string argv, int spawningCount, s
 	return;
 }
 void LibapxDefineRegionSpawn(string commandName) {
-	commandsGuideEntrySet(
+	LibapxCommandsGuideEntrySet(
 		gv_CommandsGuideEntryUnit, 
 		commandName, 
 		" This command spawns a unit or units. <br> @spawn [unitname] [amount] <br> Examples: <br> @spawn marauder 3  "
@@ -300,7 +300,7 @@ void LibapxCommandSpawnPlus(int user, unitgroup u, string argv, int spawningCoun
 	return;
 }
 void LibapxDefineRegionSpawnPlus(string commandName) {
-	commandsGuideEntrySet(
+	LibapxCommandsGuideEntrySet(
 		gv_CommandsGuideEntryUnit, 
 		commandName, 
 		" This command spawns a unit or units on click. <br> @spawn+ [unitname] [amount] <br> Examples: <br> @spawn+ marauder <br> @spawn+ marine;@scale 3 "

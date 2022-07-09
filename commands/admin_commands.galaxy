@@ -34,7 +34,7 @@ void LibapxCommandDestroy(int user, unitgroup u, string argv, int spawningCount,
 
 }
 void LibapxDefineDestroy(string commandName) {
-	commandsGuideEntrySet(
+	LibapxCommandsGuideEntrySet(
 		gv_CommandsGuideEntryAdmin, 
 		commandName, 
 		" This command destroys all actors and units within a given radius. It permanently removing these actors, never use it unless there is a stain you can't remove with @removearea. <br> This is an admin command so you must be a moderator or an admin to use it. <br> !destroy [radius] <br> Examples: <br> !destroy 3 "
@@ -96,7 +96,7 @@ void LibapxCommandBan(int user, unitgroup u, string argv, int spawningCount, str
 	return;
 }
 void LibapxDefineBan(string commandName) {
-	commandsGuideEntrySet(
+	LibapxCommandsGuideEntrySet(
 		gv_CommandsGuideEntryAdmin, 
 		commandName, 
 		" This command kicks any player from your lobby. <br> This is an admin command so you must be a moderator or an admin to use it. <br> !ban [playercolor] <br> Examples: <br> !kick purple "
@@ -131,7 +131,7 @@ void LibapxCommandDisable(int user, unitgroup u, string argv, int spawningCount,
 	return;
 }
 void LibapxDefineDisable(string commandName) {
-	commandsGuideEntrySet(
+	LibapxCommandsGuideEntrySet(
 		gv_CommandsGuideEntryAdmin, 
 		commandName, 
 		" This command disables the target player in your lobby. This means they can't use commands anymore until they are enabled. <br> This is an admin command so you must be a moderator or an admin to use it. <br> !disable [playercolor] <br> Examples: <br> !disable purple "
@@ -164,7 +164,7 @@ void LibapxCommandEnable(int user, unitgroup u, string argv, int spawningCount, 
 	return;
 }
 void LibapxDefineEnable(string commandName) {
-	commandsGuideEntrySet(
+	LibapxCommandsGuideEntrySet(
 		gv_CommandsGuideEntryAdmin, 
 		commandName, 
 		" This command enables the target player in your lobby. This means they can use commands now if they were disable beforehand. <br> This is an admin command so you must be a moderator or an admin to use it. <br> !enable [playercolor] <br> Examples: <br> !enable violet "
@@ -197,7 +197,7 @@ void LibapxCommandMute(int user, unitgroup u, string argv, int spawningCount, st
 	return;
 }
 void LibapxDefineMute(string commandName) {
-	commandsGuideEntrySet(
+	LibapxCommandsGuideEntrySet(
 		gv_CommandsGuideEntryAdmin, 
 		commandName, 
 		" This command mutes the target player in your lobby. This means their messages no longer appear in the chat. It can be undone with !unmute <br> This is an admin command so you must be a moderator or an admin to use it. <br> !mute [playercolor] <br> Examples: <br> !mute lightgrey "
@@ -231,7 +231,7 @@ void LibapxCommandUnmute(int user, unitgroup u, string argv, int spawningCount, 
 	return;
 }
 void LibapxDefineUnmute(string commandName) {
-	commandsGuideEntrySet(
+	LibapxCommandsGuideEntrySet(
 		gv_CommandsGuideEntryAdmin, 
 		commandName, 
 		" This command unmutes the target player in your lobby. This means if they were muted their messages can now display in the chat. <br> This is an admin command so you must be a moderator or an admin to use it. <br> !unmute [playercolor] <br> Examples: <br> !unmute blue "
@@ -263,7 +263,7 @@ void LibapxCommandPromote(int user, unitgroup u, string argv, int spawningCount,
 	return;
 }
 void LibapxDefinePromote(string commandName) {
-	commandsGuideEntrySet(
+	LibapxCommandsGuideEntrySet(
 		gv_CommandsGuideEntryAdmin, 
 		commandName, 
 		"  This command promotes a player to a moderator. This means they can now use administration commands. <br> This is an admin-only command so you must be an admin to use it. <br> !promote [playercolor] <br> Examples: <br> !promote lightgreen "
@@ -298,7 +298,7 @@ void LibapxCommandDemote(int user, unitgroup u, string argv, int spawningCount, 
 	return;
 }
 void LibapxDefineDemote(string commandName) {
-	commandsGuideEntrySet(
+	LibapxCommandsGuideEntrySet(
 		gv_CommandsGuideEntryAdmin, 
 		commandName, 
 		"  This command demote a player to from a moderator to a normal user. This means they can no longer use the administration commands. <br> This is an admin-only command so you must be an admin to use it. <br> !demote [playercolor] <br> Examples: <br> !demote pink "
@@ -331,7 +331,7 @@ void LibapxCommandSkybox(int user, unitgroup u, string argv, int spawningCount, 
 	GameSetBackground(c_backgroundFixed, model, animationSpeed);
 }
 void LibapxDefineSkybox(string commandName) {
-	commandsGuideEntrySet(
+	LibapxCommandsGuideEntrySet(
 		gv_CommandsGuideEntryAdmin, 
 		commandName, 
 		" This command changes the maps skybox model. <br> This is an admin command so you must be a moderator or an admin to use it. <br> !skybox [model] [animationspeed] <br> Examples: <br> !skybox KorhalFallingSky 1 ");
@@ -369,7 +369,7 @@ void LibapxCommandLight(int user, unitgroup u, string argv, int spawningCount, s
 	return;
 }
 void LibapxDefineLight(string commandName) {
-	commandsGuideEntrySet(
+	LibapxCommandsGuideEntrySet(
 		gv_CommandsGuideEntryAdmin, 
 		commandName, 
 		" This command changes the maps lighting. If no light is specific it'll reset the light to the maps default light. <br> This is an admin command so you must be a moderator or an admin to use it. <br> !light [lightname] [duration] <br> Examples: <br> !light tassadar 5 <br> !light hyperion 1 ");
@@ -411,7 +411,7 @@ void LibapxCommandRemovePlayer(int user, unitgroup u, string argv, int spawningC
 }
 
 void LibapxDefineRemovePlayer(string commandName) {
-	commandsGuideEntrySet(
+	LibapxCommandsGuideEntrySet(
 		gv_CommandsGuideEntryAdmin, 
 		commandName, 
 		" This command removes all of a targeted players units. <br> This is an admin command so you must be a moderator or an admin to use it. <br> !remove [playercolor] <br> Examples: <br> !remove teal ");
@@ -471,7 +471,7 @@ void LibapxCommandFog(int user, unitgroup u, string argv, int spawningCount, str
 }
 
 void LibapxDefineFog(string commandName) {
-	commandsGuideEntrySet(
+	LibapxCommandsGuideEntrySet(
 		gv_CommandsGuideEntryAdmin, 
 		commandName, 
 		" This command changes the fog of a map. Doing this is a permanent change and cannon't be undone easily. <br> This is an admin command so you must be a moderator or an admin to use it. <br> !fog [state] [parameters... <br> Examples: <br> !fog on <br> !fog off <br> !fog color 255 0 0 <br> !fog density 2 <br> !fog height 12 <br> !fog falloff 50");

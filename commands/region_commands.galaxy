@@ -39,7 +39,7 @@ void LibapxCommandRegionCreate(int user, unitgroup u, string argv, int spawningC
 	return;
 }
 void LibapxDefineRegionCreate(string commandName) {
-	commandsGuideEntrySet(
+	LibapxCommandsGuideEntrySet(
 		gv_CommandsGuideEntryRegion, 
 		commandName, 
 		" This command creates a region with a given radius. <br> #create [name] [radius] <br> Examples: <br> #create bob 3 "
@@ -75,7 +75,7 @@ void LibapxCommandRegionRemove(int user, unitgroup u, string argv, int spawningC
 	return;
 }
 void LibapxDefineRegionRemove(string commandName) {
-	commandsGuideEntrySet(
+	LibapxCommandsGuideEntrySet(
 		gv_CommandsGuideEntryRegion, 
 		commandName, 
 		" This command removes a region that matches the name given. <br> #remove [name]<br> Examples: <br> #remove bob "
@@ -115,7 +115,7 @@ void LibapxCommandRegionRemoveall(int user, unitgroup u, string argv, int spawni
 	return;
 }
 void LibapxDefineRegionRemoveall(string commandName) {
-	commandsGuideEntrySet(
+	LibapxCommandsGuideEntrySet(
 		gv_CommandsGuideEntryRegion, 
 		commandName, 
 		" This command removes all regions you have. <br> #removeall<br> Examples: <br> #removeall "
@@ -150,7 +150,7 @@ void LibapxCommandRegionList(int user, unitgroup u, string argv, int spawningCou
 	return;
 }
 void LibapxDefineRegionList(string commandName) {
-	commandsGuideEntrySet(
+	LibapxCommandsGuideEntrySet(
 		gv_CommandsGuideEntryRegion, 
 		commandName, 
 		" This command list all regions you have. <br> #list <br> Examples: <br> #list "
@@ -197,7 +197,7 @@ void LibapxCommandRegionTeleport(int user, unitgroup u, string argv, int spawnin
 	return;
 }
 void LibapxDefineRegionTeleport(string commandName) {
-	commandsGuideEntrySet(
+	LibapxCommandsGuideEntrySet(
 		gv_CommandsGuideEntryRegion, 
 		commandName, 
 		" This command connects two regions together. Allowing units to teleport between the regions. <br> #teleport [region1] [region2] <br> Examples <br> #teleport a b <br> @spawn marine ; #create a ; Delay 3 ; #create b ; #teleport a b "
@@ -264,7 +264,7 @@ void LibapxCommandRegionAttach(int user, unitgroup u, string argv, int spawningC
 	return;
 }
 void LibapxDefineRegionAttach(string commandName) {
-	commandsGuideEntrySet(
+	LibapxCommandsGuideEntrySet(
 		gv_CommandsGuideEntryRegion, 
 		commandName, 
 		" This command attaches a region to a unit. <br> #attach [regionname] <br> Examples <br> #attach a <br> @spawn marine;#create a;#attach a "

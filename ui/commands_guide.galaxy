@@ -42,8 +42,8 @@ void LibapxUiCommandsInit() {
 void LibapxUiCommandsInitPlayer(int player) {
   //Stringword not working on string?
   int i = 0;
-  while(LibapxCommandsGuideEntrySet(i) != "") {
-    DialogControlAddItem(UiCommandsCategory, PlayerGroupSingle(player), StringToText(LibapxCommandsGuideEntrySet(i)));
+  while(LibapxCommandsGuideGetEntryType(i) != "") {
+    DialogControlAddItem(UiCommandsCategory, PlayerGroupSingle(player), StringToText(LibapxCommandsGuideGetEntryType(i)));
     i+=1;
   }
 }
@@ -53,9 +53,9 @@ bool LibapxUiCategorySelect(bool testConds, bool runActions) {
   int i = 0;
   DialogControlRemoveAllItems(UiCommandsCommands, PlayerGroupSingle(player));
   desiredType=DialogControlGetSelectedItem(UiCommandsCategory, player)-1;
-  while(gCommandsGuideEntries[i].name != "") {
-    if(gCommandsGuideEntries[i].type == desiredType) {
-      DialogControlAddItem(UiCommandsCommands, PlayerGroupSingle(player), StringToText(gCommandsGuideEntries[i].name));
+  while(gv_CommandsGuideEntries[i].name != "") {
+    if(gv_CommandsGuideEntries[i].type == desiredType) {
+      DialogControlAddItem(UiCommandsCommands, PlayerGroupSingle(player), StringToText(gv_CommandsGuideEntries[i].name));
     }
     i+=1;
   }
@@ -74,11 +74,11 @@ bool LibapxUiCommandsSelect(bool testConds, bool runActions) {
   
   i = 0;
   //Source
-  while(gCommandsGuideEntries[i].name != "") {
-    if(gCommandsGuideEntries[i].type == desiredType) {
+  while(gv_CommandsGuideEntries[i].name != "") {
+    if(gv_CommandsGuideEntries[i].type == desiredType) {
 
       if(currentCommand == desiredCommand) {
-        commandGuideFormatDescription(UiCommandsOutput, PlayerGroupSingle(player),gCommandsGuideEntries[i].description);
+        commandGuideFormatDescription(UiCommandsOutput, PlayerGroupSingle(player),gv_CommandsGuideEntries[i].description);
         return true;
       }
       currentCommand += 1;

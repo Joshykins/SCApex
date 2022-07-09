@@ -154,7 +154,7 @@ void LibapxCommandActormessage(int user, unitgroup u, string argv, int spawningC
 	return;
 }
 void LibapxDefineActormessage(string commandName) {
-	commandsGuideEntrySet(
+	LibapxCommandsGuideEntrySet(
 		gv_CommandsGuideEntryActor, 
 		commandName, 
 		" Sends an ActorMessage to an actor, a target can be used with this command. <br> @actrmsg ->target actormessage <br> Examples: <br> @actrmsg SetTeamColor {255,0,0 3} {3,5,255 5} <br> @actrmsg SetScaleAbsolute 4 "
@@ -190,7 +190,7 @@ void LibapxCommandActoralias(int user, unitgroup u, string argv, int spawningCou
 	return;
 }
 void LibapxDefineTarget(string commandName) {
-	commandsGuideEntrySet(
+	LibapxCommandsGuideEntrySet(
 		gv_CommandsGuideEntryActor, 
 		commandName, 
 		" Gives an actor a target or name to be used to point to this actor with another command, a target can also be used with this command. <br> @target ->target targetname <br> Examples: <br> @target 123;@attach marine origin 0 0 3;@scale ->123 3 3 3 <br> @target ->b 123 <br> <br> Extra Info: <br> You can remove a target by doing <br> @actrmsg ->targetyouwanttoremove AliasRemove ->targetyouwanttoremove "
@@ -263,7 +263,7 @@ void LibapxCommandScale(int user, unitgroup u, string argv, int spawningCount, s
 	return;
 }
 void LibapxDefineScale(string commandName) {
-	commandsGuideEntrySet(
+	LibapxCommandsGuideEntrySet(
 		gv_CommandsGuideEntryActor, 
 		commandName, 
 		" Changes the scale of an actor. It can be used with target. <br> @scale ->target x y z timescale <br> Examples: <br> @scale 3 2 1 4 <br> @scale 3 <br> @target a;@attach marine head;@scale ->a 5 5 1 3  "
@@ -400,7 +400,7 @@ void LibapxCommandTint(int user, unitgroup u, string argv, int spawningCount, st
 	return;
 }
 void LibapxDefineTint(string commandName) {
-	commandsGuideEntrySet(
+	LibapxCommandsGuideEntrySet(
 		gv_CommandsGuideEntryActor, 
 		commandName, 
 		" This command changes the tint of an actor. It can be used with target. <br> @scale ->[target] [r] [g] [b] [Opacity] [HDR] [timescale] <br> Examples: <br> @tint 255 0 0 <br> @tint 0 255 255 1 3 <br> @tint 255 255 255 .3 <br> @tint 255 255 255 1 15 5  "
@@ -437,7 +437,7 @@ void LibapxCommandDecal(int user, unitgroup u, string argv, int spawningCount, s
 	return;
 }
 void LibapxDefineDecal(string commandName) {
-	commandsGuideEntrySet(
+	LibapxCommandsGuideEntrySet(
 		gv_CommandsGuideEntryActor, 
 		commandName, 
 		" Changes the decal of an actor, can be used with target. <br> @decal ->[target] [image] <br> Examples: <br> @decal decalNone <br> @target a;@attach marine weapon;@decal ->a  "
@@ -502,7 +502,7 @@ void LibapxCommandModelswap(int user, unitgroup u, string argv, int spawningCoun
 	return;
 }
 void LibapxDefineModelswap(string commandName) {
-	commandsGuideEntrySet(
+	LibapxCommandsGuideEntrySet(
 		gv_CommandsGuideEntryActor, 
 		commandName, 
 		" This command changes the model of an actor. It can be used with target. <br> @modelswap ->[target] [modelname] [variation] <br> Examples: <br> @modelswap BeaconApex <br> @modelswap HavenTree 02 <br> @target 123;@attach beaconApex head;@modelswap ->123 shapesmileyface "
@@ -584,7 +584,7 @@ void LibapxCommandPlay(int user, unitgroup u, string argv, int spawningCount, st
 	return;
 }
 void LibapxDefinePlay(string commandName) {
-	commandsGuideEntrySet(
+	LibapxCommandsGuideEntrySet(
 		gv_CommandsGuideEntryActor, 
 		commandName, 
 		" This command plays animations on an actor. It can be used with target. The parameter loop makes the animation loop. <br> @play ->[target] [animations] [animations] <br> Examples: <br> @play attack <br> @play attack loop <br> @play walk loop <br> @play start loop <br> @play cover loop <br> @play burrow loop <br> @play x 00 <br> @play x 01 <br> @play walk,01 loop <br> @play x 02 "
@@ -632,7 +632,7 @@ void LibapxCommandAnimspeed(int user, unitgroup u, string argv, int spawningCoun
 	return;
 }
 void LibapxDefineAnimspeed(string commandName) {
-	commandsGuideEntrySet(
+	LibapxCommandsGuideEntrySet(
 		gv_CommandsGuideEntryActor, 
 		commandName, 
 		" This command sets the animation speed of an actor. It can be used with target. <br> @animspeed ->[target] [animationspeed] <br> Examples: <br> @animspeed 3 <br> @animspeed 5 <br> @animspeed 0 <br> @target 6;@attach marauder origin 0 0 3;@animspeed ->6 3 "
@@ -682,7 +682,7 @@ void LibapxCommandRotate(int user, unitgroup u, string argv, int spawningCount, 
 	return;
 }
 void LibapxDefineRotate(string commandName) {
-	commandsGuideEntrySet(
+	LibapxCommandsGuideEntrySet(
 		gv_CommandsGuideEntryActor, 
 		commandName, 
 		" This command applies a rotation to a unit. It can be used with target. <br> Note: This rotation is removed if a unit moves. <br> @rotate  ->[target] [x] [y] [z] <br> Examples: <br> @rotation 90 <br> @target 123;@attach marine weapon;l@rotation ->123 90 "
@@ -718,7 +718,7 @@ void LibapxCommandStatbars(int user, unitgroup u, string argv, int spawningCount
 	return;
 }
 void LibapxDefineStatbars(string commandName) {
-	commandsGuideEntrySet(
+	LibapxCommandsGuideEntrySet(
 		gv_CommandsGuideEntryActor, 
 		commandName, 
 		" This command sets an actors statbars on or off. It can be used with target. <br> Note: If you give the command no parameters it, by default, will turn the statbars off on the actor. <br> @statbars  ->[target] [state] <br> Examples: <br> @statbars <br> @statbars on <br> @target 123;@attach marine head;@statbars ->123 "
@@ -750,7 +750,7 @@ void LibapxCommandSetscaler(int user, unitgroup u, string argv, int spawningCoun
 
 }
 void LibapxDefineSetscaler(string commandName) {
-	commandsGuideEntrySet(
+	LibapxCommandsGuideEntrySet(
 	 	gv_CommandsGuideEntryGeneral, 
 		commandName, 
 		" This command sets the default scale modifier for all units created after this point. This modifier multiplies against @scale, @actrmsg SetScale, @attach translations, and @actrmsg SetScaleAbsolute. <br> Note: The default scaler is 1 <br> @setscaler [newscale] <br> Examples: <br> @setscaler 3 <br> @setscaler .1 "
@@ -782,7 +782,7 @@ void LibapxCommandSetdelay(int user, unitgroup u, string argv, int spawningCount
 
 }
 void LibapxDefineSetdelay(string commandName) {
-	commandsGuideEntrySet(
+	LibapxCommandsGuideEntrySet(
 	 	gv_CommandsGuideEntryGeneral, 
 		commandName, 
 		" This command sets the default delay for all @attach commands and Gamesetup loading delays. <br> Note: By default it is .08, additionally the gamesetup delay will never go below a minimium value. Regardless of what you set this. <br> @setdelay [newdelay] <br> Examples: <br> @setdelay 3 <br> @setdelay .1 "
@@ -875,7 +875,7 @@ void LibapxCommandAttachMinus(int user, unitgroup u, string argv, int spawningCo
 		UnitGroupLoopEnd();
 }
 void LibapxDefineAttachMinus(string commandName) {
-	commandsGuideEntrySet(
+	LibapxCommandsGuideEntrySet(
 	 	gv_CommandsGuideEntryActor, 
 		commandName, 
 		" This command uses the old attach method, it is depreciated and generally has no reason to be used if you use @target with the modern @attach as they can emulate and surpass what attachdummy could do. <br> It is not compatible with target. <br> @attach- [actor] [point] <br> Examples: <br> @attach- marine head "
@@ -1116,7 +1116,7 @@ void LibapxCommandAttach(int user, unitgroup u, string argv, int spawningCount, 
 	return;
 }
 void LibapxDefineAttach(string commandName) {
-	commandsGuideEntrySet(
+	LibapxCommandsGuideEntrySet(
 	 	gv_CommandsGuideEntryActor, 
 		commandName, 
 		" This command attaches an actor to another actor. It is compatible with target. <br> @attach ->[target] [actor] [point] [x] [y] [z] -r [x] [y] [z]  <br> To Note: The x y z after -r is largely depreciated and now replaced by @rotation and it's functionality.  <br> You can find a list of actors to attach with _ search actor [name] <br> You can find a list of valid attachpoints with @attach listpoints  <br> You can check what points on a model with @checkpoints <br> the first [x] [y] [z] is how you attach a model with an offset <br> -nocache can be used with this command to stop it from caching in a unit's caches. <br> Examples: <br> (This would attach the actor 3 units ahead of where you attach.) <br> @attach marine origin 0 -3 0 <br>  (This would attach above where you attach) <br> @attach marine origin 0 0 4 <br> (This would go above and ahead of what you attach) <br> @attach marine origin 0 -3 5 <br> @target 123;@attach marine overhead;@attach ->123 marauder weapon 0 -3 "
@@ -1239,7 +1239,7 @@ void LibapxCommandAttachRotation(int user, unitgroup u, string argv, int spawnin
 
 }
 void LibapxDefineRotation(string commandName) {
-	commandsGuideEntrySet(
+	LibapxCommandsGuideEntrySet(
 	 	gv_CommandsGuideEntryActor, 
 		commandName, 
 		" This command creates a new actor on top of what actor it is called on with a specified rotation. It is not compatible with target. <br> @rotation [modifiers] [rotations.. <br> @rotation can have it's functionality and inputs modified with three modifiers, these modifiers are <br> -b: This changes the end actor from a default actor to a BeaconApex actor <br> -ypr: This changes it's xyz inputs into yaw pitch roll inputs <br> -nocache: This makes the command no longer store in the units caches. <br> Examples: <br> @rotation 30y <br> @rotation 90y 10z <br> @rotation -b 90x 35z 190y <br> @rotation -ypr 90y 32p 15r "
