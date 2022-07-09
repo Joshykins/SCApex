@@ -51,7 +51,7 @@ bool LibapxBlacklistparms(int catalog, string source, string replace, int p) {
 // y=a(x-h)^2+k
 // solving for a
 //
-fixed utilParabolaCalc(point vertex, point pointGiven, fixed targetX) {
+fixed LibapxUtilParabolaCalc(point vertex, point pointGiven, fixed targetX) {
 	fixed xh;
 	fixed yk;
 	fixed a;

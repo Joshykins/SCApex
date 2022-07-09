@@ -2648,47 +2648,72 @@ void LibapxDefineCopy(string commandName) {
 // ===============
 // creates an effect at target units or at a point
 void LibapxCommandEffect(int user, unitgroup u, string argv, int spawningCount, string bracketText) {
-	unitgroup g = u;
-	string effect = StringWord( argv, 2 );
+    unitgroup g = u;
+    string effect = StringWord( argv, 2 );
+    bool usingCursor;
 
-	effect = LibapxCatalogGet(c_gameCatalogEffect, effect);
-	if(effect == null) {
-		LibapxPrintError(user, "<c val=\"ff0000\">Unable to create effect</c>: No such effect exists.");
-		return;
-	}
+    effect = LibapxCatalogGet(c_gameCatalogEffect, effect);
+    if(effect == null) {
+        LibapxPrintError(user, "<c val=\"ff0000\">Unable to create effect</c>: No such effect exists.");
+        return;
+    }
+    if(StringFind(argv, "-point" ,c_stringNoCase) != -1 ) {
+        argv =  StringReplaceWord(argv, "-point", "", 1, c_stringNoCase);
+        usingCursor = true;
+    }
 
-	if( UnitGroupCount(g, c_unitCountAll) != 0 ) {
-		UnitGroupLoopBegin(g);
-		while(!UnitGroupLoopDone()) {
-			if( libNtve_gf_PlayerCanCreateEffectOnUnit(user, effect, UnitGroupLoopCurrent()) ) {
-				PlayerCreateEffectUnit(user, effect, UnitGroupLoopCurrent());
-				LibapxUnitCacheUpdate(UnitGroupLoopCurrent(), "@effect", argv);
-			}
-			else {
-				LibapxPrintError(user, "<c val=\"ff0000\">Unable to create the effect.</c>");
-			}
-			UnitGroupLoopStep();
-		}
-		UnitGroupLoopEnd();
-	}
-	else {
-		if( libNtve_gf_PlayerCanCreateEffectAtPoint(user, StringWord(EventChatMessage(false), 2), gv_LibapxPlayer[user].mousePosition) ) {
-			PlayerCreateEffectPoint(user, effect, gv_LibapxPlayer[user].mousePosition);
-		}
-		else {
-			LibapxPrintError(user, "<c val=\"ff0000\">Unable to create the effect.</c>");
-		}
-	}
+    if(usingCursor == true){
+        if( UnitGroupCount(g, c_unitCountAll) != 0 ) {
+            UnitGroupLoopBegin(g);
+            while(!UnitGroupLoopDone()) {
+                if( libNtve_gf_PlayerCanCreateEffectAtPoint(user, effect, gv_LibapxPlayer[user].mousePosition) ) {
+                    UnitCreateEffectPoint(UnitGroupLoopCurrent(), effect, gv_LibapxPlayer[user].mousePosition);
+                    LibapxUnitCacheUpdate(UnitGroupLoopCurrent(), "@effect -point", argv);
+                }
+                else {
+                    LibapxPrintError(user, "<c val=\"ff0000\">Unable to create the effect.</c>");
+                }
+                UnitGroupLoopStep();
+            }
+            UnitGroupLoopEnd();
+        }
+    }
 
-	return;
+    if(usingCursor == false){
+        if( UnitGroupCount(g, c_unitCountAll) != 0 ) {
+            UnitGroupLoopBegin(g);
+            while(!UnitGroupLoopDone()) {
+                if( libNtve_gf_PlayerCanCreateEffectOnUnit(user, effect, UnitGroupLoopCurrent()) ) {
+                    PlayerCreateEffectUnit(user, effect, UnitGroupLoopCurrent());
+                    LibapxUnitCacheUpdate(UnitGroupLoopCurrent(), "@effect", argv);
+                }
+                else {
+                    LibapxPrintError(user, "<c val=\"ff0000\">Unable to create the effect.</c>");
+                }
+                UnitGroupLoopStep();
+            }
+            UnitGroupLoopEnd();
+        }
+        else {
+            if( libNtve_gf_PlayerCanCreateEffectAtPoint(user, StringWord(EventChatMessage(false), 2), gv_LibapxPlayer[user].mousePosition) ) {
+                PlayerCreateEffectPoint(user, effect, gv_LibapxPlayer[user].mousePosition);
+            }
+            else {
+                LibapxPrintError(user, "<c val=\"ff0000\">Unable to create the effect.</c>");
+            }
+        }
+    }
+
+    return;
 }
 void LibapxDefineEffect(string commandName) {
-	LibapxCommandsGuideEntrySet(
-		gv_CommandsGuideEntryUnit, 
-		commandName, 
-		" This command creates an effect at a units position. <br> @effect [effectname] <br> Examples: <br> @effect MercenaryShield"
-	);
+    LibapxCommandsGuideEntrySet(
+        gv_CommandsGuideEntryUnit, 
+        commandName, 
+        " This command creates an effect at a units position. <br> @effect [effectname] <br> Examples: <br> @effect MercenaryShield"
+    );
 }
+
 
 // LibapxCommandKills
 // ==============

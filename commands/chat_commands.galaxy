@@ -268,116 +268,310 @@ void LibapxDefineRandom(string commandName) {
 // moves a unit to a location, then fires the string inputted once it arrives.
 // >moveto cannon/mouse -modifier [textToBeFired]
 void LibapxCommandMoveto(int user, unitgroup u, string argv, int spawningCount, string bracketText) {
-	string abil;
-	unit target;
-	point pt = gv_LibapxPlayer[user].mousePosition;
-	int mode = c_orderQueueReplace;
-	order o;
-	fixed moveSpeed;
-	fixed distance;
-	int i = 0;
-	//linear
-	bool modHeight = false;
-	fixed desiredHeight = 4;
-	//Parabolic
-	bool modArc = false;
-	fixed desiredPeak;
-	fixed slopeOfTangentLine;
-	fixed slopeOfTangentLinePerp;
-	point center;
-	point endPoint;
-	point startPoint;
-	point graphPoint;
-	int indexJumper;
-	fixed radius;
-	fixed x;
-	int percision;
-	fixed y;
-	//Otherstuff
-	fixed timeUnitlFinished;
-	abil = LibapxCatalogGet(c_gameCatalogAbil, "move");
-	if (UnitGroupCount(u, c_unitCountAlive) > 1) {
-		LibapxPrintError(user, "Command can only be used on one unit.");
-		return;
-	}
-	if (StringWord(argv, 2) == "-height") {
-		modHeight = true;
-		desiredHeight = StringToFixed(StringWord(argv, 3));
-	}
-	if (StringWord(argv, 2) == "-arc") {
-		modArc = true;
-		if(StringWord(argv, 3) == "" ) {
-			desiredPeak=4;
-		} else {
-			desiredPeak = StringToFixed(StringWord(argv, 3));
-		}
-		if (desiredPeak <= 0) {
-			desiredPeak = .1;
-		}
-	}
-
-
-	if(StringWord(argv, 4) != "" && StringWord(argv, 5) != "") {
-		pt = Point(StringToFixed(StringWord(argv, 4)), StringToFixed(StringWord(argv, 5)));
-	}
-
-	target = UnitGroupUnit(u, 1);
-	o = OrderTargetingPoint(AbilityCommand(abil, 0), pt);
-	UnitIssueOrder(target, o, mode);
-	 AnimLengthQueryWait();
-	 distance = DistanceBetweenPoints(pt, UnitGetPosition(target));
-	 moveSpeed = UnitGetPropertyFixed(target, c_unitPropMovementSpeed, c_unitPropCurrent);
-	 timeUnitlFinished = distance/moveSpeed;
-	 if (modHeight) {
-		 UnitSetHeight(target,desiredHeight,timeUnitlFinished);
-		 Wait(timeUnitlFinished,c_timeGame);
-		 LibapxChatParse(LibapxBracketTextGrab(bracketText, 1),user, u, spawningCount );
-	 }
-	else if (modArc) {
-		//config
-		percision = 8; 
-
-		//Getting points
-		startPoint = Point(-distance/2, 0 );
-		endPoint = Point(distance/2, 0 );
-		graphPoint = Point ( 0, desiredPeak );
+    string abil;
+    unit target;
+    point pt = gv_LibapxPlayer[user].mousePosition;
+    int mode = c_orderQueueReplace;
+    order o;
+    fixed moveSpeed;
+    fixed distance;
+    int i = 0;
+    //linear
+    bool modHeight = false;
+    fixed desiredHeight = 4;
+    //Parabolic
+    bool modArc = false;
+    fixed desiredPeak;
+    fixed slopeOfTangentLine;
+    fixed slopeOfTangentLinePerp;
+    point center;
+    point endPoint;
+    point startPoint;
+    point graphPoint;
+    int indexJumper;
+    fixed radius;
+    fixed x;
+    int percision;
+    fixed y;
+    //Otherstuff
+    fixed timeUnitlFinished;
+    //Static Global Offset -Ngo
+    bool offset = false;
+    //Inserting -rel from @position -Ngo
+    int shifterX = 1; // 0 is subtract, 2 is add.
+    int shifterY = 1;
+    int p = user;
+    unitgroup g = u;
+    point UnitPos;
+    fixed uX;
+    fixed uY;
+    fixed x2;
+    fixed facing;
+    fixed y2;
+    bool relative = false;
+    fixed polarDistance;
+    fixed polarFacingX;
+    fixed polarFacingY;
+    fixed polarFacing;
+    //issuing patrols
+    bool patrol;
+    //Additions to relative and offset (and for easier implementation)
+    string argX = StringWord(argv, 3);
+    string argY = StringWord(argv, 4);
 
 
 
-		for(i = 0; i < percision; i = i + 1 ) {
-			x = ((distance/percision)*(i+1))-distance/2;
-			y = utilParabolaCalc(graphPoint, startPoint, x);
-
-			UnitSetHeight(target, y, timeUnitlFinished/percision);
-			Wait(timeUnitlFinished/percision,c_timeGame);
-		};
-
-		LibapxChatParse(LibapxBracketTextGrab(bracketText, 1),user, u, spawningCount );
+    abil = LibapxCatalogGet(c_gameCatalogAbil, "move");
 
 
-		//UnitSetHeight(target,heightOfArc,timeUnitlFinished/2);
-		//Wait(timeUnitlFinished/2,c_timeGame);
-		//UnitSetHeight(target,0,timeUnitlFinished/2);
-		//Wait(timeUnitlFinished/2,c_timeGame);
-		//LibapxChatParse(LibapxBracketTextGrab(bracketText, 1),user, u, spawningCount );
+    if (UnitGroupCount(u, c_unitCountAlive) > 1) {
+        LibapxPrintError(user, "Command can only be used on one unit.");
+        return;
+    }
+    if (StringWord(argv, 2) == "-height") {
+        modHeight = true;
+        desiredHeight = StringToFixed(StringWord(argv, 3));
+    }
+    if (StringWord(argv, 2) == "-arc") {
+        modArc = true;
+        argX = StringWord(argv, 5);//Moves argX for >moveto -arc [height] [X] [Y]
+        argY = StringWord(argv, 6);//Moves argY for >moveto -arc [height] [X] [Y]
+        if(StringWord(argv, 3) == "" ) {
+            desiredPeak=4;
+        } else {
+            desiredPeak = StringToFixed(StringWord(argv, 3));
+        }
+        if (desiredPeak <= 0) {
+            desiredPeak = .1;
+        }
+    }
+    //turning offset on
+    if(StringFind(argv, "-patrol" ,c_stringNoCase) != -1 ) {
+        argv =  StringReplaceWord(argv, "-patrol", "", 1, c_stringNoCase);
+        argX = StringWord(argv, 4);
+        argY = StringWord(argv, 5);
+        abil = LibapxCatalogGet(c_gameCatalogAbil, "move");
+        patrol = true;
+    }
+    if(StringFind(argv, "-attack" ,c_stringNoCase) != -1 ) {
+        argX = StringWord(argv, 4);
+        argY = StringWord(argv, 5);
+        argv =  StringReplaceWord(argv, "-attack", "", 1, c_stringNoCase);
+        abil = LibapxCatalogGet(c_gameCatalogAbil, "attack");
+    }
+
+    //turning offset on
+    if(StringFind(argv, "-offset" ,c_stringNoCase) != -1 ) {
+        argv =  StringReplaceWord(argv, "-offset", "", 1, c_stringNoCase);
+        offset = true;
+    }
+    //turning relative on
+    if(StringFind(argv, "-rel" ,c_stringNoCase) != -1 ) {
+        argv =  StringReplaceWord(argv, "-rel", "", 1, c_stringNoCase);
+        relative = true;
+    }
+    //These are from @position -rel
+    //When -rel is active
+    if(relative == true ) {
+        argv = StringReplaceWord(argv, "-rel", "",1,c_stringNoCase);
+        // x Stuff
+        // + or - found, isolating
+        if (StringFind(argX, "+", c_stringNoCase) != -1 ) {
+            //It's a +
+            shifterX = 2;
+            //Now remove the +
+            i = StringFind(argX, "+", c_stringNoCase);
+            x = StringToFixed(StringReplace(argX, "", i, i));
+        }
+        else if (StringFind(argX, "-", c_stringNoCase) != -1 ) {
+            //It's a -
+            shifterX = 0;
+            //Now remove the -
+            i = StringFind(argX, "-", c_stringNoCase);
+            x = StringToFixed(StringReplace(argX, "", i, i));
+        }
+        else {
+            shifterX= 1;
+            x = StringToFixed(argX);
+        }
 
 
-	 }
-	 else {
-		Wait(timeUnitlFinished,c_timeGame);
-		LibapxChatParse(LibapxBracketTextGrab(bracketText, 1),user, u, spawningCount );
-	 }
+        // y Stuff
+        // + or - found, isolating
+        if (StringFind(argY, "+", c_stringNoCase) != -1 ) {
+            //It's a +
+            shifterY = 2;
+            //Now remove the +
+            i = StringFind(argY, "+", c_stringNoCase);
+            y = StringToFixed(StringReplace(argY, "", i, i));
+        }
+        else if (StringFind(argY, "-", c_stringNoCase) != -1 ) {
+            //It's a -
+            shifterY = 0;
+            //Now remove the -
+            i = StringFind(argY, "-", c_stringNoCase);
+            y = StringToFixed(StringReplace(argY, "", i, i));
+        }
+        else {
+            shifterY = 1;
+            y = StringToFixed(argY);y = StringToFixed(argY);
+        }
+
+        if(relative) {//Thanks sero. -Ngo
+            UnitGroupLoopBegin(g);
+            while(!UnitGroupLoopDone())
+            {
+                UnitPos = UnitGetPosition(UnitGroupLoopCurrent());
+                uX = PointGetX(UnitPos);
+                uY = PointGetY(UnitPos);
+                facing = UnitGetFacing(UnitGroupLoopCurrent());
+                polarDistance = x;
+    
+                if (shifterX == 2) {
+                    polarFacingX = 90 + facing;
+                }
+                else if (shifterX == 0) {
+                    polarFacingX = 270 + facing;
+                }
+                else {
+                    polarFacingX =  facing;
+                }
+                
+                x2 = uX+(polarDistance*Cos(polarFacingX));
+                y2 = uY+(polarDistance*Sin(polarFacingX));
+                polarDistance = y;
+                
+                if (shifterY == 2) {
+                    polarFacingY = facing;
+                }
+                else if (shifterY == 0) {
+                    polarFacingY = 180 + facing;
+                }
+                else {
+                    polarFacingY = facing;
+                }
+                x2 = x2+(polarDistance*Cos(polarFacingY));
+                y2 = y2+(polarDistance*Sin(polarFacingY));
+                
+    
+                pt = Point(x2,y2);
+                UnitGroupLoopStep();
+            }
+            UnitGroupLoopEnd();
+        }
+        else {
+            UnitGroupLoopBegin(g);
+            while(!UnitGroupLoopDone())
+            {
+                UnitPos = UnitGetPosition(UnitGroupLoopCurrent());
+                uX = PointGetX(UnitPos);
+                uY = PointGetY(UnitPos);
+        
+                if (shifterX == 2) {
+                    x2 = uX + x;
+                }
+                else if (shifterX == 0) {
+                    x2 = uX - x;
+                }
+                else {
+                    x2 = x;
+                }
+                if (shifterY == 2) {
+                    y2 = uY + y;
+                }
+                else if (shifterY == 0) {
+                    y2 = uY - y;
+                }
+                else {
+                    y2 = y;
+                }
+        
+        
+        
+                pt = Point(x2,y2);
+                UnitGroupLoopStep();
+            }
+            UnitGroupLoopEnd();
+        }
+    
+
+    }
 
 
-	 
-	 
+    if(StringWord(argv, 4) != "" && StringWord(argv, 5) != "") {
+        if(relative == false){
+            if(offset == false){
+            pt = Point(StringToFixed(StringWord(argv, 4)), StringToFixed(StringWord(argv, 5)));
+            }
+        }
+    }
+    //setting the point to an offset from the selected unit
+    if(offset == true) {
+        target = UnitGroupUnit(u, 1);
+        pt = PointWithOffset(UnitGetPosition(target),StringToFixed(argX),StringToFixed(argY));
+        LibapxPrintError(user, libNtve_gf_ConvertPointToString(pt));
+    }
 
-	return;
+    target = UnitGroupUnit(u, 1);
+    o = OrderTargetingPoint(AbilityCommand(abil, 0), pt);
+    if (patrol == true){
+        o =  OrderTargetingPoint(AbilityCommand("move", 1), pt);
+    }
+    UnitIssueOrder(target, o, mode);
+     AnimLengthQueryWait();
+     distance = DistanceBetweenPoints(pt, UnitGetPosition(target));
+     moveSpeed = UnitGetPropertyFixed(target, c_unitPropMovementSpeed, c_unitPropCurrent);
+     timeUnitlFinished = distance/moveSpeed;
+     if (modHeight) {
+         UnitSetHeight(target,desiredHeight,timeUnitlFinished);
+         Wait(timeUnitlFinished,c_timeGame);
+         LibapxChatParse(LibapxBracketTextGrab(bracketText, 1),user, u, spawningCount );
+     }
+    else if (modArc) {
+        //config
+        percision = 8; 
+
+        //Getting points
+        startPoint = Point(-distance/2, 0 );
+        endPoint = Point(distance/2, 0 );
+        graphPoint = Point ( 0, desiredPeak );
+
+
+
+        for(i = 0; i < percision; i = i + 1 ) {
+            x = ((distance/percision)*(i+1))-distance/2;
+            y = LibapxUtilParabolaCalc(graphPoint, startPoint, x);
+
+            UnitSetHeight(target, y, timeUnitlFinished/percision);
+            Wait(timeUnitlFinished/percision,c_timeGame);
+        };
+
+        LibapxChatParse(LibapxBracketTextGrab(bracketText, 1),user, u, spawningCount );
+
+
+        //UnitSetHeight(target,heightOfArc,timeUnitlFinished/2);
+        //Wait(timeUnitlFinished/2,c_timeGame);
+        //UnitSetHeight(target,0,timeUnitlFinished/2);
+        //Wait(timeUnitlFinished/2,c_timeGame);
+        //LibapxChatParse(LibapxBracketTextGrab(bracketText, 1),user, u, spawningCount );
+
+
+     }
+     else {
+        Wait(timeUnitlFinished,c_timeGame);
+        LibapxChatParse(LibapxBracketTextGrab(bracketText, 1),user, u, spawningCount );
+     }
+
+
+     
+     
+
+    return;
 }
 void LibapxDefineMoveto(string commandName) {
 	LibapxCommandsGuideEntrySet(
 		gv_CommandsGuideEntryGeneral, 
-		commandName, 
-		" This command moves a unit to your mousepoint and runs the input you give it when it arrives at it's destination. The unit can travel in a parabolic way by using -arc, or it can it move to a desired height with -height. <br> >moveto [modifier] [heightofparabola] [[commands;whateverelse]] <br> Examples: <br> >moveto -height 5 [Landed!] <br> >moveto -arc 12 [wee!] "
-	);
+        commandName, 
+        " This command moves a unit to your mousepoint and runs the input you give it when it arrives at it's destination. The unit can travel in a parabolic way by using -arc, or it can it move to a desired height with -height. Can instead patrol with -patrol. Using relative offset instead of mouse, use -rel but for fixed offset instead use -offset. <br> >moveto [modifier] [heightofparabola] [[commands;whateverelse]] <br> Examples: <br> >moveto -height 5 [Landed!] <br> >moveto -arc 12 [wee!] <br> >moveto -rel +5 +5 [Diagonal movement is cool] <br> >moveto -offset 0 -5 [Going down!] <br> >moveto -patrol +2 +5 [It's a nice day to go out on patrol]"
+    );
 }
