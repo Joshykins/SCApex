@@ -1,94 +1,94 @@
 //=========================================================
 //		Apex Roleplaying Engine
-//		Copyright (c) 2019, Apex Group
+//		Copyright (c) 2022, Apex Group
 //=========================================================
 // This software is distributed under the MIT License:
 // <http://opensource.org/licenses/MIT>
 //=========================================================
 
-// libapx_region_entered
+// LibapxRegionEntered
 // ===================
 // if region entered has linked regions, set unit
 // custom value to ID of linked region (for teleporting)
 // created on demand when waygates are created via
-// #teleport (see region_commands.galaxy)
+// #teleport (see regionCommands.galaxy)
 // (Modified from Cortex)
-bool libapx_region_entered(bool testConds, bool runActions) {
-	int waygate_id = 1;
+bool LibapxRegionEntered(bool testConds, bool runActions) {
+	int waygateId = 1;
 	region r;
-	string rgn_name;
-	unitgroup units_in_rgn;
+	string rgnName;
+	unitgroup unitsInRgn;
 	int nalive;
 
 	// get the region from data table
-	while( waygate_id < libapx_region_waygate_counter ) {
-		rgn_name = DataTableGetString(true, libapx_WAYGATE_DATA_TABLE_IDENTIFIER + " " + IntToString(waygate_id));
-		r = DataTableGetRegion(true, rgn_name);
+	while( waygateId < LibapxRegionWaygateCounter ) {
+		rgnName = DataTableGetString(true, LibapxWAYGATEDATATABLEIDENTIFIER + " " + IntToString(waygateId));
+		r = DataTableGetRegion(true, rgnName);
 		if( r == EventUnitRegion() ) {
 			break;
 		}
 
-		waygate_id += 1;
+		waygateId += 1;
 
 		// reached max waygate counters: not in a waygate
-		if( waygate_id == libapx_region_waygate_counter ) {
+		if( waygateId == LibapxRegionWaygateCounter ) {
 			return false;
 		}
 	}
 
 	// check if entering or leaving region
 	if( libNtve_gf_UnitInRegion(EventUnit(), EventUnitRegion()) ) { // unit entered region
-		//libapx_print_output("Region entered", UnitGetOwner(EventUnit()) );
+		//LibapxPrintOutput("Region entered", UnitGetOwner(EventUnit()) );
 
 		// get linked region
-		waygate_id = DataTableGetInt(true, libapx_REGION_LINK_DATA_TABLE_IDENTIFIER + " " + rgn_name );
-		UnitSetCustomValue(EventUnit(), libapx_UNIT_INDEX_WAYGATE, IntToFixed(waygate_id));
-		//libapx_print_output(FixedToString(UnitGetCustomValue(EventUnit(), libapx_UNIT_INDEX_WAYGATE), 1), UnitGetOwner(EventUnit()) );
+		waygateId = DataTableGetInt(true, LibapxREGIONLINKDATATABLEIDENTIFIER + " " + rgnName );
+		UnitSetCustomValue(EventUnit(), gv_LibapxUnitIndexWaygate, IntToFixed(waygateId));
+		//LibapxPrintOutput(FixedToString(UnitGetCustomValue(EventUnit(), gv_LibapxUnitIndexWaygate), 1), UnitGetOwner(EventUnit()) );
 
 		// turn on dialog "enter" button for region
-		DialogSetVisible(DataTableGetDialog(true, libapx_WAYGATE_DIALOG_DATA_TABLE_IDENTIFIER + " " + rgn_name), PlayerGroupSingle(UnitGetOwner(EventUnit())), true);
+		DialogSetVisible(DataTableGetDialog(true, LibapxWAYGATEDIALOGDATATABLEIDENTIFIER + " " + rgnName), PlayerGroupSingle(UnitGetOwner(EventUnit())), true);
 	} else { // leaving this region.
-		UnitSetCustomValue(EventUnit(), libapx_UNIT_INDEX_WAYGATE, 0);
+		UnitSetCustomValue(EventUnit(), gv_LibapxUnitIndexWaygate, 0);
 
-		//units_in_rgn = UnitGroup(null, EventPlayer(), r, UnitFilter(0, 0, (1 << c_targetFilterMissile), (1 << (c_targetFilterDead - 32)) | (1 << (c_targetFilterHidden - 32))), 0);
-		//nalive = UnitGroupCount(units_in_rgn, c_unitCountAlive);
+		//unitsInRgn = UnitGroup(null, EventPlayer(), r, UnitFilter(0, 0, (1 << c_targetFilterMissile), (1 << (c_targetFilterDead - 32)) | (1 << (c_targetFilterHidden - 32))), 0);
+		//nalive = UnitGroupCount(unitsInRgn, c_unitCountAlive);
 		//if( nalive > 0 ) {
-		//	DialogSetVisible(DataTableGetDialog(true, libapx_WAYGATE_DIALOG_DATA_TABLE_IDENTIFIER + " " + rgn_name), PlayerGroupSingle(UnitGetOwner(EventUnit())), true);
+		//	DialogSetVisible(DataTableGetDialog(true, LibapxWAYGATEDIALOGDATATABLEIDENTIFIER + " " + rgnName), PlayerGroupSingle(UnitGetOwner(EventUnit())), true);
 		//}
 	}
 	return true;
 }
 
-// libapx_waygate_dialog_manager
+// LibapxWaygateDialogManager
 // ===================
 // called periodically (set in events.galaxy) to
 // create/destroy the player waygate button
-bool libapx_waygate_dialog_manager(bool testConds, bool runActions) {
+bool LibapxWaygateDialogManager(bool testConds, bool runActions) {
 	unitgroup g;
 	int nalive; // number of units in g
 	int index;
 	unit u;
-	int waygate_id;
+	int waygateId;
 	int player = 1;
-	string rgn_name;
+	string rgnName;
 	region r;
-	unitgroup units_in_rgn;
+	unitgroup unitsInRgn;
 
 	// loop over all waygates and their regions
-	waygate_id = 1;
-	while( waygate_id < libapx_region_waygate_counter ) {
+	waygateId = 1;
+	while( waygateId < LibapxRegionWaygateCounter ) {
 		// get waygate region (if it exists)
-		if( !DataTableValueExists(true, libapx_WAYGATE_DATA_TABLE_IDENTIFIER + " " + IntToString(waygate_id)) ) {
-			waygate_id += 1;
+		if( !DataTableValueExists(true, LibapxWAYGATEDATATABLEIDENTIFIER + " " + IntToString(waygateId)) ) {
+			waygateId += 1;
 			continue;
 		}
 
-		rgn_name = DataTableGetString(true, libapx_WAYGATE_DATA_TABLE_IDENTIFIER + " " + IntToString(waygate_id));
-		r = DataTableGetRegion(true, rgn_name);
+		rgnName = DataTableGetString(true, LibapxWAYGATEDATATABLEIDENTIFIER + " " + IntToString(waygateId));
+		r = DataTableGetRegion(true, rgnName);
 
 		// check if players have non-structure units alive inside the region
 		player = 1;
-		while( player < libapx_MAX_PLAYERS ) {
+		while( player < gv_LibapxMaxPlayers ) {
 			if( PlayerType(player) != c_playerTypeUser || PlayerStatus(player) != c_playerStatusActive ) {
 				player += 1;
 				continue;
@@ -96,9 +96,9 @@ bool libapx_waygate_dialog_manager(bool testConds, bool runActions) {
 
 			// get # of units alive in region for given player. if 0, turn off the
 			// waygate dialog for the player.
-			units_in_rgn = UnitGroup(null, player, r, UnitFilter(0, 0, (1 << c_targetFilterMissile), (1 << (c_targetFilterDead - 32)) | (1 << (c_targetFilterHidden - 32))), 0);
-			if( UnitGroupCount(units_in_rgn, c_unitCountAlive) == 0 ) {
-				DialogSetVisible(DataTableGetDialog(true, libapx_WAYGATE_DIALOG_DATA_TABLE_IDENTIFIER + " " + rgn_name), PlayerGroupSingle(player), false);
+			unitsInRgn = UnitGroup(null, player, r, UnitFilter(0, 0, (1 << c_targetFilterMissile), (1 << (c_targetFilterDead - 32)) | (1 << (c_targetFilterHidden - 32))), 0);
+			if( UnitGroupCount(unitsInRgn, c_unitCountAlive) == 0 ) {
+				DialogSetVisible(DataTableGetDialog(true, LibapxWAYGATEDIALOGDATATABLEIDENTIFIER + " " + rgnName), PlayerGroupSingle(player), false);
 			}
 
 			player += 1;
@@ -107,30 +107,30 @@ bool libapx_waygate_dialog_manager(bool testConds, bool runActions) {
 
 		// if yes, continue
 		// else
-		waygate_id += 1;
+		waygateId += 1;
 	}
 
 	return true;
 }
 
-// libapx_waygate_dialog_clicked
+// LibapxWaygateDialogClicked
 // ===========================
 // runs whenever a dialog control is clicked
 // if the control is the waygate dialog, warp
 // any selected units between waygate regions
-bool libapx_waygate_dialog_clicked_old(bool testConds, bool runActions) {
+bool LibapxWaygateDialogClickedOld(bool testConds, bool runActions) {
 	unitgroup g;
 	int nalive;	// number of units alive in g
 	int index = 1;
-	int waygate_id;
+	int waygateId;
 	unit u;
 	region r;
 	string s;
 
 	// Waygate teleport system
-	if( EventDialogControl() == libapx_player[EventPlayer()].waygate_dialog_control_btn ) {
+	if( EventDialogControl() == gv_LibapxPlayer[EventPlayer()].waygateDialogControlBtn ) {
 		g = UnitGroupSelected(EventPlayer());
-		g = libapx_enforce_unit_permissions(g, EventPlayer());
+		g = LibapxEnforceUnitPermissions(g, EventPlayer());
 		nalive = UnitGroupCount(g, c_unitCountAlive);
 
 		if( nalive > 0 ) {
@@ -141,10 +141,10 @@ bool libapx_waygate_dialog_clicked_old(bool testConds, bool runActions) {
 					continue;
 				}
 
-				waygate_id = FixedToInt(UnitGetCustomValue(u, libapx_UNIT_INDEX_WAYGATE));
+				waygateId = FixedToInt(UnitGetCustomValue(u, gv_LibapxUnitIndexWaygate));
 
-				if( waygate_id != 0 ) { // Lookup this region by waygate id
-					s = DataTableGetString(true, libapx_WAYGATE_DATA_TABLE_IDENTIFIER + " " + IntToString(waygate_id));
+				if( waygateId != 0 ) { // Lookup this region by waygate id
+					s = DataTableGetString(true, LibapxWAYGATEDATATABLEIDENTIFIER + " " + IntToString(waygateId));
 					if( s != "" ) {
 						r = DataTableGetRegion(true, s);
 						if( r != null ) { // move units to linked region
@@ -161,24 +161,24 @@ bool libapx_waygate_dialog_clicked_old(bool testConds, bool runActions) {
 	return true;
 }
 
-// libapx_waygate_dialog_clicked
+// LibapxWaygateDialogClicked
 // ===========================
 // runs whenever a dialog control is clicked
 // if the control is the waygate dialog, warp
 // any selected units between waygate regions
-bool libapx_waygate_dialog_clicked(bool testConds, bool runActions) {
+bool LibapxWaygateDialogClicked(bool testConds, bool runActions) {
 	unitgroup g;
 	int nalive;	// number of units alive in g
 	int index = 1;
-	int waygate_id;
+	int waygateId;
 	unit u;
 	region r;
 	string s;
 
 	// Waygate teleport system
-	if( DataTableValueExists(true, libapx_WAYGATE_DIALOG_REG_DATA_TABLE_IDENTIFIER + " " + IntToString(DialogControlGetDialog(EventDialogControl()) ) ) ) {
+	if( DataTableValueExists(true, LibapxWAYGATEDIALOGREGDATATABLEIDENTIFIER + " " + IntToString(DialogControlGetDialog(EventDialogControl()) ) ) ) {
 		g = UnitGroupSelected(EventPlayer());
-		g = libapx_enforce_unit_permissions(g, EventPlayer());
+		g = LibapxEnforceUnitPermissions(g, EventPlayer());
 		nalive = UnitGroupCount(g, c_unitCountAlive);
 
 		if( nalive > 0 ) {
@@ -189,15 +189,15 @@ bool libapx_waygate_dialog_clicked(bool testConds, bool runActions) {
 					continue;
 				}
 
-				waygate_id = FixedToInt(UnitGetCustomValue(u, libapx_UNIT_INDEX_WAYGATE));
+				waygateId = FixedToInt(UnitGetCustomValue(u, gv_LibapxUnitIndexWaygate));
 
-				if( waygate_id != 0 ) { // Lookup this region by waygate id
-					s = DataTableGetString(true, libapx_WAYGATE_DATA_TABLE_IDENTIFIER + " " + IntToString(waygate_id));
+				if( waygateId != 0 ) { // Lookup this region by waygate id
+					s = DataTableGetString(true, LibapxWAYGATEDATATABLEIDENTIFIER + " " + IntToString(waygateId));
 					if( s != "" ) {
 						r = DataTableGetRegion(true, s);
 						if( r != null ) { // move units to linked region
 							UnitSetPosition( u, RegionGetCenter( r ), false );
-							//libapx_print_output("Leaving: " + FixedToString(UnitGetCustomValue(EventUnit(), libapx_UNIT_INDEX_WAYGATE), 1), UnitGetOwner(u) );
+							//LibapxPrintOutput("Leaving: " + FixedToString(UnitGetCustomValue(EventUnit(), gv_LibapxUnitIndexWaygate), 1), UnitGetOwner(u) );
 
 						}
 					}

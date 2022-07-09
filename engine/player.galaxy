@@ -1,50 +1,50 @@
 //=========================================================
 //		Apex Roleplaying Engine
-//		Copyright (c) 2019, Apex Group
+//		Copyright (c) 2022, Apex Group
 //=========================================================
 // This software is distributed under the MIT License:
 // <http://opensource.org/licenses/MIT>
 //=========================================================
 
 //Prototypes
-void libapx_chk_all_aliases(int player);
+void LibapxChkAllAliases(int player);
 
 // basic game player constants
-const int libapx_MAX_PLAYERS = 16; // max players supported is 16 (0 - neutral, 15 - hostile)
-const int libapx_PARSER_THREAD_COUNT = 500; // Max thread count for parser
-const string libapx_PLAYER_BANK_NAME = "ApexBank";
-const int libapx_PLAYER_NEUTRAL = 0;
-const int libapx_PLAYER_HOSTILE = 15;
-const int libapx_UI_PANEL_NONE = -1;
+const int gv_LibapxMaxPlayers = 16; // max players supported is 16 (0 - neutral, 15 - hostile)
+static const int ParserThreadCount = 500; // Max thread count for parser
+const string gv_gv_LibapxPlayerBankName = "ApexBank";
+const int gv_gv_LibapxPlayerNeutral = 0;
+const int gv_LibapxPLayerHostile = 15;
+const int gv_LibapxUiPanelNone = -1;
 
 
 //DEBUG
 //Sets the bank for the wireframe
-void libapx_wireframe_bank_layer_set(
+void LibapxWireframeBankLayerSet(
     //Not wireframe attr
     int p, string wireframe, bool create, int layer, 
     //Wireframe attrs
-    string path, int r, int g, int b, bool saturation, int render_priority, int OffsetX, int OffsetY, int width, int height, int rotation, int alpha
+    string path, int r, int g, int b, bool saturation, int renderPriority, int OffsetX, int OffsetY, int width, int height, int rotation, int alpha
 );
 
 
-// libapx_player_struct
+// gv_LibapxPlayerStruct
 // =======================
 // contains all player properties
-struct libapx_player_properties {
+struct gv_LibapxPlayerProperties {
 
 	// API 
 	// =========
 	// Variables for input data streaming
-	string api_string_input;
-	bool api_reading;
+	string apiStringInput;
+	bool apiReading;
 
-	// mouse_position
+	// mousePosition
 	// =================
 	// Location of player mouse
-	point mouse_position;		// x,y position in world
-	point mouse_position_ui;	// x,y position in the game UI
-	point mouse_position_lasttick_ui;
+	point mousePosition;		// x,y position in world
+	point mousePositionUi;	// x,y position in the game UI
+	point mousePositionLasttickUi;
 
 	//Wireframe specifics.
 	string wireframe;
@@ -57,11 +57,11 @@ struct libapx_player_properties {
 	// flags for whether keys/mouse pressed up/down:
 	// false - up
 	// true - down
-	bool key_shift;
-	bool key_ctrl;
-	bool key_ctrl_lasttick;
-	bool key_alt;
-	bool key_tab;
+	bool keyShift;
+	bool keyCtrl;
+	bool keyCtrlLasttick;
+	bool keyAlt;
+	bool keyTab;
 
 	//new keys
 	bool key_0;
@@ -75,131 +75,131 @@ struct libapx_player_properties {
 	bool key_8;
 	bool key_9;
 	//Done
-	bool key_a;
-	bool key_b;
-	bool key_c;
-	bool key_d;
-	bool key_e;
-	bool key_f;
-	bool key_g;
-	bool key_h;
-	bool key_i;
-	bool key_j;
-	bool key_k;
-	bool key_l;
-	bool key_m;
-	bool key_n;
-	bool key_o;
-	bool key_p;
-	bool key_q;
-	bool key_r;
-	bool key_s;
-	bool key_t;
-	bool key_u;
-	bool key_v;
-	bool key_w;
-	bool key_x;
-	bool key_y;
-	bool key_z;
-	bool key_up;
-	bool key_down;
-	bool key_left;
-	bool key_right;
-	bool key_pgUp;
-	bool key_pgDown;
-	bool key_numPad0;
-	bool key_numPad1;
-	bool key_numPad2;
-	bool key_numPad3;
-	bool key_numPad4;
-	bool key_numPad5;
-	bool key_numPad6;
-	bool key_numPad7;
-	bool key_numPad8;
-	bool key_numPad9;
-	bool key_numPadPlus;
-	bool key_numPadMinus;
-	bool key_numPadMultiply;
-	bool key_numPadDivide;
-	bool key_numPadDecimal;
-	bool key_grave;
+	bool keyA;
+	bool keyB;
+	bool keyC;
+	bool keyD;
+	bool keyE;
+	bool keyF;
+	bool keyG;
+	bool keyH;
+	bool keyI;
+	bool keyJ;
+	bool keyK;
+	bool keyL;
+	bool keyM;
+	bool keyN;
+	bool keyO;
+	bool keyP;
+	bool keyQ;
+	bool keyR;
+	bool keyS;
+	bool keyT;
+	bool keyU;
+	bool keyV;
+	bool keyW;
+	bool keyX;
+	bool keyY;
+	bool keyZ;
+	bool keyUp;
+	bool keyDown;
+	bool keyLeft;
+	bool keyRight;
+	bool keyPgUp;
+	bool keyPgDown;
+	bool keyNumPad0;
+	bool keyNumPad1;
+	bool keyNumPad2;
+	bool keyNumPad3;
+	bool keyNumPad4;
+	bool keyNumPad5;
+	bool keyNumPad6;
+	bool keyNumPad7;
+	bool keyNumPad8;
+	bool keyNumPad9;
+	bool keyNumPadPlus;
+	bool keyNumPadMinus;
+	bool keyNumPadMultiply;
+	bool keyNumPadDivide;
+	bool keyNumPadDecimal;
+	bool keyGrave;
 
 
-	bool mouse_right;
+	bool mouseRight;
 
 
-	// chat_msg
+	// chatMsg
 	// ================
 	// player chat message for parsing
-	// when running a command, chat_msg is set to the command being run
-	string chat_msg;
+	// when running a command, chatMsg is set to the command being run
+	string chatMsg;
 
 	//Spawncounter
 	//===============
 	//An integer to emulate threads within the parser.
 	int spawningCount;
 
-	// done_parsing
+	// doneParsing
 	// =================
 	// flag to manually interrupt and stop the parser for the player
 	// can be used by commands to stop parsing early
-	bool done_parsing;
+	bool doneParsing;
 
-	// permission_level
+	// permissionLevel
 	// =================
 	// Permission level of a player (default - 0, mod - 1, admin - 2)
-	int permission_level;
+	int permissionLevel;
 
-	// permission_allow
+	// permissionAllow
 	// =================
 	// String that contains single game instance of commands,
 	// delineated by spaces, of commands player CAN use
 	// For a single game instance, these will transfer even if admin changes
-	string permissions_allow;
+	string permissionsAllow;
 
-	// permission_block
+	// permissionBlock
 	// =================
 	// String that contains single game instance of commands,
 	// delineated by spaces, of commands player CANNOT use
 	// For a single game instance, these will transfer even if admin changes
-	string permissions_block;
+	string permissionsBlock;
 
 	// general permissions flags
 	// ==================
 	bool disabled;			// can player use any commands
 	bool muted;				// can player chat (only applies to OOC)
-	bool alias_blocked;		// can player use aliases system
-	bool template_blocked;	// can player use template system
+	bool aliasBlocked;		// can player use aliases system
+	bool templateBlocked;	// can player use template system
 
 
-	// is_placing_unit
+	// isPlacingUnit
 	// ===============
 	// flag for using @spawn mouse-click style
-	bool is_placing_unit;
+	bool isPlacingUnit;
 
-	// spawn_splat
+	// spawnSplat
 	// ==============
 	// hovers under cursor for mouse-click @spawn placement
-	unit spawn_splat;
-	fixed spawn_splat_x;	// x scaling
-	fixed spawn_splat_y;	// y scaling
-	fixed spawn_splat_z;	// z scaling
+	unit spawnSplat;
+	fixed spawnSplatX;	// x scaling
+	fixed spawnSplatY;	// y scaling
+	fixed spawnSplatZ;	// z scaling
 
 	// spawn instance variables
 	// ============
 	// these record a player's previous usage of @spawn
 	// so players can repeat @spawn without parameters
 	// to repeat the last instance
-	string spawn_instance_type;		// unit type
-	int spawn_instance_count;		// # spawned
-	int spawn_instance_player;		// player units spawned for
-	region spawn_instance_location;	// location spawned
+	string spawnInstanceType;		// unit type
+	int spawnInstanceCount;		// # spawned
+	int spawnInstancePlayer;		// player units spawned for
+	region spawnInstanceLocation;	// location spawned
 
-	// bank_storage
+	// bankStorage
 	// ===============
 	// player's bank containing things that persist between games
 	// (aliases, templates, setups, etc...)
-	bank bank_storage;
+	bank bankStorage;
 
 	// aliases
 	// ===============
@@ -212,41 +212,41 @@ struct libapx_player_properties {
 	// A list of a players current wireframes.
 	string wireframes;
 	//Current displayed wireframe layer count and dialogs
-	int wireframe_layer_count;
-	int[100] wireframe_layers;
-	string previous_wireframe;
+	int wireframeLayerCount;
+	int[100] wireframeLayers;
+	string previousWireframe;
 
 	//Current displayed wireframe layer count and dialogs
-	int fakewireframe_layer_count;
-	int[100] fakewireframe_layers;
-	string previous_fakewireframe;
+	int fakewireframeLayerCount;
+	int[100] fakewireframeLayers;
+	string previousFakewireframe;
 	
-	// map_revealer
+	// mapRevealer
 	// ===============
 	// map revealer for entire map (revealers player specific)
-	revealer map_revealer;
+	revealer mapRevealer;
 
 	// search_ variables
 	// ==============
 	// used to mark player's search catalog, index, and query
 	// when using the "\search" command
-	int search_catalog;			// current search catalog
-	int search_index;			// current search index (> 0)
-	string search_last_query;	// current search term
+	int searchCatalog;			// current search catalog
+	int searchIndex;			// current search index (> 0)
+	string searchLastQuery;	// current search term
 
-	// waygate_dialog
+	// waygateDialog
 	// ============
 	// dialog and button for using region waygates (teleport)
-	int waygate_dialog;
-	int waygate_dialog_control_btn;
+	int waygateDialog;
+	int waygateDialogControlBtn;
 
-	// active_ui_panel
+	// activeUiPanel
 	// ============
 	// for use with ui module: the current active ui panel dialog, where
 	// one panel is allowed to be active at a time.
 	// The value here is in terms of the ARRAY list of panels, NOT the
 	// dialog integer value itself.
-	int active_ui_panel;
+	int activeUiPanel;
 
 	//Scaler for units
 	fixed scaler;
@@ -255,54 +255,54 @@ struct libapx_player_properties {
 	fixed delay;
 	
 	//Custom props for >super
-	string clan_tag;
+	string clanTag;
 	string name;
 
 	//Editor mouse wheel trigger;
-	trigger editor_mouse_wheel;
+	trigger editorMouseWheel;
 	//Editor camera toggle
-	bool editor_toggled;
+	bool editorToggled;
 	//Height
-	fixed editor_heightoffset;
+	fixed editorHeightoffset;
 	//Rotating still,
-	bool editor_rotating;
+	bool editorRotating;
 
 	//Unit for spawner
-	unit spawner_unit;
-	bool spawner_toggled;
+	unit spawnerUnit;
+	bool spawnerToggled;
 
 	//This name controler
-	bool name_display;
-	bool name_leveled_display;
+	bool nameDisplay;
+	bool nameLeveledDisplay;
 
 	//Name and subtitle displays when selectingn units
-	int unit_display_name;
-	int unit_display_subtitle;
+	int unitDisplayName;
+	int unitDisplaySubtitle;
 
 	//Description open toggle
-	bool description_open;
-	string last_rendered_desc;
-	string last_rendered_desc_name;
+	bool descriptionOpen;
+	string lastRenderedDesc;
+	string lastRenderedDescName;
 
 	//Banks loaded(flag is bank has been loaded/is in the process of being loaded)
 	bool banksloaded;
 
 	//player color
-	bool display_color;
-	color custom_color;
+	bool displayColor;
+	color customColor;
 	bool rainbow;
 
 	//CAmera stuff
-	point camera_position;
+	point cameraPosition;
 
 	//Help messages
-	bool help_messages;
+	bool helpMessages;
 };
 
-// libapx_player_parser_properties
+// gv_LibapxPlayerParserProperties
 // =======================
 // contains parser context
-struct libapx_player_parser_properties {
+struct gv_LibapxPlayerParserProperties {
 	// context
 	// ===============
 	// unitgroup target for running commands
@@ -311,95 +311,95 @@ struct libapx_player_parser_properties {
 
 
 
-// libapx_player[libapx_MAX_PLAYERS]
+// gv_LibapxPlayer[gv_LibapxMaxPlayers]
 // ====================================
 // global array for players with index corresponding to player index
-libapx_player_properties[libapx_MAX_PLAYERS] libapx_player;
+gv_LibapxPlayerProperties[gv_LibapxMaxPlayers] gv_LibapxPlayer;
 
 
-// libapx_player[libapx_MAX_PLAYERS]
+// gv_LibapxPlayer[gv_LibapxMaxPlayers]
 // ====================================
 // global array for parser with index corresponding to player index and parsing count
 //10 theoretical threads able to run in sequence, I'm going to be a super indian.
-libapx_player_parser_properties[libapx_MAX_PLAYERS][libapx_PARSER_THREAD_COUNT] libapx_player_parser;
+gv_LibapxPlayerParserProperties[gv_LibapxMaxPlayers][ParserThreadCount] gv_gv_LibapxPlayerParser;
 
 
-// libapx_sort_aliases (prototype)
+// LibapxSortAliases (prototype)
 // =======================
 // Prototype for sorting player aliases. Actual function definition
 // provided by chat/aliases.galaxy.
-string libapx_sort_aliases(int player);
+string LibapxSortAliases(int player);
 
 
 //Retrieves the name of all the wireframes.
-string libapx_wireframes_get_all(int player);
+string LibapxWireframesGetAll(int player);
 
 
-// libapx_initialize_player
+// LibapxInitializePlayer
 // ==============================
 // initialize players (default settings)
-void libapx_player_initialize(int player) {
+void gv_LibapxPlayerInitialize(int player) {
 	unit u;
-	libapx_player[player].map_revealer = VisRevealerCreate(player, RegionEntireMap());
-	libapx_player[player].mouse_position = RegionGetCenter( RegionEntireMap() );
-	libapx_player[player].mouse_position_ui = Point(0, 0);
-	libapx_player[player].permission_level = 0;
-	libapx_player[player].scaler = 1;
-	libapx_player[player].spawner_unit = null;
-	libapx_player[player].spawner_toggled = false;
-	libapx_player[player].editor_toggled = false;
-	libapx_player[player].spawn_splat = null;
-	libapx_player[player].spawningCount = 1;
-	libapx_player[player].delay =  0.08;
-	libapx_player[player].waygate_dialog = 0;
-	libapx_player[player].clan_tag = "";
-	libapx_player[player].name = "";
-	libapx_player[player].api_string_input = "";
-	libapx_player[player].editor_heightoffset = 0.0;
-	libapx_player[player].wireframe = g_default_wireframe;
-	libapx_player[player].active_ui_panel = libapx_UI_PANEL_NONE;
-	libapx_player[player].banksloaded = false;
-	libapx_player[player].display_color = false;
-	libapx_player[player].rainbow = false;
-	libapx_player[player].help_messages = true;
+	gv_LibapxPlayer[player].mapRevealer = VisRevealerCreate(player, RegionEntireMap());
+	gv_LibapxPlayer[player].mousePosition = RegionGetCenter( RegionEntireMap() );
+	gv_LibapxPlayer[player].mousePositionUi = Point(0, 0);
+	gv_LibapxPlayer[player].permissionLevel = 0;
+	gv_LibapxPlayer[player].scaler = 1;
+	gv_LibapxPlayer[player].spawnerUnit = null;
+	gv_LibapxPlayer[player].spawnerToggled = false;
+	gv_LibapxPlayer[player].editorToggled = false;
+	gv_LibapxPlayer[player].spawnSplat = null;
+	gv_LibapxPlayer[player].spawningCount = 1;
+	gv_LibapxPlayer[player].delay =  0.08;
+	gv_LibapxPlayer[player].waygateDialog = 0;
+	gv_LibapxPlayer[player].clanTag = "";
+	gv_LibapxPlayer[player].name = "";
+	gv_LibapxPlayer[player].apiStringInput = "";
+	gv_LibapxPlayer[player].editorHeightoffset = 0.0;
+	gv_LibapxPlayer[player].wireframe = gv_DefaultWireframeString;
+	gv_LibapxPlayer[player].activeUiPanel = gv_LibapxUiPanelNone;
+	gv_LibapxPlayer[player].banksloaded = false;
+	gv_LibapxPlayer[player].displayColor = false;
+	gv_LibapxPlayer[player].rainbow = false;
+	gv_LibapxPlayer[player].helpMessages = true;
 
 	CameraPan( player, RegionGetCenter(RegionEntireMap()), 0.0, 10.0, 10.0, false );
 }
 
 
 
-// libapx_player_name_colored
+// gv_LibapxPlayerNameColored
 // ===========================
 // returns a text string of player name with color
-text libapx_player_name_colored(int player) {
-	string clan_tag;
-	color player_color;
-	if(libapx_player[player].display_color) {
-		if(libapx_player[player].rainbow) {
-			player_color = Color(RandomInt(0,1)*100, RandomInt(0,1)*100, RandomInt(0,1)*100);
+text gv_LibapxPlayerNameColored(int player) {
+	string clanTag;
+	color playerColor;
+	if(gv_LibapxPlayer[player].displayColor) {
+		if(gv_LibapxPlayer[player].rainbow) {
+			playerColor = Color(RandomInt(0,1)*100, RandomInt(0,1)*100, RandomInt(0,1)*100);
 		}
 		else {
-			player_color = libapx_player[player].custom_color;
+			playerColor = gv_LibapxPlayer[player].customColor;
 		}
 	}
 	else {
-		player_color = ColorFromIndex( PlayerGetColorIndex(player, false), c_teamColorDiffuse);
+		playerColor = ColorFromIndex( PlayerGetColorIndex(player, false), c_teamColorDiffuse);
 	}
 
-	if(libapx_player[player].clan_tag == "") {
-		clan_tag = " <d Player=\"" + IntToString(player) + "\" GameValue=\"PlayerClanTag\"/> ";
+	if(gv_LibapxPlayer[player].clanTag == "") {
+		clanTag = " <d Player=\"" + IntToString(player) + "\" GameValue=\"PlayerClanTag\"/> ";
 	}
 	else {
-		clan_tag = "<"+libapx_player[player].clan_tag+"> ";
+		clanTag = "<"+gv_LibapxPlayer[player].clanTag+"> ";
 	}
-	return TextWithColor( StringToText( clan_tag ) + PlayerName(player), player_color );
+	return TextWithColor( StringToText( clanTag ) + PlayerName(player), playerColor );
 }
 
 
-// libapx_color_to_player_default
+// LibapxColorToPlayerDefault
 // ==========================
 // Returns the default player index for a color string
-int libapx_color_to_player_default(string colour) {
+int LibapxColorToPlayerDefault(string colour) {
 	if( colour == "white" ) {
 		return 0;
 	} else if( colour == "red" ) {
@@ -441,24 +441,24 @@ int libapx_color_to_player_default(string colour) {
 	return -1;
 }
 
-// libapx_color_to_player
+// LibapxColorToPlayer
 // ===================
 // Converts a color from a string to a player's index
 // (since Blizzard has no function to get color of a player as a string)
-int libapx_color_to_player(string colour, int user) {
-	int player = libapx_MAX_PLAYERS - 1;
+int LibapxColorToPlayer(string colour, int user) {
+	int player = gv_LibapxMaxPlayers - 1;
 
 	// special color keywords
 	if( colour == "hostile" ) {
-		return libapx_PLAYER_HOSTILE;
+		return gv_LibapxPLayerHostile;
 	} else if( colour == "neutral" ) {
-		return libapx_PLAYER_NEUTRAL;
+		return gv_gv_LibapxPlayerNeutral;
 	} else if( colour == "me" ) {
 		return user;
 	}
 
 	while( player >= 0) {
-		if( PlayerGetColorIndex( player, false ) == libapx_color_to_player_default(colour) && PlayerStatus(player) != c_playerStatusUnused) {
+		if( PlayerGetColorIndex( player, false ) == LibapxColorToPlayerDefault(colour) && PlayerStatus(player) != c_playerStatusUnused) {
 			return player;
 		}
 		player -= 1;
@@ -467,11 +467,11 @@ int libapx_color_to_player(string colour, int user) {
 	return -1;
 }
 
-// libapx_color_from_player_default
+// LibapxColorFromPlayerDefault
 // =======================
 // returns the default color for a player index (ported from Cortex)
 // (assumes mapmakers don't mess with default player color index)
-string libapx_color_from_player_default(int plr) {
+string LibapxColorFromPlayerDefault(int plr) {
 	if( plr == 0 ) {
 		return "white";
 	} else if( plr == 1 ) {
@@ -509,41 +509,41 @@ string libapx_color_from_player_default(int plr) {
 	return "";
 }
 
-// libapx_color_from_player
+// LibapxColorFromPlayer
 // ======================
 // Returns the string name of the color a player currently is (Ported from Cortex)
 // (since Blizzard PlayerColorName returns as text, which
 // cant be used for comparisons or anything useful)
-string libapx_color_from_player(int plr) {
-	return libapx_color_from_player_default(PlayerGetColorIndex(plr, false));
+string LibapxColorFromPlayer(int plr) {
+	return LibapxColorFromPlayerDefault(PlayerGetColorIndex(plr, false));
 }
 
-void libapx_chat_parse_increment(int p) {
-	if (libapx_player[p].spawningCount < libapx_PARSER_THREAD_COUNT - 1)  {
-		libapx_player[p].spawningCount = libapx_player[p].spawningCount + 1;
+void LibapxChatParseIncrement(int p) {
+	if (gv_LibapxPlayer[p].spawningCount < ParserThreadCount - 1)  {
+		gv_LibapxPlayer[p].spawningCount = gv_LibapxPlayer[p].spawningCount + 1;
 	}
 	else {
-		libapx_player[p].spawningCount = 1;
+		gv_LibapxPlayer[p].spawningCount = 1;
 	}
 }
 
-void libapx_set_target(int player, unitgroup target, int spawningCount) {
-	libapx_player_parser[player][spawningCount].context = target;
+void LibapxSetTarget(int player, unitgroup target, int spawningCount) {
+	gv_gv_LibapxPlayerParser[player][spawningCount].context = target;
 }
 
-void libapx_waitDelay(int player) {
-	fixed time = libapx_player[player].delay;
+void LibapxWaitDelay(int player) {
+	fixed time = gv_LibapxPlayer[player].delay;
 	if(time < .0625) {
 		return;
 	}
 	Wait(time, c_timeGame);
 }
 
-void libapx_waitDelayGS(int player) {
-	fixed time = libapx_player[player].delay;
-	fixed compare_time = .2 * g_gamesetups_loading;
-	if(time < compare_time) {
-		time = compare_time;
+void LibapxWaitDelayGS(int player) {
+	fixed time = gv_LibapxPlayer[player].delay;
+	fixed compareTime = .2 * gGamesetupsLoading;
+	if(time < compareTime) {
+		time = compareTime;
 	}
 	
 	Wait(time, c_timeGame);

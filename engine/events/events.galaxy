@@ -1,6 +1,6 @@
 //=========================================================
 //		Apex Roleplaying Engine
-//		Copyright (c) 2019, Apex Group
+//		Copyright (c) 2022, Apex Group
 //=========================================================
 // This software is distributed under the MIT License:
 // <http://opensource.org/licenses/MIT>
@@ -19,40 +19,40 @@ include "apex/engine/events/ticker.galaxy"
 
 
 // create the default Apex events
-void libapx_events_initialize() {
+void LibapxEventsInitialize() {
 	// player leaves event
-	TriggerAddEventPlayerLeft(TriggerCreate("libapx_player_leaves"), c_playerAny, c_gameResultUndecided);
+	TriggerAddEventPlayerLeft(TriggerCreate("LibapxPlayerLeaves"), c_playerAny, c_gameResultUndecided);
 
 	// mouse related events
-	TriggerAddEventMouseMoved(TriggerCreate("libapx_mouse_moved"), c_playerAny );
-	TriggerAddEventMouseClicked(TriggerCreate("librtpr_mouse_left_clicked_down"), c_playerAny, c_mouseButtonLeft, true);
-	TriggerAddEventMouseClicked(TriggerCreate("librtpr_mouse_right_clicked_down"), c_playerAny, c_mouseButtonRight, true);
-	TriggerAddEventMouseClicked(TriggerCreate("librtpr_mouse_right_clicked_up"), c_playerAny, c_mouseButtonRight, false);
+	TriggerAddEventMouseMoved(TriggerCreate("LibapxMouseMoved"), c_playerAny );
+	TriggerAddEventMouseClicked(TriggerCreate("LibapxMouseLeftCLickedDown"), c_playerAny, c_mouseButtonLeft, true);
+	TriggerAddEventMouseClicked(TriggerCreate("LibapxMouseRightClickedDown"), c_playerAny, c_mouseButtonRight, true);
+	TriggerAddEventMouseClicked(TriggerCreate("LibapxMouseRightClickedUp"), c_playerAny, c_mouseButtonRight, false);
 
 	// key press (up and down) events
-	TriggerAddEventKeyPressed(TriggerCreate("libapx_key_pressed_down"), c_playerAny, c_keyNone, true, c_keyModifierStateIgnore, c_keyModifierStateIgnore, c_keyModifierStateIgnore);
-	TriggerAddEventKeyPressed(TriggerCreate("libapx_key_pressed_up"), c_playerAny, c_keyNone, false, c_keyModifierStateIgnore, c_keyModifierStateIgnore, c_keyModifierStateIgnore);
+	TriggerAddEventKeyPressed(TriggerCreate("LibapxKeyPressedDown"), c_playerAny, c_keyNone, true, c_keyModifierStateIgnore, c_keyModifierStateIgnore, c_keyModifierStateIgnore);
+	TriggerAddEventKeyPressed(TriggerCreate("LibapxKeyPressedUp"), c_playerAny, c_keyNone, false, c_keyModifierStateIgnore, c_keyModifierStateIgnore, c_keyModifierStateIgnore);
 
 	// unit initialization events (functions found in unit.galaxy)
-	TriggerAddEventUnitCreated(TriggerCreate("libapx_unit_initialize"), null, null, null);
-	TriggerAddEventUnitRemoved(TriggerCreate("libapx_unit_death_cleanup"), null);
-	TriggerAddEventUnitDied(TriggerCreate("libapx_unit_death_cleanup"), null);
+	TriggerAddEventUnitCreated(TriggerCreate("LibapxUnitInitialize"), null, null, null);
+	TriggerAddEventUnitRemoved(TriggerCreate("LibapxUnitDeathCleanup"), null);
+	TriggerAddEventUnitDied(TriggerCreate("LibapxUnitDeathCleanup"), null);
 
 	// region waygate and waygate dialog events
-	TriggerAddEventTimePeriodic(TriggerCreate("libapx_waygate_dialog_manager"), 1.0, c_timeGame);
-	//TriggerAddEventDialogControl(TriggerCreate("libapx_waygate_dialog_clicked_old"), c_playerAny, c_invalidDialogControlId, c_triggerControlEventTypeClick );
-	TriggerAddEventDialogControl(TriggerCreate("libapx_waygate_dialog_clicked"), c_playerAny, c_invalidDialogControlId, c_triggerControlEventTypeClick);
+	TriggerAddEventTimePeriodic(TriggerCreate("LibapxWaygateDialogManager"), 1.0, c_timeGame);
+	//TriggerAddEventDialogControl(TriggerCreate("LibapxWaygateDialogClickedOld"), c_playerAny, c_invalidDialogControlId, c_triggerControlEventTypeClick );
+	TriggerAddEventDialogControl(TriggerCreate("LibapxWaygateDialogClicked"), c_playerAny, c_invalidDialogControlId, c_triggerControlEventTypeClick);
 
 	//The only thing that needs an active runtime.
-	TriggerAddEventTimePeriodic(TriggerCreate("libapx_trig_ticker"), .01, c_timeGame);
+	TriggerAddEventTimePeriodic(TriggerCreate("LibapxTrigTicker"), .01, c_timeGame);
 
 
 }
 
-// libapx_player_events_initialize
+// LibapxPLayerEventsInitiallize
 // ==========================
 // events that need to be initialized individually for each player
-void libapx_player_events_initialize(int player) {
+void LibapxPLayerEventsInitiallize(int player) {
 	// initialize player chat and chat command events
-	TriggerAddEventChatMessage(TriggerCreate("libapx_process_chat_event") , player, "", false);
+	TriggerAddEventChatMessage(TriggerCreate("LibapxProcessChatEvent") , player, "", false);
 }

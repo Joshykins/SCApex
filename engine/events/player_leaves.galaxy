@@ -1,50 +1,50 @@
 //=========================================================
 //		Apex Roleplaying Engine
-//		Copyright (c) 2019, Apex Group
+//		Copyright (c) 2022, Apex Group
 //=========================================================
 // This software is distributed under the MIT License:
 // <http://opensource.org/licenses/MIT>
 //=========================================================
 
-// libapx_player_leaves
+// LibapxPlayerLeaves
 // ==================
 // print message "[Player] has left the game"
 // -> if player is admin, must promote a new admin
-bool libapx_player_leaves(bool testConds, bool runActions) {
+bool LibapxPlayerLeaves(bool testConds, bool runActions) {
 	int player = 1;
-	playergroup active_players = PlayerGroupActive();
+	playergroup activePlayers = PlayerGroupActive();
 
-	libapx_print_text(PlayerGroupAll(), libapx_player_name_colored(EventPlayer()) + StringToText(" has left the game"));
+	LibapxPrintText(PlayerGroupAll(), gv_LibapxPlayerNameColored(EventPlayer()) + StringToText(" has left the game"));
 	
 	//Disable them
-	libapx_player[EventPlayer()].disabled = true;
+	gv_LibapxPlayer[EventPlayer()].disabled = true;
 
 	// if admin leaves, make another player the admin
-	if( libapx_player[EventPlayer()].permission_level == libapx_PERMISSIONS_LEVEL_ADMIN ) {
+	if( gv_LibapxPlayer[EventPlayer()].permissionLevel == LibapxPERMISSIONSLEVELADMIN ) {
 		// demote player that left
-		libapx_player[EventPlayer()].permission_level = libapx_PERMISSIONS_LEVEL_DEFAULT;
+		gv_LibapxPlayer[EventPlayer()].permissionLevel = LibapxPERMISSIONSLEVELDEFAULT;
 
 		// promote first moderator detected
-		while( player < libapx_MAX_PLAYERS ) {
-			if ( libapx_player[player].permission_level == libapx_PERMISSIONS_LEVEL_MOD ) {
-				libapx_player[player].permission_level = libapx_PERMISSIONS_LEVEL_ADMIN;
-				libapx_print_text(PlayerGroupAll(), libapx_player_name_colored(player) + StringToText(" has been promoted to admin"));
+		while( player < gv_LibapxMaxPlayers ) {
+			if ( gv_LibapxPlayer[player].permissionLevel == gv_LibapxPermissionLevelMod ) {
+				gv_LibapxPlayer[player].permissionLevel = LibapxPERMISSIONSLEVELADMIN;
+				LibapxPrintText(PlayerGroupAll(), gv_LibapxPlayerNameColored(player) + StringToText(" has been promoted to admin"));
 				return true;
 			}
 			player += 1;
 		}
 
 		// otherwise promote random player (if there are players left)
-		if( PlayerGroupCount(active_players) == 0 ) {
+		if( PlayerGroupCount(activePlayers) == 0 ) {
 			return true;
 		}
-		player = PlayerGroupPlayer( active_players, RandomInt(1, PlayerGroupCount(active_players)) );
-		libapx_player[player].permission_level = libapx_PERMISSIONS_LEVEL_ADMIN;
-		libapx_print_text(PlayerGroupAll(), libapx_player_name_colored(player) + StringToText(" has been promoted to admin"));
+		player = PlayerGroupPlayer( activePlayers, RandomInt(1, PlayerGroupCount(activePlayers)) );
+		gv_LibapxPlayer[player].permissionLevel = LibapxPERMISSIONSLEVELADMIN;
+		LibapxPrintText(PlayerGroupAll(), gv_LibapxPlayerNameColored(player) + StringToText(" has been promoted to admin"));
 	}
 	// also demote any moderators
-	else if( libapx_player[EventPlayer()].permission_level == libapx_PERMISSIONS_LEVEL_MOD ) {
-		libapx_player[EventPlayer()].permission_level = libapx_PERMISSIONS_LEVEL_DEFAULT;
+	else if( gv_LibapxPlayer[EventPlayer()].permissionLevel == gv_LibapxPermissionLevelMod ) {
+		gv_LibapxPlayer[EventPlayer()].permissionLevel = LibapxPERMISSIONSLEVELDEFAULT;
 	}
 
 	return true;

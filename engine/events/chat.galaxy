@@ -1,58 +1,58 @@
 //=========================================================
 //		Apex Roleplaying Engine
-//		Copyright (c) 2019, Apex Group
+//		Copyright (c) 2022, Apex Group
 //=========================================================
 // This software is distributed under the MIT License:
 // <http://opensource.org/licenses/MIT>
 //=========================================================
 
 
-// libapx_process_chat_event
+// LibapxProcessChatEvent
 // ============================
 // redirects processing as needed:
 // IF message begins with "<<" , directly output the message
 // ELSE, parse message
 
 
-void libapx_process_chat(string msg,int user, unitgroup target) {
+void LibapxProcessChat(string msg,int user, unitgroup target) {
 	// "<<" directly dumps message to OOC (if player not muted)
-	if ( StringWord( msg, 1) == "<<" &&  !libapx_player[user].muted ) {
-		libapx_player[user].chat_msg = libapx_string_trim( StringSub(msg, 3, StringLength(msg)) );
-		libapx_chat_print_OOC(user, libapx_player[user].chat_msg);
+	if ( StringWord( msg, 1) == "<<" &&  !gv_LibapxPlayer[user].muted ) {
+		gv_LibapxPlayer[user].chatMsg = LibapxStringTrim( StringSub(msg, 3, StringLength(msg)) );
+		LibapxChatPrintOOC(user, gv_LibapxPlayer[user].chatMsg);
 	}
 
 
-	else if( !libapx_player[user].disabled ) {
+	else if( !gv_LibapxPlayer[user].disabled ) {
 
 		// if player is mouse-click spawning, set context to spawn splat
-		if( libapx_player[user].is_placing_unit ) {
-			UnitGroupAdd(target, libapx_player[user].spawn_splat);
+		if( gv_LibapxPlayer[user].isPlacingUnit ) {
+			UnitGroupAdd(target, gv_LibapxPlayer[user].spawnSplat);
 		}
 		else {
 			target = UnitGroupSelected(user);
-			target = libapx_enforce_unit_permissions(target, user);
+			target = LibapxEnforceUnitPermissions(target, user);
 		}
 
-		libapx_chat_parse(msg, user, target, libapx_player[user].spawningCount);
+		LibapxChatParse(msg, user, target, gv_LibapxPlayer[user].spawningCount);
 
 
 
 
 
 	}
-	else if( !libapx_player[user].muted ){
-		libapx_chat_print_OOC(user, libapx_player[user].chat_msg);
+	else if( !gv_LibapxPlayer[user].muted ){
+		LibapxChatPrintOOC(user, gv_LibapxPlayer[user].chatMsg);
 	}
 }
 
-bool libapx_process_chat_event(bool testConds, bool runActions) {
+bool LibapxProcessChatEvent(bool testConds, bool runActions) {
 
 	int user = EventPlayer();
 
 	unitgroup target = UnitGroupEmpty();
-	libapx_player[user].chat_msg = libapx_string_trim(EventChatMessage(false)); //Where injection of chat occurs
+	gv_LibapxPlayer[user].chatMsg = LibapxStringTrim(EventChatMessage(false)); //Where injection of chat occurs
 	
-	libapx_process_chat(libapx_player[user].chat_msg, user, target);
+	LibapxProcessChat(gv_LibapxPlayer[user].chatMsg, user, target);
 
 	return false;
 }

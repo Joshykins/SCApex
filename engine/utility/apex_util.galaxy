@@ -1,5 +1,5 @@
 
-bool libapx_is_fixed(string s)
+bool LibapxIsFixed(string s)
 {
 	int x = 1;
 	string c1 = "";
@@ -17,8 +17,8 @@ bool libapx_is_fixed(string s)
 
 //Function to blacklist a set of strings
 //========================================
-//ex _replace unit Interceptor Carrier
-bool libapx_blacklistparms(int catalog, string source, string replace, int p) {
+//ex Replace unit Interceptor Carrier
+bool LibapxBlacklistparms(int catalog, string source, string replace, int p) {
 	bool stringOkay = true;
 	int test;
 	if (catalog == c_gameCatalogUnit) {
@@ -28,7 +28,7 @@ bool libapx_blacklistparms(int catalog, string source, string replace, int p) {
 			//For now, the base carrier interceptor crash is done for.
 			stringOkay = false;
 		}
-		//_replace unit BroodlingEscort BroodLord
+		//Replace unit BroodlingEscort BroodLord
 		else if (source == "BroodlingEscort" && replace == "BroodLord") {
 			stringOkay = false;
 		}
@@ -43,7 +43,7 @@ bool libapx_blacklistparms(int catalog, string source, string replace, int p) {
 	if (stringOkay) {
 		return false;
 	} else {
-		libapx_print_output(p, "Replacing "+source+" with "+replace+" is a viable way to crash a game. Command halted");
+		LibapxPrintOutput(p, "Replacing "+source+" with "+replace+" is a viable way to crash a game. Command halted");
 		return true;
 	}
 
@@ -51,7 +51,7 @@ bool libapx_blacklistparms(int catalog, string source, string replace, int p) {
 // y=a(x-h)^2+k
 // solving for a
 //
-fixed util_parabolaCalc(point vertex, point pointGiven, fixed targetX) {
+fixed utilParabolaCalc(point vertex, point pointGiven, fixed targetX) {
 	fixed xh;
 	fixed yk;
 	fixed a;
@@ -72,7 +72,7 @@ fixed util_parabolaCalc(point vertex, point pointGiven, fixed targetX) {
 	y = (a*xh)+PointGetY(vertex);
 	return y;
 };
-fixed util_255_to_100(fixed num) {
+fixed util_255To_100(fixed num) {
 	num = (100*num)/255;
 	if(num <= 0) {
 		return 0.0;
@@ -80,10 +80,10 @@ fixed util_255_to_100(fixed num) {
 	return num;
 }
 
-color util_hsb_to_rgb(fixed h, fixed s, fixed b) {
-	fixed rgb_r;
-	fixed rgb_g;
-	fixed rgb_b;
+color utilHsbToRgb(fixed h, fixed s, fixed b) {
+	fixed rgbR;
+	fixed rgbG;
+	fixed rgbB;
 	fixed t1;
 	fixed t2;
 	fixed t3;
@@ -92,9 +92,9 @@ color util_hsb_to_rgb(fixed h, fixed s, fixed b) {
 	s = Round(s * 255 / 100);
 	v = Round(b * 255 / 100);
 	if (s == 0) {
-		rgb_b = v;
-		rgb_g = rgb_b;
-		rgb_r = rgb_g;
+		rgbB = v;
+		rgbG = rgbB;
+		rgbR = rgbG;
 
 	} 
 	else {
@@ -103,39 +103,39 @@ color util_hsb_to_rgb(fixed h, fixed s, fixed b) {
 		t3 = (t1 - t2) * (h % 60) / 60;
 		if (h == 360){ h = 0;};
 		if (h < 60) {
-			rgb_r = t1;
-			rgb_b = t2;
-			rgb_g = t2 + t3;
+			rgbR = t1;
+			rgbB = t2;
+			rgbG = t2 + t3;
 		} else if (h < 120) {
-			rgb_g = t1;
-			rgb_b = t2;
-			rgb_r = t1 - t3;
+			rgbG = t1;
+			rgbB = t2;
+			rgbR = t1 - t3;
 		} else if (h < 180) {
-			rgb_g = t1;
-			rgb_r = t2;
-			rgb_b = t2 + t3;
+			rgbG = t1;
+			rgbR = t2;
+			rgbB = t2 + t3;
 		} else if (h < 240) {
-			rgb_b = t1;
-			rgb_r = t2;
-			rgb_g = t1 - t3;
+			rgbB = t1;
+			rgbR = t2;
+			rgbG = t1 - t3;
 		} else if (h < 300) {
-			rgb_b = t1;
-			rgb_g = t2;
-			rgb_r = t2 + t3;
+			rgbB = t1;
+			rgbG = t2;
+			rgbR = t2 + t3;
 		} else if (h < 360) {
-			rgb_r = t1;
-			rgb_g = t2;
-			rgb_b = t1 - t3;
+			rgbR = t1;
+			rgbG = t2;
+			rgbB = t1 - t3;
 		} else {
-			rgb_r = 0;
-			rgb_g = 0;
-			rgb_b = 0;
+			rgbR = 0;
+			rgbG = 0;
+			rgbB = 0;
 		}
 	}
 	return Color(
-		util_255_to_100(rgb_r),
-		util_255_to_100(rgb_g),
-		util_255_to_100(rgb_b)
+		util_255To_100(rgbR),
+		util_255To_100(rgbG),
+		util_255To_100(rgbB)
 		);
 	
 }

@@ -1,84 +1,84 @@
 //=========================================================
 //		Apex Roleplaying Engine
-//		Copyright (c) 2019, Apex Group
+//		Copyright (c) 2022, Apex Group
 //=========================================================
 // This software is distributed under the MIT License:
 // <http://opensource.org/licenses/MIT>
 //=========================================================
 
 //Base panel
-int libapx_ui_catalog;
-int libapx_ui_catalog_exit;
+int LibapxUiCatalog;
+int LibapxUiCatalogExit;
 
-static int max_display_amount = 1000;
-static int libapx_ui_catalog_type;
-static int libapx_ui_catalog_fields;
-static int libapx_ui_catalog_filter_editbox;
-static int libapx_ui_catalog_filter_btn;
-static int[16] libapx_ui_catalog_apply_checkbox;
-static bool[16] apply_field;
-static string[16] current_catagory;
-static string[16][1000] all_queries;
+static int MaxDisplayAmount = 1000;
+static int UiCatalogType;
+static int UiCatalogFields;
+static int UiCAtalogFilterEditbox;
+static int UiCatalogFilterBtn;
+static int[16] UiCAtalogApplyCheckbox;
+static bool[16] ApplyField;
+static string[16] CurrentCatagory;
+static string[16][1000] AllQueries;
 
-static string types = "Ability Actor Behavior Effect Footprint Light Model Decal Turret Unit Upgrade Validator Weapon Sound Soundtrack";
+static string Types = "Ability Actor Behavior Effect Footprint Light Model Decal Turret Unit Upgrade Validator Weapon Sound Soundtrack";
 
-void libapx_ui_catalog_init() {
+void LibapxUiCatalogInit() {
 
 
     //Main Dialog init
-    libapx_ui_catalog = libapx_create_dialog(650, 700, c_anchorTopLeft, libapx_ui_panel_spacing, 0);
-    libapx_ui_catalog_exit = libapx_create_dialog_close_btn(libapx_ui_catalog, 650, 700, c_anchorTopLeft, libapx_ui_panel_spacing, 0);
+    LibapxUiCatalog = LibapxCreateDialog(650, 700, c_anchorTopLeft, gv_LibapxUiPanelSpacing, 0);
+    LibapxUiCatalogExit = LibapxCreateDialogCloseBtn(LibapxUiCatalog, 650, 700, c_anchorTopLeft, gv_LibapxUiPanelSpacing, 0);
 
     //Title for page
-    libapx_create_dialog_title(libapx_ui_catalog , 300, 40, 00, 40, "Data Catalog", libapx_UI_HEADER1,  180);
+    LibapxCreateDialogTitle(LibapxUiCatalog , 300, 40, 00, 40, "Data Catalog", gv_LibapxUiHeader1,  180);
 
     //Mini titles
-    libapx_create_dialog_label(libapx_ui_catalog , 300, 40, c_anchorTop, -160, 84, "Categories", libapx_UI_HEADER1);
-    libapx_create_dialog_label(libapx_ui_catalog , 300, 40, c_anchorTop,  155, 84, "Values", libapx_UI_HEADER1);
+    LibapxCreateDialogLabel(LibapxUiCatalog , 300, 40, c_anchorTop, -160, 84, "Categories", gv_LibapxUiHeader1);
+    LibapxCreateDialogLabel(LibapxUiCatalog , 300, 40, c_anchorTop,  155, 84, "Values", gv_LibapxUiHeader1);
 
     //lists
-    libapx_ui_catalog_type = libapx_create_dialog_list(libapx_ui_catalog, 280, 300, c_anchorTop, -155, 124);
-    libapx_ui_catalog_fields = libapx_create_dialog_list(libapx_ui_catalog, 280, 300, c_anchorTop, 155, 124);
+    UiCatalogType = LibapxCreateDialogList(LibapxUiCatalog, 280, 300, c_anchorTop, -155, 124);
+    UiCatalogFields = LibapxCreateDialogList(LibapxUiCatalog, 280, 300, c_anchorTop, 155, 124);
 
     //Trigger for category selection
-    TriggerAddEventDialogControl(TriggerCreate("libapx_ui_category_select_type"), c_playerAny, libapx_ui_catalog_type, c_triggerControlEventTypeSelectionChanged);
+    TriggerAddEventDialogControl(TriggerCreate("LibapxUiCategorySelectType"), c_playerAny, UiCatalogType, c_triggerControlEventTypeSelectionChanged);
     
     //trigger for field selection
-    TriggerAddEventDialogControl(TriggerCreate("libapx_ui_category_select_field"), c_playerAny, libapx_ui_catalog_fields, c_triggerControlEventTypeSelectionChanged);
+    TriggerAddEventDialogControl(TriggerCreate("LibapxUiCategorySelectField"), c_playerAny, UiCatalogFields, c_triggerControlEventTypeSelectionChanged);
         
 
     //Filter box
-    libapx_ui_catalog_filter_editbox = libapx_create_dialog_editbox(libapx_ui_catalog, 370, 50, c_anchorTopLeft, 190, 450);
+    UiCAtalogFilterEditbox = LibapxCreateDialogEditbox(LibapxUiCatalog, 370, 50, c_anchorTopLeft, 190, 450);
     //Filter Button
-    libapx_ui_catalog_filter_btn = libapx_create_dialog_btn(libapx_ui_catalog, 50, 50, c_anchorTopLeft, 565, 450, "Search", "" );
-    libapx_create_dialog_btn_icon(libapx_ui_catalog, libapx_ui_catalog_filter_btn, 50, 50, libapx_UI_ICON_SEARCH);
+    UiCatalogFilterBtn = LibapxCreateDialogBtn(LibapxUiCatalog, 50, 50, c_anchorTopLeft, 565, 450, "Search", "" );
+    LibapxCreateDialogBtnIcon(LibapxUiCatalog, UiCatalogFilterBtn, 50, 50, gv_LibapxUiIconSearch);
     //Trigger for filter
-    TriggerAddEventDialogControl(TriggerCreate("libapx_ui_category_filter"), c_playerAny, libapx_ui_catalog_filter_btn , c_triggerControlEventTypeClick);
+    TriggerAddEventDialogControl(TriggerCreate("LibapxUiCategoryFilter"), c_playerAny, UiCatalogFilterBtn , c_triggerControlEventTypeClick);
 
     
     //Labeling Filter Btn
-    libapx_create_dialog_label(libapx_ui_catalog, 100, 50, c_anchorTopLeft,60, 450, "Search", libapx_UI_HEADER1);
+    LibapxCreateDialogLabel(LibapxUiCatalog, 100, 50, c_anchorTopLeft,60, 450, "Search", gv_LibapxUiHeader1);
 
     //Creating Apply Checkbox
-    libapx_create_dialog_label(libapx_ui_catalog, 550, 300, c_anchorTop, 30, 450, " Check this box to apply the value's respective command. For instance a model will modelswap your current selected unit.", libapx_UI_HEADER1);
+    LibapxCreateDialogLabel(LibapxUiCatalog, 550, 300, c_anchorTop, 30, 450, " Check this box to apply the value's respective command. For instance a model will modelswap your current selected unit.", gv_LibapxUiHeader1);
 
 }
 
-void libapx_ui_catalog_init_player(int player) { 
+void LibapxUiCatalogInitPlayer(int player) { 
     //Populate with types
     int i;
-    for (i = 1; StringWord(types, i) != ""; i += 1) {
-        DialogControlAddItem(libapx_ui_catalog_type, PlayerGroupSingle(player), StringToText(StringWord(types, i)));
+    for (i = 1; StringWord(Types, i) != ""; i += 1) {
+        DialogControlAddItem(UiCatalogType, PlayerGroupSingle(player), StringToText(StringWord(Types, i)));
     }
-    current_catagory[player] = "Model";
-    apply_field[player] = false;
+    CurrentCatagory[player] = "Model";
+    ApplyField[player] = false;
 
     //Creating checkbox
-    libapx_ui_catalog_apply_checkbox[player] = libapx_create_dialog_checkbox(libapx_ui_catalog, 30, 30 ,c_anchorTopLeft, 50, 550);
-	TriggerAddEventDialogControl(TriggerCreate("libapx_ui_category_apply"), c_playerAny, libapx_ui_catalog_apply_checkbox[player], c_triggerControlEventTypeChecked);
+    UiCAtalogApplyCheckbox[player] = LibapxCreateDialogCheckbox(LibapxUiCatalog, 30, 30 ,c_anchorTopLeft, 50, 550);
+	TriggerAddEventDialogControl(TriggerCreate("LibapxUiCategoryApply"), c_playerAny, UiCAtalogApplyCheckbox[player], c_triggerControlEventTypeChecked);
 
 }
-int find_catelog(string type) {
+static int FindCatalog(string type) {
     int catalog;
     type = StringCase(type, false);
 
@@ -130,9 +130,9 @@ int find_catelog(string type) {
     return catalog;
 }
 
-static void populate_fields(string catalogstr,int p) {
-    int catalog = find_catelog(catalogstr);
-    string filter = libNtve_gf_DialogItemEditValue(libapx_ui_catalog_filter_editbox, p);
+static void PopulateFields(string catalogstr,int p) {
+    int catalog = FindCatalog(catalogstr);
+    string filter = libNtve_gf_DialogItemEditValue(UiCAtalogFilterEditbox, p);
     int entryCount;
     string entry;
     int i;
@@ -142,10 +142,10 @@ static void populate_fields(string catalogstr,int p) {
     string currentFilter;
 
     //Populate
-    DialogControlRemoveAllItems(libapx_ui_catalog_fields, PlayerGroupSingle(p));
+    DialogControlRemoveAllItems(UiCatalogFields, PlayerGroupSingle(p));
     entryCount = CatalogEntryCount(catalog);
     position = 0;
-    for (i = 1; (i <= entryCount) || (position >= max_display_amount); i += 1) {
+    for (i = 1; (i <= entryCount) || (position >= MaxDisplayAmount); i += 1) {
         entry = CatalogEntryGet(catalog, i);
         if(filter != "") {
             j = 1;
@@ -163,74 +163,74 @@ static void populate_fields(string catalogstr,int p) {
                 j += 1;
             }
             if(passesFilters) {
-                all_queries[p][position] = entry;
+                AllQueries[p][position] = entry;
                 position +=1;
-                DialogControlAddItem(libapx_ui_catalog_fields, PlayerGroupSingle(p),StringToText(entry));
+                DialogControlAddItem(UiCatalogFields, PlayerGroupSingle(p),StringToText(entry));
             }
         }
         else {
-            all_queries[p][position] = entry;
+            AllQueries[p][position] = entry;
             position +=1;
             //Poplate with everything
-            DialogControlAddItem(libapx_ui_catalog_fields, PlayerGroupSingle(p),StringToText(entry));
+            DialogControlAddItem(UiCatalogFields, PlayerGroupSingle(p),StringToText(entry));
         }
     }
     
 }
 
-bool libapx_ui_category_filter(bool testConds, bool runActions) {
+bool LibapxUiCategoryFilter(bool testConds, bool runActions) {
     int p = EventPlayer();
-    int desiredCatagory=DialogControlGetSelectedItem(libapx_ui_catalog_type, p);
-    string catalog= StringWord(types, desiredCatagory);
+    int desiredCatagory=DialogControlGetSelectedItem(UiCatalogType, p);
+    string catalog= StringWord(Types, desiredCatagory);
     if(catalog == "") {
-        libapx_print_output(p, "Something went wrong! Tell sero about it!");
+        LibapxPrintOutput(p, "Something went wrong! Tell sero about it!");
         return true;
     }
 
-    populate_fields(catalog, p);
+    PopulateFields(catalog, p);
 
 
     return true;
 }
 
-bool libapx_ui_category_select_type(bool testConds, bool runActions) {
+bool LibapxUiCategorySelectType(bool testConds, bool runActions) {
     int p = EventPlayer();
-    int desiredCatagory=DialogControlGetSelectedItem(libapx_ui_catalog_type, p);
-    string catalog= StringWord(types, desiredCatagory);
+    int desiredCatagory=DialogControlGetSelectedItem(UiCatalogType, p);
+    string catalog= StringWord(Types, desiredCatagory);
     if(catalog == "") {
-        libapx_print_output(p, "Something went wrong! Tell sero about it!");
+        LibapxPrintOutput(p, "Something went wrong! Tell sero about it!");
         return true;
     }
 
-    populate_fields(catalog, p);
+    PopulateFields(catalog, p);
 
     return true;
 }
-bool libapx_ui_category_apply(bool testConds, bool runActions) {
+bool LibapxUiCategoryApply(bool testConds, bool runActions) {
     int p =  EventPlayer();
     int dialog = EventDialogControl();
     bool state = libNtve_gf_DialogItemIsChecked(dialog, p);
-    apply_field[p] = state;
+    ApplyField[p] = state;
 
     return true;
 }
-bool libapx_ui_category_select_field(bool testConds, bool runActions) {
+bool LibapxUiCategorySelectField(bool testConds, bool runActions) {
     int p = EventPlayer();
-    int desiredCatagory=DialogControlGetSelectedItem(libapx_ui_catalog_type, p);
-    string catalog= StringWord(types, desiredCatagory);
-    int selectedIndex=DialogControlGetSelectedItem(libapx_ui_catalog_fields, p);
-    string selected = all_queries[p][selectedIndex-1];
+    int desiredCatagory=DialogControlGetSelectedItem(UiCatalogType, p);
+    string catalog= StringWord(Types, desiredCatagory);
+    int selectedIndex=DialogControlGetSelectedItem(UiCatalogFields, p);
+    string selected = AllQueries[p][selectedIndex-1];
     unitgroup ug = UnitGroupSelected(p);
     ug = UnitGroupFilterPlayer(ug, p, -1);
-    if(apply_field[p]) {
+    if(ApplyField[p]) {
         if(catalog == "Model") {
-            libapx_chat_parse("@modelswap "+selected, p, ug, libapx_player[p].spawningCount);
+            LibapxChatParse("@modelswap "+selected, p, ug, gv_LibapxPlayer[p].spawningCount);
         }
         if(catalog == "Light") {
-            libapx_chat_parse("!light "+selected + " .2", p, ug, libapx_player[p].spawningCount);
+            LibapxChatParse("!light "+selected + " .2", p, ug, gv_LibapxPlayer[p].spawningCount);
         }
         if(catalog == "Decal") {
-            libapx_chat_parse("@decal "+selected, p, ug, libapx_player[p].spawningCount);
+            LibapxChatParse("@decal "+selected, p, ug, gv_LibapxPlayer[p].spawningCount);
         }
     }
 

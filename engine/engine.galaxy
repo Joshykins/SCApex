@@ -1,6 +1,6 @@
 //=========================================================
 //		Apex Roleplaying Engine
-//		Copyright (c) 2019, Apex Group
+//		Copyright (c) 2022, Apex Group
 //=========================================================
 // This software is distributed under the MIT License:
 // <http://opensource.org/licenses/MIT>
@@ -10,7 +10,7 @@
 // (dependency order matters)
 
 
-// ui_helper
+// uiHelper
 // =============
 // Contains various helper functions for creating ui dialogs:
 // use helper functions instead of Blizzard natives in order to unify
@@ -75,13 +75,13 @@ include "apex/engine/chat/parser.galaxy"
 include "apex/engine/unit.galaxy"
 
 
-// unit_rename
+// unitRename
 //===============
 // functions to handle unit renaming and subtitling
 // Stores name and subtitle to datatable to be used in ui.
 include "apex/engine/unit_rename"
 
-// unit_wireframe
+// unitWireframe
 //===============
 // functions to handle unit's wireframe
 // Stores wireframe parameters to datatable to be used in ui.
@@ -125,7 +125,7 @@ include "apex/engine/events/events.galaxy"
 // contains functions for blacklist system
 // -> blacklist runs at start of game for host,
 //    disables any player on host's blacklist
-// player usage of blacklist handled by blacklist in general_commands
+// player usage of blacklist handled by blacklist in generalCommands
 include "apex/engine/blacklist.galaxy"
 
 
@@ -139,33 +139,33 @@ const int gv_LibapxBuildVersion = 2;
 const int gv_LibapxBuildSubVersion = 2;
 const string gv_LibapxBuildVersionModifier = ".1";
 
-void libapx_engine_initialize() {
+void LibapxEngineInitialize() {
 	int player = 1;
-	bool admin_set = false;
+	bool adminSet = false;
 	int i;
 
 	// intialize engine
-	libapx_scripts_init();				// scripts and dependencies
-	libapx_settings_initialize();		// initializes map settings
-	libapx_preplaced_unit_initialize();	// assigns unit IDs to preplaced units
+	LibapxScriptsInit();				// scripts and dependencies
+	gv_LibapxSettingsInitialize();		// initializes map settings
+	LibapxPreplacedUnitInitialize();	// assigns unit IDs to preplaced units
 
 
 	// initialize players
-	while ( player < libapx_MAX_PLAYERS ) {
+	while ( player < gv_LibapxMaxPlayers ) {
 		if( PlayerType(player) == c_playerTypeUser && PlayerStatus(player) == c_playerStatusActive ) {
-			libapx_player_initialize(player);			// player settings
-			libapx_player_events_initialize(player);	// player specific events
+			gv_LibapxPlayerInitialize(player);			// player settings
+			LibapxPLayerEventsInitiallize(player);	// player specific events
 
 			// give admin to first active player (assumes player 1 is lobby host and should be default admin)
 			// then run admin's blacklist
-			if( !admin_set ) {
-				libapx_player[player].permission_level = libapx_PERMISSIONS_LEVEL_ADMIN;
-				libapx_blacklist_run(player);
-				admin_set = true;
+			if( !adminSet ) {
+				gv_LibapxPlayer[player].permissionLevel = LibapxPERMISSIONSLEVELADMIN;
+				LibapxBlacklistRun(player);
+				adminSet = true;
 			}
 		}
 		player += 1;
 	}
 	
-	libapx_events_initialize();			// creates global event triggers
+	LibapxEventsInitialize();			// creates global event triggers
 }

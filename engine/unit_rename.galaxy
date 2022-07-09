@@ -1,77 +1,77 @@
 //=========================================================
 //		Apex Roleplaying Engine
-//		Copyright (c) 2019, Apex Group
+//		Copyright (c) 2022, Apex Group
 //=========================================================
 // This software is distributed under the MIT License:
 // <http://opensource.org/licenses/MIT>
 //=========================================================
-const string g_name_identifier =  "libapx_rename_";
-const string g_subtitle_identifier = "libapx_subtitle_";
-const string g_desc_identifier = "libapx_desc_";
-const string g_descall_identifier = "libapx_descall_";
-const string g_desctitle_identifier = "libapx_desctitle_";
-const string g_desctitleall_identifier = "libapx_desctitleall_";
+const string gNameIdentifier =  "LibapxRename_";
+const string gSubtitleIdentifier = "LibapxSubtitle_";
+const string gDescIdentifier = "LibapxDesc_";
+const string gDescallIdentifier = "LibapxDescall_";
+const string gDesctitleIdentifier = "LibapxDesctitle_";
+const string gDesctitleallIdentifier = "LibapxDesctitleall_";
 //Setters
-void libapx_unitname_set_entry(unit u, string name) {
-    string id = libapx_unit_id(u);
-    DataTableSetString(true, g_name_identifier + id, name);
+void LibapxUnitnameSetEntry(unit u, string name) {
+    string id = LibapxUnitId(u);
+    DataTableSetString(true, gNameIdentifier + id, name);
 }
-void libapx_unitsubtitle_set_entry(unit u, string subtitle) {
-    string id = libapx_unit_id(u);
-    DataTableSetString(true, g_subtitle_identifier + id, subtitle);
+void LibapxUnitsubtitleSetEntry(unit u, string subtitle) {
+    string id = LibapxUnitId(u);
+    DataTableSetString(true, gSubtitleIdentifier + id, subtitle);
 }
-void libapx_unitdesc_set_entry(unit u, string desc) {
-    string id = libapx_unit_id(u);
-    DataTableSetString(true, g_desc_identifier + id, desc);
+void LibapxUnitdescSetEntry(unit u, string desc) {
+    string id = LibapxUnitId(u);
+    DataTableSetString(true, gDescIdentifier + id, desc);
 }
-void libapx_unitdescall_set_entry(unit u, string descall) {
+void LibapxUnitdescallSetEntry(unit u, string descall) {
     string type = UnitGetType(u);
     string p = IntToString(UnitGetOwner(u));
-    DataTableSetString(true, g_descall_identifier + p + "_" + type, descall);
+    DataTableSetString(true, gDescallIdentifier + p + "_" + type, descall);
 }
-void libapx_unitdesctitle_set_entry(unit u, string desctitle) {
-    string id = libapx_unit_id(u);
-    DataTableSetString(true, g_desctitle_identifier + id, desctitle);
+void LibapxUnitdesctitleSetEntry(unit u, string desctitle) {
+    string id = LibapxUnitId(u);
+    DataTableSetString(true, gDesctitleIdentifier + id, desctitle);
 }
-void libapx_unitdesctitleall_set_entry(unit u, string desctitleall) {
+void LibapxUnitdesctitleallSetEntry(unit u, string desctitleall) {
     string type = UnitGetType(u);
     string p = IntToString(UnitGetOwner(u));
-    DataTableSetString(true, g_desctitleall_identifier + p + "_" + type, desctitleall);
+    DataTableSetString(true, gDesctitleallIdentifier + p + "_" + type, desctitleall);
 }
 //getters
-string libapx_unitname_get_entry(unit u) {
-    string id = libapx_unit_id(u);
-    return DataTableGetString(true, g_name_identifier + id);
+string LibapxUnitnameGetEntry(unit u) {
+    string id = LibapxUnitId(u);
+    return DataTableGetString(true, gNameIdentifier + id);
 }
-string libapx_unitsubtitle_get_entry(unit u) {
-    string id = libapx_unit_id(u);
-    return DataTableGetString(true, g_subtitle_identifier + id);
+string LibapxUnitsubtitleGetEntry(unit u) {
+    string id = LibapxUnitId(u);
+    return DataTableGetString(true, gSubtitleIdentifier + id);
 }
-string libapx_unitdesc_get_entry(unit u) {
-    string id = libapx_unit_id(u);
-    return DataTableGetString(true, g_desc_identifier + id);
+string LibapxUnitdescGetEntry(unit u) {
+    string id = LibapxUnitId(u);
+    return DataTableGetString(true, gDescIdentifier + id);
 }
-string libapx_unitdescall_get_entry(unit u) {
+string LibapxUnitdescallGetEntry(unit u) {
     string type = UnitGetType(u);
     string p = IntToString(UnitGetOwner(u));
-    return DataTableGetString(true, g_descall_identifier + p + "_" + type);
+    return DataTableGetString(true, gDescallIdentifier + p + "_" + type);
 }
-string libapx_unitdesctitle_get_entry(unit u) {
-    string id = libapx_unit_id(u);
-    return DataTableGetString(true, g_desctitle_identifier + id);
+string LibapxUnitdesctitleGetEntry(unit u) {
+    string id = LibapxUnitId(u);
+    return DataTableGetString(true, gDesctitleIdentifier + id);
 }
-string libapx_unitdesctitleall_get_entry(unit u) {
+string LibapxUnitdesctitleallGetEntry(unit u) {
     string type = UnitGetType(u);
     string p = IntToString(UnitGetOwner(u));
-    return DataTableGetString(true, g_desctitleall_identifier + p + "_" + type);
+    return DataTableGetString(true, gDesctitleallIdentifier + p + "_" + type);
 }
 //Formal getters
-string libapx_unitname_get(unit u) {
-    string id = libapx_unit_id(u);
+string LibapxUnitnameGet(unit u) {
+    string id = LibapxUnitId(u);
     string catalogName;
     //check for name
-    if(DataTableValueExists(true, g_name_identifier + id)) {
-        return libapx_unitname_get_entry(u);
+    if(DataTableValueExists(true, gNameIdentifier + id)) {
+        return LibapxUnitnameGetEntry(u);
     }
     //REturn renameall
     catalogName = CatalogFieldValueGet(c_gameCatalogUnit, UnitGetType(u), "Name", UnitGetOwner(u));
@@ -82,12 +82,12 @@ string libapx_unitname_get(unit u) {
     }
     return catalogName;
 }
-string libapx_unitsubtitle_get(unit u) {
-    string id = libapx_unit_id(u);
+string LibapxUnitsubtitleGet(unit u) {
+    string id = LibapxUnitId(u);
     string catalogName;
     //check for name
-    if(DataTableValueExists(true, g_subtitle_identifier + id)) {
-        return libapx_unitsubtitle_get_entry(u);
+    if(DataTableValueExists(true, gSubtitleIdentifier + id)) {
+        return LibapxUnitsubtitleGetEntry(u);
     }
     //REturn renameall
     catalogName = CatalogFieldValueGet(c_gameCatalogUnit, UnitGetType(u), "Subtitle", UnitGetOwner(u));
@@ -99,46 +99,46 @@ string libapx_unitsubtitle_get(unit u) {
     return catalogName;
 }
 
-string libapx_unitdesc_get(unit u) {
-    string id = libapx_unit_id(u);
+string LibapxUnitdescGet(unit u) {
+    string id = LibapxUnitId(u);
     string type = UnitGetType(u);
     string p = IntToString(UnitGetOwner(u));
     string description;
-    if(DataTableValueExists(true, g_desc_identifier + id)) {
-        description = libapx_unitdesc_get_entry(u);
+    if(DataTableValueExists(true, gDescIdentifier + id)) {
+        description = LibapxUnitdescGetEntry(u);
     }
-    else if(DataTableValueExists(true, g_descall_identifier + p + "_" + type)) {
-        description = libapx_unitdescall_get_entry(u);
+    else if(DataTableValueExists(true, gDescallIdentifier + p + "_" + type)) {
+        description = LibapxUnitdescallGetEntry(u);
     }
     else {
-        description = libapx_unitsubtitle_get(u);
+        description = LibapxUnitsubtitleGet(u);
     }
     return description;
 }
 
-string libapx_unitdesctitle_get(unit u) {
-    string id = libapx_unit_id(u);
+string LibapxUnitdesctitleGet(unit u) {
+    string id = LibapxUnitId(u);
     string type = UnitGetType(u);
     string p = IntToString(UnitGetOwner(u));
     string title;
-    if( DataTableValueExists(true, g_desctitle_identifier + id)) {
-        title = libapx_unitdesctitle_get_entry(u);
+    if( DataTableValueExists(true, gDesctitleIdentifier + id)) {
+        title = LibapxUnitdesctitleGetEntry(u);
     }
-    else if( DataTableValueExists(true, g_desctitleall_identifier + p + "_" + type)) {
-        title = libapx_unitdesctitleall_get_entry(u);
+    else if( DataTableValueExists(true, gDesctitleallIdentifier + p + "_" + type)) {
+        title = LibapxUnitdesctitleallGetEntry(u);
     }
     else {
-        title = libapx_unitname_get(u);
+        title = LibapxUnitnameGet(u);
     }
 
     return title;
 }
 
 
-//  libapx_update_alllabels(int p)
+//  LibapxUpdateAlllabels(int p)
 //============
 //  Updates subtitle, name, desctitle, and desc labels
-void libapx_update_alllabels(int p) {
+void LibapxUpdateAlllabels(int p) {
     unitgroup ug = UnitGroupSelected(p);
     unit selected;
     string name;
@@ -147,21 +147,21 @@ void libapx_update_alllabels(int p) {
     string descriptionTitle;
     if(UnitGroupCount(ug, c_unitCountAlive) == 1) {
         selected = UnitGroupUnit(ug, 1);
-        name = libapx_unitname_get(selected);
-        subtitle = libapx_unitsubtitle_get(selected);
-        descriptionTitle = libapx_unitdesctitle_get(selected);
-        description = libapx_unitdesc_get(selected);
-        DialogControlSetPropertyAsText(g_libapx_ui_name, c_triggerControlPropertyText, PlayerGroupSingle(p), StringToText("<c val=\"ffffff\">"+name+"</c>"));
-        DialogControlSetPropertyAsText(g_libapx_ui_heroname, c_triggerControlPropertyText, PlayerGroupSingle(p), StringToText("<c val=\"ffffff\">"+name+"</c>"));
-        DialogControlSetPropertyAsText(g_libapx_ui_transportname, c_triggerControlPropertyText, PlayerGroupSingle(p), StringToText("<c val=\"ffffff\">"+name+"</c>"));
-        DialogControlSetPropertyAsText(g_libapx_ui_subtitle, c_triggerControlPropertyText, PlayerGroupSingle(p), StringToText("<c val=\"ffffff\">"+subtitle+"</c>"));
-        if(libapx_player[p].description_open) {
-            if((libapx_player[p].last_rendered_desc != description)  || (libapx_player[p].last_rendered_desc_name != descriptionTitle)) {
-                libapx_player[p].last_rendered_desc_name = descriptionTitle; 
-                libapx_player[p].last_rendered_desc = description; 
-                DialogControlRemoveAllItems(g_libapx_ui_description, PlayerGroupSingle(p)); 
-                DialogControlAddItem(g_libapx_ui_description, PlayerGroupSingle(p),  StringToText("<s val=\"InfoPaneUnitName\"><c val=\"ffffff\">"+descriptionTitle+"</c></s>"));
-                DialogControlAddItem(g_libapx_ui_description, PlayerGroupSingle(p),  StringToText("<c val=\"ffffff\">"+description+"</c>"));
+        name = LibapxUnitnameGet(selected);
+        subtitle = LibapxUnitsubtitleGet(selected);
+        descriptionTitle = LibapxUnitdesctitleGet(selected);
+        description = LibapxUnitdescGet(selected);
+        DialogControlSetPropertyAsText(gv_LibapxUiName, c_triggerControlPropertyText, PlayerGroupSingle(p), StringToText("<c val=\"ffffff\">"+name+"</c>"));
+        DialogControlSetPropertyAsText(gv_LibapxUiHeroname, c_triggerControlPropertyText, PlayerGroupSingle(p), StringToText("<c val=\"ffffff\">"+name+"</c>"));
+        DialogControlSetPropertyAsText(gv_LibapxUiTransportname, c_triggerControlPropertyText, PlayerGroupSingle(p), StringToText("<c val=\"ffffff\">"+name+"</c>"));
+        DialogControlSetPropertyAsText(gv_LibapxUiSubtitle, c_triggerControlPropertyText, PlayerGroupSingle(p), StringToText("<c val=\"ffffff\">"+subtitle+"</c>"));
+        if(gv_LibapxPlayer[p].descriptionOpen) {
+            if((gv_LibapxPlayer[p].lastRenderedDesc != description)  || (gv_LibapxPlayer[p].lastRenderedDescName != descriptionTitle)) {
+                gv_LibapxPlayer[p].lastRenderedDescName = descriptionTitle; 
+                gv_LibapxPlayer[p].lastRenderedDesc = description; 
+                DialogControlRemoveAllItems(gv_LibapxUiDescription, PlayerGroupSingle(p)); 
+                DialogControlAddItem(gv_LibapxUiDescription, PlayerGroupSingle(p),  StringToText("<s val=\"InfoPaneUnitName\"><c val=\"ffffff\">"+descriptionTitle+"</c></s>"));
+                DialogControlAddItem(gv_LibapxUiDescription, PlayerGroupSingle(p),  StringToText("<c val=\"ffffff\">"+description+"</c>"));
             }
         }
     }

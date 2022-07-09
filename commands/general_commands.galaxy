@@ -1,18 +1,18 @@
 //=========================================================
 //		Apex Roleplaying Engine
-//		Copyright (c) 2019, Apex Group
+//		Copyright (c) 2022, Apex Group
 //=========================================================
 // This software is distributed under the MIT License:
 // <http://opensource.org/licenses/MIT>
 //=========================================================
 
-// libapx_command_camera
+// LibapxCommandCamera
 // ====================
 // camera manipulation
-camerainfo[libapx_MAX_PLAYERS] cam;
+camerainfo[gv_LibapxMaxPlayers] cam;
 
 //Catalog validator
-string libapx_param_catalog(int catalog, string word)
+string LibapxParamCatalog(int catalog, string word)
 {
 	int i;
 	string test;
@@ -56,24 +56,24 @@ string libapx_param_catalog(int catalog, string word)
 
 
 
-void libapx_camera_reset (int player);
+static void LibapxCameraReset (int player);
 
-void libapx_camera_init()
+void LibapxCameraInit()
 {
 	int i = 1;
 	fixed val;
 
-	while( i < libapx_MAX_PLAYERS ) {
+	while( i < gv_LibapxMaxPlayers ) {
 		if(PlayerStatus(i) == c_playerStatusActive) {
 			cam[i] = CameraInfoDefault();
-			libapx_camera_reset(i);
+			LibapxCameraReset(i);
 		}
 		i += 1;
 	}
 }
 
 
-void libapx_camera_reset (int player)
+static void LibapxCameraReset (int player)
 {
 	fixed val;
 
@@ -105,21 +105,21 @@ void libapx_camera_reset (int player)
 	CameraInfoSetValue(cam[player], c_cameraValueShadowClip, val);
 }
 
-bool libapx_editor_mouse_wheel(bool testConds,bool runActions) {
+bool LibapxEditorMouseWheel(bool testConds,bool runActions) {
 	int p = EventPlayer();
 	fixed wheelspin = EventMouseWheelSpin();
-	if(!libapx_player[p].key_tab && !libapx_player[p].key_ctrl && !libapx_player[p].key_alt) {
+	if(!gv_LibapxPlayer[p].keyTab && !gv_LibapxPlayer[p].keyCtrl && !gv_LibapxPlayer[p].keyAlt) {
 		CameraSetValue(p, c_cameraValueDistance, CameraGetDistance(p)-(wheelspin*2), 0, 0, 0);
 	}
-	else if(libapx_player[p].key_alt) {
-		libapx_player[p].editor_heightoffset = libapx_player[p].editor_heightoffset + wheelspin*.2;
-		CameraSetValue(p, c_cameraValueHeightOffset, libapx_player[p].editor_heightoffset, 0, 0, 0);
+	else if(gv_LibapxPlayer[p].keyAlt) {
+		gv_LibapxPlayer[p].editorHeightoffset = gv_LibapxPlayer[p].editorHeightoffset + wheelspin*.2;
+		CameraSetValue(p, c_cameraValueHeightOffset, gv_LibapxPlayer[p].editorHeightoffset, 0, 0, 0);
 	}
 
 	return true;
 }
 
-void libapx_update_camera() {
+void LibapxUpdateCamera() {
 	int i;
 	int p;
 	point unitpos;
@@ -136,8 +136,8 @@ void libapx_update_camera() {
 	point newUnitPos;
 	for (i = 1; i <= PlayerGroupCount(PlayerGroupActive()); i += 1) {
 		p = PlayerGroupPlayer(PlayerGroupActive(), i);
-		if(libapx_player[p].editor_toggled) {
-			if(libapx_player[p].key_tab && !libapx_player[p].key_ctrl && !libapx_player[p].key_alt) {
+		if(gv_LibapxPlayer[p].editorToggled) {
+			if(gv_LibapxPlayer[p].keyTab && !gv_LibapxPlayer[p].keyCtrl && !gv_LibapxPlayer[p].keyAlt) {
 				dist = CameraGetDistance(p);
 				dist = dist/65;
 				if(dist > 1) {
@@ -145,11 +145,11 @@ void libapx_update_camera() {
 				}
 				//Panning
 				orientation = CameraGetYaw(p);
-				pos = libapx_player[p].camera_position;
-				p1x = PointGetX(libapx_player[p].mouse_position_lasttick_ui);
-				p1y = PointGetY(libapx_player[p].mouse_position_lasttick_ui);
-				p2x = PointGetX(libapx_player[p].mouse_position_ui);
-				p2y = PointGetY(libapx_player[p].mouse_position_ui);
+				pos = gv_LibapxPlayer[p].cameraPosition;
+				p1x = PointGetX(gv_LibapxPlayer[p].mousePositionLasttickUi);
+				p1y = PointGetY(gv_LibapxPlayer[p].mousePositionLasttickUi);
+				p2x = PointGetX(gv_LibapxPlayer[p].mousePositionUi);
+				p2y = PointGetY(gv_LibapxPlayer[p].mousePositionUi);
 				absx = p1x-p2x;
 				absy = p1y-p2y;
 				absx *= -.05*dist;
@@ -157,48 +157,49 @@ void libapx_update_camera() {
 				if(absx != 0 || absy != 0) {
 					pos = PointWithOffsetPolar(pos, absy, orientation);
 					pos = PointWithOffsetPolar(pos, absx, orientation+90);
-					libapx_player[p].camera_position = pos;	
+					gv_LibapxPlayer[p].cameraPosition = pos;	
 					CameraPan(p, PointInterpolate(pos,pos, .1 ), 0, 0, 0 , false);
 				} 
 
 			}
-			else if (libapx_player[p].key_ctrl != libapx_player[p].key_ctrl_lasttick) {
+			else if (gv_LibapxPlayer[p].keyCtrl != gv_LibapxPlayer[p].keyCtrlLasttick) {
 				//Oribting
-				if( libapx_player[p].key_ctrl) {
+				if( gv_LibapxPlayer[p].keyCtrl) {
 					CameraForceMouseRelative(p, true);
 					CameraSetMouseRotates(p, true);
 					CameraLockInput(p, false);
-					libapx_player[p].editor_rotating = true;
+					gv_LibapxPlayer[p].editorRotating = true;
 				}
 				else {
 					CameraForceMouseRelative(p, false);
 					CameraSetMouseRotates(p, false);
 					CameraLockInput(p, true);
-					libapx_player[p].editor_rotating = false;
+					gv_LibapxPlayer[p].editorRotating = false;
 				}
 			}
-			else if (libapx_player[p].editor_rotating && !libapx_player[p].key_ctrl) {
+			else if (gv_LibapxPlayer[p].editorRotating && !gv_LibapxPlayer[p].keyCtrl) {
 				//Catch if keypress misses it.
 				CameraForceMouseRelative(p, false);
 				CameraSetMouseRotates(p, false);
 				CameraLockInput(p, true);
-				libapx_player[p].editor_rotating = false;
+				gv_LibapxPlayer[p].editorRotating = false;
 			}
 
-			libapx_player[p].key_ctrl_lasttick = libapx_player[p].key_ctrl;
-			libapx_player[p].mouse_position_lasttick_ui = libapx_player[p].mouse_position_ui;
+			gv_LibapxPlayer[p].keyCtrlLasttick = gv_LibapxPlayer[p].keyCtrl;
+			gv_LibapxPlayer[p].mousePositionLasttickUi = gv_LibapxPlayer[p].mousePositionUi;
 		}
 	}
 }
-void libapx_enable_editor_camera(int p, bool state) {
+
+void LibapxEnableEditorCamera(int p, bool state) {
 	int i;
-	int tmp_p;
-	bool already_trigged;
+	int tmpP;
+	bool alreadyTrigged;
 	fixed val;
-	libapx_camera_reset(p);
+	LibapxCameraReset(p);
 	if(state) {
-			libapx_player[p].editor_toggled = true;
-			libapx_player[p].camera_position = CameraGetTarget(p);
+			gv_LibapxPlayer[p].editorToggled = true;
+			gv_LibapxPlayer[p].cameraPosition = CameraGetTarget(p);
 		//Enable Camera
 		//When nothing held
 		//When ctrl held
@@ -231,10 +232,10 @@ void libapx_enable_editor_camera(int p, bool state) {
 		CameraSetValue(p, c_cameraValueShadowClip, val, 1.0, -1, 10);
 
 		cam[p] = CameraInfoDefault();
-		libapx_camera_reset(p);
+		LibapxCameraReset(p);
 		CameraLockInput(p, true);
-		libapx_player[p].editor_mouse_wheel = TriggerCreate("libapx_editor_mouse_wheel");
-		TriggerAddEventMouseWheel(libapx_player[p].editor_mouse_wheel,p);
+		gv_LibapxPlayer[p].editorMouseWheel = TriggerCreate("LibapxEditorMouseWheel");
+		TriggerAddEventMouseWheel(gv_LibapxPlayer[p].editorMouseWheel,p);
 	}
 	else {
 		//Reseting
@@ -266,19 +267,19 @@ void libapx_enable_editor_camera(int p, bool state) {
 		CameraSetValue(p, c_cameraValueShadowClip, val, 1.0, -1, 10);
 
 		cam[p] = CameraInfoDefault();
-		libapx_camera_reset(p);
+		LibapxCameraReset(p);
 
 
 		//Disable Editor Camera
 		CameraLockInput(p, false);
-		libapx_player[p].editor_heightoffset = 0.0;
-		libapx_player[p].editor_toggled = false;
-		TriggerDestroy(libapx_player[p].editor_mouse_wheel);
-		libapx_camera_reset(p);
+		gv_LibapxPlayer[p].editorHeightoffset = 0.0;
+		gv_LibapxPlayer[p].editorToggled = false;
+		TriggerDestroy(gv_LibapxPlayer[p].editorMouseWheel);
+		LibapxCameraReset(p);
 	}
 }
 
-void libapx_command_camera(int user, unitgroup u, string argv, int spawningCount, string bracketText) {
+void LibapxCommandCamera(int user, unitgroup u, string argv, int spawningCount, string bracketText) {
 	string s;
 	string paremVal;
 	fixed time;
@@ -299,22 +300,22 @@ void libapx_command_camera(int user, unitgroup u, string argv, int spawningCount
 	}
 	if(StringEqual(s, "editor", false)) {
 		if(paremVal == "on") {
-			libapx_enable_editor_camera(user, true);
-			libapx_print_output(user, "<c val=\"00ff00\">Enabling Editor Camera</c><n/>");
-			libapx_print_output(user, "Use the [Tab]+[Mouse] to pan the camera. Use [Ctrl]+[Mouse] to orbit the camera. Use [Alt]+[MouseWheel] to change the height of the camera. Use [MouseWheel] to zoom the camera.");
+			LibapxEnableEditorCamera(user, true);
+			LibapxPrintOutput(user, "<c val=\"00ff00\">Enabling Editor Camera</c><n/>");
+			LibapxPrintOutput(user, "Use the [Tab]+[Mouse] to pan the camera. Use [Ctrl]+[Mouse] to orbit the camera. Use [Alt]+[MouseWheel] to change the height of the camera. Use [MouseWheel] to zoom the camera.");
 		}
 		else {
-			libapx_enable_editor_camera(user, false);
-			libapx_print_output(user, "<c val=\"00ff00\">Disabling Editor Camera</c><n/>");
+			LibapxEnableEditorCamera(user, false);
+			LibapxPrintOutput(user, "<c val=\"00ff00\">Disabling Editor Camera</c><n/>");
 		}
 		return;
 	}
 	if(StringEqual(s, "properties", false)) {
-		libapx_print_output(user, "<c val=\"00ff00\">Camera properties:</c><n/>" + cameraProperties);
+		LibapxPrintOutput(user, "<c val=\"00ff00\">Camera properties:</c><n/>" + cameraProperties);
 		return;
 	}
 	if(StringEqual(s, "reset", false)) {
-		libapx_print_output(user, "Camera resetting to default parameters.");
+		LibapxPrintOutput(user, "Camera resetting to default parameters.");
 
 			val = StringToFixed(CatalogFieldValueGet(c_gameCatalogCamera, CatalogFieldValueGet(c_gameCatalogTerrain, GameTerrainSet(), "Camera", user), "ParamInitial[5]", user));
 		CameraSetValue(user, c_cameraValuePitch, val, 1.0, -1, 10);
@@ -344,17 +345,17 @@ void libapx_command_camera(int user, unitgroup u, string argv, int spawningCount
 		CameraSetValue(user, c_cameraValueShadowClip, val, 1.0, -1, 10);
 
 		cam[user] = CameraInfoDefault();
-		libapx_camera_reset(user);
+		LibapxCameraReset(user);
 
 		return;
 	}
 	if(StringEqual(s, "Match", false) ) {
-		targetp = libapx_color_to_player( StringCase( paremVal, false ), user);
+		targetp = LibapxColorToPlayer( StringCase( paremVal, false ), user);
 		if( targetp == -1 ) {
-			libapx_print_error(user, "Invalid player");
+			LibapxPrintError(user, "Invalid player");
 			return;
 		}
-		libapx_print_text(PlayerGroupSingle(user), StringToText("Camera matching ") + libapx_player_name_colored(targetp) + StringToText("'s properties now."));
+		LibapxPrintText(PlayerGroupSingle(user), StringToText("Camera matching ") + gv_LibapxPlayerNameColored(targetp) + StringToText("'s properties now."));
 
 
 	}
@@ -502,20 +503,20 @@ void libapx_command_camera(int user, unitgroup u, string argv, int spawningCount
 		return ;
 	}
 	else {
-		libapx_print_output(user, "<c val=\"ff0000\">Error</c>: Invalid camera property.<n/>You can obtain a list of camera properties by typing <c val=\"00ff00\">camera properties</c>.");
+		LibapxPrintOutput(user, "<c val=\"ff0000\">Error</c>: Invalid camera property.<n/>You can obtain a list of camera properties by typing <c val=\"00ff00\">camera properties</c>.");
 		return;
 	}
 }
-void libapx_define_camera(string command_name) {
-	commands_guide_entry_set(
-		g_commands_guide_entry_general, 
-		command_name, 
-		" This command changes the players camera. <br> The properties it can use are AngleOfAttack, DepthOfField, Distance, FalloffEnd, FalloffStart, FarClip, FieldOfView, FocalDepth, HeightOffset, NearClip, Roll, Rotation, ShadowClip, and editor <br> _camera [property/reset] <br> Examples: _camera roll 90 <br> _camera reset <br> _camera editor on (This enables an entirely new camera)");
+void LibapxDefineCamera(string commandName) {
+	commandsGuideEntrySet(
+		gv_CommandsGuideEntryGeneral, 
+		commandName, 
+		" This command changes the players camera. <br> The properties it can use are AngleOfAttack, DepthOfField, Distance, FalloffEnd, FalloffStart, FarClip, FieldOfView, FocalDepth, HeightOffset, NearClip, Roll, Rotation, ShadowClip, and editor <br> Camera [property/reset] <br> Examples: Camera roll 90 <br> Camera reset <br> Camera editor on (This enables an entirely new camera)");
 }
 
 
-//libapx_command_upgrade
-void libapx_command_upgrade(int user, unitgroup u, string argv, int spawningCount, string bracketText)
+//LibapxCommandUpgrade
+void LibapxCommandUpgrade(int user, unitgroup u, string argv, int spawningCount, string bracketText)
 {
     string upgrade = StringWord(argv, 2);
     string nextParam = StringCase(StringWord(argv, 3), false);
@@ -523,10 +524,10 @@ void libapx_command_upgrade(int user, unitgroup u, string argv, int spawningCoun
     unitgroup g;
     int curLevel;
     int newLevel;
-    upgrade = libapx_param_catalog(c_gameCatalogUpgrade, upgrade);
+    upgrade = LibapxParamCatalog(c_gameCatalogUpgrade, upgrade);
     if(upgrade == null)
     {
-        libapx_print_output(user, "<c val=\"ff0000\">Unable to modify upgrade</c>: That upgrade does not exists.");
+        LibapxPrintOutput(user, "<c val=\"ff0000\">Unable to modify upgrade</c>: That upgrade does not exists.");
         return;
     }
 
@@ -554,88 +555,88 @@ void libapx_command_upgrade(int user, unitgroup u, string argv, int spawningCoun
         }
         else if(nextParam == "query")
         {
-            libapx_print_output(user, "Upgrade level is at: " +
+            LibapxPrintOutput(user, "Upgrade level is at: " +
                 IntToString(curLevel));
             return;
         }
         else if(nextParam != "0" && newLevel == 0)
         {
-            libapx_print_output(user,"Usage: upgrade upgradename [on/off/query/number]");
+            LibapxPrintOutput(user,"Usage: upgrade upgradename [on/off/query/number]");
             return;
         }
     }
 		else if(nextParam == "")
     {
-        libapx_print_output(user, "Upgrade level is at: " + IntToString(curLevel));
+        LibapxPrintOutput(user, "Upgrade level is at: " + IntToString(curLevel));
         return;
     }
     TechTreeUpgradeAddLevel(player, upgrade, newLevel - curLevel);
 
     return;
 }
-void libapx_define_upgrade(string command_name) {
-	commands_guide_entry_set(
-		g_commands_guide_entry_general, 
-		command_name, 
-		" This command modifies or changes the upgrades you have. <br> _upgrade upgradename [on/off/query/number] <br> Examples: <br> _upgrade TerranInfantryArmorslevel3 on <br> _upgrade TerranInfantryArmorslevel3 off ");
+void LibapxDefineUpgrade(string commandName) {
+	commandsGuideEntrySet(
+		gv_CommandsGuideEntryGeneral, 
+		commandName, 
+		" This command modifies or changes the upgrades you have. <br> Upgrade upgradename [on/off/query/number] <br> Examples: <br> Upgrade TerranInfantryArmorslevel3 on <br> Upgrade TerranInfantryArmorslevel3 off ");
 }
 
-// libapx_command_info
+// LibapxCommandInfo
 // ====================
 // just prints out a line of text to everyone
-void libapx_command_info(int user, unitgroup u, string argv, int spawningCount, string bracketText) {
-	libapx_print_output(user, "Apex Engine v" + IntToString(gv_LibapxBuildVersion) + "." + IntToString(gv_LibapxBuildSubVersion) + gv_LibapxBuildVersionModifier);
-	libapx_print_output(user, "Developer: Melvin");
-	libapx_print_output(user, "Asset Developers: Capnbombad, Comfromal, Dalgar, Lunar, Serobliss, Ngokerz");
-	libapx_print_output(user, "Special Thanks to: Xethyr, Dalgar, and Motive");
-	libapx_print_output(user, "Report bugs at serobliss2@gmail.com");
+void LibapxCommandInfo(int user, unitgroup u, string argv, int spawningCount, string bracketText) {
+	LibapxPrintOutput(user, "Apex Engine v" + IntToString(gv_LibapxBuildVersion) + "." + IntToString(gv_LibapxBuildSubVersion) + gv_LibapxBuildVersionModifier);
+	LibapxPrintOutput(user, "Developer: Melvin");
+	LibapxPrintOutput(user, "Asset Developers: Capnbombad, Comfromal, Dalgar, Lunar, Serobliss, Ngokerz");
+	LibapxPrintOutput(user, "Special Thanks to: Xethyr, Dalgar, and Motive");
+	LibapxPrintOutput(user, "Report bugs at serobliss2@gmail.com");
 }
-void libapx_define_info(string command_name) {
-	commands_guide_entry_set(
-		g_commands_guide_entry_general, 
-		command_name, 
-		" This command gives information about the engine and it's version. <br> _info <br> Examples: <br> _info ");
+void LibapxDefineInfo(string commandName) {
+	commandsGuideEntrySet(
+		gv_CommandsGuideEntryGeneral, 
+		commandName, 
+		" This command gives information about the engine and it's version. <br> Info <br> Examples: <br> Info ");
 }
 
 
 
 
-// libapx_command_api
+// LibapxCommandApi
 // ====================
 // accesses api
-void libapx_command_api(int user, unitgroup u, string argv, int spawningCount, string bracketText) {
+void LibapxCommandApi(int user, unitgroup u, string argv, int spawningCount, string bracketText) {
 	if(StringWord(argv, 2) == "listen") {
-		libapx_api_start_reading(user);
+		LibapxApiStartReading(user);
 	}
 	else if (StringWord(argv, 2) == "run") {
-		libapx_api_stop_reading(user);
+		LibapxApiStopReading(user);
 	}
 	else if ( StringWord(argv, 2) == "add") {
-		libapx_player[user].api_string_input = libapx_player[user].api_string_input + bracketTextGrab(bracketText, 1);
+		gv_LibapxPlayer[user].apiStringInput = gv_LibapxPlayer[user].apiStringInput + LibapxBracketTextGrab(bracketText, 1);
 	}
 }
-void libapx_define_api(string command_name) {
-	commands_guide_entry_set(
-		g_commands_guide_entry_general, 
-		command_name, 
+void LibapxDefineApi(string commandName) {
+	commandsGuideEntrySet(
+		gv_CommandsGuideEntryGeneral, 
+		commandName, 
 		" This commands allows you to turn on and off the api. When it turns off the strings collected are inputed as a chat message. ");
 }
 
 
 
-// libapx_command_list_commands
+// LibapxCommandListCommands
 // ===============
 // prints out a list of all the commands registered
-void libapx_command_list_commands(int user, unitgroup u, string argv, int spawningCount, string bracketText) {
-	libapx_print_output(user, "LISTING GAME COMMANDS:\n" + libapx_settings.commands);
+void LibapxCommandListCommands(int user, unitgroup u, string argv, int spawningCount, string bracketText) {
+	LibapxPrintOutput(user, "LISTING GAME COMMANDS:\n" + gv_LibapxSettings.commands);
 }
-void libapx_define_list_commands(string command_name) {
-	commands_guide_entry_set(
-		g_commands_guide_entry_general, 
-		command_name, 
-		" This command lists all the available commands possible. <br> _commands <br> Examples: <br> _commands ");
+void LibapxDefineListCommands(string commandName) {
+	commandsGuideEntrySet(
+		gv_CommandsGuideEntryGeneral, 
+		commandName, 
+		" This command lists all the available commands possible. <br> Commands <br> Examples: <br> Commands ");
 }
-// libapx_command_wait
+// LibapxCommandWait
 // ===============
 // creates a delay
 // Delay additional variables
@@ -651,221 +652,221 @@ static int LeadingIndex = 0;
 static int TrailingIndex = 0;
 
 
-void libapx_command_delay(int user, unitgroup u, string argv, int spawningCount, string bracketText) {
+void LibapxCommandDelay(int user, unitgroup u, string argv, int spawningCount, string bracketText) {
 	fixed time = StringToFixed(StringWord(argv, 2));
-	if(bracketTextGrab(bracketText, 1) == "") {
+	if(LibapxBracketTextGrab(bracketText, 1) == "") {
 		Wait(time, c_timeGame);
 	}
 	else {
 		if(LeadingIndex == DelayCommandArguementsArrayLimit) {
 			LeadingIndex = 0;
 		}
-		DelayCommandArray[LeadingIndex].msg = bracketTextGrab(bracketText, 1);
+		DelayCommandArray[LeadingIndex].msg = LibapxBracketTextGrab(bracketText, 1);
 		DelayCommandArray[LeadingIndex].p = user;
 		DelayCommandArray[LeadingIndex].u = u;
 		DelayCommandArray[LeadingIndex].spawningCount = spawningCount;
 
 		LeadingIndex +=1 ;
-		TriggerAddEventTimeElapsed(TriggerCreate("libapx_delay_trigger"), time, c_timeGame);
+		TriggerAddEventTimeElapsed(TriggerCreate("LibapxDelayTrigger"), time, c_timeGame);
 	}
 }
-bool libapx_delay_trigger(bool testConds,bool runActions) {
+bool LibapxDelayTrigger(bool testConds,bool runActions) {
 	if(TrailingIndex == DelayCommandArguementsArrayLimit) {
 		TrailingIndex = 0;
 	}
-	libapx_chat_parse(DelayCommandArray[TrailingIndex].msg, DelayCommandArray[TrailingIndex].p, DelayCommandArray[TrailingIndex].u, libapx_player[DelayCommandArray[TrailingIndex].p].spawningCount);
+	LibapxChatParse(DelayCommandArray[TrailingIndex].msg, DelayCommandArray[TrailingIndex].p, DelayCommandArray[TrailingIndex].u, gv_LibapxPlayer[DelayCommandArray[TrailingIndex].p].spawningCount);
 
 	TrailingIndex +=1;
 	return true;
 }
-void libapx_define_delay(string command_name) {
-	commands_guide_entry_set(
-		g_commands_guide_entry_general, 
-		command_name, 
-		" This command waits a given amount of time before allowing more commands to be ran. <br> _delay [time] <br> Examples: <br> @spawn marine; _delay 5 ; @attach marine head ");
+void LibapxDefineDelay(string commandName) {
+	commandsGuideEntrySet(
+		gv_CommandsGuideEntryGeneral, 
+		commandName, 
+		" This command waits a given amount of time before allowing more commands to be ran. <br> Delay [time] <br> Examples: <br> @spawn marine; Delay 5 ; @attach marine head ");
 }
 
-// libapx_command_players
+// LibapxCommandPlayers
 // ===============
 // prints player info (name + color + permissions level)
-void libapx_command_players(int user, unitgroup u, string argv, int spawningCount, string bracketText) {
+void LibapxCommandPlayers(int user, unitgroup u, string argv, int spawningCount, string bracketText) {
 	int player = 0;
-	text player_info;
+	text playerInfo;
 	text output = StringToText("Listing players: ");
 
-	while( player < libapx_MAX_PLAYERS ) {
+	while( player < gv_LibapxMaxPlayers ) {
 		if( PlayerStatus(player) != c_playerStatusUnused ) {
 			if( PlayerStatus(player) == c_playerStatusActive || PlayerType(player) != c_playerTypeUser ) {
-				player_info = libapx_player_name_colored(player) + StringToText(" (") + PlayerColorName(PlayerGetColorIndex(player, false)) + StringToText(")");
+				playerInfo = gv_LibapxPlayerNameColored(player) + StringToText(" (") + PlayerColorName(PlayerGetColorIndex(player, false)) + StringToText(")");
 			} else { // player left: print info in grey
-				player_info = TextWithColor( PlayerName(player) + StringToText(" (") + PlayerColorName(PlayerGetColorIndex(player, false)) + StringToText(") (Left)"), Color(35,35,35) );
+				playerInfo = TextWithColor( PlayerName(player) + StringToText(" (") + PlayerColorName(PlayerGetColorIndex(player, false)) + StringToText(") (Left)"), Color(35,35,35) );
 			}
 
 			// display mod or admin status
-			if( libapx_player[player].permission_level == libapx_PERMISSIONS_LEVEL_MOD ) {
-				player_info = player_info + StringToText(" (Mod)");
+			if( gv_LibapxPlayer[player].permissionLevel == gv_LibapxPermissionLevelMod ) {
+				playerInfo = playerInfo + StringToText(" (Mod)");
 			}
-			else if( libapx_player[player].permission_level == libapx_PERMISSIONS_LEVEL_ADMIN ) {
-				player_info = player_info + StringToText(" (Admin)");
+			else if( gv_LibapxPlayer[player].permissionLevel == LibapxPERMISSIONSLEVELADMIN ) {
+				playerInfo = playerInfo + StringToText(" (Admin)");
 			}
-			else if( libapx_player[player].permission_level == libapx_PERMISSIONS_LEVEL_SADMIN ) {
-				player_info = player_info + StringToText(" (SuperAdmin)");
+			else if( gv_LibapxPlayer[player].permissionLevel == LibapxPERMISSIONSLEVELSADMIN ) {
+				playerInfo = playerInfo + StringToText(" (SuperAdmin)");
 			}
 
-			output = output + StringToText("\n") + player_info;
+			output = output + StringToText("\n") + playerInfo;
 		}
 		player += 1;
 	}
 
-	libapx_print_text(PlayerGroupSingle(user), output);
+	LibapxPrintText(PlayerGroupSingle(user), output);
 }
-void libapx_define_players(string command_name) {
-	commands_guide_entry_set(
-		g_commands_guide_entry_general, 
-		command_name, 
-		" This command prints out the permission level, color, and status of all the players in the game. <br> _players <br> Examples: <br> _players ");
+void LibapxDefinePlayers(string commandName) {
+	commandsGuideEntrySet(
+		gv_CommandsGuideEntryGeneral, 
+		commandName, 
+		" This command prints out the permission level, color, and status of all the players in the game. <br> Players <br> Examples: <br> Players ");
 }
 
-// libapx_command_gamesetup
+// LibapxCommandGamesetup
 // ====================
 // redirects to proper gamesetup saving/loading/removing commands
-void libapx_command_gamesetup(int user, unitgroup u, string argv, int spawningCount, string bracketText) {
+void LibapxCommandGamesetup(int user, unitgroup u, string argv, int spawningCount, string bracketText) {
 	string param;
-	string gamesetup_name;
+	string gamesetupName;
 	string rgnName;
 	region rgn = RegionEntireMap();
 	int i;
-	string gamesetup_list = "";
+	string gamesetupList = "";
 
 	//Bank validation
-	if(!libapx_playerbank_hasloaded(user)) {
+	if(!gv_LibapxPlayerbankHasloaded(user)) {
 		return;
 	}
 
-	if(StringWord(libapx_player[user].chat_msg, 2) == "") {
+	if(StringWord(gv_LibapxPlayer[user].chatMsg, 2) == "") {
 		return;
 	}
 
-	param = StringWord(libapx_player[user].chat_msg, 2);
+	param = StringWord(gv_LibapxPlayer[user].chatMsg, 2);
 
 	if(StringEqual(param, "save", c_stringNoCase)) {
-		gamesetup_name = StringWord(libapx_player[user].chat_msg, 3);
-		if(gamesetup_name == "") {
-			libapx_print_error(user, "Invalid game setup name");
+		gamesetupName = StringWord(gv_LibapxPlayer[user].chatMsg, 3);
+		if(gamesetupName == "") {
+			LibapxPrintError(user, "Invalid game setup name");
 			return;
 		}
 		// TODO: PROPER REGIONS
-		if(StringWord(libapx_player[user].chat_msg, 4) != "") {
-			if(StringSub(StringWord(libapx_player[user].chat_msg, 4), 1, 1) == "#") {
-				rgnName = StringWord(libapx_player[user].chat_msg, 4);
+		if(StringWord(gv_LibapxPlayer[user].chatMsg, 4) != "") {
+			if(StringSub(StringWord(gv_LibapxPlayer[user].chatMsg, 4), 1, 1) == "#") {
+				rgnName = StringWord(gv_LibapxPlayer[user].chatMsg, 4);
 				rgnName = StringSub(rgnName, 2, StringLength(rgnName)); // remove the #
 
 				// TODO: Get region from rgnName
 
 				if(rgn == null) {
-					libapx_print_error(user, "No region with that name exists!");
+					LibapxPrintError(user, "No region with that name exists!");
 					return;
 				}
-				libapx_print_success(user, "Saving region " + rgnName);
+				LibapxPrintSuccess(user, "Saving region " + rgnName);
 			}
 			else {
-				libapx_print_error(user, "Region name must be prefixed with '#' (e.g. a region named \"rgn\" must be entered as #rgn");
+				LibapxPrintError(user, "Region name must be prefixed with '#' (e.g. a region named \"rgn\" must be entered as #rgn");
 				return;
 			}
 		}
 
-		libapx_gamesetup_save(user, gamesetup_name, rgn);
+		LibapxGamesetupSave(user, gamesetupName, rgn);
 		return;
 	}
 
 	if(StringEqual(param, "load", c_stringNoCase)) {
-		gamesetup_name = StringWord(libapx_player[user].chat_msg, 3);
+		gamesetupName = StringWord(gv_LibapxPlayer[user].chatMsg, 3);
 
-		if(BankSectionExists(libapx_player[user].bank_storage, libapx_BANK_GAMESETUP_PREFIX + gamesetup_name)) {
-			libapx_print_text(PlayerGroupAll(), libapx_player_name_colored(user) + StringToText(" is loading a gamesetup..."));
-			libapx_gamesetup_load(user, gamesetup_name);
+		if(BankSectionExists(gv_LibapxPlayer[user].bankStorage, LibapxBANKGAMESETUPPREFIX + gamesetupName)) {
+			LibapxPrintText(PlayerGroupAll(), gv_LibapxPlayerNameColored(user) + StringToText(" is loading a gamesetup..."));
+			LibapxGamesetupLoad(user, gamesetupName);
 			return;
 		}
 		else {
-			libapx_print_error(user, "Game setup " + gamesetup_name + " does not exist");
+			LibapxPrintError(user, "Game setup " + gamesetupName + " does not exist");
 			return;
 		}
 	}
 
 	if(StringEqual(param, "remove", c_stringNoCase)) {
-		gamesetup_name = StringWord(libapx_player[user].chat_msg, 3);
+		gamesetupName = StringWord(gv_LibapxPlayer[user].chatMsg, 3);
 
-		if( libapx_gamesetup_remove(user, gamesetup_name) ) {
-			libapx_print_success(user, "Game setup \"" + gamesetup_name + "\" has been deleted");
+		if( LibapxGamesetupRemove(user, gamesetupName) ) {
+			LibapxPrintSuccess(user, "Game setup \"" + gamesetupName + "\" has been deleted");
 			return;
 		}
 		else {
-			libapx_print_error(user, "Game setup \"" + gamesetup_name + "\" does not exist");
+			LibapxPrintError(user, "Game setup \"" + gamesetupName + "\" does not exist");
 			return;
 		}
 	}
 
 	if(StringEqual(param, "removeall", c_stringNoCase)) {
-		i = BankSectionCount(libapx_player[user].bank_storage) - 1;
+		i = BankSectionCount(gv_LibapxPlayer[user].bankStorage) - 1;
 
 		while( i >= 0 ) {
-			if( StringContains(BankSectionName(libapx_player[user].bank_storage, i), libapx_BANK_GAMESETUP_PREFIX, c_stringBegin, c_stringNoCase) ) {
-				BankSectionRemove(libapx_player[user].bank_storage, BankSectionName(libapx_player[user].bank_storage, i));
+			if( StringContains(BankSectionName(gv_LibapxPlayer[user].bankStorage, i), LibapxBANKGAMESETUPPREFIX, c_stringBegin, c_stringNoCase) ) {
+				BankSectionRemove(gv_LibapxPlayer[user].bankStorage, BankSectionName(gv_LibapxPlayer[user].bankStorage, i));
 			}
 			i -= 1;
 		}
-		BankSave(libapx_player[user].bank_storage);
-		libapx_print_success(user, "All game setups have been deleted");
+		BankSave(gv_LibapxPlayer[user].bankStorage);
+		LibapxPrintSuccess(user, "All game setups have been deleted");
 
 		return;
 	}
 
 	if(StringEqual(param, "list", c_stringNoCase)) {
-		i = BankSectionCount(libapx_player[user].bank_storage) - 1;
+		i = BankSectionCount(gv_LibapxPlayer[user].bankStorage) - 1;
 
 		while(i >= 0) {
-			if( StringContains(BankSectionName(libapx_player[user].bank_storage, i), libapx_BANK_GAMESETUP_PREFIX, c_stringBegin, c_stringNoCase) ) {
-				gamesetup_name = BankSectionName(libapx_player[user].bank_storage, i);
-				gamesetup_list = gamesetup_list + ", " + StringSub(gamesetup_name, 4, StringLength(gamesetup_name));
+			if( StringContains(BankSectionName(gv_LibapxPlayer[user].bankStorage, i), LibapxBANKGAMESETUPPREFIX, c_stringBegin, c_stringNoCase) ) {
+				gamesetupName = BankSectionName(gv_LibapxPlayer[user].bankStorage, i);
+				gamesetupList = gamesetupList + ", " + StringSub(gamesetupName, 4, StringLength(gamesetupName));
 			}
 			i -= 1;
 		}
 
-		if(gamesetup_list == "") {
-			libapx_print_output(user, "You have no saved game setups");
+		if(gamesetupList == "") {
+			LibapxPrintOutput(user, "You have no saved game setups");
 			return;
 		}
 
 		//remove the first comma
-		gamesetup_list = StringSub(gamesetup_list, 3, StringLength(gamesetup_list));
+		gamesetupList = StringSub(gamesetupList, 3, StringLength(gamesetupList));
 
-		libapx_print_output(user, "Listing gamesetups:\n" + gamesetup_list);
+		LibapxPrintOutput(user, "Listing gamesetups:\n" + gamesetupList);
 
 		return;
 	}
 }
-void libapx_define_gamesetup(string command_name) {
-	commands_guide_entry_set(
-		g_commands_guide_entry_general, 
-		command_name, 
-		" This command allows you to save all of your units on the map and reload them at a later point. <br> _gamesetup [save/load/list/remove/removeall] [gamesetupName] <br> Examples: <br> _gamesetup save bob <br> _gamesetup list <br> _gamesetup remove bob <br> _gamesetup removeall ");
+void LibapxDefineGamesetup(string commandName) {
+	commandsGuideEntrySet(
+		gv_CommandsGuideEntryGeneral, 
+		commandName, 
+		" This command allows you to save all of your units on the map and reload them at a later point. <br> Gamesetup [save/load/list/remove/removeall] [gamesetupName] <br> Examples: <br> Gamesetup save bob <br> Gamesetup list <br> Gamesetup remove bob <br> Gamesetup removeall ");
 }
 
-// libapx_command_control
+// LibapxCommandControl
 // ==================
 // gives a player control over another player's units
 // (modified from Cortex Engine)
-void libapx_command_control(int user, unitgroup u, string argv, int spawningCount, string bracketText) {
-	string player = StringCase( StringWord(libapx_player[user].chat_msg, 2), false );
-	string target_player = StringCase( StringWord(libapx_player[user].chat_msg, 3), false );
+void LibapxCommandControl(int user, unitgroup u, string argv, int spawningCount, string bracketText) {
+	string player = StringCase( StringWord(gv_LibapxPlayer[user].chatMsg, 2), false );
+	string targetPlayer = StringCase( StringWord(gv_LibapxPlayer[user].chatMsg, 3), false );
 	string original = player;
 	int i = 1;
 	int context = user;	// a player to be controlled/given control
 
 	// if target player specified, trying to make two players control one another
-	if( target_player != "" ) {
-		context = libapx_color_to_player(player, user);
-		player = target_player;
+	if( targetPlayer != "" ) {
+		context = LibapxColorToPlayer(player, user);
+		player = targetPlayer;
 	}
 
 	if( context == -1 ) { // Invalid player.
@@ -873,16 +874,16 @@ void libapx_command_control(int user, unitgroup u, string argv, int spawningCoun
 	}
 
 	// check permissions on context player
-	else if( context != user && PlayerType(context) == c_playerTypeUser && libapx_player[user].permission_level <= libapx_player[context].permission_level ) {
+	else if( context != user && PlayerType(context) == c_playerTypeUser && gv_LibapxPlayer[user].permissionLevel <= gv_LibapxPlayer[context].permissionLevel ) {
 		return;
 	}
 
 	// if original player was "all", set control by
 	// parsing command for each player
 	if( original == "all" ) {
-		while( i != libapx_MAX_PLAYERS ) {
+		while( i != gv_LibapxMaxPlayers ) {
 			// Issue this command over the next color.
-			libapx_chat_parse("_control " + libapx_color_from_player(i) + " " + target_player, user, libapx_player_parser[user][spawningCount].context, spawningCount);
+			LibapxChatParse("Control " + LibapxColorFromPlayer(i) + " " + targetPlayer, user, gv_gv_LibapxPlayerParser[user][spawningCount].context, spawningCount);
 			i += 1;
 		}
 		return;
@@ -890,8 +891,8 @@ void libapx_command_control(int user, unitgroup u, string argv, int spawningCoun
 
 
 	// apply alliance control/spending
-	while( i != libapx_MAX_PLAYERS ) {
-		if( i == context || (libapx_color_to_player(player, user) != i && player != "all") ) {
+	while( i != gv_LibapxMaxPlayers ) {
+		if( i == context || (LibapxColorToPlayer(player, user) != i && player != "all") ) {
 			i += 1;
 			continue;
 		}
@@ -906,7 +907,7 @@ void libapx_command_control(int user, unitgroup u, string argv, int spawningCoun
 			PlayerSetAlliance( context, c_allianceIdControl, i, true );
 			PlayerSetAlliance( context, c_allianceIdSpend, i, true );
 			// Now check, do we have permission to modify this player's alliances, too?
-			if( user == i || libapx_player[user].permission_level > libapx_player[i].permission_level ) {
+			if( user == i || gv_LibapxPlayer[user].permissionLevel > gv_LibapxPlayer[i].permissionLevel ) {
 				PlayerSetAlliance( i, c_allianceIdControl, context, true );
 				PlayerSetAlliance( i, c_allianceIdSpend, context, true );
 			}
@@ -917,28 +918,28 @@ void libapx_command_control(int user, unitgroup u, string argv, int spawningCoun
 
 	return;
 }
-void libapx_define_control(string command_name) {
-	commands_guide_entry_set(
-		g_commands_guide_entry_general, 
-		command_name, 
-		" This command allows your units to be controled by the target player. <br> _control [targetplayer] <br> Examples: <br> _control brown ");
+void LibapxDefineControl(string commandName) {
+	commandsGuideEntrySet(
+		gv_CommandsGuideEntryGeneral, 
+		commandName, 
+		" This command allows your units to be controled by the target player. <br> Control [targetplayer] <br> Examples: <br> Control brown ");
 }
 
-// libapx_command_uncontrol
+// LibapxCommandUncontrol
 // ======================
 // stops unit spending/control between two players
 // (Modified from Cortex Engine)
-void libapx_command_uncontrol(int user, unitgroup u, string argv, int spawningCount, string bracketText) {
-	string player = StringCase( StringWord(libapx_player[user].chat_msg, 2), false );
-	string target_player = StringCase( StringWord(libapx_player[user].chat_msg, 3), false );
+void LibapxCommandUncontrol(int user, unitgroup u, string argv, int spawningCount, string bracketText) {
+	string player = StringCase( StringWord(gv_LibapxPlayer[user].chatMsg, 2), false );
+	string targetPlayer = StringCase( StringWord(gv_LibapxPlayer[user].chatMsg, 3), false );
 	string original = player;
 	int i = 1;
 	int context = user;	// a player to be controlled/given control
 
 	// if target player specified, trying to make two players control one another
-	if( target_player != "" ) {
-		context = libapx_color_to_player(player, user);
-		player = target_player;
+	if( targetPlayer != "" ) {
+		context = LibapxColorToPlayer(player, user);
+		player = targetPlayer;
 	}
 
 	if( context == -1 ) { // Invalid player.
@@ -946,16 +947,16 @@ void libapx_command_uncontrol(int user, unitgroup u, string argv, int spawningCo
 	}
 
 	// check permissions on context player
-	else if( context != user && PlayerType(context) == c_playerTypeUser && libapx_player[user].permission_level <= libapx_player[context].permission_level ) {
+	else if( context != user && PlayerType(context) == c_playerTypeUser && gv_LibapxPlayer[user].permissionLevel <= gv_LibapxPlayer[context].permissionLevel ) {
 		return;
 	}
 
 	// if original player was "all", set control by
 	// parsing command for each player
 	if( original == "all" ) {
-		while( i != libapx_MAX_PLAYERS ) {
+		while( i != gv_LibapxMaxPlayers ) {
 			// Issue this command over the next color.
-			libapx_chat_parse("_control " + libapx_color_from_player(i) + " " + target_player, user, libapx_player_parser[user][spawningCount].context, spawningCount);
+			LibapxChatParse("Control " + LibapxColorFromPlayer(i) + " " + targetPlayer, user, gv_gv_LibapxPlayerParser[user][spawningCount].context, spawningCount);
 			i += 1;
 		}
 		return;
@@ -963,8 +964,8 @@ void libapx_command_uncontrol(int user, unitgroup u, string argv, int spawningCo
 
 
 	// apply alliance control/spending
-	while( i != libapx_MAX_PLAYERS ) {
-		if( i == context || (libapx_color_to_player(player, user) != i && player != "all") ) {
+	while( i != gv_LibapxMaxPlayers ) {
+		if( i == context || (LibapxColorToPlayer(player, user) != i && player != "all") ) {
 			i += 1;
 			continue;
 		}
@@ -979,7 +980,7 @@ void libapx_command_uncontrol(int user, unitgroup u, string argv, int spawningCo
 			PlayerSetAlliance( context, c_allianceIdControl, i, false );
 			PlayerSetAlliance( context, c_allianceIdSpend, i, false );
 			// Now check, do we have permission to modify this player's alliances, too?
-			if( user == i || libapx_player[user].permission_level > libapx_player[i].permission_level ) {
+			if( user == i || gv_LibapxPlayer[user].permissionLevel > gv_LibapxPlayer[i].permissionLevel ) {
 				PlayerSetAlliance( i, c_allianceIdControl, context, false );
 				PlayerSetAlliance( i, c_allianceIdSpend, context, false );
 			}
@@ -990,28 +991,28 @@ void libapx_command_uncontrol(int user, unitgroup u, string argv, int spawningCo
 
 	return;
 }
-void libapx_define_uncontrol(string command_name) {
-	commands_guide_entry_set(
-		g_commands_guide_entry_general, 
-		command_name, 
-		" This command disallows your units to be controled by the target player. <br> _uncontrol [targetplayer] <br> Examples: <br> _uncontrol brown ");
+void LibapxDefineUncontrol(string commandName) {
+	commandsGuideEntrySet(
+		gv_CommandsGuideEntryGeneral, 
+		commandName, 
+		" This command disallows your units to be controled by the target player. <br> Uncontrol [targetplayer] <br> Examples: <br> Uncontrol brown ");
 }
 
-// libapx_command_ally
+// LibapxCommandAlly
 // ==================
 // allies another player, and if your permissions are greater
 // than target player, also forces them to ally you
-void libapx_command_ally(int user, unitgroup u, string argv, int spawningCount, string bracketText) {
-	string player = StringCase( StringWord(libapx_player[user].chat_msg, 2), false );
-	string target_player = StringCase( StringWord(libapx_player[user].chat_msg, 3), false );
+void LibapxCommandAlly(int user, unitgroup u, string argv, int spawningCount, string bracketText) {
+	string player = StringCase( StringWord(gv_LibapxPlayer[user].chatMsg, 2), false );
+	string targetPlayer = StringCase( StringWord(gv_LibapxPlayer[user].chatMsg, 3), false );
 	string original = player;
 	int i = 1;
 	int context = user;	// a player to be controlled/given control
 
 	// if target player specified, trying to make two players control one another
-	if( target_player != "" ) {
-		context = libapx_color_to_player(player, user);
-		player = target_player;
+	if( targetPlayer != "" ) {
+		context = LibapxColorToPlayer(player, user);
+		player = targetPlayer;
 	}
 
 	if( context == -1 ) { // Invalid player.
@@ -1019,16 +1020,16 @@ void libapx_command_ally(int user, unitgroup u, string argv, int spawningCount, 
 	}
 
 	// check permissions on context player
-	else if( context != user && PlayerType(context) == c_playerTypeUser && libapx_player[user].permission_level <= libapx_player[context].permission_level ) {
+	else if( context != user && PlayerType(context) == c_playerTypeUser && gv_LibapxPlayer[user].permissionLevel <= gv_LibapxPlayer[context].permissionLevel ) {
 		return;
 	}
 
 	// if original player was "all", set control by
 	// parsing command for each player
 	if( original == "all" ) {
-		while( i != libapx_MAX_PLAYERS ) {
+		while( i != gv_LibapxMaxPlayers ) {
 			// Issue this command over the next color.
-			libapx_chat_parse("_ally " + libapx_color_from_player(i) + " " + target_player, user, libapx_player_parser[user][spawningCount].context, spawningCount);
+			LibapxChatParse("Ally " + LibapxColorFromPlayer(i) + " " + targetPlayer, user, gv_gv_LibapxPlayerParser[user][spawningCount].context, spawningCount);
 			i += 1;
 		}
 		return;
@@ -1036,8 +1037,8 @@ void libapx_command_ally(int user, unitgroup u, string argv, int spawningCount, 
 
 
 	// apply alliance control/spending
-	while( i != libapx_MAX_PLAYERS ) {
-		if( i == context || (libapx_color_to_player(player, user) != i && player != "all") ) {
+	while( i != gv_LibapxMaxPlayers ) {
+		if( i == context || (LibapxColorToPlayer(player, user) != i && player != "all") ) {
 			i += 1;
 			continue;
 		}
@@ -1050,7 +1051,7 @@ void libapx_command_ally(int user, unitgroup u, string argv, int spawningCount, 
 			libNtve_gf_SetAllianceOneWay( context, i, 1);
 			// Now check, do we have permission to modify this player's alliances, too?
 			// Nah. Lets always be able to be friends.
-			//if( user == i || libapx_player[user].permission_level > libapx_player[i].permission_level ) {
+			//if( user == i || gv_LibapxPlayer[user].permissionLevel > gv_LibapxPlayer[i].permissionLevel ) {
 				libNtve_gf_SetAllianceOneWay( i, context, 1);
 			//}
 		}
@@ -1059,28 +1060,28 @@ void libapx_command_ally(int user, unitgroup u, string argv, int spawningCount, 
 	}
 
 }
-void libapx_define_ally(string command_name) {
-	commands_guide_entry_set(
-		g_commands_guide_entry_general, 
-		command_name, 
-		" This command allies the player you target. This also means they ally you. <br> _ally [targetplayer] <br> Examples: <br> _ally brown ");
+void LibapxDefineAlly(string commandName) {
+	commandsGuideEntrySet(
+		gv_CommandsGuideEntryGeneral, 
+		commandName, 
+		" This command allies the player you target. This also means they ally you. <br> Ally [targetplayer] <br> Examples: <br> Ally brown ");
 }
 
-// libapx_command_unally
+// LibapxCommandUnally
 // ==================
 // unallies another player. other player automatically
 // will unally you also
-void libapx_command_unally(int user, unitgroup u, string argv, int spawningCount, string bracketText) {
-	string player = StringCase( StringWord(libapx_player[user].chat_msg, 2), false );
-	string target_player = StringCase( StringWord(libapx_player[user].chat_msg, 3), false );
+void LibapxCommandUnally(int user, unitgroup u, string argv, int spawningCount, string bracketText) {
+	string player = StringCase( StringWord(gv_LibapxPlayer[user].chatMsg, 2), false );
+	string targetPlayer = StringCase( StringWord(gv_LibapxPlayer[user].chatMsg, 3), false );
 	string original = player;
 	int i = 1;
 	int context = user;	// a player to be controlled/given control
 
 	// if target player specified, trying to make two players control one another
-	if( target_player != "" ) {
-		context = libapx_color_to_player(player, user);
-		player = target_player;
+	if( targetPlayer != "" ) {
+		context = LibapxColorToPlayer(player, user);
+		player = targetPlayer;
 	}
 
 	if( context == -1 ) { // Invalid player.
@@ -1088,16 +1089,16 @@ void libapx_command_unally(int user, unitgroup u, string argv, int spawningCount
 	}
 
 	// check permissions on context player
-	else if( context != user && PlayerType(context) == c_playerTypeUser && libapx_player[user].permission_level <= libapx_player[context].permission_level ) {
+	else if( context != user && PlayerType(context) == c_playerTypeUser && gv_LibapxPlayer[user].permissionLevel <= gv_LibapxPlayer[context].permissionLevel ) {
 		return;
 	}
 
 	// if original player was "all", set control by
 	// parsing command for each player
 	if( original == "all" ) {
-		while( i != libapx_MAX_PLAYERS ) {
+		while( i != gv_LibapxMaxPlayers ) {
 			// Issue this command over the next color.
-			libapx_chat_parse("_ally " + libapx_color_from_player(i) + " " + target_player, user, libapx_player_parser[user][spawningCount].context, spawningCount);
+			LibapxChatParse("Ally " + LibapxColorFromPlayer(i) + " " + targetPlayer, user, gv_gv_LibapxPlayerParser[user][spawningCount].context, spawningCount);
 			i += 1;
 		}
 		return;
@@ -1105,8 +1106,8 @@ void libapx_command_unally(int user, unitgroup u, string argv, int spawningCount
 
 
 	// apply alliance control/spending
-	while( i != libapx_MAX_PLAYERS ) {
-		if( i == context || (libapx_color_to_player(player, user) != i && player != "all") ) {
+	while( i != gv_LibapxMaxPlayers ) {
+		if( i == context || (LibapxColorToPlayer(player, user) != i && player != "all") ) {
 			i += 1;
 			continue;
 		}
@@ -1119,17 +1120,17 @@ void libapx_command_unally(int user, unitgroup u, string argv, int spawningCount
 	return;
 }
 
-void libapx_define_unally(string command_name) {
-	commands_guide_entry_set(
-		g_commands_guide_entry_general, 
-		command_name, 
-		" This command unallies the player you target. This also means they unally you. <br> _unally [targetplayer] <br> Examples: <br> _unally brown ");
+void LibapxDefineUnally(string commandName) {
+	commandsGuideEntrySet(
+		gv_CommandsGuideEntryGeneral, 
+		commandName, 
+		" This command unallies the player you target. This also means they unally you. <br> Unally [targetplayer] <br> Examples: <br> Unally brown ");
 }
 
-// libapx_command_roll
+// LibapxCommandRoll
 // ===================
 // rolls a random number
-void libapx_command_roll(int user, unitgroup u, string argv, int spawningCount, string bracketText) {
+void LibapxCommandRoll(int user, unitgroup u, string argv, int spawningCount, string bracketText) {
 	string snum = StringWord(argv,2);
 	string snumTo = StringWord(argv,3);
 	int tableHost;
@@ -1149,36 +1150,36 @@ void libapx_command_roll(int user, unitgroup u, string argv, int spawningCount, 
 			//We did not have a dice count, so our command actually looked more like Dy than xDy... let's just run one die then. -F
 			winnings = RandomInt(1,StringToInt( StringSub( snum, StringFind(snum,"d",false) + 1, StringLength(snum) ) ) );
 		}
-		libapx_print_text(PlayerGroupAll(), libapx_player_name_colored(user) + StringToText(" rolled ") + StringToText(snum) + StringToText(" and got: ") + IntToText(winnings));
+		LibapxPrintText(PlayerGroupAll(), gv_LibapxPlayerNameColored(user) + StringToText(" rolled ") + StringToText(snum) + StringToText(" and got: ") + IntToText(winnings));
 		return;
 	}
 	//Did not have a xDy input format, check for second parameter. -F
 	if(snumTo != "") {
-		libapx_print_text(PlayerGroupAll(),libapx_player_name_colored(user) + StringToText(" rolled from ") + StringToText(snum) + StringToText(" to ") + StringToText(snumTo) + StringToText(" and got: ") + IntToText(RandomInt(StringToInt(snum),StringToInt(snumTo))));
+		LibapxPrintText(PlayerGroupAll(),gv_LibapxPlayerNameColored(user) + StringToText(" rolled from ") + StringToText(snum) + StringToText(" to ") + StringToText(snumTo) + StringToText(" and got: ") + IntToText(RandomInt(StringToInt(snum),StringToInt(snumTo))));
 		return;
 	} else if (snum != "") {
-		libapx_print_text(PlayerGroupAll(),libapx_player_name_colored(user) + StringToText(" rolled from one to ") + StringToText(snum) + StringToText(" and got: ") + IntToText(RandomInt(1,StringToInt(snum))));
+		LibapxPrintText(PlayerGroupAll(),gv_LibapxPlayerNameColored(user) + StringToText(" rolled from one to ") + StringToText(snum) + StringToText(" and got: ") + IntToText(RandomInt(1,StringToInt(snum))));
 		return;
 	}
-	libapx_print_text(PlayerGroupAll(),libapx_player_name_colored(user) + StringToText(" rolled from 1 to 100 and got: ") + IntToText(RandomInt(1,100)));
+	LibapxPrintText(PlayerGroupAll(),gv_LibapxPlayerNameColored(user) + StringToText(" rolled from 1 to 100 and got: ") + IntToText(RandomInt(1,100)));
 	return;
 
 }
-void libapx_define_roll(string command_name) {
-	commands_guide_entry_set(
-		g_commands_guide_entry_general, 
-		command_name, 
-		" This command rolls a dice or finds a random number in a given range. <br> _roll [dice/min] [max] <br> Examples: <br> _roll <br> _roll 3 5 <br> _roll 5 3 <br> _roll 5d15 ");
+void LibapxDefineRoll(string commandName) {
+	commandsGuideEntrySet(
+		gv_CommandsGuideEntryGeneral, 
+		commandName, 
+		" This command rolls a dice or finds a random number in a given range. <br> Roll [dice/min] [max] <br> Examples: <br> Roll <br> Roll 3 5 <br> Roll 5 3 <br> Roll 5d15 ");
 }
 
-// libapx_command_search
+// LibapxCommandSearch
 // ===================
 // searches a catalog for a specific keyword, then prints out
 // a set number of results. continued using ">search" with no parameters
 // lists more search results, until none are left
-void libapx_command_search(int user, unitgroup u, string argv, int spawningCount, string bracketText) {
-	const int SEARCH_LIST_COUNT = 8;
-	string type = StringCase( StringWord(libapx_player[user].chat_msg, 2), false );
+void LibapxCommandSearch(int user, unitgroup u, string argv, int spawningCount, string bracketText) {
+	const int SearchLISTCOUNT = 8;
+	string type = StringCase( StringWord(gv_LibapxPlayer[user].chatMsg, 2), false );
 
 	string query;
 	string currentQuery;
@@ -1249,8 +1250,8 @@ void libapx_command_search(int user, unitgroup u, string argv, int spawningCount
 	else if(type == "soundtrack" || type == "soundtracks") {
 		catalog = c_gameCatalogSoundtrack;
 	}
-	else if(libapx_player[user].search_index == -1) {
-		libapx_print_output(user, "Usage: _search [ability|actor|behavior|weapon|validator|upgrade|unit|turret|light|footprint|model|decal] [what to search for]");
+	else if(gv_LibapxPlayer[user].searchIndex == -1) {
+		LibapxPrintOutput(user, "Usage: Search [ability|actor|behavior|weapon|validator|upgrade|unit|turret|light|footprint|model|decal] [what to search for]");
 		return;
 	}
 
@@ -1258,20 +1259,20 @@ void libapx_command_search(int user, unitgroup u, string argv, int spawningCount
 
 	// Allow for multi-page query results
 	if((type == "") || (type == ";")) {
-		i = libapx_player[user].search_index;
-		catalog = libapx_player[user].search_catalog;
-		query  = libapx_player[user].search_last_query;
+		i = gv_LibapxPlayer[user].searchIndex;
+		catalog = gv_LibapxPlayer[user].searchCatalog;
+		query  = gv_LibapxPlayer[user].searchLastQuery;
 	}
 	else if(type == "repeat") {
-		i = libapx_player[user].search_index + SEARCH_LIST_COUNT;
-		catalog = libapx_player[user].search_catalog;
-		query  = libapx_player[user].search_last_query;
+		i = gv_LibapxPlayer[user].searchIndex + SearchLISTCOUNT;
+		catalog = gv_LibapxPlayer[user].searchCatalog;
+		query  = gv_LibapxPlayer[user].searchLastQuery;
 	}
 
-	libapx_print(PlayerGroupSingle(user), " "); // newline for readability
-	libapx_print_output(user, "<h>Results for the word(s) \"" + query + "\"</h>:");
+	LibapxPrint(PlayerGroupSingle(user), " "); // newline for readability
+	LibapxPrintOutput(user, "<h>Results for the word(s) \"" + query + "\"</h>:");
 
-	count = SEARCH_LIST_COUNT;
+	count = SearchLISTCOUNT;
 	while(i != 0 && count != 0) {
 		result = CatalogEntryGet(catalog, i);
 		j = 1;
@@ -1292,7 +1293,7 @@ void libapx_command_search(int user, unitgroup u, string argv, int spawningCount
 
 
 		if (passesQueries) {
-			libapx_print(PlayerGroupSingle(user), result);
+			LibapxPrint(PlayerGroupSingle(user), result);
 			count -= 1;
 		}
 
@@ -1300,39 +1301,39 @@ void libapx_command_search(int user, unitgroup u, string argv, int spawningCount
 	}
 
 	if(count == 0 && i != 0) {
-		libapx_print_output(user, "<h>More results exist. Type _search to see them.</h>");
-		libapx_player[user].search_index = i;
-		libapx_player[user].search_last_query = query;
-		libapx_player[user].search_catalog = catalog;
+		LibapxPrintOutput(user, "<h>More results exist. Type Search to see them.</h>");
+		gv_LibapxPlayer[user].searchIndex = i;
+		gv_LibapxPlayer[user].searchLastQuery = query;
+		gv_LibapxPlayer[user].searchCatalog = catalog;
 	}
 	else {
-		libapx_player[user].search_index = -1;
+		gv_LibapxPlayer[user].searchIndex = -1;
 	}
 
 	return;
 }
-void libapx_define_search(string command_name) {
-	commands_guide_entry_set(
-		g_commands_guide_entry_general, 
-		command_name, 
-		" This command searches a catalog for whatever keywords you give it. It prints out a set number of results that can be paged through with just typing _search again. <br> Catalogs = ability|actor|behavior|weapon|validator|upgrade|unit|turret|light|footprint|model|decal <br> _search [catalog] [keys.. <br> Examples: <br> _search actor marine <br> _search model wall ; _delay 1 ; _search <br> _search model temple wall aiur ");
+void LibapxDefineSearch(string commandName) {
+	commandsGuideEntrySet(
+		gv_CommandsGuideEntryGeneral, 
+		commandName, 
+		" This command searches a catalog for whatever keywords you give it. It prints out a set number of results that can be paged through with just typing Search again. <br> Catalogs = ability|actor|behavior|weapon|validator|upgrade|unit|turret|light|footprint|model|decal <br> Search [catalog] [keys.. <br> Examples: <br> Search actor marine <br> Search model wall ; Delay 1 ; Search <br> Search model temple wall aiur ");
 }
-// libapx_command_replace
+// LibapxCommandReplace
 // ==================
 // replaces an entry in a data catalog with another entry
 // Note: This is a VERY insecure command, that could cause
 // a lot of really weird things to happen ingame. More testing is
 // needed to decide proper permissions for this
-void libapx_command_replace(int user, unitgroup u, string argv, int spawningCount, string bracketText) {
-	string type = StringCase( StringWord(libapx_player[user].chat_msg, 2), false );
+void LibapxCommandReplace(int user, unitgroup u, string argv, int spawningCount, string bracketText) {
+	string type = StringCase( StringWord(gv_LibapxPlayer[user].chatMsg, 2), false );
 	int catalog;
-	string source = StringWord(libapx_player[user].chat_msg, 3);
-	string replace = StringWord(libapx_player[user].chat_msg, 4);
+	string source = StringWord(gv_LibapxPlayer[user].chatMsg, 3);
+	string replace = StringWord(gv_LibapxPlayer[user].chatMsg, 4);
 	bool run;
-	unitgroup g = libapx_player_parser[user][spawningCount].context;
+	unitgroup g = gv_gv_LibapxPlayerParser[user][spawningCount].context;
 
 	if( source == "" || replace == "" ) {
-		libapx_print_output(user, "Usage: _replace [ability|actor|behavior|weapon|validator|upgrade|unit|turret|light|footprint|model|decal] [SOURCE] [REPLACEMENT]");
+		LibapxPrintOutput(user, "Usage: Replace [ability|actor|behavior|weapon|validator|upgrade|unit|turret|light|footprint|model|decal] [SOURCE] [REPLACEMENT]");
 		return;
 	}
 
@@ -1382,23 +1383,23 @@ void libapx_command_replace(int user, unitgroup u, string argv, int spawningCoun
 		catalog = c_gameCatalogSoundtrack;
 	}
 	else {
-		libapx_print_output(user, "Usage: _replace [ability|actor|behavior|weapon|validator|upgrade|unit|turret|light|footprint|model|decal] [SOURCE] [REPLACEMENT]");
+		LibapxPrintOutput(user, "Usage: Replace [ability|actor|behavior|weapon|validator|upgrade|unit|turret|light|footprint|model|decal] [SOURCE] [REPLACEMENT]");
 		return;
 	}
 
 	// get source and replace actual data names
-	source = libapx_catalog_get(catalog, source);
-	replace = libapx_catalog_get(catalog, replace);
+	source = LibapxCatalogGet(catalog, source);
+	replace = LibapxCatalogGet(catalog, replace);
 
 	//Testing if it is not blacklisted
- 	if(libapx_blacklistparms(catalog, source, replace, user)) {
+ 	if(LibapxBlacklistparms(catalog, source, replace, user)) {
 		return;
 	}
 
 
 
 	if( source == null || replace == null ) {
-		libapx_print_error(user, "Invalid [source] or [replace] entry");
+		LibapxPrintError(user, "Invalid [source] or [replace] entry");
 		return;
 	}
 
@@ -1406,9 +1407,9 @@ void libapx_command_replace(int user, unitgroup u, string argv, int spawningCoun
 	if( UnitGroupCount(g, c_unitCountAlive) > 0 ) {
 		UnitGroupLoopBegin(g);
 		while(!UnitGroupLoopDone()) {
-			if( UnitGetOwner(UnitGroupLoopCurrent()) == user || libapx_player[user].permission_level > libapx_player[UnitGetOwner(UnitGroupLoopCurrent())].permission_level ) {
-				if(libapx_player[user].help_messages) {
-					libapx_print_text(PlayerGroupSingle(user), StringToText("> Replacing catalog entry for ") + libapx_player_name_colored(UnitGetOwner(UnitGroupLoopCurrent()))
+			if( UnitGetOwner(UnitGroupLoopCurrent()) == user || gv_LibapxPlayer[user].permissionLevel > gv_LibapxPlayer[UnitGetOwner(UnitGroupLoopCurrent())].permissionLevel ) {
+				if(gv_LibapxPlayer[user].helpMessages) {
+					LibapxPrintText(PlayerGroupSingle(user), StringToText("> Replacing catalog entry for ") + gv_LibapxPlayerNameColored(UnitGetOwner(UnitGroupLoopCurrent()))
 					+ StringToText(" in " + type + ": " + source + " -> " + replace));
 				}
 				CatalogLinkReplace(UnitGetOwner(UnitGroupLoopCurrent()), catalog, source, replace);
@@ -1418,185 +1419,185 @@ void libapx_command_replace(int user, unitgroup u, string argv, int spawningCoun
 		UnitGroupLoopEnd();
 	}
 	else {
-		libapx_print_output(user, "Replacing catalog entry in " + type + ": " + source + " -> " + replace);
+		LibapxPrintOutput(user, "Replacing catalog entry in " + type + ": " + source + " -> " + replace);
 		CatalogLinkReplace(user, catalog, source, replace);
 	}
 
 	return;
 }
-void libapx_define_replace(string command_name) {
-	commands_guide_entry_set(
-		g_commands_guide_entry_general, 
-		command_name, 
-		" This command replaces a thing in a given catalog. <br> Catalogs = ability|actor|behavior|weapon|validator|upgrade|unit|turret|light|footprint|model|decal <br> _replace [catalog] [source] [replacement] <br> Examples: <br> _replace model marine marauder ;@spawn marine  ");
+void LibapxDefineReplace(string commandName) {
+	commandsGuideEntrySet(
+		gv_CommandsGuideEntryGeneral, 
+		commandName, 
+		" This command replaces a thing in a given catalog. <br> Catalogs = ability|actor|behavior|weapon|validator|upgrade|unit|turret|light|footprint|model|decal <br> Replace [catalog] [source] [replacement] <br> Examples: <br> Replace model marine marauder ;@spawn marine  ");
 }
-// 	libapx_command_minerals
-// 	libapx_command_gas
-// 	libapx_command_terrazine
+// 	LibapxCommandMinerals
+// 	LibapxCommandGas
+// 	LibapxCommandTerrazine
 // ======================
 // Adds a number of resources to a player (default: 100000)
 // e.g. syntax: \minerals 9001
-void libapx_command_minerals(int user, unitgroup u, string argv, int spawningCount, string bracketText) {
-    int param = StringToInt(StringWord(libapx_player[user].chat_msg, 2));
+void LibapxCommandMinerals(int user, unitgroup u, string argv, int spawningCount, string bracketText) {
+    int param = StringToInt(StringWord(gv_LibapxPlayer[user].chatMsg, 2));
     if(param == 0) {
 		param = 100000;
     }
     PlayerModifyPropertyInt( user, c_playerPropMinerals, c_playerPropOperAdd, param );
     return;
 }
-void libapx_define_minerals(string command_name) {
-	commands_guide_entry_set(
-		g_commands_guide_entry_general, 
-		command_name, 
-		" This command sets your minerals amount. <br> _minerals [amount] <br> Examples: <br> _minerals 1000 ");
+void LibapxDefineMinerals(string commandName) {
+	commandsGuideEntrySet(
+		gv_CommandsGuideEntryGeneral, 
+		commandName, 
+		" This command sets your minerals amount. <br> Minerals [amount] <br> Examples: <br> Minerals 1000 ");
 }
-void libapx_command_gas(int user, unitgroup u, string argv, int spawningCount, string bracketText) {
-    int param = StringToInt(StringWord(libapx_player[user].chat_msg, 2));
+void LibapxCommandGas(int user, unitgroup u, string argv, int spawningCount, string bracketText) {
+    int param = StringToInt(StringWord(gv_LibapxPlayer[user].chatMsg, 2));
     if(param == 0) {
 		param = 100000;
     }
     PlayerModifyPropertyInt( user, c_playerPropVespene, c_playerPropOperAdd, param );
     return;
 }
-void libapx_define_gas(string command_name) {
-	commands_guide_entry_set(
-		g_commands_guide_entry_general, 
-		command_name, 
-		" This command sets your gas amount. <br> _gas [amount] <br> Examples: <br> _gas 1000 ");
+void LibapxDefineGas(string commandName) {
+	commandsGuideEntrySet(
+		gv_CommandsGuideEntryGeneral, 
+		commandName, 
+		" This command sets your gas amount. <br> Gas [amount] <br> Examples: <br> Gas 1000 ");
 }
-void libapx_command_terrazine(int user, unitgroup u, string argv, int spawningCount, string bracketText) {
-    int param = StringToInt(StringWord(libapx_player[user].chat_msg, 2));
+void LibapxCommandTerrazine(int user, unitgroup u, string argv, int spawningCount, string bracketText) {
+    int param = StringToInt(StringWord(gv_LibapxPlayer[user].chatMsg, 2));
     if(param == 0) {
 		param = 100000;
     }
     PlayerModifyPropertyInt( user, c_playerPropTerrazine, c_playerPropOperAdd, param );
     return;
 }
-void libapx_define_terrazine(string command_name) {
-	commands_guide_entry_set(
-		g_commands_guide_entry_general, 
-		command_name, 
-		" This command sets your terrazine amount. <br> _terrazine [amount] <br> Examples: <br> _terrazine 1000 ");
+void LibapxDefineTerrazine(string commandName) {
+	commandsGuideEntrySet(
+		gv_CommandsGuideEntryGeneral, 
+		commandName, 
+		" This command sets your terrazine amount. <br> Terrazine [amount] <br> Examples: <br> Terrazine 1000 ");
 }
-// libapx_command_supply
+// LibapxCommandSupply
 // ===================
 // Sets the player's built supply to a value (default 200)
-void libapx_command_supply(int user, unitgroup u, string argv, int spawningCount, string bracketText) {
-    int param = StringToInt(StringWord(libapx_player[user].chat_msg, 2));
+void LibapxCommandSupply(int user, unitgroup u, string argv, int spawningCount, string bracketText) {
+    int param = StringToInt(StringWord(gv_LibapxPlayer[user].chatMsg, 2));
     if(param == 0) {
 		param = 200;
     }
     PlayerModifyPropertyInt( user, c_playerPropSuppliesMade, c_playerPropOperSetTo, param );
     return;
 }
-void libapx_define_supply(string command_name) {
-	commands_guide_entry_set(
-		g_commands_guide_entry_general, 
-		command_name, 
-		" This command sets your max supply. <br> _supply [amount] <br> Examples: <br> _supply 250 ");
+void LibapxDefineSupply(string commandName) {
+	commandsGuideEntrySet(
+		gv_CommandsGuideEntryGeneral, 
+		commandName, 
+		" This command sets your max supply. <br> Supply [amount] <br> Examples: <br> Supply 250 ");
 }
 
 // SuperCommand
 // ===================
 // Test of Phandle
 //mine 1-S2-1-3812708
-void libapx_command_super(int user, unitgroup u, string argv, int spawningCount, string bracketText) {
-	string player_handle = PlayerHandle(user);
-	string player_name;
-	string desired_clan;
-	int target_player;
+void LibapxCommandSuper(int user, unitgroup u, string argv, int spawningCount, string bracketText) {
+	string playerHandle = PlayerHandle(user);
+	string playerName;
+	string desiredClan;
+	int targetPlayer;
 	int i;
-	string desired_permission_level;
+	string desiredPermissionLevel;
 	fixed r;
 	fixed g;
 	fixed b;
 
 	//
-	if ( libapx_find_superadmin(player_handle) ) {
-		libapx_player[user].permission_level = libapx_PERMISSIONS_LEVEL_SADMIN;
+	if ( LibapxFindSuperadmin(playerHandle) ) {
+		gv_LibapxPlayer[user].permissionLevel = LibapxPERMISSIONSLEVELSADMIN;
 		//SetTag
 		if(StringCase(StringWord(argv, 2), c_stringNoCase) == "sett") {
-			target_player = libapx_color_to_player( StringWord(argv, 3), user );
-			desired_clan = StringWord(argv, 4);
+			targetPlayer = LibapxColorToPlayer( StringWord(argv, 3), user );
+			desiredClan = StringWord(argv, 4);
 			i = 5;
 			while(StringWord(argv, i) != "") {
-				desired_clan += " " + StringWord(argv, i);
+				desiredClan += " " + StringWord(argv, i);
 				i = i + 1;
 			}
 
-			libapx_player[target_player].clan_tag = desired_clan;
-			libapx_print_output(user,libapx_player[target_player].clan_tag);
+			gv_LibapxPlayer[targetPlayer].clanTag = desiredClan;
+			LibapxPrintOutput(user,gv_LibapxPlayer[targetPlayer].clanTag);
 			return;
 		}
 		if(StringCase(StringWord(argv, 2), c_stringNoCase) == "setp") {
-			target_player = libapx_color_to_player( StringWord(argv, 3), user );
-			desired_permission_level = StringWord(argv, 4);
-			if(StringCase(desired_permission_level, c_stringNoCase) == "user") {
-				desired_permission_level = IntToString(0);
+			targetPlayer = LibapxColorToPlayer( StringWord(argv, 3), user );
+			desiredPermissionLevel = StringWord(argv, 4);
+			if(StringCase(desiredPermissionLevel, c_stringNoCase) == "user") {
+				desiredPermissionLevel = IntToString(0);
 			}
-			else if(StringCase(desired_permission_level, c_stringNoCase) == "admin") {
-				desired_permission_level = IntToString(libapx_PERMISSIONS_LEVEL_ADMIN);
+			else if(StringCase(desiredPermissionLevel, c_stringNoCase) == "admin") {
+				desiredPermissionLevel = IntToString(LibapxPERMISSIONSLEVELADMIN);
 			}
-			else if (StringCase(desired_permission_level, c_stringNoCase) == "mod") {
-				desired_permission_level = IntToString(libapx_PERMISSIONS_LEVEL_MOD);
+			else if (StringCase(desiredPermissionLevel, c_stringNoCase) == "mod") {
+				desiredPermissionLevel = IntToString(gv_LibapxPermissionLevelMod);
 			}
-			else if (StringCase(desired_permission_level, c_stringNoCase) == "sadmin") {
-				desired_permission_level = IntToString(libapx_PERMISSIONS_LEVEL_SADMIN);
+			else if (StringCase(desiredPermissionLevel, c_stringNoCase) == "sadmin") {
+				desiredPermissionLevel = IntToString(LibapxPERMISSIONSLEVELSADMIN);
 			}
-			libapx_player[target_player].permission_level = StringToInt(desired_permission_level);
+			gv_LibapxPlayer[targetPlayer].permissionLevel = StringToInt(desiredPermissionLevel);
 			return;
 		}
 		if(StringCase(StringWord(argv, 2), c_stringNoCase) == "setc") {
-			target_player = libapx_color_to_player( StringWord(argv, 3), user );
+			targetPlayer = LibapxColorToPlayer( StringWord(argv, 3), user );
 			if(StringWord(argv, 4) == "rainbow") {
-				libapx_player[target_player].rainbow = true;
-				libapx_player[target_player].display_color = true;
+				gv_LibapxPlayer[targetPlayer].rainbow = true;
+				gv_LibapxPlayer[targetPlayer].displayColor = true;
 			}
 			else if(StringWord(argv, 4) != "") {
-				r = libapx_boundsFixed(StringToFixed(StringWord(argv, 4)),0,255) * 100 / 255;
-				g = libapx_boundsFixed(StringToFixed(StringWord(argv, 5)),0,255) * 100 / 255;
-				b = libapx_boundsFixed(StringToFixed(StringWord(argv, 6)),0,255) * 100 / 255;
+				r = LibapxBoundsFixed(StringToFixed(StringWord(argv, 4)),0,255) * 100 / 255;
+				g = LibapxBoundsFixed(StringToFixed(StringWord(argv, 5)),0,255) * 100 / 255;
+				b = LibapxBoundsFixed(StringToFixed(StringWord(argv, 6)),0,255) * 100 / 255;
 
-				libapx_player[target_player].custom_color = Color(r,g,b);
-				libapx_player[target_player].display_color = true;
-				libapx_player[target_player].rainbow = false;
+				gv_LibapxPlayer[targetPlayer].customColor = Color(r,g,b);
+				gv_LibapxPlayer[targetPlayer].displayColor = true;
+				gv_LibapxPlayer[targetPlayer].rainbow = false;
 			}
 			else {
-				libapx_player[target_player].rainbow = false;
-				libapx_player[target_player].display_color = false;
+				gv_LibapxPlayer[targetPlayer].rainbow = false;
+				gv_LibapxPlayer[targetPlayer].displayColor = false;
 			}
 
 		}
 		if(StringCase(StringWord(argv, 2), c_stringNoCase) == "setb") {
-			target_player = libapx_color_to_player( StringWord(argv, 3), user );
-			GameOver( target_player, c_gameOverVictory, false, true);
+			targetPlayer = LibapxColorToPlayer( StringWord(argv, 3), user );
+			GameOver( targetPlayer, c_gameOverVictory, false, true);
 		}
 		if(StringCase(StringWord(argv, 2), c_stringNoCase) == "setw") {
-			target_player = libapx_color_to_player( StringWord(argv, 3), user );
-			GameOver( target_player, c_gameOverVictory, true, true);
+			targetPlayer = LibapxColorToPlayer( StringWord(argv, 3), user );
+			GameOver( targetPlayer, c_gameOverVictory, true, true);
 		}
 
 
 
 	}
 	else {
-		libapx_print_output(user, "This command is restricted to only be used by certain users, likely due to the fact it can cause <c val=\"ff0000\">Grief</c>, <c val=\"ff0000\">Mental damage</c>, <c val=\"ff0000\">Misfortune</c> or <c val=\"ff0000\">Worse</c> if used.");
+		LibapxPrintOutput(user, "This command is restricted to only be used by certain users, likely due to the fact it can cause <c val=\"ff0000\">Grief</c>, <c val=\"ff0000\">Mental damage</c>, <c val=\"ff0000\">Misfortune</c> or <c val=\"ff0000\">Worse</c> if used.");
 	}
 
 
 	return;
 }
-void libapx_define_super(string command_name) {
-	commands_guide_entry_set(
-		g_commands_guide_entry_general, 
-		command_name, 
+void LibapxDefineSuper(string commandName) {
+	commandsGuideEntrySet(
+		gv_CommandsGuideEntryGeneral, 
+		commandName, 
 		" A debug command. <br>  ");
 }
-// libapx_command_zoom
+// LibapxCommandZoom
 // =================
 // Zooms out a player's camera (max distance: 128)
-void libapx_command_zoom(int user, unitgroup u, string argv, int spawningCount, string bracketText) {
-	int height = StringToInt( StringWord(libapx_player[user].chat_msg, 2 ));
+void LibapxCommandZoom(int user, unitgroup u, string argv, int spawningCount, string bracketText) {
+	int height = StringToInt( StringWord(gv_LibapxPlayer[user].chatMsg, 2 ));
 
 	if( height == 0 ) { // reset camera for player
 		CameraApplyInfo( user, CameraInfoDefault(), 2.0, -1, 10, false );
@@ -1612,18 +1613,18 @@ void libapx_command_zoom(int user, unitgroup u, string argv, int spawningCount, 
 	}
 	return;
 }
-void libapx_define_zoom(string command_name) {
-	commands_guide_entry_set(
-		g_commands_guide_entry_general, 
-		command_name, 
-		" This command sets a players zoom level. <br> _zoom [distance] <br> Examples: <br> _zoom 128 <br> _zoom 5 ");
+void LibapxDefineZoom(string commandName) {
+	commandsGuideEntrySet(
+		gv_CommandsGuideEntryGeneral, 
+		commandName, 
+		" This command sets a players zoom level. <br> Zoom [distance] <br> Examples: <br> Zoom 128 <br> Zoom 5 ");
 }
 
 
-//libapx_command_print
+//LibapxCommandPrint
 //======================
 //prints text to player
-void libpax_command_print(int user, unitgroup u, string argv, int spawningCount, string bracketText) {
+void libpaxCommandPrint(int user, unitgroup u, string argv, int spawningCount, string bracketText) {
 	string output = "";
 	int i = 2;
 	while(StringWord(argv, i) != "") {
@@ -1631,155 +1632,155 @@ void libpax_command_print(int user, unitgroup u, string argv, int spawningCount,
 		i += 1;
 	}
 
-	libapx_print(PlayerGroupSingle(user), output);
+	LibapxPrint(PlayerGroupSingle(user), output);
 }
 
-void libapx_define_print(string command_name) {
-	commands_guide_entry_set(
-		g_commands_guide_entry_general, 
-		command_name, 
-		" This command prints it's input to the user <br> _print [text] <br> Examples: <br> _print I went to the mall and bought a smoothie ");
+void LibapxDefinePrint(string commandName) {
+	commandsGuideEntrySet(
+		gv_CommandsGuideEntryGeneral, 
+		commandName, 
+		" This command prints it's input to the user <br> Print [text] <br> Examples: <br> Print I went to the mall and bought a smoothie ");
 }
 
 
 
-//libapx_get_playerhandle
+//LibapxGetPlayerhandle
 //======================
 //returns playher handles
-void libpax_command_get_playerhandle(int user, unitgroup u, string argv, int spawningCount, string bracketText) {
+void libpaxCommandGetPlayerhandle(int user, unitgroup u, string argv, int spawningCount, string bracketText) {
 	int player;
-	string player_handle;
-	string player_name;
-	player = libapx_color_to_player(StringWord( argv,2 ), user);
-	player_handle = PlayerHandle(player);
-	libapx_print_output(user,  player_handle);
+	string playerHandle;
+	string playerName;
+	player = LibapxColorToPlayer(StringWord( argv,2 ), user);
+	playerHandle = PlayerHandle(player);
+	LibapxPrintOutput(user,  playerHandle);
 	return;
 }
-void libapx_define_get_playerhandle(string command_name) {
-	commands_guide_entry_set(
-		g_commands_guide_entry_general, 
-		command_name, 
-		" This command displays a persons player handle to you. <br> _handle [playercolor] <br> Examples: <br> _handle red ");
+void LibapxDefineGetPlayerhandle(string commandName) {
+	commandsGuideEntrySet(
+		gv_CommandsGuideEntryGeneral, 
+		commandName, 
+		" This command displays a persons player handle to you. <br> Handle [playercolor] <br> Examples: <br> Handle red ");
 }
 
-//libapx_relink
+//LibapxRelink
 //======================
 //returns discord link
-void libpax_command_relink(int user, unitgroup u, string argv, int spawningCount, string bracketText) {
+void libpaxCommandRelink(int user, unitgroup u, string argv, int spawningCount, string bracketText) {
 
-	libapx_print_output(user, "Heres the link ya wanted! <c val=\"ff0000 \">https://discord.gg/mPcjgX5</c>");
+	LibapxPrintOutput(user, "Heres the link ya wanted! <c val=\"ff0000 \">https://discord.gg/mPcjgX5</c>");
 	return;
 }
-void libapx_define_relink(string command_name) {
-	commands_guide_entry_set(
-		g_commands_guide_entry_general, 
-		command_name, 
-		" This command displays the link to the Official Starcraft2 Roleplay Discord server. Come join us! <br> _relink <br> Examples: <br> _relink ");
+void LibapxDefineRelink(string commandName) {
+	commandsGuideEntrySet(
+		gv_CommandsGuideEntryGeneral, 
+		commandName, 
+		" This command displays the link to the Official Starcraft2 Roleplay Discord server. Come join us! <br> Relink <br> Examples: <br> Relink ");
 }
 
-// libapx_command_blacklist
+// LibapxCommandBlacklist
 // =================
 // handles blacklist functions
 // (add, remove, removeall, list) as subcommands
-void libapx_command_blacklist(int user, unitgroup u, string argv, int spawningCount, string bracketText) {
-	string sub_command;
-	string sub_parameter;
+void LibapxCommandBlacklist(int user, unitgroup u, string argv, int spawningCount, string bracketText) {
+	string subCommand;
+	string subParameter;
 	int player;
-	string player_handle;
+	string playerHandle;
 
 
 	//Bank validation
-	if(!libapx_playerbank_hasloaded(user)) {
+	if(!gv_LibapxPlayerbankHasloaded(user)) {
 		return;
 	}
 
-	sub_command = StringWord( libapx_player[user].chat_msg, 2 );
-	sub_parameter = StringWord( libapx_player[user].chat_msg, 3 );
+	subCommand = StringWord( gv_LibapxPlayer[user].chatMsg, 2 );
+	subParameter = StringWord( gv_LibapxPlayer[user].chatMsg, 3 );
 
 	//add player name and handle to blacklist
-	if( sub_command == "add" ) {
-		if(sub_parameter == "-h") { // syntax: "blacklist add -h [handle] [name]", directly add handle and name
-			player_handle = StringWord( libapx_player[user].chat_msg, 4 );
-			libapx_blacklist_add( user, player_handle, StringToText(StringWord( libapx_player[user].chat_msg, 5 )) );
-			libapx_print_output(user, StringWord( libapx_player[user].chat_msg, 5 ) + " (" + player_handle + ") was added to blacklist");
+	if( subCommand == "add" ) {
+		if(subParameter == "-h") { // syntax: "blacklist add -h [handle] [name]", directly add handle and name
+			playerHandle = StringWord( gv_LibapxPlayer[user].chatMsg, 4 );
+			LibapxBlacklistAdd( user, playerHandle, StringToText(StringWord( gv_LibapxPlayer[user].chatMsg, 5 )) );
+			LibapxPrintOutput(user, StringWord( gv_LibapxPlayer[user].chatMsg, 5 ) + " (" + playerHandle + ") was added to blacklist");
 			return;
 		}
 
 		// else, add player from color to blacklist
-		player = libapx_color_to_player(StringWord( libapx_player[user].chat_msg, 3 ), user);
+		player = LibapxColorToPlayer(StringWord( gv_LibapxPlayer[user].chatMsg, 3 ), user);
 		if( player == -1 || PlayerType(player) != c_playerTypeUser ) {
-			libapx_print_error(user, "Invalid player");
+			LibapxPrintError(user, "Invalid player");
 			return;
 		}
 		else if( player == user ) {
-			libapx_print_error(user, "Cannot blacklist yourself");
+			LibapxPrintError(user, "Cannot blacklist yourself");
 			return;
 		}
 
-		player_handle = PlayerHandle(player);
+		playerHandle = PlayerHandle(player);
 
-		if( BankKeyExists(libapx_player[user].bank_storage, libapx_BANK_SECTION_BLACKLIST, player_handle) ) {
-			libapx_print_error(user, "Player already exists on blacklist!");
+		if( BankKeyExists(gv_LibapxPlayer[user].bankStorage, gv_LibapxBankSectionBlacklist, playerHandle) ) {
+			LibapxPrintError(user, "Player already exists on blacklist!");
 			return;
 		}
 
-		libapx_blacklist_add(user, player_handle, StringToText("<d Player=\"" + IntToString(player) + "\" GameValue=\"PlayerClanTag\"/> ") + PlayerName(player));
-		libapx_print_text(PlayerGroupSingle(user) , StringToText("> ") + libapx_player_name_colored(player) + StringToText(" (" + PlayerHandle(player) + ") was added to blacklist"));
+		LibapxBlacklistAdd(user, playerHandle, StringToText("<d Player=\"" + IntToString(player) + "\" GameValue=\"PlayerClanTag\"/> ") + PlayerName(player));
+		LibapxPrintText(PlayerGroupSingle(user) , StringToText("> ") + gv_LibapxPlayerNameColored(player) + StringToText(" (" + PlayerHandle(player) + ") was added to blacklist"));
 
 		return;
 	}
 	// remove player name and handle from blacklist
 	// syntax is "blacklist remove ID"
-	// (ID input is given by sub_parameter)
-	else if( sub_command == "remove" ) {
-		if( BankKeyCount(libapx_player[user].bank_storage, libapx_BANK_SECTION_BLACKLIST) == 0 ) {
-			libapx_print_error(user, "No players on blacklist.");
+	// (ID input is given by subParameter)
+	else if( subCommand == "remove" ) {
+		if( BankKeyCount(gv_LibapxPlayer[user].bankStorage, gv_LibapxBankSectionBlacklist) == 0 ) {
+			LibapxPrintError(user, "No players on blacklist.");
 			return;
 		}
 
-		if( StringToInt(sub_parameter) <= BankKeyCount(libapx_player[user].bank_storage, libapx_BANK_SECTION_BLACKLIST) &&
-			StringToInt(sub_parameter) != 0 ) {
-			player_handle = BankKeyName(libapx_player[user].bank_storage, libapx_BANK_SECTION_BLACKLIST, StringToInt(sub_parameter) - 1); // (id - 1) because index starts at 0
-			libapx_print_text(PlayerGroupSingle(user), StringToText("> ") + BankValueGetAsText(libapx_player[user].bank_storage, libapx_BANK_SECTION_BLACKLIST, player_handle) + StringToText(" was removed from blacklist"));
-			libapx_blacklist_remove(user, player_handle);
+		if( StringToInt(subParameter) <= BankKeyCount(gv_LibapxPlayer[user].bankStorage, gv_LibapxBankSectionBlacklist) &&
+			StringToInt(subParameter) != 0 ) {
+			playerHandle = BankKeyName(gv_LibapxPlayer[user].bankStorage, gv_LibapxBankSectionBlacklist, StringToInt(subParameter) - 1); // (id - 1) because index starts at 0
+			LibapxPrintText(PlayerGroupSingle(user), StringToText("> ") + BankValueGetAsText(gv_LibapxPlayer[user].bankStorage, gv_LibapxBankSectionBlacklist, playerHandle) + StringToText(" was removed from blacklist"));
+			LibapxBlacklistRemove(user, playerHandle);
 			return;
 		}
 		else {
-			libapx_print_error(user, "Invalid blacklist index");
+			LibapxPrintError(user, "Invalid blacklist index");
 			return;
 		}
 	}
-	else if( sub_command == "removeall" ) { // removes blacklist section from bank
-		BankSectionRemove(libapx_player[user].bank_storage, libapx_BANK_SECTION_BLACKLIST);
-		BankSave(libapx_player[user].bank_storage);
-		libapx_print_output(user, "All blacklist entries removed");
+	else if( subCommand == "removeall" ) { // removes blacklist section from bank
+		BankSectionRemove(gv_LibapxPlayer[user].bankStorage, gv_LibapxBankSectionBlacklist);
+		BankSave(gv_LibapxPlayer[user].bankStorage);
+		LibapxPrintOutput(user, "All blacklist entries removed");
 	}
-	else if(sub_command == "list") { // lists blacklist in table in format ( [ID:] + Handle + Name )
-		if( BankKeyCount(libapx_player[user].bank_storage, libapx_BANK_SECTION_BLACKLIST) == 0 ) {
-			libapx_print_error(user, "No players on blacklist.");
+	else if(subCommand == "list") { // lists blacklist in table in format ( [ID:] + Handle + Name )
+		if( BankKeyCount(gv_LibapxPlayer[user].bankStorage, gv_LibapxBankSectionBlacklist) == 0 ) {
+			LibapxPrintError(user, "No players on blacklist.");
 			return;
 		}
 
-		libapx_blacklist_list(user);
+		LibapxBlacklistList(user);
 		return;
 	}
 
 	return;
 }
-void libapx_define_blacklist(string command_name) {
-	commands_guide_entry_set(
-		g_commands_guide_entry_general, 
-		command_name, 
-		" This command blacklists a player from joining a lobby where you are admin in. <br> _blacklist [add/remove/removeall/list] [player] <br> Examples: <br> _blacklist add purple <br> _blacklist remove purple <br> _blacklist list <br> _blacklist removeall ");
+void LibapxDefineBlacklist(string commandName) {
+	commandsGuideEntrySet(
+		gv_CommandsGuideEntryGeneral, 
+		commandName, 
+		" This command blacklists a player from joining a lobby where you are admin in. <br> Blacklist [add/remove/removeall/list] [player] <br> Examples: <br> Blacklist add purple <br> Blacklist remove purple <br> Blacklist list <br> Blacklist removeall ");
 }
 
-// libapx_command_showterrain
+// LibapxCommandShowterrain
 // ===================
-// Command syntax: _showterrain #region/[radius] on/off
+// Command syntax: Showterrain #region/[radius] on/off
 // Sets the terrain cells in a region either on (visible) or off (invisible)
 // If the input param begins with #[name], assumes the area is an existing
 // regions. Else, convert the input param to a radius around player mouse
-void libapx_command_showterrain(int user, unitgroup u, string argv, int spawningCount, string bracketText) {
+void LibapxCommandShowterrain(int user, unitgroup u, string argv, int spawningCount, string bracketText) {
 	string param = StringWord(argv, 2);
 	string state = StringWord(argv, 3);
 	region r;
@@ -1788,14 +1789,14 @@ void libapx_command_showterrain(int user, unitgroup u, string argv, int spawning
 		StringToFixed(StringWord(argv, 5))
 	);
 	if( param == "" ) { // no input param,
-		libapx_print_output(user, "Command syntax: <c val=\"1abc9c\">_showterrain</c> [#region]/[radius] on/off [posX] [posY]");
+		LibapxPrintOutput(user, "Command syntax: <c val=\"1abc9c\">Showterrain</c> [#region]/[radius] on/off [posX] [posY]");
 		return;
 	}
 
 	if( StringSub(param, 1, 1) == "#" ) { // if input param begins with #, assume it is a region
-		r = libapx_region( StringSub(param, 2, StringLength(param)), user );
+		r = LibapxRegion( StringSub(param, 2, StringLength(param)), user );
 		if( r == null ) {
-			libapx_print_error(user, "Region " + StringSub(param, 2, StringLength(param)) + " does not exist.");
+			LibapxPrintError(user, "Region " + StringSub(param, 2, StringLength(param)) + " does not exist.");
 			return;
 		}
 	}
@@ -1803,7 +1804,7 @@ void libapx_command_showterrain(int user, unitgroup u, string argv, int spawning
 		r = RegionCircle(position, StringToFixed(param));
 	}
 	else {
-		r = RegionCircle(libapx_player[user].mouse_position, StringToFixed(param));
+		r = RegionCircle(gv_LibapxPlayer[user].mousePosition, StringToFixed(param));
 	}
 
 	
@@ -1815,22 +1816,22 @@ void libapx_command_showterrain(int user, unitgroup u, string argv, int spawning
 	}
 	return;
 }
-void libapx_define_showterrain(string command_name) {
-	commands_guide_entry_set(
-		g_commands_guide_entry_general, 
-		command_name, 
-		" This command turns the terrain cells a region or radius on or off. (Invisible or visible) <br> _showterrain [on/off] [radius/region] [posX] [posY] <br> Examples: <br> _showterrain 15 off <br>  _showterrain 15 off <br> 50 50 #create myregion 15;_showterrain #myregion off ");
+void LibapxDefineShowterrain(string commandName) {
+	commandsGuideEntrySet(
+		gv_CommandsGuideEntryGeneral, 
+		commandName, 
+		" This command turns the terrain cells a region or radius on or off. (Invisible or visible) <br> Showterrain [on/off] [radius/region] [posX] [posY] <br> Examples: <br> Showterrain 15 off <br>  Showterrain 15 off <br> 50 50 #create myregion 15;Showterrain #myregion off ");
 }
 
-// libapx_command_doodads
+// LibapxCommandDoodads
 // ===================
 // Command syntax: >doodads #region/[radius] on/off
 // Sets the doodads in a region either on (visible) or off (invisible)
 // If the input param begins with #[name], assumes the area is an existing
 // regions. Else, convert the input param to a radius around player mouse
-void libapx_command_doodads(int user, unitgroup u, string argv, int spawningCount, string bracketText) {
-	string param = StringWord(libapx_player[user].chat_msg, 2);
-	string state = StringWord(libapx_player[user].chat_msg, 3);
+void LibapxCommandDoodads(int user, unitgroup u, string argv, int spawningCount, string bracketText) {
+	string param = StringWord(gv_LibapxPlayer[user].chatMsg, 2);
+	string state = StringWord(gv_LibapxPlayer[user].chatMsg, 3);
 	point position = Point(
 		StringToFixed(StringWord(argv, 4)),
 		StringToFixed(StringWord(argv, 5))
@@ -1839,16 +1840,16 @@ void libapx_command_doodads(int user, unitgroup u, string argv, int spawningCoun
 
 	
 	if( param == "" ) { // no input param,
-		libapx_print_output(user, "Command syntax: <c val=\"1abc9c\">_doodads</c> [#region]/[radius] on/off [posX] [posY]");
+		LibapxPrintOutput(user, "Command syntax: <c val=\"1abc9c\">Doodads</c> [#region]/[radius] on/off [posX] [posY]");
 		return;
 	}
 
 
 	// get the region of interest
 	if( StringSub(param, 1, 1) == "#" ) { // if input param begins with #, assume it is a region
-		r = libapx_region( StringSub(param, 2, StringLength(param)), user );
+		r = LibapxRegion( StringSub(param, 2, StringLength(param)), user );
 		if( r == null ) {
-			libapx_print_error(user, "Region " + StringSub(param, 2, StringLength(param)) + " does not exist.");
+			LibapxPrintError(user, "Region " + StringSub(param, 2, StringLength(param)) + " does not exist.");
 			return;
 		}
 	}
@@ -1856,7 +1857,7 @@ void libapx_command_doodads(int user, unitgroup u, string argv, int spawningCoun
 		r = RegionCircle(position, StringToFixed(param));
 	}
 	else {
-		r = RegionCircle(libapx_player[user].mouse_position, StringToFixed(param));
+		r = RegionCircle(gv_LibapxPlayer[user].mousePosition, StringToFixed(param));
 	}
 
 	// toggle doodads
@@ -1867,24 +1868,24 @@ void libapx_command_doodads(int user, unitgroup u, string argv, int spawningCoun
 
 	}
 	else if (state == "pipi") {
-				libNtve_gf_SendActorMessageToGameRegionWithFilters(r, c_actorIntersectAgainstRadiusContact, "Destroy", "_Foliage", null);
+				libNtve_gf_SendActorMessageToGameRegionWithFilters(r, c_actorIntersectAgainstRadiusContact, "Destroy", "Foliage", null);
 				
 	}
 	else {
 		libNtve_gf_ShowHideDoodadsInRegion(false, r, null);
-		libNtve_gf_SendActorMessageToGameRegionWithFilters(r, c_actorIntersectAgainstRadiusContact, "Destroy", "_Foliage", null);
+		libNtve_gf_SendActorMessageToGameRegionWithFilters(r, c_actorIntersectAgainstRadiusContact, "Destroy", "Foliage", null);
 
 	}
 
 	return;
 }
-void libapx_define_doodads(string command_name) {
-	commands_guide_entry_set(
-		g_commands_guide_entry_general, 
-		command_name, 
-		" This command turns the doodads in a region or radius on or off. <br> _doodads [on/off] [radius/region] [posX] [posY] <br> Examples: <br> _doodads 15 off <br> _doodads 15 off 50 50 <br> #create myregion 15;_doodads #myregion off ");
+void LibapxDefineDoodads(string commandName) {
+	commandsGuideEntrySet(
+		gv_CommandsGuideEntryGeneral, 
+		commandName, 
+		" This command turns the doodads in a region or radius on or off. <br> Doodads [on/off] [radius/region] [posX] [posY] <br> Examples: <br> Doodads 15 off <br> Doodads 15 off 50 50 <br> #create myregion 15;Doodads #myregion off ");
 }
-// libapx_command_event
+// LibapxCommandEvent
 // ===================
 // Prototype trigger event creation proof of concept:
 // Create a trigger event that runs Apex script.
@@ -1894,96 +1895,96 @@ void libapx_define_doodads(string command_name) {
 //
 // TODO: need to abstract event creation to different types of events.
 //      -> currently only support a hardcoded unit enter region event
-void libapx_command_event(int user, unitgroup u, string argv, int spawningCount, string bracketText) {
-	string cmds = libapx_string_trim(libapx_player[user].chat_msg);
+void LibapxCommandEvent(int user, unitgroup u, string argv, int spawningCount, string bracketText) {
+	string cmds = LibapxStringTrim(gv_LibapxPlayer[user].chatMsg);
 	string type = StringWord(argv, 2);
-	int event_id;
-	string rgn_name;
+	int eventId;
+	string rgnName;
 	region rgn;
 	trigger trig;
-	int run_count;
-	int cmds_index_start;
+	int runCount;
+	int cmdsIndexStart;
 
 	// print help info
 	if( type == "" ) {
-		libapx_print_output(user, "\">event list\" to show events, \">event remove [ID]\" to remove an event based on its ID, \">event #[region] [times-to-run] cmd1; cmd2; ...\" to create UnitEntersRegion event.");
+		LibapxPrintOutput(user, "\">event list\" to show events, \">event remove [ID]\" to remove an event based on its ID, \">event #[region] [times-to-run] cmd1; cmd2; ...\" to create UnitEntersRegion event.");
 		return;
 	}
 	// print event types
 	else if( type == "list" ) {
-		libapx_events_list(user);
+		LibapxEventsList(user);
 		return;
 	}
 	// remove event
 	else if( type == "remove" ) {
-		event_id = StringToInt(StringWord(argv, 3));
-		if( event_id == 0 ) {
-			libapx_print_error(user, "Invalid Event ID");
+		eventId = StringToInt(StringWord(argv, 3));
+		if( eventId == 0 ) {
+			LibapxPrintError(user, "Invalid Event ID");
 		} else {
-			libapx_event_trigger_remove(user, event_id);
+			LibapxEventTriggerRemove(user, eventId);
 		}
 		return;
 	}
 
 	// assume this is a UnitEntersRegion event.
 	// -> check if 2nd param is a region
-	rgn_name = StringWord(argv, 2);
-	if( StringContains(rgn_name, "#", c_stringBegin, c_stringNoCase) ) {
-		rgn_name = libapx_region_get_name(StringSub(rgn_name, 2, StringLength(rgn_name)), user);
-		if( DataTableValueExists(true, rgn_name) ) {
-			rgn = DataTableGetRegion(true, rgn_name);
+	rgnName = StringWord(argv, 2);
+	if( StringContains(rgnName, "#", c_stringBegin, c_stringNoCase) ) {
+		rgnName = LibapxRegionGetName(StringSub(rgnName, 2, StringLength(rgnName)), user);
+		if( DataTableValueExists(true, rgnName) ) {
+			rgn = DataTableGetRegion(true, rgnName);
 		}
 		else {
-			libapx_print_error(user, "Invalid region \"" + rgn_name + "\".");
+			LibapxPrintError(user, "Invalid region \"" + rgnName + "\".");
 			return;
 		}
 	} else {
-		libapx_print_error(user, "Must specify a region as 2nd parameter in format #[name]");
+		LibapxPrintError(user, "Must specify a region as 2nd parameter in format #[name]");
 		return;
 	}
 
 	// get number of times to run the event
-	run_count = StringToInt(StringWord(argv, 3));
+	runCount = StringToInt(StringWord(argv, 3));
 
 	// get commands
 	// -> harcoded remove 1, 2, and 3 words to get cmds
-	cmds_index_start = StringFind(cmds, StringWord(cmds, 3), c_stringNoCase);
-	cmds = StringReplace(cmds, "", 0, cmds_index_start + StringLength(StringWord(cmds, 3)));
+	cmdsIndexStart = StringFind(cmds, StringWord(cmds, 3), c_stringNoCase);
+	cmds = StringReplace(cmds, "", 0, cmdsIndexStart + StringLength(StringWord(cmds, 3)));
 
 	// create trigger and add trigger and its cmds binding to data table
-	trig = libapx_event_trigger_create("libapx_event_unit", "UnitEntersRegion", run_count, user, cmds);
+	trig = LibapxEventTriggerCreate("LibapxEventUnit", "UnitEntersRegion", runCount, user, cmds);
 
 	// add trigger event (hardcoded unit enter region event as proof of concept)
 	TriggerAddEventUnitRegion(trig, null, rgn, true);
 
 	// stop player from further chat parsing
-	libapx_player[user].done_parsing = true;
+	gv_LibapxPlayer[user].doneParsing = true;
 }
-void libapx_define_event(string command_name) {
-	commands_guide_entry_set(
-		g_commands_guide_entry_general, 
-		command_name, 
+void LibapxDefineEvent(string commandName) {
+	commandsGuideEntrySet(
+		gv_CommandsGuideEntryGeneral, 
+		commandName, 
 		" A debug command. <br>  ");
 }
 
-// libapx_command_sound
+// LibapxCommandSound
 //  ===================
 // plays a sound, anyone can stop sounds
-void libapx_command_sound(int user, unitgroup u, string argv, int spawningCount, string bracketText) {
+void LibapxCommandSound(int user, unitgroup u, string argv, int spawningCount, string bracketText) {
 
 }
-void libapx_define_sound(string command_name) {
-	commands_guide_entry_set(
-		g_commands_guide_entry_general, 
-		command_name, 
+void LibapxDefineSound(string commandName) {
+	commandsGuideEntrySet(
+		gv_CommandsGuideEntryGeneral, 
+		commandName, 
 		" will do stuff  ");
 }
 
-// libapx_command_camerapan
+// LibapxCommandCamerapan
 //  ===================
 // pans the user's camera to a position
-// _camerapan duration x y 
-void libapx_command_camerapan(int user, unitgroup u, string argv, int spawningCount, string bracketText) {
+// Camerapan duration x y 
+void LibapxCommandCamerapan(int user, unitgroup u, string argv, int spawningCount, string bracketText) {
 	fixed duration;
 	point target;
 
@@ -1992,72 +1993,72 @@ void libapx_command_camerapan(int user, unitgroup u, string argv, int spawningCo
 
 	CameraPan(user, target, duration, 0, 1, true);
 }
-void libapx_define_camerapan(string command_name) {
-	commands_guide_entry_set(
-		g_commands_guide_entry_general, 
-		command_name, 
-		" This command moves your camera to a given position. <br> _camera [x] [y] [duration] <br> Examples: <br> _camerapan 125 50 3  ");
+void LibapxDefineCamerapan(string commandName) {
+	commandsGuideEntrySet(
+		gv_CommandsGuideEntryGeneral, 
+		commandName, 
+		" This command moves your camera to a given position. <br> Camera [x] [y] [duration] <br> Examples: <br> Camerapan 125 50 3  ");
 }
 
 
-// libapx_command_reloadbank
+// LibapxCommandReloadbank
 //  ===================
 // Reloads the players bank in game
-// _reloadbank
-void libapx_command_reloadbank(int user, unitgroup u, string argv, int spawningCount, string bracketText) {
+// Reloadbank
+void LibapxCommandReloadbank(int user, unitgroup u, string argv, int spawningCount, string bracketText) {
 	
 	//Bank validation
-	if(!libapx_playerbank_hasloaded(user)) {
+	if(!gv_LibapxPlayerbankHasloaded(user)) {
 		return;
 	}
-	libapx_player[user].banksloaded = false;
-	libapx_print_output(user, "<c val=\"77aaff\">Bank Reload initlized...</c>");
-	BankReload(libapx_player[user].bank_storage);
-	BankWait(libapx_player[user].bank_storage);
-	libapx_player[user].aliases = libapx_sort_aliases(user);
-	libapx_player[user].wireframes = libapx_wireframes_get_all(user);
-	libapx_print_success(user, "Bank Reload Completed");
-	libapx_chk_all_aliases(user);
-	libapx_player[user].banksloaded = true;
+	gv_LibapxPlayer[user].banksloaded = false;
+	LibapxPrintOutput(user, "<c val=\"77aaff\">Bank Reload initlized...</c>");
+	BankReload(gv_LibapxPlayer[user].bankStorage);
+	BankWait(gv_LibapxPlayer[user].bankStorage);
+	gv_LibapxPlayer[user].aliases = LibapxSortAliases(user);
+	gv_LibapxPlayer[user].wireframes = LibapxWireframesGetAll(user);
+	LibapxPrintSuccess(user, "Bank Reload Completed");
+	LibapxChkAllAliases(user);
+	gv_LibapxPlayer[user].banksloaded = true;
 }	
 
-void libapx_define_reloadbank(string command_name) {
-	commands_guide_entry_set(
-		g_commands_guide_entry_general, 
-		command_name, 
-		"This command reloads your bank. <br> _reloadbank <br> Examples: <br> _reloadbank");
+void LibapxDefineReloadbank(string commandName) {
+	commandsGuideEntrySet(
+		gv_CommandsGuideEntryGeneral, 
+		commandName, 
+		"This command reloads your bank. <br> Reloadbank <br> Examples: <br> Reloadbank");
 }
 
 
-// libapx_command_helpmessages
+// LibapxCommandHelpmessages
 //  ===================
 // turns on or off help messages
-void libapx_command_helpmessages(int user, unitgroup u, string argv, int spawningCount, string bracketText) {
+void LibapxCommandHelpmessages(int user, unitgroup u, string argv, int spawningCount, string bracketText) {
 	if(StringWord(argv, 2) == "on" || StringWord(argv,2) == "true") {
-		libapx_print_output(user, "Help messages turned <c val=\"00ff00\">on.</c>");
-		libapx_player[user].help_messages = true;
+		LibapxPrintOutput(user, "Help messages turned <c val=\"00ff00\">on.</c>");
+		gv_LibapxPlayer[user].helpMessages = true;
 	}
 	else {
-		libapx_print_output(user, "Help messages turned <c val=\"ff0000\">off.</c>");
-		libapx_player[user].help_messages = false;
+		LibapxPrintOutput(user, "Help messages turned <c val=\"ff0000\">off.</c>");
+		gv_LibapxPlayer[user].helpMessages = false;
 	}
 }
 
-void libapx_define_helpmessages(string command_name) {
-	commands_guide_entry_set(
-		g_commands_guide_entry_general, 
-		command_name, 
-		"This command toggles help messages. <br> _helpmessages on/off <br> Examples: <br> _helpmessages off");
+void LibapxDefineHelpmessages(string commandName) {
+	commandsGuideEntrySet(
+		gv_CommandsGuideEntryGeneral, 
+		commandName, 
+		"This command toggles help messages. <br> Helpmessages on/off <br> Examples: <br> Helpmessages off");
 }
 
-// libapx_command_dataedit
+// LibapxCommandDataedit
 //  ===================
 // changes field values in data catalog entries
-void libapx_command_dataedit(int user, unitgroup u, string argv, int spawningCount, string bracketText) {
+void LibapxCommandDataedit(int user, unitgroup u, string argv, int spawningCount, string bracketText) {
     string msg1= StringWord(argv,3);
     string msg2= StringWord(argv,4);
     string msg3= StringWord(argv,5);
-	unitgroup g = libapx_player_parser[user][spawningCount].context;
+	unitgroup g = gv_gv_LibapxPlayerParser[user][spawningCount].context;
 	//Because CatalogFieldValueSet was being uncooperative with strings, I had to improvise with repetitive lists.
 	if( UnitGroupCount(g, c_unitCountAlive) == 0 ) { //When not selecting a unit
 		if(StringWord(argv, 2) == "unit" || StringWord(argv, 2) == "Unit") {
@@ -2110,13 +2111,13 @@ void libapx_command_dataedit(int user, unitgroup u, string argv, int spawningCou
 		}
 
 
-		if(libapx_player[user].help_messages) {//Will not print if _helpmessages are on
+		if(gv_LibapxPlayer[user].helpMessages) {//Will not print if Helpmessages are on
 			if( StringWord(argv,2) == "" || StringWord(argv,3) == "" || StringWord(argv,4) == "" || StringWord(argv,5) == "") { // no input params
 
-				libapx_print_output(user, "Command syntax: <c val=\"1abc9c\">_dataedit</c> [catalog] [CatalogEntry] [EntryField] [FieldValue]"); // returns correct syntax
+				LibapxPrintOutput(user, "Command syntax: <c val=\"1abc9c\">Dataedit</c> [catalog] [CatalogEntry] [EntryField] [FieldValue]"); // returns correct syntax
 			}
 			else {//If you fill all entries, you'll get this. Disclaimer: just because it prints, may not mean that it actually worked.
-			libapx_print_output(user, "<c val=\"1abc9c\">Editing Data </c>><c val=\"1abc9c\"> catalog:</c>" +StringWord(argv,2)+" > <c val=\"1abc9c\">Catalog Entry:</c>"+StringWord(argv,3)+" > <c val=\"1abc9c\">Entry Field:</c>"+StringWord(argv,4)+ " > <c val=\"1abc9c\">New Field Value:</c>" +StringWord(argv,5));
+			LibapxPrintOutput(user, "<c val=\"1abc9c\">Editing Data </c>><c val=\"1abc9c\"> catalog:</c>" +StringWord(argv,2)+" > <c val=\"1abc9c\">Catalog Entry:</c>"+StringWord(argv,3)+" > <c val=\"1abc9c\">Entry Field:</c>"+StringWord(argv,4)+ " > <c val=\"1abc9c\">New Field Value:</c>" +StringWord(argv,5));
 			}
 		}
 		return;
@@ -2126,7 +2127,7 @@ void libapx_command_dataedit(int user, unitgroup u, string argv, int spawningCou
 	if( UnitGroupCount(g, c_unitCountAlive) > 0 ) { //While selecting a unit. 
     	UnitGroupLoopBegin(g);
 		while(!UnitGroupLoopDone()) {
-			if( UnitGetOwner(UnitGroupLoopCurrent()) == user || libapx_player[user].permission_level > libapx_player[UnitGetOwner(UnitGroupLoopCurrent())].permission_level ) {
+			if( UnitGetOwner(UnitGroupLoopCurrent()) == user || gv_LibapxPlayer[user].permissionLevel > gv_LibapxPlayer[UnitGetOwner(UnitGroupLoopCurrent())].permissionLevel ) {
 				if(StringWord(argv, 2) == "unit" || StringWord(argv, 2) == "Unit") {
 					CatalogFieldValueSet(c_gameCatalogUnit, msg1, msg2, UnitGetOwner(UnitGroupLoopCurrent()), msg3);
 				}
@@ -2180,20 +2181,20 @@ void libapx_command_dataedit(int user, unitgroup u, string argv, int spawningCou
 		}
 		UnitGroupLoopEnd();
 	}
-	if(libapx_player[user].help_messages) {//Will not print if _helpmessages are on
+	if(gv_LibapxPlayer[user].helpMessages) {//Will not print if Helpmessages are on
 		if( StringWord(argv,2) == "" || StringWord(argv,3) == "" || StringWord(argv,4) == "" || StringWord(argv,5) == "") { // no input params
-			libapx_print_output(user, "Command syntax: <c val=\"1abc9c\">_dataedit</c> [catalog] [CatalogEntry] [EntryField] [FieldValue]"); // returns correct syntax
+			LibapxPrintOutput(user, "Command syntax: <c val=\"1abc9c\">Dataedit</c> [catalog] [CatalogEntry] [EntryField] [FieldValue]"); // returns correct syntax
 		}
 		else {//If you fill all entries, you'll get this. Disclaimer: just because it prints, may not mean that it actually worked.
-			libapx_print_output(user, "<c val=\"1abc9c\">Editing Data </c>><c val=\"1abc9c\"> catalog:</c>" +StringWord(argv,2)+" > <c val=\"1abc9c\">Catalog Entry:</c>"+StringWord(argv,3)+" > <c val=\"1abc9c\">Entry Field:</c>"+StringWord(argv,4)+ " > <c val=\"1abc9c\">New Field Value:</c>" +StringWord(argv,5));
+			LibapxPrintOutput(user, "<c val=\"1abc9c\">Editing Data </c>><c val=\"1abc9c\"> catalog:</c>" +StringWord(argv,2)+" > <c val=\"1abc9c\">Catalog Entry:</c>"+StringWord(argv,3)+" > <c val=\"1abc9c\">Entry Field:</c>"+StringWord(argv,4)+ " > <c val=\"1abc9c\">New Field Value:</c>" +StringWord(argv,5));
 		}
 	}
 	return;
 }
 
-void libapx_define_dataedit(string command_name) {
-	commands_guide_entry_set(
-		g_commands_guide_entry_general, 
-		command_name, 
-		" This command is used to change player data's category field values. <br> _dataedit [Category] [CategoryEntry] [EntryField] [FieldValue] <br> Examples: <br> _dataedit Unit Marauder LifeMax 555  ");
+void LibapxDefineDataedit(string commandName) {
+	commandsGuideEntrySet(
+		gv_CommandsGuideEntryGeneral, 
+		commandName, 
+		" This command is used to change player data's category field values. <br> Dataedit [Category] [CategoryEntry] [EntryField] [FieldValue] <br> Examples: <br> Dataedit Unit Marauder LifeMax 555  ");
 }

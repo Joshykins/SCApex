@@ -1,69 +1,69 @@
 //=========================================================
 //		Apex Roleplaying Engine
-//		Copyright (c) 2019, Apex Group
+//		Copyright (c) 2022, Apex Group
 //=========================================================
 // This software is distributed under the MIT License:
 // <http://opensource.org/licenses/MIT>
 //=========================================================
 
 //Base panel
-int libapx_ui_attachchk;
-int libapx_ui_attachchk_exit;
+int LibapxUiAttachchk;
+int LibapxUiAttachchkExit;
 
-static int libapx_ui_attachchk_list;
-static int button_count;
-static int pointcount = 16;
-static int[16] point_dialogs;
-static string points = "All Origin Center Damage Engine Hardpoint Head Hit Overhead Left Right Target Turret TurretY TurretZ Weapon";
-void libapx_ui_attachchk_init() {
+static int UiAttachCheckList;
+static int ButtonCount;
+static int PointCount = 16;
+static int[16] PointDialogs;
+static string Points = "All Origin Center Damage Engine Hardpoint Head Hit Overhead Left Right Target Turret TurretY TurretZ Weapon";
+void LibapxUiAttachchkInit() {
     int i;
 
     //Main Dialog init
-    libapx_ui_attachchk = libapx_create_dialog(650, 700, c_anchorTopLeft, libapx_ui_panel_spacing, 00);
-    libapx_ui_attachchk_exit = libapx_create_dialog_close_btn(libapx_ui_attachchk, 650, 700, c_anchorTopLeft, libapx_ui_panel_spacing, 0);
+    LibapxUiAttachchk = LibapxCreateDialog(650, 700, c_anchorTopLeft, gv_LibapxUiPanelSpacing, 00);
+    LibapxUiAttachchkExit = LibapxCreateDialogCloseBtn(LibapxUiAttachchk, 650, 700, c_anchorTopLeft, gv_LibapxUiPanelSpacing, 0);
 
     //Title
-    libapx_create_dialog_title(libapx_ui_attachchk, 300, 40, 00, 40, "Attach Checker", libapx_UI_HEADER1, 200);
+    LibapxCreateDialogTitle(LibapxUiAttachchk, 300, 40, 00, 40, "Attach Checker", gv_LibapxUiHeader1, 200);
 
     //Titles
-    libapx_create_dialog_label(libapx_ui_attachchk , 300, 40, c_anchorTop, -160, 84, "Attach Points", libapx_UI_HEADER1);
-    libapx_create_dialog_label(libapx_ui_attachchk , 300, 40, c_anchorTop,  155, 84, "Displayed Points", libapx_UI_HEADER1);
+    LibapxCreateDialogLabel(LibapxUiAttachchk , 300, 40, c_anchorTop, -160, 84, "Attach Points", gv_LibapxUiHeader1);
+    LibapxCreateDialogLabel(LibapxUiAttachchk , 300, 40, c_anchorTop,  155, 84, "Displayed Points", gv_LibapxUiHeader1);
   
 
     //Generate Buttons
     i = 1;
-    while(StringWord(points, i) != "") {
-        point_dialogs[i-1] = libapx_create_dialog_btn(libapx_ui_attachchk, 30, 30, c_anchorTopLeft, 50, 100 + (30*i), StringWord(points, i), "" );
-        libapx_create_dialog_btn_icon(libapx_ui_attachchk, point_dialogs[i-1], 20, 20, libapx_UI_ICON_X);
-        libapx_create_dialog_label(libapx_ui_attachchk, 100, 60, c_anchorTopLeft, 80, 102 + (30*i), StringWord(points, i), libapx_UI_HEADER4);
-        TriggerAddEventDialogControl(TriggerCreate("libapx_ui_click_points_" + StringWord(points, i)), c_playerAny, point_dialogs[i-1], c_triggerControlEventTypeClick);
+    while(StringWord(Points, i) != "") {
+        PointDialogs[i-1] = LibapxCreateDialogBtn(LibapxUiAttachchk, 30, 30, c_anchorTopLeft, 50, 100 + (30*i), StringWord(Points, i), "" );
+        LibapxCreateDialogBtnIcon(LibapxUiAttachchk, PointDialogs[i-1], 20, 20, gv_LibapxUiIconX);
+        LibapxCreateDialogLabel(LibapxUiAttachchk, 100, 60, c_anchorTopLeft, 80, 102 + (30*i), StringWord(Points, i), gv_LibapxUiHeader4);
+        TriggerAddEventDialogControl(TriggerCreate("LibapxUiClickPoints" + StringWord(Points, i)), c_playerAny, PointDialogs[i-1], c_triggerControlEventTypeClick);
 
         i+= 1;
     }
 
     //Points list
-    libapx_ui_attachchk_list = libapx_create_dialog_list(libapx_ui_attachchk, 330, (30*i)-30, c_anchorTopRight, 50, 130);
+    UiAttachCheckList = LibapxCreateDialogList(LibapxUiAttachchk, 330, (30*i)-30, c_anchorTopRight, 50, 130);
 
   //Trigger for command selection
-  TriggerAddEventDialogControl(TriggerCreate("libapx_ui_attachpoint_select"), c_playerAny, libapx_ui_attachchk_list, c_triggerControlEventTypeSelectionChanged);
+  TriggerAddEventDialogControl(TriggerCreate("LibapxUiAttachpointSelect"), c_playerAny, UiAttachCheckList, c_triggerControlEventTypeSelectionChanged);
 
 }
 
-void libapx_ui_attachchk_init_player(int player) {
+void LibapxUiAttachchkInitPlayer(int player) {
 
 }
 
 
 //Presets
-static string defaultAttachPointTarget = "HelpThisshit";
+static string DefaultAttachPoint = "HelpThisshit";
 
 
-static void remove_attachpoints(int p) {
+static void RemoveAttachpoints(int p) {
     unit u;
     unitgroup ug = UnitGroupSelected(p);
     ug = UnitGroupFilterPlayer(ug, p, -1);
     u = UnitGroupUnit(ug,1);
-    ActorSendTo(libNtve_gf_MainActorofUnit(u), defaultAttachPointTarget, "AliasRemove " + defaultAttachPointTarget);
+    ActorSendTo(libNtve_gf_MainActorofUnit(u), DefaultAttachPoint, "AliasRemove " + DefaultAttachPoint);
     
     ActorSendTo(libNtve_gf_MainActorofUnit(u), "attachmentsforchk", "SetScale 0.0005 .1 ");
     Wait(.1, c_timeGame);
@@ -71,50 +71,53 @@ static void remove_attachpoints(int p) {
 
 };
 
-static void set_target_attachchk(int p) {
+static void SetTargetAttachCheck(int p) {
     unit u;
     unitgroup ug = UnitGroupSelected(p);
     ug = UnitGroupFilterPlayer(ug, p, -1);
     u = UnitGroupUnit(ug,1);
-    ActorSendTo(libNtve_gf_MainActorofUnit(u), "::Main", "AliasAdd " + defaultAttachPointTarget);
+    ActorSendTo(libNtve_gf_MainActorofUnit(u), "::Main", "AliasAdd " + DefaultAttachPoint);
 }
-static void apply_attachpoints(int p,string attachment, int idx, string tc) {
+
+static void ApplyAttachpoints(int p,string attachment, int idx, string tc) {
     unit u;
     unitgroup ug = UnitGroupSelected(p);
     ug = UnitGroupFilterPlayer(ug, p, -1);
     u = UnitGroupUnit(ug,1);
 
     
-    ActorSendTo(libNtve_gf_MainActorofUnit(u), defaultAttachPointTarget, " AttachModelOffset Beacon_Nova {} {"+attachment + "}");
+    LibapxPrint(PlayerGroupAll(), attachment);
+
+    ActorSendTo(libNtve_gf_MainActorofUnit(u), DefaultAttachPoint, " AttachModelOffset Beacon_Nova {} {"+attachment + "}");
     ActorSendTo(libNtve_gf_MainActorofUnit(u), "::Main", "ModelSwap EditorHelper");
     ActorSendTo(libNtve_gf_MainActorofUnit(u), "::Main", "SetTeamColor {"+tc+"} {"+tc+"}");
-    ActorSendTo(libNtve_gf_MainActorofUnit(u), "::Main", "AliasAdd " + IntToString(idx) + "_alias");
+    ActorSendTo(libNtve_gf_MainActorofUnit(u), "::Main", "AliasAdd " + IntToString(idx) + "Alias");
     ActorSendTo(libNtve_gf_MainActorofUnit(u), "::Main", "AliasAdd " + "attachmentsforchk");
     ActorSendTo(libNtve_gf_MainActorofUnit(u), "::Main", "SetScale 0.0005 ");
     ActorSendTo(libNtve_gf_MainActorofUnit(u), "::Main", "SetScale 1,1,1.5 "+FixedToString(RandomFixed(.35,.45),2)+" ");
     ActorSendTo(libNtve_gf_MainActorofUnit(u), "::Main", "SetTintColor {255,255,255 1} ");
 };
 
-static void highlight_attachpoint(int p, string attachment, int idx) {
+static void HighlightAttachpoint(int p, string attachment, int idx) {
     unit u;
     unitgroup ug = UnitGroupSelected(p);
-    string target = IntToString(idx) + "_alias";
+    string target = IntToString(idx) + "Alias";
     ug = UnitGroupFilterPlayer(ug, p, -1);
     u = UnitGroupUnit(ug,1);
     ActorSendTo(libNtve_gf_MainActorofUnit(u), "attachmentsforchk", "SetScale 1,1,1.5 "+FixedToString(RandomFixed(.35,.45),2)+" ");
     ActorSendTo(libNtve_gf_MainActorofUnit(u), target, "SetScale 1.5,1.5,3 .4 ");
 
 };
-static string[16][45] listed_points;
+static string[16][45] ListedPoints;
 
-static void reset_listed_points(int p) {
+static void ResetListedPoints(int p) {
     int i;
     for (i = 0; i < 45; i += 1) {
-        listed_points[p][i] = "";
+        ListedPoints[p][i] = "";
     }
 }
-static void libapx_ui_click_points_populate(int p, string attachment) {
-    int list = libapx_ui_attachchk_list;
+static void UiClickPointsPopulate(int p, string attachment) {
+    int list = UiAttachCheckList;
     int i;
     string displayindex;
     unitgroup ug = UnitGroupSelected(p);
@@ -124,18 +127,18 @@ static void libapx_ui_click_points_populate(int p, string attachment) {
     GameSetSeed(3213);
 
 
-    reset_listed_points(p);
+    ResetListedPoints(p);
 
     if(UnitGroupCount(ug,c_unitCountAlive) == 0) {
-        libapx_print_output(p, "Select a unit to apply attachments");
+        LibapxPrintOutput(p, "Select a unit to apply attachments");
         apply = false;
     }
     
     DialogControlRemoveAllItems(list, PlayerGroupSingle(p));
 
     if(apply) {
-        remove_attachpoints(p);
-        set_target_attachchk(p);
+        RemoveAttachpoints(p);
+        SetTargetAttachCheck(p);
     }
     if(attachment != "All") {
         for (i = 0; i < 45; i += 1) {
@@ -145,112 +148,113 @@ static void libapx_ui_click_points_populate(int p, string attachment) {
             else {
                 displayindex = "_" + IntToString(i);
             }
+            LibapxPrint(PlayerGroupAll(), displayindex);
             tc = IntToString(RandomInt(0,255))+","+IntToString(RandomInt(0,255))+","+IntToString(RandomInt(0,255));
            DialogControlAddItem(list, PlayerGroupSingle(p), StringToText( "<c val =\""+tc+"\"> "+attachment + displayindex+ "</c>"));
-           listed_points[p][i] = attachment + displayindex;
+           ListedPoints[p][i] = attachment + displayindex;
             if(apply) {
-                apply_attachpoints(p,attachment + " " + StringReplace(displayindex, "",StringFind(displayindex, "_",c_stringNoCase),StringFind(displayindex, "_",c_stringNoCase)+1),i,tc);
+                ApplyAttachpoints(p,attachment + " " + StringReplace(displayindex, "",StringFind(displayindex, "_",c_stringNoCase),StringFind(displayindex, "_",c_stringNoCase)),i,tc);
             }
         }
     }
     else {
         i = 2; //as one is "all", we start at 2
-        while(StringWord(points, i) != "") {
+        while(StringWord(Points, i) != "") {
             tc = IntToString(RandomInt(0,255))+","+IntToString(RandomInt(0,255))+","+IntToString(RandomInt(0,255));
-            DialogControlAddItem(list, PlayerGroupSingle(p), StringToText("<c val =\""+tc+"\">"+StringWord(points, i)+ "</c>"));
-            apply_attachpoints(p, StringWord(points, i),i-2,tc);
-            listed_points[p][i-2] = attachment + displayindex;
+            DialogControlAddItem(list, PlayerGroupSingle(p), StringToText("<c val =\""+tc+"\">"+StringWord(Points, i)+ "</c>"));
+            ApplyAttachpoints(p, StringWord(Points, i),i-2,tc);
+            ListedPoints[p][i-2] = attachment + displayindex;
             i+= 1;
         }
     }
-    
-
 }
-bool libapx_ui_attachpoint_select(bool testConds, bool runActions) {
+
+bool LibapxUiAttachpointSelect(bool testConds, bool runActions) {
     int p = EventPlayer();
-    int selected = DialogControlGetSelectedItem(libapx_ui_attachchk_list, p);
-    string attachpoint = listed_points[p][selected];
-    highlight_attachpoint(p, attachpoint, selected-1);
+    int selected = DialogControlGetSelectedItem(UiAttachCheckList, p);
+    string attachpoint = ListedPoints[p][selected];
+    int i;
+    HighlightAttachpoint(p, attachpoint, selected-1);
 
     return true;
 }
 
-bool libapx_ui_click_points_All(bool testConds, bool runActions) {
-    libapx_ui_click_points_populate(EventPlayer(), "All");
+bool LibapxUiClickPointsAll(bool testConds, bool runActions) {
+    UiClickPointsPopulate(EventPlayer(), "All");
     return true;
 }
 
-bool libapx_ui_click_points_Center(bool testConds, bool runActions) {
-    libapx_ui_click_points_populate(EventPlayer(), "Center");
+bool LibapxUiClickPointsCenter(bool testConds, bool runActions) {
+    UiClickPointsPopulate(EventPlayer(), "Center");
     return true;
 }
 
-bool libapx_ui_click_points_Engine(bool testConds, bool runActions) {
-    libapx_ui_click_points_populate(EventPlayer(), "Engine");
+bool LibapxUiClickPointsEngine(bool testConds, bool runActions) {
+    UiClickPointsPopulate(EventPlayer(), "Engine");
     return true;
 }
 
-bool libapx_ui_click_points_Hardpoint(bool testConds, bool runActions) {
-    libapx_ui_click_points_populate(EventPlayer(), "Hardpoint");
+bool LibapxUiClickPointsHardpoint(bool testConds, bool runActions) {
+    UiClickPointsPopulate(EventPlayer(), "Hardpoint");
     return true;
 }
 
-bool libapx_ui_click_points_Head(bool testConds, bool runActions) {
-    libapx_ui_click_points_populate(EventPlayer(), "Head");
+bool LibapxUiClickPointsHead(bool testConds, bool runActions) {
+    UiClickPointsPopulate(EventPlayer(), "Head");
     return true;
 }
 
-bool libapx_ui_click_points_Hit(bool testConds, bool runActions) {
-    libapx_ui_click_points_populate(EventPlayer(), "Hit");
+bool LibapxUiClickPointsHit(bool testConds, bool runActions) {
+    UiClickPointsPopulate(EventPlayer(), "Hit");
     return true;
 }
 
-bool libapx_ui_click_points_Overhead(bool testConds, bool runActions) {
-    libapx_ui_click_points_populate(EventPlayer(), "Overhead");
+bool LibapxUiClickPointsOverhead(bool testConds, bool runActions) {
+    UiClickPointsPopulate(EventPlayer(), "Overhead");
     return true;
 }
 
-bool libapx_ui_click_points_Left(bool testConds, bool runActions) {
-    libapx_ui_click_points_populate(EventPlayer(), "Left");
+bool LibapxUiClickPointsLeft(bool testConds, bool runActions) {
+    UiClickPointsPopulate(EventPlayer(), "Left");
     return true;
 }
 
-bool libapx_ui_click_points_Right(bool testConds, bool runActions) {
-    libapx_ui_click_points_populate(EventPlayer(), "Right");
+bool LibapxUiClickPointsRight(bool testConds, bool runActions) {
+    UiClickPointsPopulate(EventPlayer(), "Right");
     return true;
 }
 
-bool libapx_ui_click_points_Target(bool testConds, bool runActions) {
-    libapx_ui_click_points_populate(EventPlayer(), "Target");
+bool LibapxUiClickPointsTarget(bool testConds, bool runActions) {
+    UiClickPointsPopulate(EventPlayer(), "Target");
     return true;
 }
 
-bool libapx_ui_click_points_Turret(bool testConds, bool runActions) {
-    libapx_ui_click_points_populate(EventPlayer(), "Turret");
+bool LibapxUiClickPointsTurret(bool testConds, bool runActions) {
+    UiClickPointsPopulate(EventPlayer(), "Turret");
     return true;
 }
 
-bool libapx_ui_click_points_TurretY(bool testConds, bool runActions) {
-    libapx_ui_click_points_populate(EventPlayer(), "TurretY");
+bool LibapxUiClickPointsTurretY(bool testConds, bool runActions) {
+    UiClickPointsPopulate(EventPlayer(), "TurretY");
     return true;
 }
 
-bool libapx_ui_click_points_TurretZ(bool testConds, bool runActions) {
-    libapx_ui_click_points_populate(EventPlayer(), "TurretZ");
+bool LibapxUiClickPointsTurretZ(bool testConds, bool runActions) {
+    UiClickPointsPopulate(EventPlayer(), "TurretZ");
     return true;
 }
 
-bool libapx_ui_click_points_Weapon(bool testConds, bool runActions) {
-    libapx_ui_click_points_populate(EventPlayer(), "Weapon");
+bool LibapxUiClickPointsWeapon(bool testConds, bool runActions) {
+    UiClickPointsPopulate(EventPlayer(), "Weapon");
     return true;
 }
 
-bool libapx_ui_click_points_Damage(bool testConds, bool runActions) {
-    libapx_ui_click_points_populate(EventPlayer(), "Damage");
+bool LibapxUiClickPointsDamage(bool testConds, bool runActions) {
+    UiClickPointsPopulate(EventPlayer(), "Damage");
     return true;
 }
 
-bool libapx_ui_click_points_Origin(bool testConds, bool runActions) {
-    libapx_ui_click_points_populate(EventPlayer(), "Origin");
+bool LibapxUiClickPointsOrigin(bool testConds, bool runActions) {
+    UiClickPointsPopulate(EventPlayer(), "Origin");
     return true;
 }

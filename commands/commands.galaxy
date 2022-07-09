@@ -1,6 +1,6 @@
 //=========================================================
 //		Apex Roleplaying Engine
-//		Copyright (c) 2019, Apex Group
+//		Copyright (c) 2022, Apex Group
 //=========================================================
 // This software is distributed under the MIT License:
 // <http://opensource.org/licenses/MIT>
@@ -15,179 +15,177 @@ include "apex/commands/chat_commands.galaxy"
 include "apex/commands/region_commands.galaxy"
 include "apex/commands/debug_commands.galaxy"
 
-void libapx_define_nodef(string command_name) {} // For Some CMds
+void LibapxDefineNodef(string commandName) {} // For Some CMds
 
-void libapx_commands_initialize() {
+void LibapxCommandsInitialize() {
 
 	// debug commands
-	// libapx_chat_command_create(">sort", libapx_command_sort);
+	// LibapxChatCommandCreate(">sort", LibapxCommandSort);
 
-	command_guide_preset_descriptions();
+	commandGuidePresetDescriptions();
 	// general commands - done in cmd guide
-	libapx_chat_command_create("_info", libapx_command_info, libapx_define_info);
-	libapx_chat_command_create("_commands", libapx_command_list_commands, libapx_define_list_commands);
-	libapx_chat_command_create("_delay", libapx_command_delay, libapx_define_delay);
-	libapx_chat_command_create("_players", libapx_command_players, libapx_define_players);
-	libapx_chat_command_create("_gamesetup", libapx_command_gamesetup, libapx_define_gamesetup);
-	libapx_chat_command_create("_control", libapx_command_control, libapx_define_control);
-	libapx_chat_command_create("_uncontrol", libapx_command_uncontrol, libapx_define_uncontrol);
-	libapx_chat_command_create("_ally", libapx_command_ally, libapx_define_ally);
-	libapx_chat_command_create("_unally", libapx_command_unally, libapx_define_unally);
-	libapx_chat_command_create("_search", libapx_command_search, libapx_define_search);
-	libapx_chat_command_create("_replace", libapx_command_replace, libapx_define_replace);
-	libapx_chat_command_create("_minerals", libapx_command_minerals, libapx_define_minerals);
-	libapx_chat_command_create("_gas", libapx_command_gas, libapx_define_gas);
-	libapx_chat_command_create("_terrazine", libapx_command_terrazine, libapx_define_terrazine);
-	libapx_chat_command_create("_supply", libapx_command_supply, libapx_define_supply);
-	libapx_chat_command_create("_zoom", libapx_command_zoom, libapx_define_zoom);
-	libapx_chat_command_create("_roll", libapx_command_roll, libapx_define_roll);
-	libapx_chat_command_create("_doodads", libapx_command_doodads, libapx_define_doodads);
-	libapx_chat_command_create("_showterrain", libapx_command_showterrain, libapx_define_showterrain);
-	libapx_chat_command_create("_camera", libapx_command_camera, libapx_define_camera);
-	libapx_chat_command_create("_upgrade",libapx_command_upgrade, libapx_define_upgrade);
-	libapx_chat_command_create("_handle",libpax_command_get_playerhandle, libapx_define_get_playerhandle);
-	libapx_chat_command_create("_relink",libpax_command_relink, libapx_define_relink);
-	libapx_chat_command_create("_sound", libapx_command_sound, libapx_define_sound);
-	libapx_chat_command_create("_camerapan", libapx_command_camerapan, libapx_define_camerapan);
-	libapx_chat_command_create("_print", libpax_command_print, libapx_define_print);
-	libapx_chat_command_create("_dataedit", libapx_command_dataedit, libapx_define_dataedit);
+	LibapxChatCommandCreate("_info", LibapxCommandInfo, LibapxDefineInfo);
+	LibapxChatCommandCreate("_commands", LibapxCommandListCommands, LibapxDefineListCommands);
+	LibapxChatCommandCreate("_delay", LibapxCommandDelay, LibapxDefineDelay);
+	LibapxChatCommandCreate("_players", LibapxCommandPlayers, LibapxDefinePlayers);
+	LibapxChatCommandCreate("_gamesetup", LibapxCommandGamesetup, LibapxDefineGamesetup);
+	LibapxChatCommandCreate("_control", LibapxCommandControl, LibapxDefineControl);
+	LibapxChatCommandCreate("_uncontrol", LibapxCommandUncontrol, LibapxDefineUncontrol);
+	LibapxChatCommandCreate("_ally", LibapxCommandAlly, LibapxDefineAlly);
+	LibapxChatCommandCreate("_unally", LibapxCommandUnally, LibapxDefineUnally);
+	LibapxChatCommandCreate("_search", LibapxCommandSearch, LibapxDefineSearch);
+	LibapxChatCommandCreate("_replace", LibapxCommandReplace, LibapxDefineReplace);
+	LibapxChatCommandCreate("_minerals", LibapxCommandMinerals, LibapxDefineMinerals);
+	LibapxChatCommandCreate("_gas", LibapxCommandGas, LibapxDefineGas);
+	LibapxChatCommandCreate("_terrazine", LibapxCommandTerrazine, LibapxDefineTerrazine);
+	LibapxChatCommandCreate("_supply", LibapxCommandSupply, LibapxDefineSupply);
+	LibapxChatCommandCreate("_zoom", LibapxCommandZoom, LibapxDefineZoom);
+	LibapxChatCommandCreate("_roll", LibapxCommandRoll, LibapxDefineRoll);
+	LibapxChatCommandCreate("_doodads", LibapxCommandDoodads, LibapxDefineDoodads);
+	LibapxChatCommandCreate("_showterrain", LibapxCommandShowterrain, LibapxDefineShowterrain);
+	LibapxChatCommandCreate("_camera", LibapxCommandCamera, LibapxDefineCamera);
+	LibapxChatCommandCreate("_upgrade",LibapxCommandUpgrade, LibapxDefineUpgrade);
+	LibapxChatCommandCreate("_handle",libpaxCommandGetPlayerhandle, LibapxDefineGetPlayerhandle);
+	LibapxChatCommandCreate("_relink",libpaxCommandRelink, LibapxDefineRelink);
+	LibapxChatCommandCreate("_sound", LibapxCommandSound, LibapxDefineSound);
+	LibapxChatCommandCreate("_camerapan", LibapxCommandCamerapan, LibapxDefineCamerapan);
+	LibapxChatCommandCreate("_print", libpaxCommandPrint, LibapxDefinePrint);
+	LibapxChatCommandCreate("_dataedit", LibapxCommandDataedit, LibapxDefineDataedit);
 	
 	//API commands
-	libapx_chat_command_create("_api", libapx_command_api, libapx_define_api);
+	LibapxChatCommandCreate("_api", LibapxCommandApi, LibapxDefineApi);
 
 	//Permissions - done in cmd guide
-	libapx_chat_command_create("_blacklist", libapx_command_blacklist, libapx_define_blacklist);
+	LibapxChatCommandCreate("_blacklist", LibapxCommandBlacklist, LibapxDefineBlacklist);
 
 	//Bank Commands
-	libapx_chat_command_create("_reloadbank", libapx_command_reloadbank, libapx_define_reloadbank);
-	libapx_chat_command_create("_helpmessages", libapx_command_helpmessages, libapx_define_helpmessages);
+	LibapxChatCommandCreate("_reloadbank", LibapxCommandReloadbank, LibapxDefineReloadbank);
+	LibapxChatCommandCreate("_helpmessages", LibapxCommandHelpmessages, LibapxDefineHelpmessages);
 
 	// admin commands - done in cmd guide
-	libapx_chat_command_create("!light", libapx_command_light, libapx_define_light);
-	libapx_chat_command_create("!kick", libapx_command_ban, libapx_define_ban);
-	libapx_chat_command_create("!disable", libapx_command_disable, libapx_define_disable);
-	libapx_chat_command_create("!enable", libapx_command_enable, libapx_define_enable);
-	libapx_chat_command_create("!mute", libapx_command_mute, libapx_define_mute);
-	libapx_chat_command_create("!unmute", libapx_command_unmute, libapx_define_unmute);
-	libapx_chat_command_create("!promote", libapx_command_promote, libapx_define_promote);
-	libapx_chat_command_create("!demote", libapx_command_demote, libapx_define_demote);
-	libapx_chat_command_create("!remove", libapx_command_remove_player, libapx_define_remove_player);
-	libapx_chat_command_create("!destroy", libapx_command_destroy, libapx_define_destroy);
-	libapx_chat_command_create("!fog", libapx_command_fog, libapx_define_fog);
-	libapx_chat_command_create("!skybox", libapx_command_skybox, libapx_define_skybox);
+	LibapxChatCommandCreate("!light", LibapxCommandLight, LibapxDefineLight);
+	LibapxChatCommandCreate("!kick", LibapxCommandBan, LibapxDefineBan);
+	LibapxChatCommandCreate("!disable", LibapxCommandDisable, LibapxDefineDisable);
+	LibapxChatCommandCreate("!enable", LibapxCommandEnable, LibapxDefineEnable);
+	LibapxChatCommandCreate("!mute", LibapxCommandMute, LibapxDefineMute);
+	LibapxChatCommandCreate("!unmute", LibapxCommandUnmute, LibapxDefineUnmute);
+	LibapxChatCommandCreate("!promote", LibapxCommandPromote, LibapxDefinePromote);
+	LibapxChatCommandCreate("!demote", LibapxCommandDemote, LibapxDefineDemote);
+	LibapxChatCommandCreate("!remove", LibapxCommandRemovePlayer, LibapxDefineRemovePlayer);
+	LibapxChatCommandCreate("!destroy", LibapxCommandDestroy, LibapxDefineDestroy);
+	LibapxChatCommandCreate("!fog", LibapxCommandFog, LibapxDefineFog);
+	LibapxChatCommandCreate("!skybox", LibapxCommandSkybox, LibapxDefineSkybox);
 
 	// spawn command - done in cmd guide
-	libapx_chat_command_create("@spawn+", libapx_command_spawn_plus, libapx_define_region_spawn_plus);
-	libapx_chat_command_create("@spawn", libapx_command_spawn, libapx_define_region_spawn);
+	LibapxChatCommandCreate("@spawn+", LibapxCommandSpawnPlus, LibapxDefineRegionSpawnPlus);
+	LibapxChatCommandCreate("@spawn", LibapxCommandSpawn, LibapxDefineRegionSpawn);
 
 
 
 	// unit commands - done in cmd guide
-	libapx_chat_command_create("@wireframe", libapx_command_wireframe, libapx_define_wireframe);
-	libapx_chat_command_create("@unitswap", libapx_command_unitswap, libapx_define_unitswap);
-	libapx_chat_command_create("@unitmimic", libapx_command_unitmimic, libapx_define_unitmimic);
-	libapx_chat_command_create("@unitvar", libapx_command_unitvar, libapx_define_unitvar);
-	libapx_chat_command_create("@context", libapx_command_context, libapx_define_context);
-	libapx_chat_command_create("@kill", libapx_command_kill, libapx_define_kill);
-	libapx_chat_command_create("@remove", libapx_command_remove, libapx_define_remove);
-	libapx_chat_command_create("@selectarea", libapx_command_selectarea, libapx_define_selectarea);
-	libapx_chat_command_create("@removearea", libapx_command_removearea, libapx_define_removearea);
-	libapx_chat_command_create("@cache", libapx_command_cache, libapx_define_cache);
-	libapx_chat_command_create("@give", libapx_command_give, libapx_define_give);
-	libapx_chat_command_create("@rename", libapx_command_rename, libapx_define_rename);
-	libapx_chat_command_create("@renameall", libapx_command_renameall, libapx_define_renameall);
-	libapx_chat_command_create("@height", libapx_command_height, libapx_define_height);
-	libapx_chat_command_create("@color", libapx_command_color, libapx_define_color);
-	libapx_chat_command_create("@face", libapx_command_face, libapx_define_face);
-	libapx_chat_command_create("@subtitle", libapx_command_subtitle, libapx_define_subtitle);
-	libapx_chat_command_create("@subtitleall", libapx_command_subtitleall, libapx_define_subtitleall);
-	libapx_chat_command_create("@desc", libapx_command_desc, libapx_define_desc);
-	libapx_chat_command_create("@descall", libapx_command_descall, libapx_define_desceall);
-	libapx_chat_command_create("@desctitle", libapx_command_desctitle, libapx_define_desctitle);
-	libapx_chat_command_create("@desctitleall", libapx_command_desctitleall, libapx_define_desctitleall);
-	libapx_chat_command_create("@tooltip", libapx_command_tooltip, libapx_define_tooltip);
-	libapx_chat_command_create("@copy", libapx_command_copy, libapx_define_copy);
-	libapx_chat_command_create("@kills", libapx_command_kills, libapx_define_kills);
-	libapx_chat_command_create("@level", libapx_command_level, libapx_define_level);
-	libapx_chat_command_create("@label", libapx_command_label, libapx_define_label);
-	libapx_chat_command_create("@radius", libapx_command_radius, libapx_define_radius);
-	libapx_chat_command_create("@state", libapx_command_state, libapx_define_state);
-	libapx_chat_command_create("@pos", libapx_command_position, libapx_define_nodef);
-	libapx_chat_command_create("@position", libapx_command_position, libapx_define_position);
-	libapx_chat_command_create("@move", libapx_command_move, libapx_define_move);
-	libapx_chat_command_create("@undo", libapx_command_undo, libapx_define_undo);
+	LibapxChatCommandCreate("@wireframe", LibapxCommandWireframe, LibapxDefineWireframe);
+	LibapxChatCommandCreate("@unitswap", LibapxCommandUnitswap, LibapxDefineUnitswap);
+	LibapxChatCommandCreate("@unitmimic", LibapxCommandUnitmimic, LibapxDefineUnitmimic);
+	LibapxChatCommandCreate("@unitvar", LibapxCommandUnitvar, LibapxDefineUnitvar);
+	LibapxChatCommandCreate("@context", LibapxCommandContext, LibapxDefineContext);
+	LibapxChatCommandCreate("@kill", LibapxCommandKill, LibapxDefineKill);
+	LibapxChatCommandCreate("@remove", LibapxCommandRemove, LibapxDefineRemove);
+	LibapxChatCommandCreate("@selectarea", LibapxCommandSelectarea, LibapxDefineSelectarea);
+	LibapxChatCommandCreate("@removearea", LibapxCommandRemovearea, LibapxDefineRemovearea);
+	LibapxChatCommandCreate("@cache", LibapxCommandCache, LibapxDefineCache);
+	LibapxChatCommandCreate("@give", LibapxCommandGive, LibapxDefineGive);
+	LibapxChatCommandCreate("@rename", LibapxCommandRename, LibapxDefineRename);
+	LibapxChatCommandCreate("@renameall", LibapxCommandRenameall, LibapxDefineRenameall);
+	LibapxChatCommandCreate("@height", LibapxCommandHeight, LibapxDefineHeight);
+	LibapxChatCommandCreate("@color", LibapxCommandColor, LibapxDefineColor);
+	LibapxChatCommandCreate("@face", LibapxCommandFace, LibapxDefineFace);
+	LibapxChatCommandCreate("@subtitle", LibapxCommandSubtitle, LibapxDefineSubtitle);
+	LibapxChatCommandCreate("@subtitleall", LibapxCommandSubtitleall, LibapxDefineSubtitleall);
+	LibapxChatCommandCreate("@desc", LibapxCommandDesc, LibapxDefineDesc);
+	LibapxChatCommandCreate("@descall", LibapxCommandDescall, LibapxDefineDesceall);
+	LibapxChatCommandCreate("@desctitle", LibapxCommandDesctitle, LibapxDefineDesctitle);
+	LibapxChatCommandCreate("@desctitleall", LibapxCommandDesctitleall, LibapxDefineDesctitleall);
+	LibapxChatCommandCreate("@tooltip", LibapxCommandTooltip, LibapxDefineTooltip);
+	LibapxChatCommandCreate("@copy", LibapxCommandCopy, LibapxDefineCopy);
+	LibapxChatCommandCreate("@kills", LibapxCommandKills, LibapxDefineKills);
+	LibapxChatCommandCreate("@level", LibapxCommandLevel, LibapxDefineLevel);
+	LibapxChatCommandCreate("@label", LibapxCommandLabel, LibapxDefineLabel);
+	LibapxChatCommandCreate("@radius", LibapxCommandRadius, LibapxDefineRadius);
+	LibapxChatCommandCreate("@state", LibapxCommandState, LibapxDefineState);
+	LibapxChatCommandCreate("@pos", LibapxCommandPosition, LibapxDefineNodef);
+	LibapxChatCommandCreate("@position", LibapxCommandPosition, LibapxDefinePosition);
+	LibapxChatCommandCreate("@move", LibapxCommandMove, LibapxDefineMove);
+	LibapxChatCommandCreate("@undo", LibapxCommandUndo, LibapxDefineUndo);
 
 	//stats - done in commands guide
-	libapx_chat_command_create("@behaviors", libapx_command_behaviors, libapx_define_behaviors);
-	libapx_chat_command_create("@addbehavior", libapx_command_addbehavior, libapx_define_addbehavior);
-	libapx_chat_command_create("@removebehavior", libapx_command_removebehavior, libapx_define_removebehavior);
-	libapx_chat_command_create("@weapons", libapx_command_weapons, libapx_define_weapons);
-	libapx_chat_command_create("@addweapon", libapx_command_addweapon, libapx_define_addweapon);
-	libapx_chat_command_create("@removeweapon", libapx_command_removeweapon, libapx_define_removeweapon);
-	libapx_chat_command_create("@life", libapx_command_life, libapx_define_life);
-	libapx_chat_command_create("@shields", libapx_command_shields, libapx_define_shields);
-	libapx_chat_command_create("@energy", libapx_command_energy, libapx_define_energy);
-	libapx_chat_command_create("@maxlife", libapx_command_maxlife, libapx_define_maxlife);
-	libapx_chat_command_create("@maxshields", libapx_command_maxshields, libapx_define_maxshields);
-	libapx_chat_command_create("@maxenergy", libapx_command_maxenergy, libapx_define_maxenergy);
-	libapx_chat_command_create("@liferegen", libapx_command_liferegen, libapx_define_liferegen);
-	libapx_chat_command_create("@shieldsregen", libapx_command_shieldsregen, libapx_define_shieldsregen);
-	libapx_chat_command_create("@energyregen", libapx_command_energyregen, libapx_define_energyregen);
-	libapx_chat_command_create("@speed", libapx_command_speed, libapx_define_speed);
-	libapx_chat_command_create("@invulnerable", libapx_command_invulnerable, libapx_define_invulnerable);
-	libapx_chat_command_create("@vulnerable", libapx_command_vulnerable, libapx_define_vulnerable);
-	libapx_chat_command_create("@adddamage", libapx_command_damage, libapx_define_adddamage);
-	libapx_chat_command_create("@removedamage", libapx_command_damage, libapx_define_removedamage);
-	libapx_chat_command_create("@addrange", libapx_command_range, libapx_define_addrange);
-	libapx_chat_command_create("@removerange", libapx_command_range, libapx_define_removerange);
-	libapx_chat_command_create("@armor", libapx_command_armor, libapx_define_armor);
-	libapx_chat_command_create("@shieldsarmor", libapx_command_armor, libapx_define_shieldsarmor);
-	libapx_chat_command_create("@weaponspeed", libapx_command_weaponspeed, libapx_define_weaponspeed);
-	libapx_chat_command_create("@weaponspeedall", libapx_command_weaponspeedall, libapx_define_weaponspeedall);
-	libapx_chat_command_create("@effect", libapx_command_effect, libapx_define_effect);
+	LibapxChatCommandCreate("@behaviors", LibapxCommandBehaviors, LibapxDefineBehaviors);
+	LibapxChatCommandCreate("@addbehavior", LibapxCommandAddbehavior, LibapxDefineAddbehavior);
+	LibapxChatCommandCreate("@removebehavior", LibapxCommandRemovebehavior, LibapxDefineRemovebehavior);
+	LibapxChatCommandCreate("@weapons", LibapxCommandWeapons, LibapxDefineWeapons);
+	LibapxChatCommandCreate("@addweapon", LibapxCommandAddweapon, LibapxDefineAddweapon);
+	LibapxChatCommandCreate("@removeweapon", LibapxCommandRemoveweapon, LibapxDefineRemoveweapon);
+	LibapxChatCommandCreate("@life", LibapxCommandLife, LibapxDefineLife);
+	LibapxChatCommandCreate("@shields", LibapxCommandShields, LibapxDefineShields);
+	LibapxChatCommandCreate("@energy", LibapxCommandEnergy, LibapxDefineEnergy);
+	LibapxChatCommandCreate("@maxlife", LibapxCommandMaxlife, LibapxDefineMaxlife);
+	LibapxChatCommandCreate("@maxshields", LibapxCommandMaxshields, LibapxDefineMaxshields);
+	LibapxChatCommandCreate("@maxenergy", LibapxCommandMaxenergy, LibapxDefineMaxenergy);
+	LibapxChatCommandCreate("@liferegen", LibapxCommandLiferegen, LibapxDefineLiferegen);
+	LibapxChatCommandCreate("@shieldsregen", LibapxCommandShieldsregen, LibapxDefineShieldsregen);
+	LibapxChatCommandCreate("@energyregen", LibapxCommandEnergyregen, LibapxDefineEnergyregen);
+	LibapxChatCommandCreate("@speed", LibapxCommandSpeed, LibapxDefineSpeed);
+	LibapxChatCommandCreate("@invulnerable", LibapxCommandInvulnerable, LibapxDefineInvulnerable);
+	LibapxChatCommandCreate("@vulnerable", LibapxCommandVulnerable, LibapxDefineVulnerable);
+	LibapxChatCommandCreate("@adddamage", LibapxCommandDamage, LibapxDefineAdddamage);
+	LibapxChatCommandCreate("@removedamage", LibapxCommandDamage, LibapxDefineRemovedamage);
+	LibapxChatCommandCreate("@addrange", LibapxCommandRange, LibapxDefineAddrange);
+	LibapxChatCommandCreate("@removerange", LibapxCommandRange, LibapxDefineRemoverange);
+	LibapxChatCommandCreate("@armor", LibapxCommandArmor, LibapxDefineArmor);
+	LibapxChatCommandCreate("@shieldsarmor", LibapxCommandArmor, LibapxDefineShieldsarmor);
+	LibapxChatCommandCreate("@weaponspeed", LibapxCommandWeaponspeed, LibapxDefineWeaponspeed);
+	LibapxChatCommandCreate("@weaponspeedall", LibapxCommandWeaponspeedall, LibapxDefineWeaponspeedall);
+	LibapxChatCommandCreate("@effect", LibapxCommandEffect, LibapxDefineEffect);
 
 	// unit visual (actor) commands - done in cmd guide
-	libapx_chat_command_create("@setdelay", libapx_command_setdelay, libapx_define_setdelay);
-	libapx_chat_command_create("@decal", libapx_command_decal, libapx_define_decal);
-	libapx_chat_command_create("@setscaler", libapx_command_setscaler, libapx_define_setscaler);
-	libapx_chat_command_create("@actrmsg", libapx_command_actormessage, libapx_define_actormessage);
-	libapx_chat_command_create("@target", libapx_command_actoralias, libapx_define_target);
-	libapx_chat_command_create("@scale", libapx_command_scale, libapx_define_scale);
-	libapx_chat_command_create("@tint", libapx_command_tint, libapx_define_tint);
-	libapx_chat_command_create("@modelswap", libapx_command_modelswap, libapx_define_modelswap);
-	libapx_chat_command_create("@play", libapx_command_play, libapx_define_play);
-	libapx_chat_command_create("@animspeed", libapx_command_animspeed, libapx_define_animspeed);
-	libapx_chat_command_create("@rotate", libapx_command_rotate, libapx_define_rotate);
-	libapx_chat_command_create("@statbars", libapx_command_statbars, libapx_define_statbars);
-	libapx_chat_command_create("@attach", libapx_command_attach, libapx_define_attach);
-	libapx_chat_command_create("@attach-", libapx_command_attach_minus, libapx_define_attach_minus);
-	libapx_chat_command_create("@rotation", libapx_command_attach_rotation, libapx_define_rotation);
+	LibapxChatCommandCreate("@setdelay", LibapxCommandSetdelay, LibapxDefineSetdelay);
+	LibapxChatCommandCreate("@decal", LibapxCommandDecal, LibapxDefineDecal);
+	LibapxChatCommandCreate("@setscaler", LibapxCommandSetscaler, LibapxDefineSetscaler);
+	LibapxChatCommandCreate("@actrmsg", LibapxCommandActormessage, LibapxDefineActormessage);
+	LibapxChatCommandCreate("@target", LibapxCommandActoralias, LibapxDefineTarget);
+	LibapxChatCommandCreate("@scale", LibapxCommandScale, LibapxDefineScale);
+	LibapxChatCommandCreate("@tint", LibapxCommandTint, LibapxDefineTint);
+	LibapxChatCommandCreate("@modelswap", LibapxCommandModelswap, LibapxDefineModelswap);
+	LibapxChatCommandCreate("@play", LibapxCommandPlay, LibapxDefinePlay);
+	LibapxChatCommandCreate("@animspeed", LibapxCommandAnimspeed, LibapxDefineAnimspeed);
+	LibapxChatCommandCreate("@rotate", LibapxCommandRotate, LibapxDefineRotate);
+	LibapxChatCommandCreate("@statbars", LibapxCommandStatbars, LibapxDefineStatbars);
+	LibapxChatCommandCreate("@attach", LibapxCommandAttach, LibapxDefineAttach);
+	LibapxChatCommandCreate("@attach-", LibapxCommandAttachMinus, LibapxDefineAttachMinus);
+	LibapxChatCommandCreate("@rotation", LibapxCommandAttachRotation, LibapxDefineRotation);
 
 	// chat commands
-	libapx_chat_command_create("@narrate", libapx_command_narrate, libapx_define_narrate);
-	libapx_chat_command_create("@say", libapx_command_say, libapx_define_say);
-	libapx_chat_command_create("@setname", libapx_command_setname, libapx_define_setname);
-	libapx_chat_command_create("@setnamecolor", libapx_command_setnamecolor, libapx_define_setnamecolor);
+	LibapxChatCommandCreate("@narrate", LibapxCommandNarrate, LibapxDefineNarrate);
+	LibapxChatCommandCreate("@say", LibapxCommandSay, LibapxDefineSay);
+	LibapxChatCommandCreate("@setname", LibapxCommandSetname, LibapxDefineSetname);
+	LibapxChatCommandCreate("@setnamecolor", LibapxCommandSetnamecolor, LibapxDefineSetnamecolor);
 
 	// region commands - Done in cmd guide
-	libapx_chat_command_create("#create", libapx_command_region_create, libapx_define_region_create);
-	libapx_chat_command_create("#remove", libapx_command_region_remove, libapx_define_region_remove);
-	libapx_chat_command_create("#removeall", libapx_command_region_removeall, libapx_define_region_removeall);
-	libapx_chat_command_create("#list", libapx_command_region_list, libapx_define_region_list);
-	libapx_chat_command_create("#teleport", libapx_command_region_teleport, libapx_define_region_teleport);
-	libapx_chat_command_create("#attach", libapx_command_region_attach, libapx_define_region_attach);
+	LibapxChatCommandCreate("#create", LibapxCommandRegionCreate, LibapxDefineRegionCreate);
+	LibapxChatCommandCreate("#remove", LibapxCommandRegionRemove, LibapxDefineRegionRemove);
+	LibapxChatCommandCreate("#removeall", LibapxCommandRegionRemoveall, LibapxDefineRegionRemoveall);
+	LibapxChatCommandCreate("#list", LibapxCommandRegionList, LibapxDefineRegionList);
+	LibapxChatCommandCreate("#teleport", LibapxCommandRegionTeleport, LibapxDefineRegionTeleport);
+	LibapxChatCommandCreate("#attach", LibapxCommandRegionAttach, LibapxDefineRegionAttach);
 
-	// Super Command, these commands parse in the entire lines from [ to ] and do a string filter on them. _repeat, _chance, etc.
+	// Super Command, these commands parse in the entire lines from [ to ] and do a string filter on them. Repeat, Chance, etc.
 	// Then parse the return afterwards in replacement of cmd to be parsed.
-	libapx_chat_command_create(">repeat", libapx_command_repeat, libapx_define_repeat);
-	libapx_chat_command_create(">chance", libapx_command_chance, libapx_define_chance);
-	libapx_chat_command_create(">random", libapx_command_random, libapx_define_random);
-	libapx_chat_command_create(">keypress", libapx_command_keypress, libapx_define_keypress);
-	libapx_chat_command_create(">moveto", libapx_command_moveto, libapx_define_moveto);
+	LibapxChatCommandCreate(">repeat", LibapxCommandRepeat, LibapxDefineRepeat);
+	LibapxChatCommandCreate(">chance", LibapxCommandChance, LibapxDefineChance);
+	LibapxChatCommandCreate(">random", LibapxCommandRandom, LibapxDefineRandom);
+	LibapxChatCommandCreate(">keypress", LibapxCommandKeypress, LibapxDefineKeypress);
+	LibapxChatCommandCreate(">moveto", LibapxCommandMoveto, LibapxDefineMoveto);
 
 
 	//seroCmds
-	libapx_chat_command_create(">super", libapx_command_super, libapx_define_super);
-
-
+	LibapxChatCommandCreate(">super", LibapxCommandSuper, LibapxDefineSuper);
 }

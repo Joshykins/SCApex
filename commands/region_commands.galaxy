@@ -1,23 +1,23 @@
 //=========================================================
 //		Apex Roleplaying Engine
-//		Copyright (c) 2019, Apex Group
+//		Copyright (c) 2022, Apex Group
 //=========================================================
 // This software is distributed under the MIT License:
 // <http://opensource.org/licenses/MIT>
 //=========================================================
 
-// libapx_command_region_create
+// LibapxCommandRegionCreate
 // ====================
 // creates a region and sets it into the global data table
 // regions are stored in format:
 // "reg [player] [name]"
-void libapx_command_region_create(int user, unitgroup u, string argv, int spawningCount, string bracketText) {
+void LibapxCommandRegionCreate(int user, unitgroup u, string argv, int spawningCount, string bracketText) {
 	region r;
 	fixed radius;
 	string name = StringWord(argv, 2);
 
 	if( name == "" ) {
-		libapx_print_error(user, "Invalid region name");
+		LibapxPrintError(user, "Invalid region name");
 		return;
 	}
 
@@ -26,78 +26,78 @@ void libapx_command_region_create(int user, unitgroup u, string argv, int spawni
 		radius = 2;
 	}
 
-	if( DataTableGetRegion( true, libapx_region_get_name(name, user) ) ) {
-		libapx_print_error(user, "A region with that name already exists!");
+	if( DataTableGetRegion( true, LibapxRegionGetName(name, user) ) ) {
+		LibapxPrintError(user, "A region with that name already exists!");
 		return;
 	}
 
-	r = RegionCircle( libapx_player[user].mouse_position, radius );
+	r = RegionCircle( gv_LibapxPlayer[user].mousePosition, radius );
 
-	DataTableSetRegion( true, libapx_region_get_name(name, user), r );
-	libapx_print_output(user, "Region (circle) \"" + name + "\" has been created.");
+	DataTableSetRegion( true, LibapxRegionGetName(name, user), r );
+	LibapxPrintOutput(user, "Region (circle) \"" + name + "\" has been created.");
 
 	return;
 }
-void libapx_define_region_create(string command_name) {
-	commands_guide_entry_set(
-		g_commands_guide_entry_region, 
-		command_name, 
+void LibapxDefineRegionCreate(string commandName) {
+	commandsGuideEntrySet(
+		gv_CommandsGuideEntryRegion, 
+		commandName, 
 		" This command creates a region with a given radius. <br> #create [name] [radius] <br> Examples: <br> #create bob 3 "
 	);
 }
 
-// libapx_command_region_remove
+// LibapxCommandRegionRemove
 // ==================
 // removes a region and any linking to other regions
-// (for linking, see libapx_command_region_teleport below)
-void libapx_command_region_remove(int user, unitgroup u, string argv, int spawningCount, string bracketText) {
-	string name = libapx_region_get_name(StringWord(argv, 2), user);
+// (for linking, see LibapxCommandRegionTeleport below)
+void LibapxCommandRegionRemove(int user, unitgroup u, string argv, int spawningCount, string bracketText) {
+	string name = LibapxRegionGetName(StringWord(argv, 2), user);
 	region rgn = DataTableGetRegion( true, name );
 
 	if( rgn == null ) {
-		libapx_print_error(user, "Region does not exist");
+		LibapxPrintError(user, "Region does not exist");
 		return;
 	}
 
 	// first remove any linking data (for teleports) related to this region
-	libapx_region_remove_links(name, user);
+	LibapxRegionRemoveLinks(name, user);
 
 	// remove region
 	DataTableValueRemove( true, name );
 
 	// if region attached to unit, remove unit anchor data table entry
-	if( DataTableValueExists(true, libapx_REGION_ANCHOR_DATA_TABLE_IDENTIFIER + " " + name) ) {
-		DataTableValueRemove(true, libapx_REGION_ANCHOR_DATA_TABLE_IDENTIFIER + " " + name);
+	if( DataTableValueExists(true, LibapxREGIONANCHORDATATABLEIDENTIFIER + " " + name) ) {
+		DataTableValueRemove(true, LibapxREGIONANCHORDATATABLEIDENTIFIER + " " + name);
 	}
 
-	libapx_print_output(user, "Region \"" + libapx_region_get_public_name(name) + "\" has been removed");
+	LibapxPrintOutput(user, "Region \"" + LibapxRegionGetPublicName(name) + "\" has been removed");
 
 	return;
 }
-void libapx_define_region_remove(string command_name) {
-	commands_guide_entry_set(
-		g_commands_guide_entry_region, 
-		command_name, 
+void LibapxDefineRegionRemove(string commandName) {
+	commandsGuideEntrySet(
+		gv_CommandsGuideEntryRegion, 
+		commandName, 
 		" This command removes a region that matches the name given. <br> #remove [name]<br> Examples: <br> #remove bob "
 	);
 }
-// libapx_command_region_removeall
+// LibapxCommandRegionRemoveall
 // ======================
 // removes all regions and links
-void libapx_command_region_removeall(int user, unitgroup u, string argv, int spawningCount, string bracketText) {
+void LibapxCommandRegionRemoveall(int user, unitgroup u, string argv, int spawningCount, string bracketText) {
 	int index = 1;
 	int removed = 0;
-	string rgn_identifier = libapx_region_get_name("", user);
+	string rgnIdentifier = LibapxRegionGetName("", user);
 	string name; // full region data table name
 
 	while( index <= DataTableValueCount(true) ) {
-		if( StringContains(DataTableValueName(true, index), rgn_identifier, c_stringBegin, c_stringNoCase) ) {
+		if( StringContains(DataTableValueName(true, index), rgnIdentifier, c_stringBegin, c_stringNoCase) ) {
 			name = DataTableValueName(true, index);
-			libapx_region_remove_links( name, user );
+			LibapxRegionRemoveLinks( name, user );
 			DataTableValueRemove(true, name);
 			// if region attached to unit, remove unit anchor data table entry
-			if( DataTableValueExists(true, libapx_REGION_ANCHOR_DATA_TABLE_IDENTIFIER + " " + name) ) {
-				DataTableValueRemove(true, libapx_REGION_ANCHOR_DATA_TABLE_IDENTIFIER + " " + name);
+			if( DataTableValueExists(true, LibapxREGIONANCHORDATATABLEIDENTIFIER + " " + name) ) {
+				DataTableValueRemove(true, LibapxREGIONANCHORDATATABLEIDENTIFIER + " " + name);
 			}
 
 			removed += 1;
@@ -106,119 +106,119 @@ void libapx_command_region_removeall(int user, unitgroup u, string argv, int spa
 	}
 
 	if(removed > 0) {
-		libapx_print_output(user, "All your regions have been removed");
+		LibapxPrintOutput(user, "All your regions have been removed");
 	}
 	else {
-		libapx_print_output(user, "You have no regions to remove");
+		LibapxPrintOutput(user, "You have no regions to remove");
 	}
 
 	return;
 }
-void libapx_define_region_removeall(string command_name) {
-	commands_guide_entry_set(
-		g_commands_guide_entry_region, 
-		command_name, 
+void LibapxDefineRegionRemoveall(string commandName) {
+	commandsGuideEntrySet(
+		gv_CommandsGuideEntryRegion, 
+		commandName, 
 		" This command removes all regions you have. <br> #removeall<br> Examples: <br> #removeall "
 	);
 }
 
-// libapx_command_region_list
+// LibapxCommandRegionList
 // ======================
 // lists a player's regions from the data table
 // because region creation is not case sensitive,
 // these will always be in lowercase
-void libapx_command_region_list(int user, unitgroup u, string argv, int spawningCount, string bracketText) {
+void LibapxCommandRegionList(int user, unitgroup u, string argv, int spawningCount, string bracketText) {
 	int i = 1;
-	string region_list = "";
+	string regionList = "";
 
 	while( i < DataTableValueCount(true) ) {
-		if( StringWord( DataTableValueName(true, i), 1 ) == libapx_REGION_DATA_TABLE_IDENTIFIER &&
+		if( StringWord( DataTableValueName(true, i), 1 ) == LibapxREGIONDATATABLEIDENTIFIER &&
 			StringToInt( StringWord( DataTableValueName(true, i), 2) ) == user ) {
-			region_list = region_list + ", " + libapx_region_get_public_name(DataTableValueName(true, i));
+			regionList = regionList + ", " + LibapxRegionGetPublicName(DataTableValueName(true, i));
 		}
 		i += 1;
 	}
 
-	if( region_list != "" ) {
-		region_list = StringSub(region_list, 3, StringLength(region_list)); // get rid of leading ", "
-		libapx_print_output(user, "Your regions:\n" + region_list);
+	if( regionList != "" ) {
+		regionList = StringSub(regionList, 3, StringLength(regionList)); // get rid of leading ", "
+		LibapxPrintOutput(user, "Your regions:\n" + regionList);
 	}
 	else {
-		libapx_print_output(user, "You have no regions");
+		LibapxPrintOutput(user, "You have no regions");
 	}
 
 	return;
 }
-void libapx_define_region_list(string command_name) {
-	commands_guide_entry_set(
-		g_commands_guide_entry_region, 
-		command_name, 
+void LibapxDefineRegionList(string commandName) {
+	commandsGuideEntrySet(
+		gv_CommandsGuideEntryRegion, 
+		commandName, 
 		" This command list all regions you have. <br> #list <br> Examples: <br> #list "
 	);
 }
-// libapx_command_region_teleport
+// LibapxCommandRegionTeleport
 // =========================
 // creates a "waygate" between two regions, allowing (any) player
 // to press a dialog button to teleport selected units between
 // regions. (see engine/regions.galaxy to see how regions are linked,
-// events/region_waygates.galaxy to see how waygates function)
+// events/regionWaygates.galaxy to see how waygates function)
 // (heavily modified from Cortex engine)
-void libapx_command_region_teleport(int user, unitgroup u, string argv, int spawningCount, string bracketText) {
-	string rgn_1_name = libapx_region_get_name(StringWord(argv, 2), user);
-	string rgn_2_name = libapx_region_get_name(StringWord(argv, 3), user);
+void LibapxCommandRegionTeleport(int user, unitgroup u, string argv, int spawningCount, string bracketText) {
+	string rgn_1Name = LibapxRegionGetName(StringWord(argv, 2), user);
+	string rgn_2Name = LibapxRegionGetName(StringWord(argv, 3), user);
 	region rgn_1;
 	region rgn_2;
 	trigger t;
 
-	if( !DataTableValueExists(true, rgn_1_name) || !DataTableValueExists(true, rgn_2_name) ) {
-		libapx_print_error(user, "One or more invalid regions were entered.");
+	if( !DataTableValueExists(true, rgn_1Name) || !DataTableValueExists(true, rgn_2Name) ) {
+		LibapxPrintError(user, "One or more invalid regions were entered.");
 		return;
 	}
 
-	rgn_1 = DataTableGetRegion( true, rgn_1_name );
-	rgn_2 = DataTableGetRegion( true, rgn_2_name );
+	rgn_1 = DataTableGetRegion( true, rgn_1Name );
+	rgn_2 = DataTableGetRegion( true, rgn_2Name );
 
 	// remove existing links for the regions
-	libapx_region_remove_links(rgn_1_name, user);
-	libapx_region_remove_links(rgn_2_name, user);
+	LibapxRegionRemoveLinks(rgn_1Name, user);
+	LibapxRegionRemoveLinks(rgn_2Name, user);
 
 	// create link between these two regions
-	libapx_link_regions(rgn_1_name, rgn_2_name);
+	LibapxLinkRegions(rgn_1Name, rgn_2Name);
 
-	t = TriggerCreate("libapx_region_entered");
+	t = TriggerCreate("LibapxRegionEntered");
 	TriggerAddEventUnitRegion( t, null, rgn_1, true );
 	TriggerAddEventUnitRegion( t, null, rgn_1, false );
 	TriggerAddEventUnitRegion( t, null, rgn_2, true );
 	TriggerAddEventUnitRegion( t, null, rgn_2, false );
 
-	libapx_print_output(user, "Teleport created between regions " + libapx_region_get_public_name(rgn_1_name)
-	                    + " and " + libapx_region_get_public_name(rgn_2_name));
+	LibapxPrintOutput(user, "Teleport created between regions " + LibapxRegionGetPublicName(rgn_1Name)
+	                    + " and " + LibapxRegionGetPublicName(rgn_2Name));
 
 	return;
 }
-void libapx_define_region_teleport(string command_name) {
-	commands_guide_entry_set(
-		g_commands_guide_entry_region, 
-		command_name, 
-		" This command connects two regions together. Allowing units to teleport between the regions. <br> #teleport [region1] [region2] <br> Examples <br> #teleport a b <br> @spawn marine ; #create a ; _delay 3 ; #create b ; #teleport a b "
+void LibapxDefineRegionTeleport(string commandName) {
+	commandsGuideEntrySet(
+		gv_CommandsGuideEntryRegion, 
+		commandName, 
+		" This command connects two regions together. Allowing units to teleport between the regions. <br> #teleport [region1] [region2] <br> Examples <br> #teleport a b <br> @spawn marine ; #create a ; Delay 3 ; #create b ; #teleport a b "
 	);
 }
 
-// libapx_command_region_attach
+// LibapxCommandRegionAttach
 // =================
 // attaches a region to a unit
-void libapx_command_region_attach(int user, unitgroup u, string argv, int spawningCount, string bracketText) {
+void LibapxCommandRegionAttach(int user, unitgroup u, string argv, int spawningCount, string bracketText) {
 	string name = StringWord(argv, 2);
 	region rgn = null;
-	unitgroup g = libapx_player_parser[user][spawningCount].context;
+	unitgroup g = gv_gv_LibapxPlayerParser[user][spawningCount].context;
 	point offset;
-	int waygate_dialog; // waygate dialog for region
+	int waygateDialog; // waygate dialog for region
 
-	name = libapx_region_get_name(name, user);
+	name = LibapxRegionGetName(name, user);
 
 	rgn = DataTableGetRegion(true, name);
 	if(rgn == null) {
-		libapx_print_error(user, "No region with that name exists!");
+		LibapxPrintError(user, "No region with that name exists!");
 		return;
 	}
 
@@ -227,46 +227,46 @@ void libapx_command_region_attach(int user, unitgroup u, string argv, int spawni
 
 	if(UnitGroupCount(g, c_unitCountAll) == 0) {	// no units selected -> unattach region
 		RegionAttachToUnit(rgn, null, offset);
-		DataTableValueRemove(true, libapx_REGION_ANCHOR_DATA_TABLE_IDENTIFIER + " " + name);
-		libapx_print_success(user, "Region unattached successfully.");
+		DataTableValueRemove(true, LibapxREGIONANCHORDATATABLEIDENTIFIER + " " + name);
+		LibapxPrintSuccess(user, "Region unattached successfully.");
 	}
 	else if(UnitGroupCount(g, c_unitCountAll) == 1) { // attach region to unit
 		// if a unit has previously had region attached, remove unit custom value
 		// set to track waygate dialogs (if it exists)
-		if( DataTableValueExists(true, libapx_REGION_ANCHOR_DATA_TABLE_IDENTIFIER + " " + name) ) {
-			UnitSetCustomValue(DataTableGetUnit(true, libapx_REGION_ANCHOR_DATA_TABLE_IDENTIFIER + " " + name), libapx_UNIT_INDEX_WAYGATE_DIALOG, 0);
+		if( DataTableValueExists(true, LibapxREGIONANCHORDATATABLEIDENTIFIER + " " + name) ) {
+			UnitSetCustomValue(DataTableGetUnit(true, LibapxREGIONANCHORDATATABLEIDENTIFIER + " " + name), gv_LibapxUnitIndexWaygateDialog, 0);
 		}
 
 
 		// attach region to new unit
 		RegionAttachToUnit(rgn, UnitGroupUnit(g, 1), offset);
-		DataTableSetUnit(true, libapx_REGION_ANCHOR_DATA_TABLE_IDENTIFIER + " " + name, UnitGroupUnit(g, 1));
+		DataTableSetUnit(true, LibapxREGIONANCHORDATATABLEIDENTIFIER + " " + name, UnitGroupUnit(g, 1));
 
 		// if region has assocated waygate dialog, attach it to the unit as well
-		if( DataTableValueExists(true, libapx_WAYGATE_DIALOG_DATA_TABLE_IDENTIFIER + " " + name) ) {
-			waygate_dialog = DataTableGetDialog(true, libapx_WAYGATE_DIALOG_DATA_TABLE_IDENTIFIER + " " + name);
-			DialogSetPositionRelativeToUnit(waygate_dialog, UnitGroupUnit(g, 1), "Ref_Origin", -60, 0);
-			UnitSetCustomValue(UnitGroupUnit(g, 1), libapx_UNIT_INDEX_WAYGATE_DIALOG, IntToFixed(waygate_dialog));
+		if( DataTableValueExists(true, LibapxWAYGATEDIALOGDATATABLEIDENTIFIER + " " + name) ) {
+			waygateDialog = DataTableGetDialog(true, LibapxWAYGATEDIALOGDATATABLEIDENTIFIER + " " + name);
+			DialogSetPositionRelativeToUnit(waygateDialog, UnitGroupUnit(g, 1), "RefOrigin", -60, 0);
+			UnitSetCustomValue(UnitGroupUnit(g, 1), gv_LibapxUnitIndexWaygateDialog, IntToFixed(waygateDialog));
 
 			// if a static anchor for waygate exists, remove it
-			if( DataTableValueExists(true, libapx_WAYGATE_ANCHOR_DATA_TABLE_IDENTIFIER + " " + name) ) {
-				UnitRemove(DataTableGetUnit(true, libapx_WAYGATE_ANCHOR_DATA_TABLE_IDENTIFIER + " " + name));
-				DataTableValueRemove(true, libapx_WAYGATE_ANCHOR_DATA_TABLE_IDENTIFIER + " " + name);
+			if( DataTableValueExists(true, LibapxWAYGATEANCHORDATATABLEIDENTIFIER + " " + name) ) {
+				UnitRemove(DataTableGetUnit(true, LibapxWAYGATEANCHORDATATABLEIDENTIFIER + " " + name));
+				DataTableValueRemove(true, LibapxWAYGATEANCHORDATATABLEIDENTIFIER + " " + name);
 			}
 		}
 
-		libapx_print_success(user, "Region attached successfully.");
+		LibapxPrintSuccess(user, "Region attached successfully.");
 	}
 	else {
-		libapx_print_error(user, "You can't attach the same region to multiple units!");
+		LibapxPrintError(user, "You can't attach the same region to multiple units!");
 	}
 
 	return;
 }
-void libapx_define_region_attach(string command_name) {
-	commands_guide_entry_set(
-		g_commands_guide_entry_region, 
-		command_name, 
+void LibapxDefineRegionAttach(string commandName) {
+	commandsGuideEntrySet(
+		gv_CommandsGuideEntryRegion, 
+		commandName, 
 		" This command attaches a region to a unit. <br> #attach [regionname] <br> Examples <br> #attach a <br> @spawn marine;#create a;#attach a "
 	);
 }

@@ -1,58 +1,7 @@
 //=========================================================
 //		Apex Roleplaying Engine
-//		Copyright (c) 2019, Apex Group
+//		Copyright (c) 2022, Apex Group
 //=========================================================
 // This software is distributed under the MIT License:
 // <http://opensource.org/licenses/MIT>
 //=========================================================
-
-// variables are stored in the following format:
-// var_[type]_[player_index]_[variable name]
-
-const string libapx_VARIABLE_PREFIX = "var";
-
-// supported variable types
-const int libapx_VARIABLE_TYPE_INT = 0;
-const int libapx_VARIABLE_TYPE_FIXED = 1;
-const int libapx_VARIABLE_TYPE_STRING = 2;
-const int libapx_VARIABLE_TYPE_UNITGROUP = 3;
-
-// libapx_variable_key
-// ===========================
-// variables are stored with the following data table key:
-// var [type] [player_index] [variable name]
-// separated by spaces for easy get via StringWord
-string libapx_variable_key(string var_name, string var_type, int player) {
-	return libapx_VARIABLE_PREFIX + " " + var_type + " " + IntToString(player) + " " + var_name;
-}
-
-// libapx_variable_get
-// =====================
-// 
-int libapx_variable_generic_get(string var_name, string var_type, int player) {
-	string var_table_key = libapx_VARIABLE_PREFIX + var_type + "_" + IntToString(player) + "_" + var_name;
-	
-	if(DataTableValueExists(true, var_table_key)) {
-		return DataTableGetInt(true, var_table_key);
-	}
-	
-	return -1;
-}
-
-
-
-void libapx_variable_set(string var_name, string var_type, int player) {
-	
-	//var a = 5;
-	//var unit marine = @spawn marin
-	//var unit marine[5][5]
-	
-}
-
-
-bool libapx_variable_name_is_valid(string var_name) {
-	// need to fully decide variable name format
-	return true;
-}
-
-

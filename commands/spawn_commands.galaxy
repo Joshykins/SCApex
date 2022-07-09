@@ -1,6 +1,6 @@
 //=========================================================
 //		Apex Roleplaying Engine
-//		Copyright (c) 2019, Apex Group
+//		Copyright (c) 2022, Apex Group
 //=========================================================
 // This software is distributed under the MIT License:
 // <http://opensource.org/licenses/MIT>
@@ -10,10 +10,10 @@
 // =======================
 // Deals with redirecting the @spawn command to a proper unit create command
 // all actual unit creation is handled in engine/unit.galaxy
-//libapx_command_spawn
+//LibapxCommandSpawn
 
-void libapx_command_spawn(int user, unitgroup u, string argv, int spawningCount, string bracketText) {
-  point spawn_point = libapx_player[user].mouse_position;
+void LibapxCommandSpawn(int user, unitgroup u, string argv, int spawningCount, string bracketText) {
+  point spawnPoint = gv_LibapxPlayer[user].mousePosition;
 	int count = StringToInt( StringWord(argv, 2) );
 	string type = StringWord(argv, 3);
 	region location = null;
@@ -28,24 +28,24 @@ void libapx_command_spawn(int user, unitgroup u, string argv, int spawningCount,
 
 	// if no parameters specified, check last instance and try to repeat
 	if( StringWord(argv, 2) == "" ) {
-		if( libapx_player[user].spawn_instance_type != "" ) {
-			type = libapx_player[user].spawn_instance_type;
-			count = libapx_player[user].spawn_instance_count;
-			player = libapx_player[user].spawn_instance_player;
-			if( libapx_player[user].spawn_instance_location != null ) {
-				spawn_point = RegionGetCenter( libapx_player[user].spawn_instance_location );
+		if( gv_LibapxPlayer[user].spawnInstanceType != "" ) {
+			type = gv_LibapxPlayer[user].spawnInstanceType;
+			count = gv_LibapxPlayer[user].spawnInstanceCount;
+			player = gv_LibapxPlayer[user].spawnInstancePlayer;
+			if( gv_LibapxPlayer[user].spawnInstanceLocation != null ) {
+				spawnPoint = RegionGetCenter( gv_LibapxPlayer[user].spawnInstanceLocation );
 			}
 
-			libapx_player_parser[user][spawningCount].context = UnitGroupEmpty();
+			gv_gv_LibapxPlayerParser[user][spawningCount].context = UnitGroupEmpty();
 			while (count > 0) {
-				libapx_unit_create(type, player, spawn_point, 270.0, spawningCount);
+				LibapxUnitCreate(type, player, spawnPoint, 270.0, spawningCount);
 				count -= 1;
 			}
 
 			return;
 		}
 		else {
-			libapx_print_error(user, "Invalid unit type, or no previous spawn instance");
+			LibapxPrintError(user, "Invalid unit type, or no previous spawn instance");
 			return;
 		}
 	}
@@ -59,15 +59,15 @@ void libapx_command_spawn(int user, unitgroup u, string argv, int spawningCount,
 
 	// get unit type
 	if( type == "" ) {
-		libapx_print_error(user, "INVALID UNIT TYPE");
+		LibapxPrintError(user, "INVALID UNIT TYPE");
 		return;
 	}
 
 	else {
 		type = UnitTypeFromString(type);
-		//type = librtpr_catalog_get( c_gameCatalogUnit, type );
+		//type = librtprCatalogGet( c_gameCatalogUnit, type );
 		if (type == "" || !CatalogEntryIsValid(c_gameCatalogUnit, type) || UnitTypeTestFlag(type, c_unitFlagMissile) ) {
-			libapx_print_error(user, "INVALID UNIT TYPE");
+			LibapxPrintError(user, "INVALID UNIT TYPE");
 			return;
 		}
 	}
@@ -85,77 +85,77 @@ void libapx_command_spawn(int user, unitgroup u, string argv, int spawningCount,
 	if( StringWord(argv, 4) != "" ) {
 		if( StringContains( StringWord(argv, 4), "#", c_stringBegin, c_stringNoCase) ) {
 			parameter = StringWord(argv, 4);
-			parameter = libapx_region_get_name( StringSub(parameter, 2, StringLength(parameter)), user );
+			parameter = LibapxRegionGetName( StringSub(parameter, 2, StringLength(parameter)), user );
 			if( DataTableValueExists(true, parameter) ) {
 				location = DataTableGetRegion(true, parameter);
-				spawn_point = RegionGetCenter(location);
+				spawnPoint = RegionGetCenter(location);
 			}
 			else {
-				libapx_print_error(user, "No region by name \"" + parameter + "\" exists, defaulting to cursor");
+				LibapxPrintError(user, "No region by name \"" + parameter + "\" exists, defaulting to cursor");
 			}
 		}
 		else if( StringContains( StringWord(argv, 4), "@", c_stringBegin, c_stringNoCase) ) {
 			parameter = StringWord(argv, 4);
-			player = libapx_color_to_player( StringSub(parameter, 2, StringLength(parameter)), user );
+			player = LibapxColorToPlayer( StringSub(parameter, 2, StringLength(parameter)), user );
 			if( player == -1 ) {
 				player = user;
-				libapx_print_error(user, "Invalid player color, defaulting to self");
+				LibapxPrintError(user, "Invalid player color, defaulting to self");
 			}
 		}
 	}
 	if( StringWord(argv, 5) != "" ) {
 		if( StringContains( StringWord(argv, 5), "#", c_stringBegin, c_stringNoCase) ) {
 			parameter = StringWord(argv, 5);
-			parameter = libapx_region_get_name( StringSub(parameter, 2, StringLength(parameter)), user );
+			parameter = LibapxRegionGetName( StringSub(parameter, 2, StringLength(parameter)), user );
 			if( DataTableValueExists(true, parameter) ) {
 				location = DataTableGetRegion(true, parameter);
-				spawn_point = RegionGetCenter(location);
+				spawnPoint = RegionGetCenter(location);
 			}
 			else {
-				libapx_print_error(user, "No region by name \"" + parameter + "\" exists, defaulting to cursor");
+				LibapxPrintError(user, "No region by name \"" + parameter + "\" exists, defaulting to cursor");
 			}
 		}
 		else if( StringContains( StringWord(argv, 5), "@", c_stringBegin, c_stringNoCase) ) {
 			parameter = StringWord(argv, 5);
-			player = libapx_color_to_player( StringSub(parameter, 2, StringLength(parameter)), user );
+			player = LibapxColorToPlayer( StringSub(parameter, 2, StringLength(parameter)), user );
 			if( player == -1 ) {
 				player = user;
-				libapx_print_error(user, "Invalid player color, defaulting to self");
+				LibapxPrintError(user, "Invalid player color, defaulting to self");
 			}
 		}
 	}
 
 	// ensure spawn instance count is less than max count in settings
 	// TEMPORARY: until better spawn throttling is implemented
-	if( count > libapx_settings.max_spawn_count ) {
-		count = libapx_settings.max_spawn_count;
+	if( count > gv_LibapxSettings.maxSpawnCount ) {
+		count = gv_LibapxSettings.maxSpawnCount;
 	}
 
 	// set player spawn instance (before spawning so count is preserved)
-	libapx_player[user].spawn_instance_type = type;
-	libapx_player[user].spawn_instance_count = count;
-	libapx_player[user].spawn_instance_player = player;
-	libapx_player[user].spawn_instance_location = location;
+	gv_LibapxPlayer[user].spawnInstanceType = type;
+	gv_LibapxPlayer[user].spawnInstanceCount = count;
+	gv_LibapxPlayer[user].spawnInstancePlayer = player;
+	gv_LibapxPlayer[user].spawnInstanceLocation = location;
 
 	// make spawned units
-	libapx_player_parser[user][spawningCount].context = UnitGroupEmpty();
+	gv_gv_LibapxPlayerParser[user][spawningCount].context = UnitGroupEmpty();
 	while (count > 0) {
-		UnitGroupAddUnitGroup(libapx_player_parser[user][spawningCount].context, libapx_unit_create(type, player, spawn_point, 270.0, spawningCount));
+		UnitGroupAddUnitGroup(gv_gv_LibapxPlayerParser[user][spawningCount].context, LibapxUnitCreate(type, player, spawnPoint, 270.0, spawningCount));
 		count -= 1;
 	}
 
 	return;
 }
-void libapx_define_region_spawn(string command_name) {
-	commands_guide_entry_set(
-		g_commands_guide_entry_unit, 
-		command_name, 
+void LibapxDefineRegionSpawn(string commandName) {
+	commandsGuideEntrySet(
+		gv_CommandsGuideEntryUnit, 
+		commandName, 
 		" This command spawns a unit or units. <br> @spawn [unitname] [amount] <br> Examples: <br> @spawn marauder 3  "
 	);
 }
-//libapx_command_spawn_plus
-void libapx_command_spawn_plus(int user, unitgroup u, string argv, int spawningCount, string bracketText) {
-	point spawn_point = libapx_player[user].mouse_position;
+//LibapxCommandSpawnPlus
+void LibapxCommandSpawnPlus(int user, unitgroup u, string argv, int spawningCount, string bracketText) {
+	point spawnPoint = gv_LibapxPlayer[user].mousePosition;
 	int count = StringToInt( StringWord(argv, 2) );
 	string type = StringWord(argv, 3);
 	region location = null;
@@ -168,24 +168,24 @@ void libapx_command_spawn_plus(int user, unitgroup u, string argv, int spawningC
 
 	// if no parameters specified, check last instance and try to repeat
 	if( StringWord(argv, 2) == "" ) {
-		if( libapx_player[user].spawn_instance_type != "" ) {
-			type = libapx_player[user].spawn_instance_type;
-			count = libapx_player[user].spawn_instance_count;
-			player = libapx_player[user].spawn_instance_player;
-			if( libapx_player[user].spawn_instance_location != null ) {
-				spawn_point = RegionGetCenter( libapx_player[user].spawn_instance_location );
+		if( gv_LibapxPlayer[user].spawnInstanceType != "" ) {
+			type = gv_LibapxPlayer[user].spawnInstanceType;
+			count = gv_LibapxPlayer[user].spawnInstanceCount;
+			player = gv_LibapxPlayer[user].spawnInstancePlayer;
+			if( gv_LibapxPlayer[user].spawnInstanceLocation != null ) {
+				spawnPoint = RegionGetCenter( gv_LibapxPlayer[user].spawnInstanceLocation );
 			}
 
-			libapx_player_parser[user][spawningCount].context = UnitGroupEmpty();
+			gv_gv_LibapxPlayerParser[user][spawningCount].context = UnitGroupEmpty();
 			while (count > 0) {
-				libapx_unit_create(type, player, spawn_point, 270.0, spawningCount);
+				LibapxUnitCreate(type, player, spawnPoint, 270.0, spawningCount);
 				count -= 1;
 			}
 
 			return;
 		}
 		else {
-			libapx_print_error(user, "Invalid unit type, or no previous spawn instance");
+			LibapxPrintError(user, "Invalid unit type, or no previous spawn instance");
 			return;
 		}
 	}
@@ -199,15 +199,15 @@ void libapx_command_spawn_plus(int user, unitgroup u, string argv, int spawningC
 
 	// get unit type
 	if( type == "" ) {
-		libapx_print_error(user, "INVALID UNIT TYPE");
+		LibapxPrintError(user, "INVALID UNIT TYPE");
 		return;
 	}
 
 	else {
 		type = UnitTypeFromString(type);
-		//type = librtpr_catalog_get( c_gameCatalogUnit, type );
+		//type = librtprCatalogGet( c_gameCatalogUnit, type );
 		if (type == "" || !CatalogEntryIsValid(c_gameCatalogUnit, type) || UnitTypeTestFlag(type, c_unitFlagMissile) ) {
-			libapx_print_error(user, "INVALID UNIT TYPE");
+			LibapxPrintError(user, "INVALID UNIT TYPE");
 			return;
 		}
 	}
@@ -215,14 +215,14 @@ void libapx_command_spawn_plus(int user, unitgroup u, string argv, int spawningC
 	// if count is <= 0, then turn on mouse-click spawning
 	if( count <= 0 ) {
     if(StringFind(type, "colossus", c_stringNoCase) != -1 ) {
-  		libapx_print_output(user, "Spawn+ can't be used with colossus");
+  		LibapxPrintOutput(user, "Spawn+ can't be used with colossus");
       return;
   	} else {
-      libapx_print_output(user, "SPAWNING: " + type + "\n(Press [Left Mouse] to place, [ESC] key to cancel.\n" +
+      LibapxPrintOutput(user, "SPAWNING: " + type + "\n(Press [Left Mouse] to place, [ESC] key to cancel.\n" +
   							"Hold: [Ctrl] to rotate, [Shift] to scale, [Alt] to change height,\n" +
   							"Hold: [Right Mouse] to lock position)");
-  		libapx_spawn_create_splat(type, user,  spawningCount);
-  		libapx_player[user].is_placing_unit = true;
+  		LibapxSpawnCreateSplat(type, user,  spawningCount);
+  		gv_LibapxPlayer[user].isPlacingUnit = true;
   		UISetSelectionTypeEnabled(PlayerGroupSingle(user), c_localSelectionTypeUnknown, false);
   		UnitClearSelection(user);	// deselect player selected units
   		return;
@@ -238,71 +238,71 @@ void libapx_command_spawn_plus(int user, unitgroup u, string argv, int spawningC
 	if( StringWord(argv, 4) != "" ) {
 		if( StringContains( StringWord(argv, 4), "#", c_stringBegin, c_stringNoCase) ) {
 			parameter = StringWord(argv, 4);
-			parameter = libapx_region_get_name( StringSub(parameter, 2, StringLength(parameter)), user );
+			parameter = LibapxRegionGetName( StringSub(parameter, 2, StringLength(parameter)), user );
 			if( DataTableValueExists(true, parameter) ) {
 				location = DataTableGetRegion(true, parameter);
-				spawn_point = RegionGetCenter(location);
+				spawnPoint = RegionGetCenter(location);
 			}
 			else {
-				libapx_print_error(user, "No region by name \"" + parameter + "\" exists, defaulting to cursor");
+				LibapxPrintError(user, "No region by name \"" + parameter + "\" exists, defaulting to cursor");
 			}
 		}
 		else if( StringContains( StringWord(argv, 4), "@", c_stringBegin, c_stringNoCase) ) {
 			parameter = StringWord(argv, 4);
-			player = libapx_color_to_player( StringSub(parameter, 2, StringLength(parameter)), user );
+			player = LibapxColorToPlayer( StringSub(parameter, 2, StringLength(parameter)), user );
 			if( player == -1 ) {
 				player = user;
-				libapx_print_error(user, "Invalid player color, defaulting to self");
+				LibapxPrintError(user, "Invalid player color, defaulting to self");
 			}
 		}
 	}
 	if( StringWord(argv, 5) != "" ) {
 		if( StringContains( StringWord(argv, 5), "#", c_stringBegin, c_stringNoCase) ) {
 			parameter = StringWord(argv, 5);
-			parameter = libapx_region_get_name( StringSub(parameter, 2, StringLength(parameter)), user );
+			parameter = LibapxRegionGetName( StringSub(parameter, 2, StringLength(parameter)), user );
 			if( DataTableValueExists(true, parameter) ) {
 				location = DataTableGetRegion(true, parameter);
-				spawn_point = RegionGetCenter(location);
+				spawnPoint = RegionGetCenter(location);
 			}
 			else {
-				libapx_print_error(user, "No region by name \"" + parameter + "\" exists, defaulting to cursor");
+				LibapxPrintError(user, "No region by name \"" + parameter + "\" exists, defaulting to cursor");
 			}
 		}
 		else if( StringContains( StringWord(argv, 5), "@", c_stringBegin, c_stringNoCase) ) {
 			parameter = StringWord(argv, 5);
-			player = libapx_color_to_player( StringSub(parameter, 2, StringLength(parameter)), user );
+			player = LibapxColorToPlayer( StringSub(parameter, 2, StringLength(parameter)), user );
 			if( player == -1 ) {
 				player = user;
-				libapx_print_error(user, "Invalid player color, defaulting to self");
+				LibapxPrintError(user, "Invalid player color, defaulting to self");
 			}
 		}
 	}
 
 	// ensure spawn instance count is less than max count in settings
 	// TEMPORARY: until better spawn throttling is implemented
-	if( count > libapx_settings.max_spawn_count ) {
-		count = libapx_settings.max_spawn_count;
+	if( count > gv_LibapxSettings.maxSpawnCount ) {
+		count = gv_LibapxSettings.maxSpawnCount;
 	}
 
 	// set player spawn instance (before spawning so count is preserved)
-	libapx_player[user].spawn_instance_type = type;
-	libapx_player[user].spawn_instance_count = count;
-	libapx_player[user].spawn_instance_player = player;
-	libapx_player[user].spawn_instance_location = location;
+	gv_LibapxPlayer[user].spawnInstanceType = type;
+	gv_LibapxPlayer[user].spawnInstanceCount = count;
+	gv_LibapxPlayer[user].spawnInstancePlayer = player;
+	gv_LibapxPlayer[user].spawnInstanceLocation = location;
 
 	// make spawned units
-	libapx_player_parser[user][spawningCount].context = UnitGroupEmpty();
+	gv_gv_LibapxPlayerParser[user][spawningCount].context = UnitGroupEmpty();
 	while (count > 0) {
-		UnitGroupAddUnitGroup(libapx_player_parser[user][spawningCount].context, libapx_unit_create(type, player, spawn_point, 270.0, spawningCount));
+		UnitGroupAddUnitGroup(gv_gv_LibapxPlayerParser[user][spawningCount].context, LibapxUnitCreate(type, player, spawnPoint, 270.0, spawningCount));
 		count -= 1;
 	}
 
 	return;
 }
-void libapx_define_region_spawn_plus(string command_name) {
-	commands_guide_entry_set(
-		g_commands_guide_entry_unit, 
-		command_name, 
+void LibapxDefineRegionSpawnPlus(string commandName) {
+	commandsGuideEntrySet(
+		gv_CommandsGuideEntryUnit, 
+		commandName, 
 		" This command spawns a unit or units on click. <br> @spawn+ [unitname] [amount] <br> Examples: <br> @spawn+ marauder <br> @spawn+ marine;@scale 3 "
 	);
 }

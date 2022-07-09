@@ -1,37 +1,37 @@
 //=========================================================
 //		Apex Roleplaying Engine
-//		Copyright (c) 2019, Apex Group
+//		Copyright (c) 2022, Apex Group
 //=========================================================
 // This software is distributed under the MIT License:
 // <http://opensource.org/licenses/MIT>
 //=========================================================
 
 //Gamesetups loading
-int g_gamesetups_loading = 0;
+int gGamesetupsLoading = 0;
 
 //Camera
-trigger g_camera_updater;
-trigger g_camera_mouse_wheel;
+trigger gv_CameraUpdater;
+trigger gv_CameraMouseWheel;
 
 //Commands guide
 //======
 //Commands guide entries
-int g_commands_guide_entry_admin = 0; //!admin
-int g_commands_guide_entry_general = 1;  //generalshit
-int g_commands_guide_entry_unit = 2; //@spawn
-int g_commands_guide_entry_actor = 3; //@attach
-int g_commands_guide_entry_region = 4; //#create
-int g_commands_guide_entry_stats = 5; //@maxlife
+int gv_CommandsGuideEntryAdmin = 0; //!admin
+int gv_CommandsGuideEntryGeneral = 1;  //generalshit
+int gv_CommandsGuideEntryUnit = 2; //@spawn
+int gv_CommandsGuideEntryActor = 3; //@attach
+int gv_CommandsGuideEntryRegion = 4; //#create
+int gv_CommandsGuideEntryStats = 5; //@maxlife
 
 //Wireframe
 //Definition of each layer
-struct wireframe_layer_sig {
+struct wireframeLayerSig {
     string path;
     int r;
     int g;
 	int b;
 	bool saturation;
-	int render_priority;
+	int renderPriority;
 	int OffsetX;
 	int OffsetY;
 	int width;
@@ -39,109 +39,109 @@ struct wireframe_layer_sig {
 	int rotation;
 	int alpha;
 };
-wireframe_layer_sig default_wireframe;
-string g_default_wireframe = "default_wireframe_x1235asdAZSw";
+wireframeLayerSig gv_DefaultWireframe;
+string gv_DefaultWireframeString = "defaultWireframeX1235asdAZSw";
 
 
 
 
 //gets a units set name
-string libapx_unitname_get_entry(unit u);
+string LibapxUnitnameGetEntry(unit u);
 
 //Respawns/spawns the camera unit
-void libapx_respawn_camera_unit(int p);
+int LibapxRespawnCameraUnit(int p);
 
 //Dialog for name
-int g_libapx_ui_name = DialogControlHookupStandard(c_triggerControlTypeLabel, "UIContainer/ConsoleUIContainer/InfoPanel/InfoPaneUnit/ApexNameLabel");
-int g_libapx_ui_subtitle = DialogControlHookupStandard(c_triggerControlTypeLabel, "UIContainer/ConsoleUIContainer/InfoPanel/InfoPaneUnit/ApexSubtitle");	
-int g_libapx_ui_heroname =  DialogControlHookupStandard(c_triggerControlTypeLabel, "UIContainer/ConsoleUIContainer/InfoPanel/InfoPaneHero/ApexNameLabel");
-int g_libapx_ui_transportname =  DialogControlHookupStandard(c_triggerControlTypeLabel, "UIContainer/ConsoleUIContainer/InfoPanel/InfoPaneCargo/ApexNameLabel");
+int gv_LibapxUiName = DialogControlHookupStandard(c_triggerControlTypeLabel, "UIContainer/ConsoleUIContainer/InfoPanel/InfoPaneUnit/ApexNameLabel");
+int gv_LibapxUiSubtitle = DialogControlHookupStandard(c_triggerControlTypeLabel, "UIContainer/ConsoleUIContainer/InfoPanel/InfoPaneUnit/ApexSubtitle");	
+int gv_LibapxUiHeroname =  DialogControlHookupStandard(c_triggerControlTypeLabel, "UIContainer/ConsoleUIContainer/InfoPanel/InfoPaneHero/ApexNameLabel");
+int gv_LibapxUiTransportname =  DialogControlHookupStandard(c_triggerControlTypeLabel, "UIContainer/ConsoleUIContainer/InfoPanel/InfoPaneCargo/ApexNameLabel");
 
 
 
 //Image frame(tmp)
-int g_libapx_ui_wireframeIMG = DialogControlHookupStandard(c_triggerControlTypeImage, "UIContainer/ConsoleUIContainer/ApexUnitImageAndStatsPanel/ApexWireframe");
+int gv_LibapxUiWireframeIMG = DialogControlHookupStandard(c_triggerControlTypeImage, "UIContainer/ConsoleUIContainer/ApexUnitImageAndStatsPanel/ApexWireframe");
 
 //Dialogs for stats
-int[3] g_libapx_ui_stats_label;
-int[3] g_libapx_ui_stats_bar;
-int[3] g_libapx_ui_stats_barbg;
-int g_libapx_ui_statsparrent = DialogControlHookupStandard(c_triggerControlTypePanel, "UIContainer/ConsoleUIContainer/ApexUnitImageAndStatsPanel");
-int g_libapx_ui_wireframe_btn = DialogControlHookupStandard(c_triggerControlTypeButton, "UIContainer/ConsoleUIContainer/ApexUnitImageAndStatsPanel/ApexWireframe/ApexWireFrameBtn");
-int g_libapx_ui_wireframe = DialogControlHookupStandard(c_triggerControlTypePanel, "UIContainer/ConsoleUIContainer/ApexUnitImageAndStatsPanel/ApexWireframe");
-int g_libapx_ui_fakewireframe = DialogControlHookupStandard(c_triggerControlTypePanel, "UIContainer/ConsoleUIContainer/FakeApexUnitImageAndStatsPanel");
+int[3] gv_LibapxUiStatsLabel;
+int[3] gv_LibapxUiStatsBar;
+int[3] gv_LibapxUiStatsBarbg;
+int gv_LibapxUiStatsparrent = DialogControlHookupStandard(c_triggerControlTypePanel, "UIContainer/ConsoleUIContainer/ApexUnitImageAndStatsPanel");
+int gv_LibapxUiWireframeBtn = DialogControlHookupStandard(c_triggerControlTypeButton, "UIContainer/ConsoleUIContainer/ApexUnitImageAndStatsPanel/ApexWireframe/ApexWireFrameBtn");
+int gv_LibapxUiWireframe = DialogControlHookupStandard(c_triggerControlTypePanel, "UIContainer/ConsoleUIContainer/ApexUnitImageAndStatsPanel/ApexWireframe");
+int gv_LibapxUiFakewireframe = DialogControlHookupStandard(c_triggerControlTypePanel, "UIContainer/ConsoleUIContainer/FakeApexUnitImageAndStatsPanel");
 
 //Description listbox
-int g_libapx_ui_description_parrent = DialogControlHookupStandard(c_triggerControlTypePanel, "UIContainer/ConsoleUIContainer/ApexDescriptionFrame");
-int g_libapx_ui_description = DialogControlHookupStandard(c_triggerControlTypeListBox, "UIContainer/ConsoleUIContainer/ApexDescriptionFrame/ApexDescription");
+int gv_LibapxUiDescriptionParrent = DialogControlHookupStandard(c_triggerControlTypePanel, "UIContainer/ConsoleUIContainer/ApexDescriptionFrame");
+int gv_LibapxUiDescription = DialogControlHookupStandard(c_triggerControlTypeListBox, "UIContainer/ConsoleUIContainer/ApexDescriptionFrame/ApexDescription");
 
 //Additional Beautiful Lines
-int g_libapx_ui_line1 = DialogControlHookupStandard(c_triggerControlTypePanel, "UIContainer/ConsoleUIContainer/BeautifyingFrame/LeftBar1");
-int g_libapx_ui_line2 = DialogControlHookupStandard(c_triggerControlTypePanel, "UIContainer/ConsoleUIContainer/BeautifyingFrame/LeftBar2");
-int g_libapx_ui_line3 = DialogControlHookupStandard(c_triggerControlTypePanel, "UIContainer/ConsoleUIContainer/BeautifyingFrame/LeftBar3");
-int g_libapx_ui_line4 = DialogControlHookupStandard(c_triggerControlTypePanel, "UIContainer/ConsoleUIContainer/BeautifyingFrame/LeftBar4");
+int gv_LibapxUiLine1 = DialogControlHookupStandard(c_triggerControlTypePanel, "UIContainer/ConsoleUIContainer/BeautifyingFrame/LeftBar1");
+int gv_LibapxUiLine2 = DialogControlHookupStandard(c_triggerControlTypePanel, "UIContainer/ConsoleUIContainer/BeautifyingFrame/LeftBar2");
+int gv_LibapxUiLine3 = DialogControlHookupStandard(c_triggerControlTypePanel, "UIContainer/ConsoleUIContainer/BeautifyingFrame/LeftBar3");
+int gv_LibapxUiLine4 = DialogControlHookupStandard(c_triggerControlTypePanel, "UIContainer/ConsoleUIContainer/BeautifyingFrame/LeftBar4");
 
 //New Ui
-int gv_libapx_uilib_fullscreen = DialogControlHookupStandard(c_triggerControlTypePanel, "UIContainer/ConsoleUIContainer/ApexUiLibParent");
+int gv_LibapxUilibFullscreen = DialogControlHookupStandard(c_triggerControlTypePanel, "UIContainer/ConsoleUIContainer/ApexUiLibParent");
 
 
-void libapx_globals_init() {
-    default_wireframe.path = "Apex/Assets/Textures/Info.png";
-    default_wireframe.r = 255;
-    default_wireframe.g = 255;
-    default_wireframe.b = 255;
-    default_wireframe.saturation = true;
-    default_wireframe.render_priority = 2;
-    default_wireframe.OffsetX = 20;
-    default_wireframe.OffsetY = 20;
-    default_wireframe.width = 160;
-    default_wireframe.height = 160;
-    default_wireframe.rotation = 0;
-    default_wireframe.alpha = 255;
+void LibapxGlobalsInit() {
+    gv_DefaultWireframe.path = "Apex/Assets/Textures/Info.png";
+    gv_DefaultWireframe.r = 255;
+    gv_DefaultWireframe.g = 255;
+    gv_DefaultWireframe.b = 255;
+    gv_DefaultWireframe.saturation = true;
+    gv_DefaultWireframe.renderPriority = 2;
+    gv_DefaultWireframe.OffsetX = 20;
+    gv_DefaultWireframe.OffsetY = 20;
+    gv_DefaultWireframe.width = 160;
+    gv_DefaultWireframe.height = 160;
+    gv_DefaultWireframe.rotation = 0;
+    gv_DefaultWireframe.alpha = 255;
     
-    default_wireframe.rotation = 0;
-    g_libapx_ui_stats_label[0] = DialogControlHookupStandard(c_triggerControlTypeLabel, "UIContainer/ConsoleUIContainer/ApexUnitImageAndStatsPanel/ApexStats/ShieldLabel");
-    g_libapx_ui_stats_bar[0] = DialogControlHookupStandard(c_triggerControlTypeProgressBar, "UIContainer/ConsoleUIContainer/ApexUnitImageAndStatsPanel/ApexStats/ApexShieldBar");
-    g_libapx_ui_stats_barbg[0] = DialogControlHookupStandard(c_triggerControlTypeProgressBar, "UIContainer/ConsoleUIContainer/ApexUnitImageAndStatsPanel/ApexStats/ApexShieldBarBackground");
-    g_libapx_ui_stats_label[1] = DialogControlHookupStandard(c_triggerControlTypeLabel, "UIContainer/ConsoleUIContainer/ApexUnitImageAndStatsPanel/ApexStats/LifeLabel");
-    g_libapx_ui_stats_bar[1] = DialogControlHookupStandard(c_triggerControlTypeProgressBar, "UIContainer/ConsoleUIContainer/ApexUnitImageAndStatsPanel/ApexStats/ApexLifeBar");
-    g_libapx_ui_stats_barbg[1] = DialogControlHookupStandard(c_triggerControlTypeProgressBar, "UIContainer/ConsoleUIContainer/ApexUnitImageAndStatsPanel/ApexStats/ApexLifeBarBackground");
-    g_libapx_ui_stats_label[2] = DialogControlHookupStandard(c_triggerControlTypeLabel, "UIContainer/ConsoleUIContainer/ApexUnitImageAndStatsPanel/ApexStats/EnergyLabel");
-    g_libapx_ui_stats_bar[2] = DialogControlHookupStandard(c_triggerControlTypeProgressBar, "UIContainer/ConsoleUIContainer/ApexUnitImageAndStatsPanel/ApexStats/ApexEnergyBar");
-    g_libapx_ui_stats_barbg[2] = DialogControlHookupStandard(c_triggerControlTypeProgressBar, "UIContainer/ConsoleUIContainer/ApexUnitImageAndStatsPanel/ApexStats/ApexEnergyBarBackground");
+    gv_DefaultWireframe.rotation = 0;
+    gv_LibapxUiStatsLabel[0] = DialogControlHookupStandard(c_triggerControlTypeLabel, "UIContainer/ConsoleUIContainer/ApexUnitImageAndStatsPanel/ApexStats/ShieldLabel");
+    gv_LibapxUiStatsBar[0] = DialogControlHookupStandard(c_triggerControlTypeProgressBar, "UIContainer/ConsoleUIContainer/ApexUnitImageAndStatsPanel/ApexStats/ApexShieldBar");
+    gv_LibapxUiStatsBarbg[0] = DialogControlHookupStandard(c_triggerControlTypeProgressBar, "UIContainer/ConsoleUIContainer/ApexUnitImageAndStatsPanel/ApexStats/ApexShieldBarBackground");
+    gv_LibapxUiStatsLabel[1] = DialogControlHookupStandard(c_triggerControlTypeLabel, "UIContainer/ConsoleUIContainer/ApexUnitImageAndStatsPanel/ApexStats/LifeLabel");
+    gv_LibapxUiStatsBar[1] = DialogControlHookupStandard(c_triggerControlTypeProgressBar, "UIContainer/ConsoleUIContainer/ApexUnitImageAndStatsPanel/ApexStats/ApexLifeBar");
+    gv_LibapxUiStatsBarbg[1] = DialogControlHookupStandard(c_triggerControlTypeProgressBar, "UIContainer/ConsoleUIContainer/ApexUnitImageAndStatsPanel/ApexStats/ApexLifeBarBackground");
+    gv_LibapxUiStatsLabel[2] = DialogControlHookupStandard(c_triggerControlTypeLabel, "UIContainer/ConsoleUIContainer/ApexUnitImageAndStatsPanel/ApexStats/EnergyLabel");
+    gv_LibapxUiStatsBar[2] = DialogControlHookupStandard(c_triggerControlTypeProgressBar, "UIContainer/ConsoleUIContainer/ApexUnitImageAndStatsPanel/ApexStats/ApexEnergyBar");
+    gv_LibapxUiStatsBarbg[2] = DialogControlHookupStandard(c_triggerControlTypeProgressBar, "UIContainer/ConsoleUIContainer/ApexUnitImageAndStatsPanel/ApexStats/ApexEnergyBarBackground");
     
 
 }
 
-string commands_guide_get_entry(int entryType) {
-    if(entryType == g_commands_guide_entry_admin) {
+string LibapxCommandsGuideEntrySet(int entryType) {
+    if(entryType == gv_CommandsGuideEntryAdmin) {
         return "Admin";
     } 
-    if(entryType == g_commands_guide_entry_general) {
+    if(entryType == gv_CommandsGuideEntryGeneral) {
         return "General";
     } 
-    if(entryType == g_commands_guide_entry_unit) {
+    if(entryType == gv_CommandsGuideEntryUnit) {
         return "Unit";
     } 
-    if(entryType == g_commands_guide_entry_actor) {
+    if(entryType == gv_CommandsGuideEntryActor) {
         return "Actor";
     } 
-    if(entryType == g_commands_guide_entry_region) {
+    if(entryType == gv_CommandsGuideEntryRegion) {
         return "Region";
     } 
-    if(entryType == g_commands_guide_entry_stats) {
+    if(entryType == gv_CommandsGuideEntryStats) {
         return "Stats";
     } 
     return "";
 }
 
-struct commands_guide_entry {
+struct commandsGuideEntry {
     int type;               //Type of command
     string name;            //Name of the command
     string description;     //Description of command
     int uiPosition;
 };
-struct command_guide_type_count {
+struct commandGuideTypeCount {
     int Admin;
     int General;
     int Unit;
@@ -150,7 +150,7 @@ struct command_guide_type_count {
     int Stats;
 };
 
-void command_guide_format_description(int dialog, playergroup pg, string description) {
+void commandGuideFormatDescription(int dialog, playergroup pg, string description) {
     int maxDialogCharacters = 60;
     string currentVal;
     string preText;
@@ -167,7 +167,7 @@ void command_guide_format_description(int dialog, playergroup pg, string descrip
             currentVal+= StringWord(description, i)+" "; 
         }
         else if (StringLength(currentVal + StringWord(description, i)) > maxDialogCharacters) {
-            //currentVal = libapx_string_trim(currentVal);
+            //currentVal = LibapxStringTrim(currentVal);
             DialogControlAddItem(dialog, pg,StringToText(currentVal));
             currentVal = "";
             continue;
@@ -191,61 +191,61 @@ void command_guide_format_description(int dialog, playergroup pg, string descrip
 
 }
 
-command_guide_type_count g_command_guide_type_count;
+commandGuideTypeCount gCommandGuideTypeCount;
 
-commands_guide_entry[500] g_commands_guide_entries;
+commandsGuideEntry[500] gCommandsGuideEntries;
 
-int commands_guide_entry_count = 0;
+int commandsGuideEntryCount = 0;
 
 
-void commands_guide_entry_set(int type, string name, string description) {
-    if (type == g_commands_guide_entry_admin) {
-        g_command_guide_type_count.Admin += 1;
+void commandsGuideEntrySet(int type, string name, string description) {
+    if (type == gv_CommandsGuideEntryAdmin) {
+        gCommandGuideTypeCount.Admin += 1;
     }
-    if (type == g_commands_guide_entry_general) {
-        g_command_guide_type_count.General += 1;
+    if (type == gv_CommandsGuideEntryGeneral) {
+        gCommandGuideTypeCount.General += 1;
     }
-    if (type == g_commands_guide_entry_unit) {
-        g_command_guide_type_count.Unit += 1;
+    if (type == gv_CommandsGuideEntryUnit) {
+        gCommandGuideTypeCount.Unit += 1;
     }
-    if (type == g_commands_guide_entry_actor) {
-        g_command_guide_type_count.Actor += 1;
+    if (type == gv_CommandsGuideEntryActor) {
+        gCommandGuideTypeCount.Actor += 1;
     }
-    if (type == g_commands_guide_entry_region) {
-        g_command_guide_type_count.Region += 1;
+    if (type == gv_CommandsGuideEntryRegion) {
+        gCommandGuideTypeCount.Region += 1;
     }
-    if (type == g_commands_guide_entry_stats) {
-        g_command_guide_type_count.Stats += 1;
+    if (type == gv_CommandsGuideEntryStats) {
+        gCommandGuideTypeCount.Stats += 1;
     }
-    g_commands_guide_entries[commands_guide_entry_count].type = type;
-    g_commands_guide_entries[commands_guide_entry_count].name = name;
-    g_commands_guide_entries[commands_guide_entry_count].description = description;
-    commands_guide_entry_count += 1;
+    gCommandsGuideEntries[commandsGuideEntryCount].type = type;
+    gCommandsGuideEntries[commandsGuideEntryCount].name = name;
+    gCommandsGuideEntries[commandsGuideEntryCount].description = description;
+    commandsGuideEntryCount += 1;
 }
 
-void command_guide_preset_descriptions() {
-    commands_guide_entry_set(
-		g_commands_guide_entry_actor, 
+void commandGuidePresetDescriptions() {
+    commandsGuideEntrySet(
+		gv_CommandsGuideEntryActor, 
 		"What are actors?", 
         " Actors are essentially everything you attach to a unit. Anytime you spawn a unit the unit creates the respective units actor. Usually these things are named the same (@spawn marine = @attach marine). <br> <br> That means any command under the actor cateogry doesn't apply to the entire unit. It only applies to the \"main\" actor of the unit. Aka the last actor that was attached or created. Or the actor you target with @target. This is a critical piece of understanding to becoming a good modeler. <br> <br> Extra info: <br> The first actor of a unit carries some of it's commands onto the later actors of the unit. For instance if you do <br> @spawn marine;@tint 255;@attach marine head <br> The first marine will be tinted red aswell as the second marine. That is because the second marine copied the first marine's commands. "
     );
-    commands_guide_entry_set(
-		g_commands_guide_entry_general, 
-		"_alias", 
+    commandsGuideEntrySet(
+		gv_CommandsGuideEntryGeneral, 
+		"Alias", 
         " This command creates, removes an alias. It can also list all your aliases. <br> alias [aliasname] [commands.. <br> Examples: <br> alias create s @spawn <br> alias create orc1 @spawn marine;@renameall orc;@tint 0 255 <br> alias remove s <br> alias list <br> alias removeall   "
     ); 
-    commands_guide_entry_set(
-		g_commands_guide_entry_general, 
+    commandsGuideEntrySet(
+		gv_CommandsGuideEntryGeneral, 
 		"<<", 
         " If you start typing with everything you type afterwards will be display. Regardless of if it's a command or an alias/macro/variable. <br> Examples: <br> << @spawn goat doesn't work man!; what do you mean son?;Idk!  "
     ); 
-    commands_guide_entry_set(
-		g_commands_guide_entry_general, 
+    commandsGuideEntrySet(
+		gv_CommandsGuideEntryGeneral, 
 		"\\;", 
         " If you preceed a semicolen with a slash the colen will display reguarly and not break apart statements like it usually does.  "
     );
-    commands_guide_entry_set(
-		g_commands_guide_entry_general, 
+    commandsGuideEntrySet(
+		gv_CommandsGuideEntryGeneral, 
 		";", 
         " Semicolens break apart statements and commands. It's is vital to entering more than one command at a time or creating complicated aliases.  "
     );

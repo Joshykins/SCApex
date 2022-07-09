@@ -1,394 +1,394 @@
 //=========================================================
 //		Apex Roleplaying Engine
-//		Copyright (c) 2019, Apex Group
+//		Copyright (c) 2022, Apex Group
 //=========================================================
 // This software is distributed under the MIT License:
 // <http://opensource.org/licenses/MIT>
 //=========================================================
 
-bool libapx_key_pressed_down(bool testConds, bool runActions) {
+bool LibapxKeyPressedDown(bool testConds, bool runActions) {
 	int user = EventPlayer();
 
 	if( EventKeyPressed() == c_keyControl ) {
-		libapx_player[user].key_ctrl = true;
+		gv_LibapxPlayer[user].keyCtrl = true;
 	}
 	// [Esc] key used to cancel spawn placing (if occuring)
 	if( EventKeyPressed() == c_keyEscape ) {
-		if( libapx_player[user].is_placing_unit ) {
-			libapx_player[user].is_placing_unit = false;
-			UnitRemove(libapx_player[user].spawn_splat);
+		if( gv_LibapxPlayer[user].isPlacingUnit ) {
+			gv_LibapxPlayer[user].isPlacingUnit = false;
+			UnitRemove(gv_LibapxPlayer[user].spawnSplat);
 			UISetSelectionTypeEnabled(PlayerGroupSingle(user), c_localSelectionTypeUnknown, true);
 		}
 	}
 	if( EventKeyPressed() == c_keyAlt ) {
-		libapx_player[user].key_alt = true;
+		gv_LibapxPlayer[user].keyAlt = true;
 	}
 	if( EventKeyPressed() == c_keyTab ) {
-		libapx_player[user].key_tab = true;
+		gv_LibapxPlayer[user].keyTab = true;
 	}
 	if( EventKeyPressed() == c_keyShift ) {
-		libapx_player[user].key_shift = true;
+		gv_LibapxPlayer[user].keyShift = true;
 	}
 	if( EventKeyPressed() == c_keyGrave) {
-		libapx_player[user].key_grave = true;
+		gv_LibapxPlayer[user].keyGrave = true;
 	}
 	if( EventKeyPressed() == c_key0 ) {
-		libapx_player[user].key_0 = true;
+		gv_LibapxPlayer[user].key_0 = true;
 	}
 	if( EventKeyPressed() == c_key1 ) {
-		libapx_player[user].key_1 = true;
+		gv_LibapxPlayer[user].key_1 = true;
 	}
 	if( EventKeyPressed() == c_key2 ) {
-		libapx_player[user].key_2 = true;
+		gv_LibapxPlayer[user].key_2 = true;
 	}
 	if( EventKeyPressed() == c_key3 ) {
-		libapx_player[user].key_3 = true;
+		gv_LibapxPlayer[user].key_3 = true;
 	}
 	if( EventKeyPressed() == c_key4 ) {
-		libapx_player[user].key_4 = true;
+		gv_LibapxPlayer[user].key_4 = true;
 	}
 	if( EventKeyPressed() == c_key5 ) {
-		libapx_player[user].key_5 = true;
+		gv_LibapxPlayer[user].key_5 = true;
 	}
 	if( EventKeyPressed() == c_key6 ) {
-		libapx_player[user].key_6 = true;
+		gv_LibapxPlayer[user].key_6 = true;
 	}
 	if( EventKeyPressed() == c_key7 ) {
-		libapx_player[user].key_7 = true;
+		gv_LibapxPlayer[user].key_7 = true;
 	}
 	if( EventKeyPressed() == c_key8 ) {
-		libapx_player[user].key_8 = true;
+		gv_LibapxPlayer[user].key_8 = true;
 	}
 	if( EventKeyPressed() == c_key9 ) {
-		libapx_player[user].key_9 = true;
+		gv_LibapxPlayer[user].key_9 = true;
 	}
 	if( EventKeyPressed() == c_keyA ) {
-		libapx_player[user].key_a = true;
+		gv_LibapxPlayer[user].keyA = true;
 	}
 	if( EventKeyPressed() == c_keyB ) {
-		libapx_player[user].key_b = true;
+		gv_LibapxPlayer[user].keyB = true;
 	}
 	if( EventKeyPressed() == c_keyC ) {
-		libapx_player[user].key_c = true;
+		gv_LibapxPlayer[user].keyC = true;
 	}
 	if( EventKeyPressed() == c_keyD ) {
-		libapx_player[user].key_d = true;
+		gv_LibapxPlayer[user].keyD = true;
 	}
 	if( EventKeyPressed() == c_keyE ) {
-		libapx_player[user].key_e = true;
+		gv_LibapxPlayer[user].keyE = true;
 	}
 	if( EventKeyPressed() == c_keyF ) {
-		libapx_player[user].key_f = true;
+		gv_LibapxPlayer[user].keyF = true;
 	}
 	if( EventKeyPressed() == c_keyG ) {
-		libapx_player[user].key_g = true;
+		gv_LibapxPlayer[user].keyG = true;
 	}
 	if( EventKeyPressed() == c_keyH ) {
-		libapx_player[user].key_h = true;
+		gv_LibapxPlayer[user].keyH = true;
 	}
 	if( EventKeyPressed() == c_keyI ) {
-		libapx_player[user].key_i = true;
+		gv_LibapxPlayer[user].keyI = true;
 	}
 	if( EventKeyPressed() == c_keyJ ) {
-		libapx_player[user].key_j = true;
+		gv_LibapxPlayer[user].keyJ = true;
 	}
 	if( EventKeyPressed() == c_keyK ) {
-		libapx_player[user].key_k = true;
+		gv_LibapxPlayer[user].keyK = true;
 	}
 	if( EventKeyPressed() == c_keyL ) {
-		libapx_player[user].key_l = true;
+		gv_LibapxPlayer[user].keyL = true;
 	}
 	if( EventKeyPressed() == c_keyM ) {
-		libapx_player[user].key_m = true;
+		gv_LibapxPlayer[user].keyM = true;
 	}
 	if( EventKeyPressed() == c_keyN ) {
-		libapx_player[user].key_n = true;
+		gv_LibapxPlayer[user].keyN = true;
 	}
 	if( EventKeyPressed() == c_keyO ) {
-		libapx_player[user].key_o = true;
+		gv_LibapxPlayer[user].keyO = true;
 	}
 	if( EventKeyPressed() == c_keyP ) {
-		libapx_player[user].key_p = true;
+		gv_LibapxPlayer[user].keyP = true;
 	}
 	if( EventKeyPressed() == c_keyQ ) {
-		libapx_player[user].key_q = true;
+		gv_LibapxPlayer[user].keyQ = true;
 	}
 	if( EventKeyPressed() == c_keyR ) {
-		libapx_player[user].key_r = true;
+		gv_LibapxPlayer[user].keyR = true;
 	}
 	if( EventKeyPressed() == c_keyS ) {
-		libapx_player[user].key_s = true;
+		gv_LibapxPlayer[user].keyS = true;
 	}
 	if( EventKeyPressed() == c_keyT ) {
-		libapx_player[user].key_t = true;
+		gv_LibapxPlayer[user].keyT = true;
 	}
 	if( EventKeyPressed() == c_keyU ) {
-		libapx_player[user].key_u = true;
+		gv_LibapxPlayer[user].keyU = true;
 	}
 	if( EventKeyPressed() == c_keyV ) {
-		libapx_player[user].key_v = true;
+		gv_LibapxPlayer[user].keyV = true;
 	}
 	if( EventKeyPressed() == c_keyW ) {
-		libapx_player[user].key_w = true;
+		gv_LibapxPlayer[user].keyW = true;
 	}
 	if( EventKeyPressed() == c_keyX ) {
-		libapx_player[user].key_x = true;
+		gv_LibapxPlayer[user].keyX = true;
 	}
 	if( EventKeyPressed() == c_keyY ) {
-		libapx_player[user].key_y = true;
+		gv_LibapxPlayer[user].keyY = true;
 	}
 	if( EventKeyPressed() == c_keyZ ) {
-		libapx_player[user].key_z = true;
+		gv_LibapxPlayer[user].keyZ = true;
 	}
 	if( EventKeyPressed() == c_keyUp ) {
-		libapx_player[user].key_up = true;
+		gv_LibapxPlayer[user].keyUp = true;
 	}
 	if( EventKeyPressed() == c_keyDown ) {
-		libapx_player[user].key_down = true;
+		gv_LibapxPlayer[user].keyDown = true;
 	}
 	if( EventKeyPressed() == c_keyLeft ) {
-		libapx_player[user].key_left = true;
+		gv_LibapxPlayer[user].keyLeft = true;
 	}
 	if( EventKeyPressed() == c_keyRight ) {
-		libapx_player[user].key_right = true;
+		gv_LibapxPlayer[user].keyRight = true;
 	}
 	if( EventKeyPressed() == c_keyPageUp ) {
-		libapx_player[user].key_pgUp = true;
+		gv_LibapxPlayer[user].keyPgUp = true;
 	}
 	if( EventKeyPressed() == c_keyPageDown ) {
-		libapx_player[user].key_pgDown = true;
+		gv_LibapxPlayer[user].keyPgDown = true;
 	}
 	if( EventKeyPressed() == c_keyNumPad0 ) {
-		libapx_player[user].key_numPad0 = true;
+		gv_LibapxPlayer[user].keyNumPad0 = true;
 	}
 	if( EventKeyPressed() == c_keyNumPad1 ) {
-		libapx_player[user].key_numPad1 = true;
+		gv_LibapxPlayer[user].keyNumPad1 = true;
 	}
 	if( EventKeyPressed() == c_keyNumPad2 ) {
-		libapx_player[user].key_numPad2 = true;
+		gv_LibapxPlayer[user].keyNumPad2 = true;
 	}
 	if( EventKeyPressed() == c_keyNumPad3 ) {
-		libapx_player[user].key_numPad3 = true;
+		gv_LibapxPlayer[user].keyNumPad3 = true;
 	}
 	if( EventKeyPressed() == c_keyNumPad4 ) {
-		libapx_player[user].key_numPad4 = true;
+		gv_LibapxPlayer[user].keyNumPad4 = true;
 	}
 	if( EventKeyPressed() == c_keyNumPad5 ) {
-		libapx_player[user].key_numPad5 = true;
+		gv_LibapxPlayer[user].keyNumPad5 = true;
 	}
 	if( EventKeyPressed() == c_keyNumPad6 ) {
-		libapx_player[user].key_numPad6 = true;
+		gv_LibapxPlayer[user].keyNumPad6 = true;
 	}
 	if( EventKeyPressed() == c_keyNumPad7 ) {
-		libapx_player[user].key_numPad7 = true;
+		gv_LibapxPlayer[user].keyNumPad7 = true;
 	}
 	if( EventKeyPressed() == c_keyNumPad8 ) {
-		libapx_player[user].key_numPad8 = true;
+		gv_LibapxPlayer[user].keyNumPad8 = true;
 	}
 	if( EventKeyPressed() == c_keyNumPad9 ) {
-		libapx_player[user].key_numPad9 = true;
+		gv_LibapxPlayer[user].keyNumPad9 = true;
 	}
 	if( EventKeyPressed() == c_keyNumPadPlus ) {
-		libapx_player[user].key_numPadPlus = true;
+		gv_LibapxPlayer[user].keyNumPadPlus = true;
 	}
 	if( EventKeyPressed() == c_keyNumPadMultiply ) {
-		libapx_player[user].key_numPadMultiply = true;
+		gv_LibapxPlayer[user].keyNumPadMultiply = true;
 	}
 	if( EventKeyPressed() == c_keyNumPadDivide ) {
-		libapx_player[user].key_numPadDivide = true;
+		gv_LibapxPlayer[user].keyNumPadDivide = true;
 	}
 	if( EventKeyPressed() == c_keyNumPadDecimal ) {
-		libapx_player[user].key_numPadDecimal = true;
+		gv_LibapxPlayer[user].keyNumPadDecimal = true;
 	}
 
-	libapx_unit_keypress_check();
+	LibapxUnitKeypressCheck();
 	return true;
 }
 
-bool libapx_key_pressed_up(bool testConds, bool runActions) {
+bool LibapxKeyPressedUp(bool testConds, bool runActions) {
 	int user = EventPlayer();
 	if( EventKeyPressed() == c_keyControl ) {
-		libapx_player[user].key_ctrl = false;
+		gv_LibapxPlayer[user].keyCtrl = false;
 	}
 	if( EventKeyPressed() == c_keyAlt ) {
-		libapx_player[user].key_alt = false;
+		gv_LibapxPlayer[user].keyAlt = false;
 	}
 	if( EventKeyPressed() == c_keyTab ) {
-		libapx_player[user].key_tab = false;
+		gv_LibapxPlayer[user].keyTab = false;
 	}
 	if( EventKeyPressed() == c_keyShift ) {
-		libapx_player[user].key_shift = false;
+		gv_LibapxPlayer[user].keyShift = false;
 	}
 	if( EventKeyPressed() == c_keyGrave) {
-		libapx_player[user].key_grave = false;
+		gv_LibapxPlayer[user].keyGrave = false;
 	}
 	if( EventKeyPressed() == c_key0 ) {
-		libapx_player[user].key_0 = false;
+		gv_LibapxPlayer[user].key_0 = false;
 	}
 	if( EventKeyPressed() == c_key1 ) {
-		libapx_player[user].key_1 = false;
+		gv_LibapxPlayer[user].key_1 = false;
 	}
 	if( EventKeyPressed() == c_key2 ) {
-		libapx_player[user].key_2 = false;
+		gv_LibapxPlayer[user].key_2 = false;
 	}
 	if( EventKeyPressed() == c_key3 ) {
-		libapx_player[user].key_3 = false;
+		gv_LibapxPlayer[user].key_3 = false;
 	}
 	if( EventKeyPressed() == c_key4 ) {
-		libapx_player[user].key_4 = false;
+		gv_LibapxPlayer[user].key_4 = false;
 	}
 	if( EventKeyPressed() == c_key5 ) {
-		libapx_player[user].key_5 = false;
+		gv_LibapxPlayer[user].key_5 = false;
 	}
 	if( EventKeyPressed() == c_key6 ) {
-		libapx_player[user].key_6 = false;
+		gv_LibapxPlayer[user].key_6 = false;
 	}
 	if( EventKeyPressed() == c_key7 ) {
-		libapx_player[user].key_7 = false;
+		gv_LibapxPlayer[user].key_7 = false;
 	}
 	if( EventKeyPressed() == c_key8 ) {
-		libapx_player[user].key_8 = false;
+		gv_LibapxPlayer[user].key_8 = false;
 	}
 	if( EventKeyPressed() == c_key9 ) {
-		libapx_player[user].key_9 = false;
+		gv_LibapxPlayer[user].key_9 = false;
 	}
 	if( EventKeyPressed() == c_keyA ) {
-		libapx_player[user].key_a = false;
+		gv_LibapxPlayer[user].keyA = false;
 	}
 	if( EventKeyPressed() == c_keyB ) {
-		libapx_player[user].key_b = false;
+		gv_LibapxPlayer[user].keyB = false;
 	}
 	if( EventKeyPressed() == c_keyC ) {
-		libapx_player[user].key_c = false;
+		gv_LibapxPlayer[user].keyC = false;
 	}
 	if( EventKeyPressed() == c_keyD ) {
-		libapx_player[user].key_d = false;
+		gv_LibapxPlayer[user].keyD = false;
 	}
 	if( EventKeyPressed() == c_keyE ) {
-		libapx_player[user].key_e = false;
+		gv_LibapxPlayer[user].keyE = false;
 	}
 	if( EventKeyPressed() == c_keyF ) {
-		libapx_player[user].key_f = false;
+		gv_LibapxPlayer[user].keyF = false;
 	}
 	if( EventKeyPressed() == c_keyG ) {
-		libapx_player[user].key_g = false;
+		gv_LibapxPlayer[user].keyG = false;
 	}
 	if( EventKeyPressed() == c_keyH ) {
-		libapx_player[user].key_h = false;
+		gv_LibapxPlayer[user].keyH = false;
 	}
 	if( EventKeyPressed() == c_keyI ) {
-		libapx_player[user].key_i = false;
+		gv_LibapxPlayer[user].keyI = false;
 	}
 	if( EventKeyPressed() == c_keyJ ) {
-		libapx_player[user].key_j = false;
+		gv_LibapxPlayer[user].keyJ = false;
 	}
 	if( EventKeyPressed() == c_keyK ) {
-		libapx_player[user].key_k = false;
+		gv_LibapxPlayer[user].keyK = false;
 	}
 	if( EventKeyPressed() == c_keyL ) {
-		libapx_player[user].key_l = false;
+		gv_LibapxPlayer[user].keyL = false;
 	}
 	if( EventKeyPressed() == c_keyM ) {
-		libapx_player[user].key_m = false;
+		gv_LibapxPlayer[user].keyM = false;
 	}
 	if( EventKeyPressed() == c_keyN ) {
-		libapx_player[user].key_n = false;
+		gv_LibapxPlayer[user].keyN = false;
 	}
 	if( EventKeyPressed() == c_keyO ) {
-		libapx_player[user].key_o = false;
+		gv_LibapxPlayer[user].keyO = false;
 	}
 	if( EventKeyPressed() == c_keyP ) {
-		libapx_player[user].key_p = false;
+		gv_LibapxPlayer[user].keyP = false;
 	}
 	if( EventKeyPressed() == c_keyQ ) {
-		libapx_player[user].key_q = false;
+		gv_LibapxPlayer[user].keyQ = false;
 	}
 	if( EventKeyPressed() == c_keyR ) {
-		libapx_player[user].key_r = false;
+		gv_LibapxPlayer[user].keyR = false;
 	}
 	if( EventKeyPressed() == c_keyS ) {
-		libapx_player[user].key_s = false;
+		gv_LibapxPlayer[user].keyS = false;
 	}
 	if( EventKeyPressed() == c_keyT ) {
-		libapx_player[user].key_t = false;
+		gv_LibapxPlayer[user].keyT = false;
 	}
 	if( EventKeyPressed() == c_keyU ) {
-		libapx_player[user].key_u = false;
+		gv_LibapxPlayer[user].keyU = false;
 	}
 	if( EventKeyPressed() == c_keyV ) {
-		libapx_player[user].key_v = false;
+		gv_LibapxPlayer[user].keyV = false;
 	}
 	if( EventKeyPressed() == c_keyW ) {
-		libapx_player[user].key_w = false;
+		gv_LibapxPlayer[user].keyW = false;
 	}
 	if( EventKeyPressed() == c_keyX ) {
-		libapx_player[user].key_x = false;
+		gv_LibapxPlayer[user].keyX = false;
 	}
 	if( EventKeyPressed() == c_keyY ) {
-		libapx_player[user].key_y = false;
+		gv_LibapxPlayer[user].keyY = false;
 	}
 	if( EventKeyPressed() == c_keyZ ) {
-		libapx_player[user].key_z = false;
+		gv_LibapxPlayer[user].keyZ = false;
 	}
 	if( EventKeyPressed() == c_keyUp ) {
-		libapx_player[user].key_up = false;
+		gv_LibapxPlayer[user].keyUp = false;
 	}
 	if( EventKeyPressed() == c_keyDown ) {
-		libapx_player[user].key_down = false;
+		gv_LibapxPlayer[user].keyDown = false;
 	}
 	if( EventKeyPressed() == c_keyLeft ) {
-		libapx_player[user].key_left = false;
+		gv_LibapxPlayer[user].keyLeft = false;
 	}
 	if( EventKeyPressed() == c_keyRight ) {
-		libapx_player[user].key_right = false;
+		gv_LibapxPlayer[user].keyRight = false;
 	}
 	if( EventKeyPressed() == c_keyPageUp ) {
-		libapx_player[user].key_pgUp = false;
+		gv_LibapxPlayer[user].keyPgUp = false;
 	}
 	if( EventKeyPressed() == c_keyPageDown ) {
-		libapx_player[user].key_pgDown = false;
+		gv_LibapxPlayer[user].keyPgDown = false;
 	}
 	if( EventKeyPressed() == c_keyNumPad0 ) {
-		libapx_player[user].key_numPad0 = false;
+		gv_LibapxPlayer[user].keyNumPad0 = false;
 	}
 	if( EventKeyPressed() == c_keyNumPad1 ) {
-		libapx_player[user].key_numPad1 = false;
+		gv_LibapxPlayer[user].keyNumPad1 = false;
 	}
 	if( EventKeyPressed() == c_keyNumPad2 ) {
-		libapx_player[user].key_numPad2 = false;
+		gv_LibapxPlayer[user].keyNumPad2 = false;
 	}
 	if( EventKeyPressed() == c_keyNumPad3 ) {
-		libapx_player[user].key_numPad3 = false;
+		gv_LibapxPlayer[user].keyNumPad3 = false;
 	}
 	if( EventKeyPressed() == c_keyNumPad4 ) {
-		libapx_player[user].key_numPad4 = false;
+		gv_LibapxPlayer[user].keyNumPad4 = false;
 	}
 	if( EventKeyPressed() == c_keyNumPad5 ) {
-		libapx_player[user].key_numPad5 = false;
+		gv_LibapxPlayer[user].keyNumPad5 = false;
 	}
 	if( EventKeyPressed() == c_keyNumPad6 ) {
-		libapx_player[user].key_numPad6 = false;
+		gv_LibapxPlayer[user].keyNumPad6 = false;
 	}
 	if( EventKeyPressed() == c_keyNumPad7 ) {
-		libapx_player[user].key_numPad7 = false;
+		gv_LibapxPlayer[user].keyNumPad7 = false;
 	}
 	if( EventKeyPressed() == c_keyNumPad8 ) {
-		libapx_player[user].key_numPad8 = false;
+		gv_LibapxPlayer[user].keyNumPad8 = false;
 	}
 	if( EventKeyPressed() == c_keyNumPad9 ) {
-		libapx_player[user].key_numPad9 = false;
+		gv_LibapxPlayer[user].keyNumPad9 = false;
 	}
 	if( EventKeyPressed() == c_keyNumPadPlus ) {
-		libapx_player[user].key_numPadPlus = false;
+		gv_LibapxPlayer[user].keyNumPadPlus = false;
 	}
 	if( EventKeyPressed() == c_keyNumPadMultiply ) {
-		libapx_player[user].key_numPadMultiply = false;
+		gv_LibapxPlayer[user].keyNumPadMultiply = false;
 	}
 	if( EventKeyPressed() == c_keyNumPadDivide ) {
-		libapx_player[user].key_numPadDivide = false;
+		gv_LibapxPlayer[user].keyNumPadDivide = false;
 	}
 	if( EventKeyPressed() == c_keyNumPadDecimal ) {
-		libapx_player[user].key_numPadDecimal = false;
+		gv_LibapxPlayer[user].keyNumPadDecimal = false;
 	}
 
 	return true;

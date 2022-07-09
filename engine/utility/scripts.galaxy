@@ -1,6 +1,6 @@
 //=========================================================
 //		Apex Roleplaying Engine
-//		Copyright (c) 2019, Apex Group
+//		Copyright (c) 2022, Apex Group
 //=========================================================
 // This software is distributed under the MIT License:
 // <http://opensource.org/licenses/MIT>
@@ -8,24 +8,24 @@
 
 include "apex/engine/utility/string.galaxy"
 include "apex/engine/utility/qsort.galaxy"
-include "apex/engine/utility/apexUtil.galaxy"
+include "apex/engine/utility/apex_util.galaxy"
 
-void libapx_scripts_init() {
-	libx_qsort_init();
+void LibapxScriptsInit() {
+	libxQsortInit();
 }
 
-bool libapx_playerbank_hasloaded(int p) {
-	if(libapx_player[p].banksloaded) 
+bool gv_LibapxPlayerbankHasloaded(int p) {
+	if(gv_LibapxPlayer[p].banksloaded) 
 	{
 		return true;
 	}
 	else {
-		libapx_print_error(p,"Banks not loaded, wait until banks are loaded to use this command");
+		LibapxPrintError(p,"Banks not loaded, wait until banks are loaded to use this command");
 		return false;
 	}
 }
 
-fixed libapx_boundsFixed(fixed src, fixed min, fixed max) {
+fixed LibapxBoundsFixed(fixed src, fixed min, fixed max) {
 	if( src < min ) {
 		return min;
 	}
