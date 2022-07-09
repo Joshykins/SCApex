@@ -55,7 +55,7 @@ void LibapxCommandSay(int user, unitgroup u, string argv, int spawningCount, str
 
 		// @say unit visuals (flash circle, make a talk icon appear overhead)
 		UnitFlashSelection(UnitGroupLoopCurrent(), 2.0);
-		ActorSend(libNtve_gf_MainActorofUnit(UnitGroupLoopCurrent()), "AttachModel " + LibapxTALKIconACTOR + "{} Overhead");
+		ActorSend(libNtve_gf_MainActorofUnit(UnitGroupLoopCurrent()), "AttachModel " + LibapxTalkIconActor + "{} Overhead");
 
 		LibapxPrintText(PlayerGroupAll(), unitName + unitMsg);
 

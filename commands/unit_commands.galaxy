@@ -1689,16 +1689,16 @@ void LibapxCommandDamage(int user, unitgroup u, string argv, int spawningCount, 
 	// since we are using the same command for both @adddamage and @removedamage,
 	// check which command it is, and set proper behaviors
 	if( (command == "@adddamage" && val > 0) || (command == "@removedamage" && val < 0) ) {
-		dmgBehavior_1 = LibapxBEHAVIORADDDAMAGE_1;
-		dmgBehavior_10 = LibapxBEHAVIORADDDAMAGE_10;
-		dmgBehavior_100 = LibapxBEHAVIORADDDAMAGE_100;
-		dmgBehavior_1000 = LibapxBEHAVIORADDDAMAGE_1000;
+		dmgBehavior_1 = LibapxBehaviorAddDamage_1;
+		dmgBehavior_10 = LibapxBehaviorAddDamage_10;
+		dmgBehavior_100 = LibapxBehaviorAddDamage_100;
+		dmgBehavior_1000 = LibapxBehaviorAddDamage_1000;
 	}
 	else { // we are using @removedamage
-		dmgBehavior_1 = LibapxBEHAVIORSUBTRACTDAMAGE_1;
-		dmgBehavior_10 = LibapxBEHAVIORSUBTRACTDAMAGE_10;
-		dmgBehavior_100 = LibapxBEHAVIORSUBTRACTDAMAGE_100;
-		dmgBehavior_1000 = LibapxBEHAVIORSUBTRACTDAMAGE_1000;
+		dmgBehavior_1 = LibapxBehaviorSubtractDamage_1;
+		dmgBehavior_10 = LibapxBehaviorSubtractDamage_10;
+		dmgBehavior_100 = LibapxBehaviorSubtractDamage_100;
+		dmgBehavior_1000 = LibapxBehaviorSubtractDamage_1000;
 	}
 
 	val = AbsI(val);
@@ -1711,14 +1711,14 @@ void LibapxCommandDamage(int user, unitgroup u, string argv, int spawningCount, 
 	UnitGroupLoopBegin(g);
 	while(!UnitGroupLoopDone()) {
 		// First remove all damage bonuses and maluses, since we're now treating this as a "strictly positive setdamagebonus" command
-		UnitBehaviorRemove( UnitGroupLoopCurrent(), LibapxBEHAVIORADDDAMAGE_1, -1);
-		UnitBehaviorRemove( UnitGroupLoopCurrent(), LibapxBEHAVIORADDDAMAGE_10, -1);
-		UnitBehaviorRemove( UnitGroupLoopCurrent(), LibapxBEHAVIORADDDAMAGE_100, -1);
-		UnitBehaviorRemove( UnitGroupLoopCurrent(), LibapxBEHAVIORADDDAMAGE_1000, -1);
-		UnitBehaviorRemove( UnitGroupLoopCurrent(), LibapxBEHAVIORSUBTRACTDAMAGE_1, -1);
-		UnitBehaviorRemove( UnitGroupLoopCurrent(), LibapxBEHAVIORSUBTRACTDAMAGE_10, -1);
-		UnitBehaviorRemove( UnitGroupLoopCurrent(), LibapxBEHAVIORSUBTRACTDAMAGE_100, -1);
-		UnitBehaviorRemove( UnitGroupLoopCurrent(), LibapxBEHAVIORSUBTRACTDAMAGE_1000, -1);
+		UnitBehaviorRemove( UnitGroupLoopCurrent(), LibapxBehaviorAddDamage_1, -1);
+		UnitBehaviorRemove( UnitGroupLoopCurrent(), LibapxBehaviorAddDamage_10, -1);
+		UnitBehaviorRemove( UnitGroupLoopCurrent(), LibapxBehaviorAddDamage_100, -1);
+		UnitBehaviorRemove( UnitGroupLoopCurrent(), LibapxBehaviorAddDamage_1000, -1);
+		UnitBehaviorRemove( UnitGroupLoopCurrent(), LibapxBehaviorSubtractDamage_1, -1);
+		UnitBehaviorRemove( UnitGroupLoopCurrent(), LibapxBehaviorSubtractDamage_10, -1);
+		UnitBehaviorRemove( UnitGroupLoopCurrent(), LibapxBehaviorSubtractDamage_100, -1);
+		UnitBehaviorRemove( UnitGroupLoopCurrent(), LibapxBehaviorSubtractDamage_1000, -1);
 
 		val = amt;
 
@@ -1774,12 +1774,12 @@ void LibapxCommandRange(int user, unitgroup u, string argv, int spawningCount, s
 	// since we are using the same command for both @addrange and @removerange,
 	// check which command it is, and set proper behaviors
 	if( (command == "@addrange" && range > 0) || (command == "@removerange" && range < 0) ) {
-		rangeBehavior_1 = LibapxBEHAVIORADDRANGE_1;
-		rangeBehavior_10 = LibapxBEHAVIORADDRANGE_10;
+		rangeBehavior_1 = LibapxBehaviorAddRange_1;
+		rangeBehavior_10 = LibapxBehaviorAddRange_10;
 	}
 	else { // are removing range
-		rangeBehavior_1 = LibapxBEHAVIORSUBTRACTRANGE_1;
-		rangeBehavior_10 = LibapxBEHAVIORSUBTRACTRANGE_10;
+		rangeBehavior_1 = LibapxBehaviorSubtractRange_1;
+		rangeBehavior_10 = LibapxBehaviorSubtractRange_10;
 	}
 
 	range = AbsI(range);
@@ -1789,10 +1789,10 @@ void LibapxCommandRange(int user, unitgroup u, string argv, int spawningCount, s
 
 	UnitGroupLoopBegin(g);
 	while(!UnitGroupLoopDone()) {
-		UnitBehaviorRemove(UnitGroupLoopCurrent(), LibapxBEHAVIORADDRANGE_1, -1);
-		UnitBehaviorRemove(UnitGroupLoopCurrent(), LibapxBEHAVIORADDRANGE_10, -1);
-		UnitBehaviorRemove(UnitGroupLoopCurrent(), LibapxBEHAVIORSUBTRACTRANGE_1, -1);
-		UnitBehaviorRemove(UnitGroupLoopCurrent(), LibapxBEHAVIORSUBTRACTRANGE_10, -1);
+		UnitBehaviorRemove(UnitGroupLoopCurrent(), LibapxBehaviorAddRange_1, -1);
+		UnitBehaviorRemove(UnitGroupLoopCurrent(), LibapxBehaviorAddRange_10, -1);
+		UnitBehaviorRemove(UnitGroupLoopCurrent(), LibapxBehaviorSubtractRange_1, -1);
+		UnitBehaviorRemove(UnitGroupLoopCurrent(), LibapxBehaviorSubtractRange_10, -1);
 
 		UnitBehaviorAdd(UnitGroupLoopCurrent(), rangeBehavior_1, null, ModI(range, 10));
 		UnitBehaviorAdd(UnitGroupLoopCurrent(), rangeBehavior_10, null, range / 10);
@@ -1836,20 +1836,20 @@ void LibapxCommandArmor(int user, unitgroup u, string argv, int spawningCount, s
 	unitgroup g = u;
 
 	if( StringCase( StringWord( argv, 1 ), false ) == "@shieldsarmor" ) {
-		behavArmorAddP1 = LibapxBEHAVIORADDSHIELDSARMORP1;
-		behavArmorAdd_1 = LibapxBEHAVIORADDSHIELDSARMOR_1;
-		behavArmorAdd_10 = LibapxBEHAVIORADDSHIELDSARMOR_10;
-		behavArmorSubtractP1 = LibapxBEHAVIORSUBTRACTSHIELDSARMORP1;
-		behavArmorSubtract_1 = LibapxBEHAVIORSUBTRACTSHIELDSARMOR_1;
-		behavArmorSubtract_10 = LibapxBEHAVIORSUBTRACTSHIELDSARMOR_10;
+		behavArmorAddP1 = LibapxBehaviorAddShieldsArmorP1;
+		behavArmorAdd_1 = LibapxBehaviorAddShieldsArmor_1;
+		behavArmorAdd_10 = LibapxBehaviorAddShieldsArmor_10;
+		behavArmorSubtractP1 = LibapxBehaviorSubtractShieldsArmorP1;
+		behavArmorSubtract_1 = LibapxBehaviorSubtractShieldsArmor_1;
+		behavArmorSubtract_10 = LibapxBehaviorSubtractShieldsArmor_10;
 	}
 	else { // using @armor
-		behavArmorAddP1 = LibapxBEHAVIORADDLIFEARMORP1;
-		behavArmorAdd_1 = LibapxBEHAVIORADDLIFEARMOR_1;
-		behavArmorAdd_10 = LibapxBEHAVIORADDLIFEARMOR_10;
-		behavArmorSubtractP1 = LibapxBEHAVIORSUBTRACTLIFEARMORP1;
-		behavArmorSubtract_1 = LibapxBEHAVIORSUBTRACTLIFEARMOR_1;
-		behavArmorSubtract_10 = LibapxBEHAVIORSUBTRACTLIFEARMOR_10;
+		behavArmorAddP1 = LibapxBehaviorAddLifeArmorP1;
+		behavArmorAdd_1 = LibapxBehaviorAddLifeArmor_1;
+		behavArmorAdd_10 = LibapxBehaviorAddLifeArmor_10;
+		behavArmorSubtractP1 = LibapxBehaviorSubtractLifeArmorP1;
+		behavArmorSubtract_1 = LibapxBehaviorSubtractLifeArmor_1;
+		behavArmorSubtract_10 = LibapxBehaviorSubtractLifeArmor_10;
 	}
 
 	if(armor > 255) {
@@ -1965,22 +1965,22 @@ void LibapxCommandWeaponspeed(int user, unitgroup u, string argv, int spawningCo
 			ratio = speed;
 		}
 
-		UnitBehaviorRemove(current, LibapxBEHAVIORWEAPONSPEEDMULTP9, -1);
-		UnitBehaviorRemove(current, LibapxBEHAVIORWEAPONSPEEDMULT_1P1, -1);
+		UnitBehaviorRemove(current, LibapxBehaviorWeaponsSpeedMultP9, -1);
+		UnitBehaviorRemove(current, LibapxBehaviorWeaponsSpeedMult_1P1, -1);
 
 		if(ratio > 1) { // apply 1.1 multiplier
 			stackRequired = FixedToInt( Log2(ratio)/Log2(1.1) );
 			if( stackRequired > 100 ) {
 				stackRequired = 100;
 			}
-			UnitBehaviorAdd(current, LibapxBEHAVIORWEAPONSPEEDMULT_1P1, null, stackRequired);
+			UnitBehaviorAdd(current, LibapxBehaviorWeaponsSpeedMult_1P1, null, stackRequired);
 		}
 		else if( ratio < 1) { // ratio < 1: apply .9 multiplier
 			stackRequired = FixedToInt( Log2(ratio)/Log2(0.9) );
 			if( stackRequired > 100 ) {
 				stackRequired = 100;
 			}
-			UnitBehaviorAdd(current, LibapxBEHAVIORWEAPONSPEEDMULTP9, null, stackRequired);
+			UnitBehaviorAdd(current, LibapxBehaviorWeaponsSpeedMultP9, null, stackRequired);
 		}
 
 		LibapxUnitCacheUpdate(UnitGroupLoopCurrent(), "@weaponspeed", argv);
@@ -2027,8 +2027,8 @@ void LibapxCommandWeaponspeedall(int user, unitgroup u, string argv, int spawnin
 			index -= 1;
 		}
 
-		UnitBehaviorRemove(current, LibapxBEHAVIORWEAPONSPEEDMULTP9, -1);
-		UnitBehaviorRemove(current, LibapxBEHAVIORWEAPONSPEEDMULT_1P1, -1);
+		UnitBehaviorRemove(current, LibapxBehaviorWeaponsSpeedMultP9, -1);
+		UnitBehaviorRemove(current, LibapxBehaviorWeaponsSpeedMult_1P1, -1);
 
 		LibapxUnitCacheUpdate(UnitGroupLoopCurrent(), "@weaponspeedall", argv);
 		UnitGroupLoopStep();
@@ -2759,8 +2759,8 @@ void LibapxCommandLevel(int user, unitgroup u, string argv, int spawningCount, s
 	UnitGroupLoopBegin(g);
 	while(!UnitGroupLoopDone()) {
         // Give the level behavior to the unit so that it can level.
-        if( !UnitHasBehavior(UnitGroupLoopCurrent(), LibapxBEHAVIORLEVELS) ) {
-            UnitBehaviorAdd( UnitGroupLoopCurrent(), LibapxBEHAVIORLEVELS, UnitGroupLoopCurrent(), 1);
+        if( !UnitHasBehavior(UnitGroupLoopCurrent(), LibapxBehaviorLEVELS) ) {
+            UnitBehaviorAdd( UnitGroupLoopCurrent(), LibapxBehaviorLEVELS, UnitGroupLoopCurrent(), 1);
         }
 
         if( UnitLevel(UnitGroupLoopCurrent()) == val ) {

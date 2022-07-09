@@ -227,7 +227,7 @@ void LibapxSpawnCreateSplat(string type, int player, int spawningCount) {
 	UnitSetState(gv_LibapxPlayer[player].spawnSplat, c_unitStateMoveSuppressed, true);
 	UnitSetState(gv_LibapxPlayer[player].spawnSplat, c_unitStateRadarable, false);
 	ActorSend(libNtve_gf_MainActorofUnit(gv_LibapxPlayer[player].spawnSplat), "SetOpacity .5");
-	UnitBehaviorAdd(gv_LibapxPlayer[player].spawnSplat, LibapxBEHAVIORSUPPRESSCOLLISION, gv_LibapxPlayer[player].spawnSplat, 1);
+	UnitBehaviorAdd(gv_LibapxPlayer[player].spawnSplat, LibapxBehaviorSUPPRESSCOLLISION, gv_LibapxPlayer[player].spawnSplat, 1);
 
 	// set context to spawn splat, so commands applied to it
 	UnitGroupAdd(splat, gv_LibapxPlayer[player].spawnSplat);

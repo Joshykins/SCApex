@@ -69,7 +69,7 @@
 				</Frame>
 				<Frame type="EquipmentIcon" name="EquipmentIconTemplate">
 					<Frame type="Image" name="EquipmentIconBorder">
-						<Texture val="Assets\Textures\btn-border-equipmentHelp.dds"/>
+						<Texture val="Assets\Textures\btn-border-equipment_help.dds"/>
 						<Color val="255,255,255"/>
 						<Desaturated val="true"/>
 					</Frame>

@@ -52,7 +52,7 @@
                 <Anchor side="Right" relative="$parent" pos="Max" offset="-1140"/>
                 <Anchor side="Top" relative="$parent" pos="Max" offset="-35"/>
                 <Anchor side="Bottom" relative="$parent" pos="Max" offset="-33"/>
-                <Texture val="Assets/Textures/flareAiurcompletenebula01DirtlylensflareWhitebox.dds"/>
+                <Texture val="Assets/Textures/flare_aiurcompletenebula01_dirtlylensflare_whitebox.dds"/>
                 <TextureType val="Normal"/>
                 <Visible val="false"/>
             </Frame>

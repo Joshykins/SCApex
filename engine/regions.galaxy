@@ -19,7 +19,7 @@ const string LibapxWAYGATEANCHORDATATABLEIDENTIFIER = "waygateDiagUnit";
 
 // the dummy unit type used to anchor the waygate dialog "ENTER" button
 // (actual declaration occurs in data.galaxy, due to include order issues)
-// const string LibapxWAYGATEDIALOGANCHORUNIT = "BeaconZerg";
+// const string LibapxWaygateDialogAnchorUnit = "BeaconZerg";
 
 // region teleport counter
 // (must start at one because unit custom val defaults to 0)
@@ -83,7 +83,7 @@ void LibapxCreateWaygateDialog(string rgnName) {
 		}
 	}
 	// else, create a static unit anchor on ground
-	UnitCreate(1, LibapxWAYGATEDIALOGANCHORUNIT, c_unitCreateIgnorePlacement, 0, p, 270.0);
+	UnitCreate(1, LibapxWaygateDialogAnchorUnit, c_unitCreateIgnorePlacement, 0, p, 270.0);
 	//ActorSend(libNtve_gf_MainActorofUnit(UnitLastCreated()), "SetOpacity {0.1}"); // set opacity to hide
 	// hide the beacons for all players
 	for( i = 1; i < gv_LibapxMaxPlayers; i += 1 ) {

@@ -26,7 +26,7 @@ bool LibapxUnitDeathCleanup(bool testConds, bool runActions) {
 	if( waygateDialog > 0 ) {
 		rgnName = DataTableGetString(true, LibapxWAYGATEDIALOGREGDATATABLEIDENTIFIER + " " + IntToString(waygateDialog));
 		// anchor dialog to position where unit died with a new unit
-		UnitCreate(1, LibapxWAYGATEDIALOGANCHORUNIT, c_unitCreateIgnorePlacement, 0, UnitGetPosition(EventUnit()), 270.0);
+		UnitCreate(1, LibapxWaygateDialogAnchorUnit, c_unitCreateIgnorePlacement, 0, UnitGetPosition(EventUnit()), 270.0);
 		DataTableSetUnit(true, LibapxWAYGATEANCHORDATATABLEIDENTIFIER + " " + rgnName, UnitLastCreated());
 
 		//ActorSend(libNtve_gf_MainActorofUnit(UnitLastCreated()), "SetOpacity {0.1}"); // set opacity to hide

@@ -48,9 +48,9 @@ in the action list which will say
 Run Trigger (Check Conditions, Don't Wait until it finishes)
 ```
 Select the **Trigger** and a window will appear with multiple triggers. Select
-**apexTrig** and hit OK. The action should now say
+**apex_trig** and hit OK. The action should now say
 ```
-Run apexTrig (Check Conditions, Don't Wait until it finishes)
+Run apex_trig (Check Conditions, Don't Wait until it finishes)
 ```
 
 You are now good to go! Run the map and see if the Apex engine works!
@@ -66,17 +66,17 @@ be found under the import path **Apex/Apex.galaxy**.
 
 ### Data
 Inside the **data/data.galaxy** file, there will be a list of const strings
-prefixed by **LibapxBEHAVIOR**. These are all behaviors that must be
+prefixed by **LibapxBehavior**. These are all behaviors that must be
 created in the SC2Editor for a map that uses Apex. Go to the **Data Editor**
 (F7) and create all these behaviors with the names defined by the constants.
 **If the names do not match, certain commands will not work ingame.**
 
 ### Adding Chat UI
-Included in the repo imported should also be the **chatFrame.SC2Layout** file
-under **Apex/chatFrame.SC2Layout**. Go back to the **Data Editor** (F7)
+Included in the repo imported should also be the **chat_frame.SC2Layout** file
+under **Apex/chat_frame.SC2Layout**. Go back to the **Data Editor** (F7)
 and go to the **Game UI Data** tab. In the **Default SC2 UI Settings** entry,
 go to the **(Basic) UI: Custom Layout Files+** field and add the
-**Apex/chatFrame.SC2Layout**.
+**Apex/chat_frame.SC2Layout**.
 
 ### Player banks
 Now initialize player banks. In the top bar of the SC2 Editor, navigate to  
@@ -96,7 +96,7 @@ include "apex/Apex.galaxy"
 Now create a new trigger with event **Map Initialization** and create an action
 to run the custom code
 ```
-LibapxInitialize();
+libapx_initialize();
 ```
 
 Now test the map and see if the Apex engine works!
