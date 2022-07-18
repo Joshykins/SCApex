@@ -505,7 +505,7 @@ void LibapxDefineModelswap(string commandName) {
 	LibapxCommandsGuideEntrySet(
 		gv_CommandsGuideEntryActor, 
 		commandName, 
-		" This command changes the model of an actor. It can be used with target. <br> @modelswap ->[target] [modelname] [variation] <br> Examples: <br> @modelswap BeaconApex <br> @modelswap HavenTree 02 <br> @target 123;@attach beaconApex head;@modelswap ->123 shapesmileyface "
+		" This command changes the model of an actor. It can be used with target. <br> @modelswap ->[target] [modelname] [variation] <br> Examples: <br> @modelswap Beacon_Apex <br> @modelswap HavenTree 02 <br> @target 123;@attach Beacon_Apex head;@modelswap ->123 shapesmileyface "
 	);
 }
 
@@ -1126,7 +1126,7 @@ void LibapxDefineAttach(string commandName) {
 
 // LibapxCommandRotation
 // =====================
-//This command uses the "ApexRotator" model and actor with attachmodeloffset to achieve  x y and z rotations.
+//This command uses the "Apex_Rotator" model and actor with attachmodeloffset to achieve  x y and z rotations.
 // ex @rotation 90x 35z 25x
 // @rotation 32y
 // Modifiers
@@ -1242,7 +1242,7 @@ void LibapxDefineRotation(string commandName) {
 	LibapxCommandsGuideEntrySet(
 	 	gv_CommandsGuideEntryActor, 
 		commandName, 
-		" This command creates a new actor on top of what actor it is called on with a specified rotation. It is not compatible with target. <br> @rotation [modifiers] [rotations.. <br> @rotation can have it's functionality and inputs modified with three modifiers, these modifiers are <br> -b: This changes the end actor from a default actor to a BeaconApex actor <br> -ypr: This changes it's xyz inputs into yaw pitch roll inputs <br> -nocache: This makes the command no longer store in the units caches. <br> Examples: <br> @rotation 30y <br> @rotation 90y 10z <br> @rotation -b 90x 35z 190y <br> @rotation -ypr 90y 32p 15r "
+		" This command creates a new actor on top of what actor it is called on with a specified rotation. It is not compatible with target. <br> @rotation [modifiers] [rotations.. <br> @rotation can have it's functionality and inputs modified with three modifiers, these modifiers are <br> -b: This changes the end actor from a default actor to a Beacon_Apex actor <br> -ypr: This changes it's xyz inputs into yaw pitch roll inputs <br> -nocache: This makes the command no longer store in the units caches. <br> Examples: <br> @rotation 30y <br> @rotation 90y 10z <br> @rotation -b 90x 35z 190y <br> @rotation -ypr 90y 32p 15r "
 	);
 }
 //Helper commands for rotation
@@ -1253,10 +1253,10 @@ void attachRotationX(int degrees, bool absScale, unit u) {
 	//X is Target_01-08
 	//Y is Hit_01-08
 	//Z is Hardpoint_01-08
-	string actorName = "BeaconApex";
+	string actorName = "Beacon_Apex";
 	int degreesAbs = AbsI(degrees);
 	if(absScale) {
-		actorName = "ApexActor";
+		actorName = "Apex_Actor";
 	}
 	while(degreesAbs > 360 || degreesAbs == 360) {
 		degreesAbs -= 360;
@@ -1287,7 +1287,7 @@ void attachRotationX(int degrees, bool absScale, unit u) {
 	}
 
 
-	ActorSendTo(libNtve_gf_MainActorofUnit(u),"::Main", "ModelSwap ApexRotator");
+	ActorSendTo(libNtve_gf_MainActorofUnit(u),"::Main", "ModelSwap Apex_Rotator");
 	ActorSendTo(libNtve_gf_MainActorofUnit(u),"::Main", "SetScaleAbsolute 1");
 	ActorSendTo(libNtve_gf_MainActorofUnit(u),"::Main", "ModelAllowHitTest 0");
 	//AttachModelOffset " +attachment + " {} " + attachPoint + " " + offset + " " + rotation + " " + siteops
@@ -1302,10 +1302,10 @@ void attachRotationZ(int degrees, bool absScale, unit u) {
 	//X is Target_01-08
 	//Y is Hit_01-08
 	//Z is Hardpoint_01-08
-	string actorName = "BeaconApex";
+	string actorName = "Beacon_Apex";
 	int degreesAbs = AbsI(degrees);
 	if(absScale) {
-		actorName = "ApexActor";
+		actorName = "Apex_Actor";
 	}
 	while(degreesAbs > 360 || degreesAbs == 360) {
 		degreesAbs -= 360;
@@ -1338,7 +1338,7 @@ void attachRotationZ(int degrees, bool absScale, unit u) {
 	}
 
 
-	ActorSendTo(libNtve_gf_MainActorofUnit(u),"::Main", "ModelSwap ApexRotator");
+	ActorSendTo(libNtve_gf_MainActorofUnit(u),"::Main", "ModelSwap Apex_Rotator");
 	ActorSendTo(libNtve_gf_MainActorofUnit(u),"::Main", "SetScaleAbsolute 1");
 	ActorSendTo(libNtve_gf_MainActorofUnit(u),"::Main", "ModelAllowHitTest 0");
 	//AttachModelOffset " +attachment + " {} " + attachPoint + " " + offset + " " + rotation + " " + siteops
@@ -1351,10 +1351,10 @@ void attachRotationY(int degrees, bool absScale, unit u) {
 	//X is Target_01-08
 	//Y is Hit_01-08
 	//Z is Hardpoint_01-08
-	string actorName = "BeaconApex";
+	string actorName = "Beacon_Apex";
 	int degreesAbs = AbsI(degrees);
 	if(absScale) {
-		actorName = "ApexActor";
+		actorName = "Apex_Actor";
 	}
 	while(degreesAbs > 360 || degreesAbs == 360) {
 		degreesAbs -= 360;
@@ -1387,7 +1387,7 @@ void attachRotationY(int degrees, bool absScale, unit u) {
 	}
 
 
-	ActorSendTo(libNtve_gf_MainActorofUnit(u),"::Main", "ModelSwap ApexRotator");
+	ActorSendTo(libNtve_gf_MainActorofUnit(u),"::Main", "ModelSwap Apex_Rotator");
 	ActorSendTo(libNtve_gf_MainActorofUnit(u),"::Main", "SetScaleAbsolute 1");
 	ActorSendTo(libNtve_gf_MainActorofUnit(u),"::Main", "ModelAllowHitTest 0");
 	//AttachModelOffset " +attachment + " {} " + attachPoint + " " + offset + " " + rotation + " " + siteops
