@@ -73,9 +73,20 @@ bool LibapxVariableWithinBraceCheck(string stringToCheck, int currentIndex) {
 	int closeI = 0;
 	bool opened = false;
 	bool closed = false;
-	if ((StringFind(stringBefore, gv_LibapxVariableParserStartString, c_stringNoCase)  != -1) 
-    && 
-    (StringFind(stringAfter, gv_LibapxVariableParserEndString, c_stringNoCase)  != -1)) {
+    int stringBeforeEndIndex = StringFind(stringBefore, gv_LibapxVariableParserEndString, c_stringNoCase);
+    int stringBeforeStartIndex = StringFind(stringBefore, gv_LibapxVariableParserStartString, c_stringNoCase);
+    int stringAfterEndIndex = StringFind(stringAfter, gv_LibapxVariableParserEndString, c_stringNoCase);
+    int stringAfterStartIndex = StringFind(stringAfter, gv_LibapxVariableParserStartString, c_stringNoCase);
+
+	if (
+        (stringBeforeStartIndex != -1) 
+        &&
+        (stringBeforeStartIndex > stringBeforeEndIndex)
+        &&
+        (stringAfterEndIndex != -1)
+        && 
+        ((stringAfterEndIndex < stringAfterStartIndex) || (stringAfterStartIndex == -1))
+        ) {
         return true;
 	}
 	return false;

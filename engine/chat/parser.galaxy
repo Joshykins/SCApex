@@ -188,6 +188,8 @@ void LibapxChatParse(string msg, int player, unitgroup target, int spawningCount
 
 		}
 
+
+
 		//pull bracket pairs and remove
 		i = 1;
 		bracketText = "";
@@ -228,6 +230,7 @@ void LibapxChatParse(string msg, int player, unitgroup target, int spawningCount
 
 		//Logic for breaking down variables
 		current = LibapxVariableParse(current, gv_LibapxPlayerParser[player][spawningCount].context, player);
+
 
 
 

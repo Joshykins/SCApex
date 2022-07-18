@@ -310,6 +310,11 @@ string LibapxUtilsTrimExcessZeros(string input) {
 	int i;
 	string current;
 	int amountOfZerosOnEnd = 0;
+	
+	if(StringFind(input, ".", c_stringNoCase) == -1) {
+		return input;
+	}
+
 	for (i = StringLength(input); i > 0; i -= 1) {
 		current = StringSub(input, i,i);
 		if(current == "0") {

@@ -2215,13 +2215,15 @@ void LibapxCommandSetVar(int user, unitgroup u, string argv, int spawningCount, 
 		return;
 	}
 	else if(!LibapxIsFixed(value)) {
+		LibapxPrintOutput(user, value  + " | THIS IS VALUE");
+
 		LibapxPrintError(user, "Variable must be a number.");
 		return;
 	}
 
 	LibapxVariableSet(name, value);
 	if(gv_LibapxPlayer[user].helpMessages) {
-		LibapxPrintOutput(user, "[SET] '"+name+"' = '"+value+"'" );
+		LibapxPrintOutput(user, "<c val=\"00ffff\">[SET]</c> "+name+" = "+value+"" );
 	}
 	return;
 }
