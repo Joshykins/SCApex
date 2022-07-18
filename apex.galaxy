@@ -1,6 +1,6 @@
 //=========================================================
 //		Apex Roleplaying Engine
-//		Copyright (c) 2019, Apex Group
+//		Copyright (c) 2022, Apex Group
 //=========================================================
 // This software is distributed under the MIT License:
 // <http://opensource.org/licenses/MIT>
@@ -8,41 +8,48 @@
 include "apex/engine/globals.galaxy"
 include "apex/engine/engine.galaxy"
 include "apex/commands/commands.galaxy"
+include "apex/variables/variables.galaxy"
 include "apex/ui/ui.galaxy"
-// include "apex/ui_lib/ui_library.galaxy"
+// include "apex/uiLib/uiLibrary.galaxy"
 include "apex/toolkit/toolkit.galaxy"
 
 // welcome message
-static string[7] libapx_inspirational_quotes;
+static string[7] InspirationalQuotes;
 
+//TODO: Add a function to make units not save with gamesetup
+//TODO: 3
+
+//THIS HAS TO BE SNAKE, TRIGGER TIES INTO THIS
+//DO NOT CHANGE, EVER
 void libapx_initialize() {
 	int i = RandomInt(0,6);
-	libapx_toolkit_initialize();
-	libapx_engine_initialize();
-	libapx_commands_initialize();
-	libapx_ui_initialize();
-	libapx_globals_init();
-	libapx_statbars_init();
+	LibapxToolkitInitialize();
+	LibapxEngineInitialize();
+	LibapxCommandsInitialize();
+	LibapxVariableFunctionInitialize();
+	LibapxUiInitialize();
+	LibapxGlobalsInit();
+	LibapxStatbarsInit();
 	// Josh Testing Some new UI Lib, doesn't work yet :).
-	// libapx_initilize_ui_lib();
-	libapx_inspirational_quotes[0] = " Be inspired. This engine can do almost anything you could want! ";
-	libapx_inspirational_quotes[1] = " Don't always be a passive roleplayer. Have your character be proactive and go to people instead of waiting about for someone to come to you. ";
-	libapx_inspirational_quotes[2] = " Cooperate and be considerate of what others want while roleplaying. Try your best to make everyone in the roleplay satisfied with their experience. ";
-	libapx_inspirational_quotes[3] = " Don't constrict others. Roleplayers and creators alike don't like having their freedom constricted, don't force your desires onto others unless they're being harmfull to the roleplay. ";
-	libapx_inspirational_quotes[4] = " Don't know something? Are you looking to do what that person just did but it isn't in the commands guide or references? Come to the discord and pose your question, someone will know how to do it. ";
-	libapx_inspirational_quotes[5] = " If you're new be public about it. Come join us on discord and we'll make your time in Apex easier. ";
-	libapx_inspirational_quotes[6] = " Help the new players. A good and welcoming community is only possible if most will it. Don't drag everyone down. ";
+	// LibapxInitilizeUiLib();
+	InspirationalQuotes[0] = " Be inspired. This engine can do almost anything you could want! ";
+	InspirationalQuotes[1] = " Don't always be a passive roleplayer. Have your character be proactive and go to people instead of waiting about for someone to come to you. ";
+	InspirationalQuotes[2] = " Cooperate and be considerate of what others want while roleplaying. Try your best to make everyone in the roleplay satisfied with their experience. ";
+	InspirationalQuotes[3] = " Don't constrict others. Roleplayers and creators alike don't like having their freedom constricted, don't force your desires onto others unless they're being harmfull to the roleplay. ";
+	InspirationalQuotes[4] = " Don't know something? Are you looking to do what that person just did but it isn't in the commands guide or references? Come to the discord and pose your question, someone will know how to do it. ";
+	InspirationalQuotes[5] = " If you're new be public about it. Come join us on discord and we'll make your time in Apex easier. ";
+	InspirationalQuotes[6] = " Help the new players. A good and welcoming community is only possible if most will it. Don't drag everyone down. ";
 
 
 	if(RandomInt(0,1000) != 666) {
-		libapx_print(PlayerGroupAll(), "Welcome to the <c val=\"ff0000\"> Apex Roleplaying Engine</c> created by Serobliss. " + libapx_inspirational_quotes[i]);
+		LibapxPrint(PlayerGroupAll(), "Welcome to the <c val=\"ff0000\"> Apex Roleplaying Engine</c> created by Serobliss. " + InspirationalQuotes[i]);
 	}
 	else {
-		libapx_print(PlayerGroupAll(), "Welcome to the <c val=\"ff0000\"> Apex Roleplaying Engine</c> created by Serobliss. hE'S kInDa a bIg dEaL. SeRoBliSs Is GaY ");
+		LibapxPrint(PlayerGroupAll(), "Welcome to the <c val=\"ff0000\"> Apex Roleplaying Engine</c> created by Serobliss. hE'S kInDa a bIg dEaL. SeRoBliSs Is GaY ");
 	}
 	
-	libapx_bank_load();
-	libapx_api_start();
-	//libapx_print(PlayerGroupAll(), "apex Engine: v" + IntToString(gv_LibapxBuildVersion) + "." + IntToString(gv_LibapxBuildSubVersion) + gv_LibapxBuildVersionModifier);
-	//libapx_print(PlayerGroupAll(), libapx_SPLASH_MESSAGE);
+	LibapxBankLoad();
+	LibapxApiStart();
+	//LibapxPrint(PlayerGroupAll(), "apex Engine: v" + IntToString(gv_LibapxBuildVersion) + "." + IntToString(gv_LibapxBuildSubVersion) + gv_LibapxBuildVersionModifier);
+	//LibapxPrint(PlayerGroupAll(), LibapxSPLASHMESSAGE);
 }

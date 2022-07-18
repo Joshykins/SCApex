@@ -1,24 +1,24 @@
 //=========================================================
 //		Apex Roleplaying Engine
-//		Copyright (c) 2019, Apex Group
+//		Copyright (c) 2022, Apex Group
 //=========================================================
 // This software is distributed under the MIT License:
 // <http://opensource.org/licenses/MIT>
 //=========================================================
 
-const int libapx_ALIAS_MAX_DEPTH = 12;	// max depth of recursive alias replacing (prevent infinite aliasing)
-const string libapx_BANK_SECTION_ALIAS = "aliases";
-void libapx_alias_chk(string alias, int player);
+const int gv_LibapxAliasMaxDepth = 12;	// max depth of recursive alias replacing (prevent infinite aliasing)
+const string gv_LibapxBankSectionAlias = "aliases";
+void LibapxAliasChk(string alias, int player);
 
-// libapx_alias_insert_in_list
+// AliasInsertInList
 // =====================
 // Inserts an alias string into the (player) alias list, list given by:
 //  " alias(1) alias(2) alias(3) ... alias(n) "
 // Each alias separated by a space. Note the spaces at each end of the string.
 // Alias is inserted in order by searching through list until find
-// the index k where: alias_inserted < alias(k).
+// the index k where: aliasInserted < alias(k).
 // Otherwise, if not less than any, alias appended to the end.
-static string libapx_alias_insert_in_list(string list, string alias) {
+static string AliasInsertInList(string list, string alias) {
 	string curr = StringWord(list, 1);
 	int i = 1;
 	int index = 1; // index in string
@@ -38,10 +38,10 @@ static string libapx_alias_insert_in_list(string list, string alias) {
 }
 
 
-// libapx_alias_command_redirect
+// LibapxAliasCommandRedirect
 // ===================
 // gets "alias ..." command from parser, redirects to function
-bool libapx_alias_command_redirect(string command, int player) {
+bool LibapxAliasCommandRedirect(string command, int player) {
 	string subcommand = StringWord(command, 2);
 	string alias = "";
 	string content = "";
@@ -49,91 +49,96 @@ bool libapx_alias_command_redirect(string command, int player) {
 		alias = StringWord(command, 3);
 
 
-		// remove "_alias" and "create" and the alias from chat msg
-		content = StringReplaceWord(libapx_player[player].chat_msg, "_alias", "", 1, c_stringNoCase);
-		content = StringReplaceWord(libapx_player[player].chat_msg, "alias", "", 1, c_stringNoCase);
+		// remove "Alias" and "create" and the alias from chat msg
+		content = StringReplaceWord(gv_LibapxPlayer[player].chatMsg, "Alias", "", 1, c_stringNoCase);
+		content = StringReplaceWord(gv_LibapxPlayer[player].chatMsg, "alias", "", 1, c_stringNoCase);
 		content = StringReplaceWord(content, "create", "", 1, c_stringNoCase);
-		content = libapx_string_trim( StringSub(content, StringFind(content, alias, c_stringNoCase) + StringLength(alias) + 1, StringLength(content)) );
+		content = LibapxStringTrim( StringSub(content, StringFind(content, alias, c_stringNoCase) + StringLength(alias) + 1, StringLength(content)) );
 
 
 		// first check if alias already exists
-		if( BankKeyExists(libapx_player[player].bank_storage, libapx_BANK_SECTION_ALIAS, alias) ) {
-			libapx_print_error(player, "Alias already exists, rewriting");
-			libapx_bank_remove(libapx_BANK_SECTION_ALIAS, alias, player);
-			libapx_player[player].aliases = StringReplaceWord(libapx_player[player].aliases, " " + alias + " ", " ", 1, c_stringCase);
-			libapx_print_success(player, "ALIAS REMOVED: " + alias);
+		if( BankKeyExists(gv_LibapxPlayer[player].bankStorage, gv_LibapxBankSectionAlias, alias) ) {
+			LibapxPrintError(player, "Alias already exists, rewriting");
+			LibapxBankRemove(gv_LibapxBankSectionAlias, alias, player);
+			gv_LibapxPlayer[player].aliases = StringReplaceWord(gv_LibapxPlayer[player].aliases, " " + alias + " ", " ", 1, c_stringCase);
+			LibapxPrintSuccess(player, "ALIAS REMOVED: " + alias);
 
-			libapx_bank_create(libapx_BANK_SECTION_ALIAS, alias, content, player);
-			libapx_player[player].aliases = libapx_alias_insert_in_list(libapx_player[player].aliases, alias);
-			libapx_print_success(player, "ALIAS CREATED: " + alias + "\n" + "[\'" + content + "\']");
-			libapx_alias_chk(alias, player);
+			LibapxBankCreate(gv_LibapxBankSectionAlias, alias, content, player);
+			gv_LibapxPlayer[player].aliases = AliasInsertInList(gv_LibapxPlayer[player].aliases, alias);
+			LibapxPrintSuccess(player, "ALIAS CREATED: " + alias + "\n" + "[\'" + content + "\']");
+			LibapxAliasChk(alias, player);
 
 			return true;
 		}
 
 		if( content != "" ) {
-			libapx_bank_create(libapx_BANK_SECTION_ALIAS, alias, content, player);
-			libapx_player[player].aliases = libapx_alias_insert_in_list(libapx_player[player].aliases, alias);
-			libapx_print_success(player, "ALIAS CREATED: " + alias + "\n" + "[\'" + content + "\']");
-			libapx_alias_chk(alias, player);
+			LibapxBankCreate(gv_LibapxBankSectionAlias, alias, content, player);
+			gv_LibapxPlayer[player].aliases = AliasInsertInList(gv_LibapxPlayer[player].aliases, alias);
+			LibapxPrintSuccess(player, "ALIAS CREATED: " + alias + "\n" + "[\'" + content + "\']");
+			LibapxAliasChk(alias, player);
 		}
 		else {
-			libapx_print_error(player, "ALIAS CANNOT BE EMPTY");
+			LibapxPrintError(player, "ALIAS CANNOT BE EMPTY");
 		}
 
 		return true;
 	}
 	else if( StringEqual(subcommand, "remove", c_stringNoCase) ) {
 		alias = StringWord(command, 3);
-		if( BankKeyExists(libapx_player[player].bank_storage, libapx_BANK_SECTION_ALIAS, alias) ) {
-			libapx_bank_remove(libapx_BANK_SECTION_ALIAS, alias, player);
-			libapx_player[player].aliases = StringReplaceWord(libapx_player[player].aliases, " " + alias + " ", " ", 1, c_stringCase);
-			libapx_print_success(player, "ALIAS REMOVED: " + alias);
+		if( BankKeyExists(gv_LibapxPlayer[player].bankStorage, gv_LibapxBankSectionAlias, alias) ) {
+			LibapxBankRemove(gv_LibapxBankSectionAlias, alias, player);
+			gv_LibapxPlayer[player].aliases = StringReplaceWord(gv_LibapxPlayer[player].aliases, " " + alias + " ", " ", 1, c_stringCase);
+			LibapxPrintSuccess(player, "ALIAS REMOVED: " + alias);
 		}
 		else {
-			libapx_print_error(player, "ALIAS " + alias + " DOES NOT EXIST");
+			LibapxPrintError(player, "ALIAS " + alias + " DOES NOT EXIST");
 		}
 	}
 	else if( StringEqual(subcommand, "removeall", c_stringNoCase) ) {
-		libapx_bank_section_remove_all(libapx_BANK_SECTION_ALIAS, player);
-		libapx_player[player].aliases = "";
-		libapx_print_success(player, "ALL ALIASES REMOVED");
+		LibapxBankSectionRemoveAll(gv_LibapxBankSectionAlias, player);
+		gv_LibapxPlayer[player].aliases = "";
+		LibapxPrintSuccess(player, "ALL ALIASES REMOVED");
 	}
 	else if( StringEqual(subcommand, "list", c_stringNoCase) ) {
-		//libapx_player[player].aliases = libapx_sort_aliases(player);
-		alias = libapx_string_trim(libapx_player[player].aliases);
+		//gv_LibapxPlayer[player].aliases = LibapxSortAliases(player);
+		alias = LibapxStringTrim(gv_LibapxPlayer[player].aliases);
 		alias = StringReplaceWord(alias, " ", ", ", c_stringReplaceAll, c_stringNoCase);
-		libapx_print_output(player, "ALIASES: ");
-		libapx_print(PlayerGroupSingle(player), alias);
+		LibapxPrintOutput(player, "ALIASES: ");
+		LibapxPrint(PlayerGroupSingle(player), alias);
 	}
 	else if( StringEqual(subcommand, "print", c_stringNoCase) ) {
-		libapx_bank_key_content_dump(libapx_BANK_SECTION_ALIAS, StringWord(command, 3), player);
+		LibapxBankKeyContentDump(gv_LibapxBankSectionAlias, StringWord(command, 3), player);
 	}
-	else if( BankKeyExists(libapx_player[player].bank_storage, libapx_BANK_SECTION_ALIAS, subcommand) ) {
-		libapx_bank_key_content_dump(libapx_BANK_SECTION_ALIAS, subcommand, player);
+	else if( BankKeyExists(gv_LibapxPlayer[player].bankStorage, gv_LibapxBankSectionAlias, subcommand) ) {
+		LibapxBankKeyContentDump(gv_LibapxBankSectionAlias, subcommand, player);
 	}
 	else {
-		libapx_print_error(player, "INVALID ALIAS COMMAND");
+		LibapxPrintError(player, "INVALID ALIAS COMMAND");
 	}
 
 	return false;
 }
 
-// libapx_alias_sub
+// LibapxAliasSub
 // ===================
 // recursively find and replace aliases in a given string
-string libapx_alias_sub(string msg, int player, int recursion_depth) {
+string LibapxAliasSub(string msg, int player, int recursionDepth) {
 	string alias = StringWord(msg, 1);
 	string subbed = "";
 	int i = 1;
 
-	if( recursion_depth > libapx_ALIAS_MAX_DEPTH ) {
+	if( recursionDepth > gv_LibapxAliasMaxDepth ) {
 		return msg;
 	}
 
 	while( alias != "" ) {
-		if( BankKeyExists( libapx_player[player].bank_storage, libapx_BANK_SECTION_ALIAS, alias ) ) {
-			subbed = subbed + " " + libapx_alias_sub(BankValueGetAsString(libapx_player[player].bank_storage, libapx_BANK_SECTION_ALIAS, alias), player, recursion_depth + 1);
+		if( 
+			!LibapxVariableWithinBraceCheck(msg, StringFind(msg, alias, c_stringNoCase))
+			&& 
+			BankKeyExists( gv_LibapxPlayer[player].bankStorage, gv_LibapxBankSectionAlias, alias ) 
+		
+		) {
+			subbed = subbed + " " + LibapxAliasSub(BankValueGetAsString(gv_LibapxPlayer[player].bankStorage, gv_LibapxBankSectionAlias, alias), player, recursionDepth + 1);
 		}
 		else {
 			subbed = subbed + " " + alias;
@@ -147,26 +152,26 @@ string libapx_alias_sub(string msg, int player, int recursion_depth) {
 	return StringSub(subbed, 2, StringLength(subbed));
 }
 
-//libapx_chk_all_aliases
+//LibapxChkAllAliases
 // =====================
 // Checks all aliases
-void libapx_chk_all_aliases(int player) {
-	string aliases = libapx_string_trim(libapx_player[player].aliases);
+void LibapxChkAllAliases(int player) {
+	string aliases = LibapxStringTrim(gv_LibapxPlayer[player].aliases);
 	int i = 1;
 	while(StringWord(aliases, i) != "") {
-		libapx_alias_chk(StringWord(aliases, i), player);
+		LibapxAliasChk(StringWord(aliases, i), player);
 		i += 1;
 	}
 }
 
-// libapx_chk_alias
+// LibapxChkAlias
 // =====================
 // Checks alias for recursion or an invalid key
-void libapx_alias_chk(string alias, int player) {
-	string invalidKeyList = libapx_settings.commands;
+void LibapxAliasChk(string alias, int player) {
+	string invalidKeyList = gv_LibapxSettings.commands;
 	int i = 1;
 	string aliasVal = "";
-	if( !BankKeyExists( libapx_player[player].bank_storage, libapx_BANK_SECTION_ALIAS, alias ) ) { 
+	if( !BankKeyExists( gv_LibapxPlayer[player].bankStorage, gv_LibapxBankSectionAlias, alias ) ) { 
 		return;
 	}
 	//Remove "," from commands list
@@ -181,16 +186,16 @@ void libapx_alias_chk(string alias, int player) {
 	//Check if invalid key
 	while(StringWord(invalidKeyList, i) != "") {
 		if(alias == StringWord(invalidKeyList, i)) {
-			libapx_print_text(PlayerGroupActive(), libapx_player_name_colored(player) + StringToText(" had a alias with the key of <c val=\"00ffff\">" + alias + " </c> </n> As such this alias was removed because you can't have an alias with a key that matches a command."));
-			libapx_bank_remove(libapx_BANK_SECTION_ALIAS, alias, player);
-			libapx_player[player].aliases = StringReplaceWord(libapx_player[player].aliases, " " + alias + " ", " ", 1, c_stringCase);
+			LibapxPrintText(PlayerGroupActive(), gv_LibapxPlayerNameColored(player) + StringToText(" had a alias with the key of <c val=\"00ffff\">" + alias + " </c> </n> As such this alias was removed because you can't have an alias with a key that matches a command."));
+			LibapxBankRemove(gv_LibapxBankSectionAlias, alias, player);
+			gv_LibapxPlayer[player].aliases = StringReplaceWord(gv_LibapxPlayer[player].aliases, " " + alias + " ", " ", 1, c_stringCase);
 			return;
 		}
 		i += 1;
 	}
 
 	//Check for face-level recursion 
-	aliasVal = BankValueGetAsString(libapx_player[player].bank_storage, libapx_BANK_SECTION_ALIAS, alias);
+	aliasVal = BankValueGetAsString(gv_LibapxPlayer[player].bankStorage, gv_LibapxBankSectionAlias, alias);
 	while(StringFind(aliasVal, ";", c_stringNoCase) != -1 ) {
 		aliasVal = StringReplace(aliasVal,
 		" ",
@@ -202,9 +207,9 @@ void libapx_alias_chk(string alias, int player) {
 
 	while(StringWord(aliasVal, i) != "") {
 		if(alias == StringWord(aliasVal, i)) {
-			libapx_print_text(PlayerGroupActive(), libapx_player_name_colored(player) + StringToText(" had a recursive alias with the key of <c val=\"00ffff\">" + alias + " </c> </n> As such this alias was removed because recursion is prohibited."));
-			libapx_bank_remove(libapx_BANK_SECTION_ALIAS, alias, player);
-			libapx_player[player].aliases = StringReplaceWord(libapx_player[player].aliases, " " + alias + " ", " ", 1, c_stringCase);
+			LibapxPrintText(PlayerGroupActive(), gv_LibapxPlayerNameColored(player) + StringToText(" had a recursive alias with the key of <c val=\"00ffff\">" + alias + " </c> </n> As such this alias was removed because recursion is prohibited."));
+			LibapxBankRemove(gv_LibapxBankSectionAlias, alias, player);
+			gv_LibapxPlayer[player].aliases = StringReplaceWord(gv_LibapxPlayer[player].aliases, " " + alias + " ", " ", 1, c_stringCase);
 			return;
 		}
 		i += 1;
@@ -213,31 +218,31 @@ void libapx_alias_chk(string alias, int player) {
 }
 
 
-// libapx_strcmp
+// LibapxStrcmp
 // =============
 // String comparison function for use with qsort
-static int libapx_strcmp(string k1, string k2) {
+static int LibapxStrcmp(string k1, string k2) {
 	return StringCompare(DataTableGetString(true, k1), DataTableGetString(true, k2), c_stringCase);
 }
 
-// libapx_sort_aliases
+// LibapxSortAliases
 // ==================
 // Creates an alphabetized list of a player's alias strings where
 // each alias is separated by a space (e.g. "alias1 alias2 alias3 ...")
-string libapx_sort_aliases(int player) {
-	string var = libapx_BANK_SECTION_ALIAS + "_" + IntToString(player);
-	int count = BankKeyCount(libapx_player[player].bank_storage, libapx_BANK_SECTION_ALIAS);
+string LibapxSortAliases(int player) {
+	string var = gv_LibapxBankSectionAlias + "_" + IntToString(player);
+	int count = BankKeyCount(gv_LibapxPlayer[player].bankStorage, gv_LibapxBankSectionAlias);
 	int i;
 	string sorted = " ";
 
 	// gather aliases and set into a data table "array"
 	for( i = 0; i < count; i += 1 ) {
-		DataTableSetString(true, var + " " + IntToString(i), BankKeyName(libapx_player[player].bank_storage, libapx_BANK_SECTION_ALIAS, i));
-		//libapx_print_success(player, IntToString(i) + ":" + alias);
+		DataTableSetString(true, var + " " + IntToString(i), BankKeyName(gv_LibapxPlayer[player].bankStorage, gv_LibapxBankSectionAlias, i));
+		//LibapxPrintSuccess(player, IntToString(i) + ":" + alias);
 	}
 
 	// sort alias "array" in data table
-	libx_qsort(var + " 0", count, c_dataTypeString, libapx_strcmp);
+	libxQsort(var + " 0", count, c_dataTypeString, LibapxStrcmp);
 
 	// recollect sorted aliases and set into player's alias string
 	for( i = 0; i < count; i += 1 ) {

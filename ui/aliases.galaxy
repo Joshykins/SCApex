@@ -1,13 +1,13 @@
 //=========================================================
 //		Apex Roleplaying Engine
-//		Copyright (c) 2019, Apex Group
+//		Copyright (c) 2022, Apex Group
 //=========================================================
 // This software is distributed under the MIT License:
 // <http://opensource.org/licenses/MIT>
 //=========================================================
 
 //Dealing with aliases101, copied from aliases ;)
-static string libapx_alias_insert_in_list(string list, string alias) {
+static string AliasInsertInList(string list, string alias) {
 	string curr = StringWord(list, 1);
 	int i = 1;
 	int index = 1; // index in string
@@ -27,88 +27,88 @@ static string libapx_alias_insert_in_list(string list, string alias) {
 }
 
 //Dialog for aliases
-int libapx_ui_aliases;
-int libapx_ui_aliases_exit;
-static string[libapx_MAX_PLAYERS]  searchQuery;
+int LibapxUiAliases;
+int LibapxUiAliasesExit;
+static string[gv_LibapxMaxPlayers]  searchQuery;
 
 //Dialog Control Items
-static int libapx_ui_aliases_list_key;
-static int libapx_ui_aliases_list_output;
-static int libapx_ui_aliases_search;
-static int libapx_ui_aliases_search_btn;
-static int libapx_ui_aliases_search_reset;
+static int LibapxUiAliasesListKey;
+static int LibapxUiAliasesListOutput;
+static int LibapxUiAliasesSearch;
+static int LibapxUiAliasesSearchBtn;
+static int LibapxUiAliasesSearchReset;
 
-static int libapx_ui_aliases_key;
-static int libapx_ui_aliases_key_btn;
-static int libapx_ui_aliases_key_btn_remove;
-static int libapx_ui_aliases_val;
-
-
+static int LibapxUiAliasesKey;
+static int LibapxUiAliasesKeyBtn;
+static int LibapxUiAliasesKeyBtnRemove;
+static int LibapxUiAliasesVal;
 
 
 
-void libapx_ui_aliases_init() {
+
+
+void LibapxUiAliasesInit() {
 
 
   //Main Dialog init
-  libapx_ui_aliases = libapx_create_dialog(650, 700, c_anchorTopLeft, libapx_ui_panel_spacing, 0);
-  libapx_ui_aliases_exit = libapx_create_dialog_close_btn(libapx_ui_aliases, 650, 700, c_anchorTopLeft, libapx_ui_panel_spacing, 0);
+  LibapxUiAliases = LibapxCreateDialog(650, 700, c_anchorTopLeft, gv_LibapxUiPanelSpacing, 0);
+  LibapxUiAliasesExit = LibapxCreateDialogCloseBtn(LibapxUiAliases, 650, 700, c_anchorTopLeft, gv_LibapxUiPanelSpacing, 0);
 
   //Title for page
-  libapx_create_dialog_title(libapx_ui_aliases , 300, 40, 00, 40, "Alias Editor", libapx_UI_HEADER1,  180);
+  LibapxCreateDialogTitle(LibapxUiAliases , 300, 40, 00, 40, "Alias Editor", gv_LibapxUiHeader1,  180);
   //Title For List
-	libapx_create_dialog_label(libapx_ui_aliases, 250, 40, c_anchorTop, -200, 84, "Alias List", libapx_UI_HEADER2);
+	LibapxCreateDialogLabel(LibapxUiAliases, 250, 40, c_anchorTop, -200, 84, "Alias List", gv_LibapxUiHeader2);
   //SearchTitle
-	libapx_create_dialog_label(libapx_ui_aliases, 250, 40, c_anchorTop, -200, 517, "Search", libapx_UI_HEADER2);
+	LibapxCreateDialogLabel(LibapxUiAliases, 250, 40, c_anchorTop, -200, 517, "Search", gv_LibapxUiHeader2);
   //Key Title
-	libapx_create_dialog_label(libapx_ui_aliases, 250, 40, c_anchorTop, -200, 565, "Key Value", libapx_UI_HEADER2);
+	LibapxCreateDialogLabel(LibapxUiAliases, 250, 40, c_anchorTop, -200, 565, "Key Value", gv_LibapxUiHeader2);
   //keyvalue
-  libapx_ui_aliases_key = libapx_create_dialog_editbox(libapx_ui_aliases, 270, 50, c_anchorTopLeft, 215, 560);
-  libapx_ui_aliases_key_btn = libapx_create_dialog_btn(libapx_ui_aliases, 50, 50, c_anchorTopLeft, 515, 560, "Set Alias", "" );
-  libapx_ui_aliases_key_btn_remove = libapx_create_dialog_btn(libapx_ui_aliases, 50, 50, c_anchorTopLeft, 565, 560, "Remove Alias", "" );
-	libapx_create_dialog_btn_icon(libapx_ui_aliases, libapx_ui_aliases_key_btn, 40, 40, libapx_UI_ICON_GO);
-	libapx_create_dialog_btn_icon(libapx_ui_aliases, libapx_ui_aliases_key_btn_remove, 40, 40, libapx_UI_ICON_X);
+  LibapxUiAliasesKey = LibapxCreateDialogEditbox(LibapxUiAliases, 270, 50, c_anchorTopLeft, 215, 560);
+  LibapxUiAliasesKeyBtn = LibapxCreateDialogBtn(LibapxUiAliases, 50, 50, c_anchorTopLeft, 515, 560, "Set Alias", "" );
+  LibapxUiAliasesKeyBtnRemove = LibapxCreateDialogBtn(LibapxUiAliases, 50, 50, c_anchorTopLeft, 565, 560, "Remove Alias", "" );
+	LibapxCreateDialogBtnIcon(LibapxUiAliases, LibapxUiAliasesKeyBtn, 40, 40, gv_LibapxUiIconGo);
+	LibapxCreateDialogBtnIcon(LibapxUiAliases, LibapxUiAliasesKeyBtnRemove, 40, 40, gv_LibapxUiIconX);
   //value
-  libapx_ui_aliases_val = libapx_create_dialog_editbox(libapx_ui_aliases, 580, 50, c_anchorTopLeft, 25, 610);
+  LibapxUiAliasesVal = LibapxCreateDialogEditbox(LibapxUiAliases, 580, 50, c_anchorTopLeft, 25, 610);
 
   //search
-  libapx_ui_aliases_search = libapx_create_dialog_editbox(libapx_ui_aliases, 270, 50, c_anchorTopLeft, 215, 510);
-  libapx_ui_aliases_search_reset = libapx_create_dialog_btn(libapx_ui_aliases, 50, 50, c_anchorTopLeft, 565, 510, "Reset List", "" );
-  libapx_ui_aliases_search_btn = libapx_create_dialog_btn(libapx_ui_aliases, 50, 50, c_anchorTopLeft, 515, 510, "Search Bank", "" );
+  LibapxUiAliasesSearch = LibapxCreateDialogEditbox(LibapxUiAliases, 270, 50, c_anchorTopLeft, 215, 510);
+  LibapxUiAliasesSearchReset = LibapxCreateDialogBtn(LibapxUiAliases, 50, 50, c_anchorTopLeft, 565, 510, "Reset List", "" );
+  LibapxUiAliasesSearchBtn = LibapxCreateDialogBtn(LibapxUiAliases, 50, 50, c_anchorTopLeft, 515, 510, "Search Bank", "" );
 
-	libapx_create_dialog_btn_icon(libapx_ui_aliases, libapx_ui_aliases_search_btn, 40, 40, libapx_UI_ICON_SEARCH);
-	libapx_create_dialog_btn_icon(libapx_ui_aliases, libapx_ui_aliases_search_reset, 40, 40, libapx_UI_ICON_RESET);
+	LibapxCreateDialogBtnIcon(LibapxUiAliases, LibapxUiAliasesSearchBtn, 40, 40, gv_LibapxUiIconSearch);
+	LibapxCreateDialogBtnIcon(LibapxUiAliases, LibapxUiAliasesSearchReset, 40, 40, gv_LibapxUiIconReset);
 
 
   //alias List Dialog(keyvalue)
-  libapx_ui_aliases_list_key = libapx_create_dialog_list(libapx_ui_aliases, 230, 400, c_anchorTopLeft, 25, 112);
+  LibapxUiAliasesListKey = LibapxCreateDialogList(LibapxUiAliases, 230, 400, c_anchorTopLeft, 25, 112);
 
   //alias Output Dialog(pair)
-  libapx_ui_aliases_list_output = libapx_create_dialog_list(libapx_ui_aliases, 340, 400, c_anchorTopRight, 25, 112);
+  LibapxUiAliasesListOutput = LibapxCreateDialogList(LibapxUiAliases, 340, 400, c_anchorTopRight, 25, 112);
 
   //Triggers for search
-	TriggerAddEventDialogControl(TriggerCreate("libapx_ui_aliases_filter"), c_playerAny, libapx_ui_aliases_search_btn, c_triggerControlEventTypeClick);
-  TriggerAddEventDialogControl(TriggerCreate("libapx_ui_aliases_list_reset"), c_playerAny, libapx_ui_aliases_search_reset, c_triggerControlEventTypeClick);
+	TriggerAddEventDialogControl(TriggerCreate("LibapxUiAliasesFilter"), c_playerAny, LibapxUiAliasesSearchBtn, c_triggerControlEventTypeClick);
+  TriggerAddEventDialogControl(TriggerCreate("LibapxUiAliasesListReset"), c_playerAny, LibapxUiAliasesSearchReset, c_triggerControlEventTypeClick);
   //Trigger for selection
-  TriggerAddEventDialogControl(TriggerCreate("libapx_ui_alias_select"), c_playerAny, libapx_ui_aliases_list_key, c_triggerControlEventTypeSelectionChanged);
+  TriggerAddEventDialogControl(TriggerCreate("LibapxUiAliasSelect"), c_playerAny, LibapxUiAliasesListKey, c_triggerControlEventTypeSelectionChanged);
   //Trigger for setting alias
-  TriggerAddEventDialogControl(TriggerCreate("libapx_ui_alias_set"), c_playerAny, libapx_ui_aliases_key_btn, c_triggerControlEventTypeClick);
+  TriggerAddEventDialogControl(TriggerCreate("LibapxUiAliasSet"), c_playerAny, LibapxUiAliasesKeyBtn, c_triggerControlEventTypeClick);
   //Trigger for removing alias
-  TriggerAddEventDialogControl(TriggerCreate("libapx_ui_alias_remove"), c_playerAny, libapx_ui_aliases_key_btn_remove, c_triggerControlEventTypeClick);
+  TriggerAddEventDialogControl(TriggerCreate("LibapxUiAliasRemove"), c_playerAny, LibapxUiAliasesKeyBtnRemove, c_triggerControlEventTypeClick);
 
 
 }
-static void libapx_ui_aliases_list_populate(int player) {
+static void UiAliasesListPopulate(int player) {
     int count = 1;	// counter
   	text msg;
     string alias;
-    alias = libapx_string_trim(libapx_player[player].aliases);
+    alias = LibapxStringTrim(gv_LibapxPlayer[player].aliases);
     searchQuery[player] = "";
-    DialogControlRemoveAllItems(libapx_ui_aliases_list_key, PlayerGroupSingle(player));
+    DialogControlRemoveAllItems(LibapxUiAliasesListKey, PlayerGroupSingle(player));
     while(StringWord(alias,count) != "")
     {
       msg = StringToText(StringWord(alias, count));
-      DialogControlAddItem(libapx_ui_aliases_list_key, PlayerGroupSingle(player), msg);
+      DialogControlAddItem(LibapxUiAliasesListKey, PlayerGroupSingle(player), msg);
       //Search Query Addition
       searchQuery[player]+=StringWord(alias,count) + " ";
 
@@ -117,25 +117,25 @@ static void libapx_ui_aliases_list_populate(int player) {
 }
 
 
-void libapx_ui_aliases_init_player(int p) {
-  libapx_ui_aliases_list_populate(p);
+void LibapxUiAliasesInitPlayer(int p) {
+  UiAliasesListPopulate(p);
 }
 
-void libapx_ui_aliases_open_player(int p) {
-  libapx_ui_aliases_list_populate(p);
+void LibapxUiAliasesOpenPlayer(int p) {
+  UiAliasesListPopulate(p);
 }
 
-bool libapx_ui_aliases_filter(bool testConds, bool runActions) {
+bool LibapxUiAliasesFilter(bool testConds, bool runActions) {
   int player = EventPlayer();
-	string filter = libNtve_gf_DialogItemEditValue(libapx_ui_aliases_search, player);
+	string filter = libNtve_gf_DialogItemEditValue(LibapxUiAliasesSearch, player);
 	int i = 1;
   int j = 0;
   string alias;
   text msg;
   //Reset list
-  libapx_ui_aliases_list_populate(player);
+  UiAliasesListPopulate(player);
   //Nab alias list
-  alias = libapx_string_trim(libapx_player[player].aliases);
+  alias = LibapxStringTrim(gv_LibapxPlayer[player].aliases);
 
  if( filter == "" ) {
    return true;
@@ -145,7 +145,7 @@ bool libapx_ui_aliases_filter(bool testConds, bool runActions) {
   while(StringWord(alias,i) != "") {
 
     if(!StringContains(  StringWord(alias, i), filter, c_stringAnywhere, c_stringNoCase)) {
-      DialogControlRemoveItem(libapx_ui_aliases_list_key, PlayerGroupSingle(EventPlayer()), i - j);
+      DialogControlRemoveItem(LibapxUiAliasesListKey, PlayerGroupSingle(EventPlayer()), i - j);
       j+=1;
     }
     else {
@@ -160,15 +160,15 @@ bool libapx_ui_aliases_filter(bool testConds, bool runActions) {
 	return true;
 }
 
-bool libapx_ui_aliases_list_reset(bool testConds, bool runActions) {
-	libapx_ui_aliases_list_populate(EventPlayer());
+bool LibapxUiAliasesListReset(bool testConds, bool runActions) {
+	UiAliasesListPopulate(EventPlayer());
 	return true;
 }
 
 //Event Trigger for when alias is selected :)
-bool libapx_ui_alias_select(bool testConds, bool runActions) {
+bool LibapxUiAliasSelect(bool testConds, bool runActions) {
   int player = EventPlayer();
-  string aliases = libapx_string_trim(libapx_player[player].aliases);
+  string aliases = LibapxStringTrim(gv_LibapxPlayer[player].aliases);
   string aliasval;
 	string currentVal;
   string aliaskey;
@@ -177,22 +177,22 @@ bool libapx_ui_alias_select(bool testConds, bool runActions) {
 	int i;
 
 
-	i = DialogControlGetSelectedItem(libapx_ui_aliases_list_key, player);
-  aliasval = BankValueGetAsString(libapx_player[player].bank_storage, libapx_BANK_SECTION_ALIAS, StringWord(searchQuery[player], i));
+	i = DialogControlGetSelectedItem(LibapxUiAliasesListKey, player);
+  aliasval = BankValueGetAsString(gv_LibapxPlayer[player].bankStorage, gv_LibapxBankSectionAlias, StringWord(searchQuery[player], i));
   aliaskey = StringWord(searchQuery[player], i);
-  DialogControlRemoveAllItems(libapx_ui_aliases_list_output, PlayerGroupSingle(player));
+  DialogControlRemoveAllItems(LibapxUiAliasesListOutput, PlayerGroupSingle(player));
 
 	while ( StringSub(aliasval, j, j+charPerLine) != "" ) {
 		currentVal = StringSub(aliasval, j, j + charPerLine - 1);
-  	DialogControlAddItem(libapx_ui_aliases_list_output, PlayerGroupSingle(player), StringToText(currentVal));
+  	DialogControlAddItem(LibapxUiAliasesListOutput, PlayerGroupSingle(player), StringToText(currentVal));
 		j = j + charPerLine;
 	}
 
 
 
 
-  libNtve_gf_SetDialogItemEditorValue(libapx_ui_aliases_key, aliaskey,  PlayerGroupSingle(player));
-  libNtve_gf_SetDialogItemEditorValue(libapx_ui_aliases_val, aliasval,  PlayerGroupSingle(player));
+  libNtve_gf_SetDialogItemEditorValue(LibapxUiAliasesKey, aliaskey,  PlayerGroupSingle(player));
+  libNtve_gf_SetDialogItemEditorValue(LibapxUiAliasesVal, aliasval,  PlayerGroupSingle(player));
 
 
 
@@ -200,21 +200,21 @@ bool libapx_ui_alias_select(bool testConds, bool runActions) {
 }
 
 //Event Trigger for when set alias occurs :)
-bool libapx_ui_alias_set(bool testConds, bool runActions) {
+bool LibapxUiAliasSet(bool testConds, bool runActions) {
   int player = EventPlayer();
-  string aliases = libapx_string_trim(libapx_player[player].aliases);
+  string aliases = LibapxStringTrim(gv_LibapxPlayer[player].aliases);
   string aliasval;
   string aliaskey;
   bool samekey = true;
   int i = 1;
-  aliasval = libNtve_gf_DialogItemEditValue(libapx_ui_aliases_val, player);
-  aliaskey = libNtve_gf_DialogItemEditValue(libapx_ui_aliases_key, player);
+  aliasval = libNtve_gf_DialogItemEditValue(LibapxUiAliasesVal, player);
+  aliaskey = libNtve_gf_DialogItemEditValue(LibapxUiAliasesKey, player);
   if ( aliasval == "" ) {
-    libapx_print_success(player, "Alias value cannon't be empty");
+    LibapxPrintSuccess(player, "Alias value cannon't be empty");
     return true;
   }
   if ( aliaskey == "" ) {
-    libapx_print_success(player, "Alias key cannon't be empty");
+    LibapxPrintSuccess(player, "Alias key cannon't be empty");
     return true;
   }
   while (StringWord(aliases, i) != "") {
@@ -225,35 +225,35 @@ bool libapx_ui_alias_set(bool testConds, bool runActions) {
   }
   if (StringWord(aliaskey, 2) == "") {
     if (samekey == true) {
-      libapx_print_success(player, "Alias key not found, creating new alias under \"" + aliaskey  + "\".");
-      libapx_bank_create(libapx_BANK_SECTION_ALIAS, aliaskey, aliasval, player);
-      libapx_player[player].aliases = libapx_alias_insert_in_list(libapx_player[player].aliases, aliaskey);
-      libapx_alias_chk(aliaskey, player);
+      LibapxPrintSuccess(player, "Alias key not found, creating new alias under \"" + aliaskey  + "\".");
+      LibapxBankCreate(gv_LibapxBankSectionAlias, aliaskey, aliasval, player);
+      gv_LibapxPlayer[player].aliases = AliasInsertInList(gv_LibapxPlayer[player].aliases, aliaskey);
+      LibapxAliasChk(aliaskey, player);
     }
     else {
-      libapx_print_success(player, "Writing over alias \"" + aliaskey  + "\" with new content.");
-      libapx_bank_remove(libapx_BANK_SECTION_ALIAS, aliaskey, player);
-      libapx_player[player].aliases = StringReplaceWord(libapx_player[player].aliases, " " + aliaskey + " ", " ", 1, c_stringCase);
-      libapx_bank_create(libapx_BANK_SECTION_ALIAS, aliaskey, aliasval, player);
-      libapx_player[player].aliases = libapx_alias_insert_in_list(libapx_player[player].aliases, aliaskey);
-      libapx_alias_chk(aliaskey, player);
+      LibapxPrintSuccess(player, "Writing over alias \"" + aliaskey  + "\" with new content.");
+      LibapxBankRemove(gv_LibapxBankSectionAlias, aliaskey, player);
+      gv_LibapxPlayer[player].aliases = StringReplaceWord(gv_LibapxPlayer[player].aliases, " " + aliaskey + " ", " ", 1, c_stringCase);
+      LibapxBankCreate(gv_LibapxBankSectionAlias, aliaskey, aliasval, player);
+      gv_LibapxPlayer[player].aliases = AliasInsertInList(gv_LibapxPlayer[player].aliases, aliaskey);
+      LibapxAliasChk(aliaskey, player);
     }
   }
   else {
-    libapx_print_error(player, "You're being dumb, keys can't have spaces.");
+    LibapxPrintError(player, "You're being dumb, keys can't have spaces.");
   }
-  libapx_ui_aliases_list_populate(player);
+  UiAliasesListPopulate(player);
 
   return true;
 }
 //Event Trigger for when remove alias occurs :)
-bool libapx_ui_alias_remove(bool testConds, bool runActions) {
+bool LibapxUiAliasRemove(bool testConds, bool runActions) {
   int player = EventPlayer();
-  string aliases = libapx_string_trim(libapx_player[player].aliases);
+  string aliases = LibapxStringTrim(gv_LibapxPlayer[player].aliases);
   string aliaskey;
   bool samekey = true;
   int i = 1;
-  aliaskey = libNtve_gf_DialogItemEditValue(libapx_ui_aliases_key, player);
+  aliaskey = libNtve_gf_DialogItemEditValue(LibapxUiAliasesKey, player);
   while (StringWord(aliases, i) != "") {
     if (StringWord(aliases, i)==aliaskey) {
       samekey=false;
@@ -261,13 +261,13 @@ bool libapx_ui_alias_remove(bool testConds, bool runActions) {
     i += 1;
   }
   if (samekey == true) {
-    libapx_print_error(player, "Unable to remove, no alias found.");
+    LibapxPrintError(player, "Unable to remove, no alias found.");
   }
   else {
-    libapx_print_success(player, "Removing alias \"" + aliaskey  + "\".");
-    libapx_bank_remove(libapx_BANK_SECTION_ALIAS, aliaskey, player);
-    libapx_player[player].aliases = StringReplaceWord(libapx_player[player].aliases, " " + aliaskey + " ", " ", 1, c_stringCase);
+    LibapxPrintSuccess(player, "Removing alias \"" + aliaskey  + "\".");
+    LibapxBankRemove(gv_LibapxBankSectionAlias, aliaskey, player);
+    gv_LibapxPlayer[player].aliases = StringReplaceWord(gv_LibapxPlayer[player].aliases, " " + aliaskey + " ", " ", 1, c_stringCase);
   }
-  libapx_ui_aliases_list_populate(player);
+  UiAliasesListPopulate(player);
   return true;
 }

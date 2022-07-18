@@ -1,6 +1,6 @@
 //=========================================================
 //		Apex Roleplaying Engine
-//		Copyright (c) 2019, Apex Group
+//		Copyright (c) 2022, Apex Group
 //=========================================================
 // This software is distributed under the MIT License:
 // <http://opensource.org/licenses/MIT>
@@ -17,18 +17,18 @@
 // The rest of the command is its unique parameter list
 
 // Main actor for unit (default actor reference target)
-static string libapx_ACTOR_REF_MAIN = "->::Main";
+static string LibapxACTORREFMAIN = "->::Main";
 
 
 
 
-// libapx_has_actor_ref
+// LibapxHasActorRef
 // ===================
 // Helper function to check if a paramater is a proper actor reference
 // Syntax for reference and scope are:
 //      >  "__[target]" : global reference
 //      >  "->[target]" : local reference (single unit)
-static bool libapx_has_actor_ref(string ref) {
+static bool LibapxHasActorRef(string ref) {
 	string scope;
 	if( ref != "" ) { // disregard if ref is invalid
 		scope = StringSub(ref, 1, 2);
@@ -40,20 +40,20 @@ static bool libapx_has_actor_ref(string ref) {
 	return false;
 }
 
-// libapx_apply_actormsg
+// ApplyActormsg
 // ======================
 // Generic function to apply the internal actor msg to a group of units
 // -> normally group of units will be the player context (units selected)
 // Certain actor commands require special casing for the actor msgs applied,
 // in which case this block is special cased in the actor command
 // function (Galaxy highly limited in dealing with generic functions)
-static void libapx_apply_actormsg(unitgroup g, string target, string argv, string cmd, string amsg) {
+static void ApplyActormsg(unitgroup g, string target, string argv, string cmd, string amsg) {
 	if( StringSub(target, 1, 2) == "->" ) {
 		target = StringSub(target, 3, StringLength(target));
 		UnitGroupLoopBegin(g);
 		while(!UnitGroupLoopDone()) {
 			ActorSendTo(libNtve_gf_MainActorofUnit(UnitGroupLoopCurrent()), target, amsg);
-			libapx_unit_cache_update(UnitGroupLoopCurrent(), cmd, argv);
+			LibapxUnitCacheUpdate(UnitGroupLoopCurrent(), cmd, argv);
 			UnitGroupLoopStep();
 		}
 		UnitGroupLoopEnd();
@@ -69,7 +69,7 @@ static void libapx_apply_actormsg(unitgroup g, string target, string argv, strin
 	}
 }
 
-// libapx_command_actormessage
+// LibapxCommandActormessage
 // =======================
 // Sends an ActorMessage to a unit (main or a actor reference) or to a global reference
 // Optional reference is either ->[reference] for local scope (within a unit scope)
@@ -81,13 +81,13 @@ static void libapx_apply_actormsg(unitgroup g, string target, string argv, strin
 // match user input to actual actor messages (many elseif), which is shitty
 //
 // TODO: convert to new generalized amsg target system?
-void libapx_command_actormessage(int user, unitgroup u, string argv, int spawningCount, string bracketText) {
+void LibapxCommandActormessage(int user, unitgroup u, string argv, int spawningCount, string bracketText) {
 	unitgroup g = u;
 	string target = StringWord( argv, 2);
-	bool target_scope_global = false;
+	bool targetScopeGlobal = false;
 	string amsg;
-	int amsg_start_word_index = 1;
-	int amsg_start_index;
+	int amsgStartWordIndex = 1;
+	int amsgStartIndex;
 	unitgroup p = u;
 	int colcheker = 1;
 	bool colFlag = false;
@@ -95,7 +95,7 @@ void libapx_command_actormessage(int user, unitgroup u, string argv, int spawnin
 		if(StringFind(StringWord(argv, colcheker), "colossus", c_stringNoCase) != -1 ) {
 				UnitGroupLoopBegin(p);
 				while(!UnitGroupLoopDone()) {
-					libapx_unit_flag_colossus(UnitGroupLoopCurrent());
+					LibapxUnitFlagColossus(UnitGroupLoopCurrent());
 					UnitGroupLoopStep();
 				}
 				UnitGroupLoopEnd();
@@ -108,44 +108,44 @@ void libapx_command_actormessage(int user, unitgroup u, string argv, int spawnin
 
 	// check the actor message target:
 	// target is specified by @actrmsg ->[Target] [msg] OR @actrmsg __[Target] [msg]
-	// e.g. @actrmsg ->_Unit SetTint 250,0,0 or @actrmsg ->::Main SetTint 250,0,0
+	// e.g. @actrmsg ->Unit SetTint 250,0,0 or @actrmsg ->::Main SetTint 250,0,0
 	// default will use target ::Main (the main actor for a unit)
 	// -> indicates local scope (unit actor) whereas __ indicates a global scope
 	else if( StringSub(target,1,2) == "__" ) {
 		target = StringSub(target, 3, StringLength(target));
-		amsg_start_word_index = 2;
-		target_scope_global = true;
+		amsgStartWordIndex = 2;
+		targetScopeGlobal = true;
 	}
 	else if( StringSub(target,1,2) == "->" ) {
 		target = StringSub(target, 3, StringLength(target));
-		amsg_start_word_index = 2;
+		amsgStartWordIndex = 2;
 	}
 	else { // default target is ::Main (local unit scope)
 		target = "::Main";
 	}
 
 	// get the actor message string (remainder of line)
-	amsg_start_index = StringLength(StringWord( argv, 1)) + 2;
-	if( amsg_start_word_index == 2 ) {
-		amsg_start_index += StringLength(StringWord( argv, 2)) + 1;
+	amsgStartIndex = StringLength(StringWord( argv, 1)) + 2;
+	if( amsgStartWordIndex == 2 ) {
+		amsgStartIndex += StringLength(StringWord( argv, 2)) + 1;
 	}
 
-	amsg = StringSub( argv, amsg_start_index, StringLength(argv));
+	amsg = StringSub( argv, amsgStartIndex, StringLength(argv));
 
 	if (StringWord(amsg,1) == "SetScale" || StringWord(amsg,1) == "SetScaleAbsolute") {
 
-		amsg = StringWord(amsg,1) +  " " + libapx_scalerapply(StringWord(amsg,2), u, "scale", user) + " " + StringWord(amsg,3);
+		amsg = StringWord(amsg,1) +  " " + LibapxScalerapply(StringWord(amsg,2), u, "scale", user) + " " + StringWord(amsg,3);
 	}
-	//libapx_scalerapply(offset)
+	//LibapxScalerapply(offset)
 
 	UnitGroupLoopBegin(g);
 	while(!UnitGroupLoopDone()) {
-		if( target_scope_global ) {
+		if( targetScopeGlobal ) {
 			ActorSend(ActorFrom(target), amsg);
 		}
 		else {
 			ActorSendTo(libNtve_gf_MainActorofUnit(UnitGroupLoopCurrent()), target, amsg);
-			libapx_unit_cache_update(UnitGroupLoopCurrent(), "@actrmsg", argv);
+			LibapxUnitCacheUpdate(UnitGroupLoopCurrent(), "@actrmsg", argv);
 		}
 		UnitGroupLoopStep();
 	}
@@ -153,84 +153,84 @@ void libapx_command_actormessage(int user, unitgroup u, string argv, int spawnin
 
 	return;
 }
-void libapx_define_actormessage(string command_name) {
-	commands_guide_entry_set(
-		g_commands_guide_entry_actor, 
-		command_name, 
+void LibapxDefineActormessage(string commandName) {
+	LibapxCommandsGuideEntrySet(
+		gv_CommandsGuideEntryActor, 
+		commandName, 
 		" Sends an ActorMessage to an actor, a target can be used with this command. <br> @actrmsg ->target actormessage <br> Examples: <br> @actrmsg SetTeamColor {255,0,0 3} {3,5,255 5} <br> @actrmsg SetScaleAbsolute 4 "
 	);
 }
 
-// libapx_command_actoralias
+// LibapxCommandActoralias
 // =======================
 // wrapper for the AliasAdd actor msg to add actor aliases to a unit's actors.
 // These can be referenced as actor references by other actor commands
 // using ->[ref]
 // syntax: @actoralias (->[ref]) [alias]
-void libapx_command_actoralias(int user, unitgroup u, string argv, int spawningCount, string bracketText) {
+void LibapxCommandActoralias(int user, unitgroup u, string argv, int spawningCount, string bracketText) {
 	string actoralias;
-	int param_offset = 0;
-	string target = libapx_ACTOR_REF_MAIN;
+	int paramOffset = 0;
+	string target = LibapxACTORREFMAIN;
 
 	// get actor reference target
-	if( libapx_has_actor_ref(StringWord(argv, 2)) ) {
+	if( LibapxHasActorRef(StringWord(argv, 2)) ) {
 		target = StringWord(argv, 2);
-		param_offset = 1;
+		paramOffset = 1;
 	}
 
 	// get actor alias
-	actoralias = StringWord(argv, 2 + param_offset);
+	actoralias = StringWord(argv, 2 + paramOffset);
 	if( actoralias == "" ) {
-		libapx_print_error(user, "Actor alias cannot be blank");
+		LibapxPrintError(user, "Actor alias cannot be blank");
 		return;
 	}
 
-	libapx_apply_actormsg(u, target, argv, "@target", "AliasAdd " + actoralias);
-	libapx_unit_cache_update(UnitGroupLoopCurrent(), "@target", argv);
+	ApplyActormsg(u, target, argv, "@target", "AliasAdd " + actoralias);
+	LibapxUnitCacheUpdate(UnitGroupLoopCurrent(), "@target", argv);
 	return;
 }
-void libapx_define_target(string command_name) {
-	commands_guide_entry_set(
-		g_commands_guide_entry_actor, 
-		command_name, 
+void LibapxDefineTarget(string commandName) {
+	LibapxCommandsGuideEntrySet(
+		gv_CommandsGuideEntryActor, 
+		commandName, 
 		" Gives an actor a target or name to be used to point to this actor with another command, a target can also be used with this command. <br> @target ->target targetname <br> Examples: <br> @target 123;@attach marine origin 0 0 3;@scale ->123 3 3 3 <br> @target ->b 123 <br> <br> Extra Info: <br> You can remove a target by doing <br> @actrmsg ->targetyouwanttoremove AliasRemove ->targetyouwanttoremove "
 	);
 }
 
 
 
-// libapx_command_scale
+// LibapxCommandScale
 // ====================
 // sets the scale of a unit's main actor for all units in context (modified from Cortex Engine)
 // Syntax: @scale (->[ref]) [x] [y] [z] [time-blend]
-void libapx_command_scale(int user, unitgroup u, string argv, int spawningCount, string bracketText) {
+void LibapxCommandScale(int user, unitgroup u, string argv, int spawningCount, string bracketText) {
 	fixed x = 0;
 	fixed y = 0;
 	fixed z  = 0;
 	fixed time = 0;
-	string param_x;
-	string param_y;
-	string param_z;
-	string param_time;
+	string paramX;
+	string paramY;
+	string paramZ;
+	string paramTime;
 	string scale;
-	int param_offset = 0;
-	string target = libapx_ACTOR_REF_MAIN;
+	int paramOffset = 0;
+	string target = LibapxACTORREFMAIN;
 
 	// get actor reference target
-	if( libapx_has_actor_ref(StringWord(argv, 2)) ) {
+	if( LibapxHasActorRef(StringWord(argv, 2)) ) {
 		target = StringWord(argv, 2);
-		param_offset = 1;
+		paramOffset = 1;
 	}
 
 	// get scale params "x y z time"
-	param_x = StringWord(argv, 2 + param_offset);
-	param_y = StringWord(argv, 3 + param_offset);
-	param_z = StringWord(argv, 4 + param_offset);
-	param_time = StringWord(argv, 5 + param_offset);
+	paramX = StringWord(argv, 2 + paramOffset);
+	paramY = StringWord(argv, 3 + paramOffset);
+	paramZ = StringWord(argv, 4 + paramOffset);
+	paramTime = StringWord(argv, 5 + paramOffset);
 
-	x = StringToFixed(param_x);
-	y = StringToFixed(param_y);
-	z = StringToFixed(param_z);
+	x = StringToFixed(paramX);
+	y = StringToFixed(paramY);
+	z = StringToFixed(paramZ);
 
 	if(y == 0.0) {
 		y = x;
@@ -241,42 +241,42 @@ void libapx_command_scale(int user, unitgroup u, string argv, int spawningCount,
 	}
 
 	// verify bounds.
-	x = MinF( libapx_settings.max_scale, x );
-	x = MaxF( libapx_settings.min_scale, x );
+	x = MinF( gv_LibapxSettings.maxScale, x );
+	x = MaxF( gv_LibapxSettings.minScale, x );
 
-	y = MinF( libapx_settings.max_scale, y );
-	y = MaxF( libapx_settings.min_scale, y );
+	y = MinF( gv_LibapxSettings.maxScale, y );
+	y = MaxF( gv_LibapxSettings.minScale, y );
 
-	z = MinF( libapx_settings.max_scale, z );
-	z = MaxF( libapx_settings.min_scale, z );
+	z = MinF( gv_LibapxSettings.maxScale, z );
+	z = MaxF( gv_LibapxSettings.minScale, z );
 
 	// get blend time
-	if( param_time != "" ) {
-		time = StringToFixed(param_time);
+	if( paramTime != "" ) {
+		time = StringToFixed(paramTime);
 	}
 	scale = FixedToString(x, 4) + "," + FixedToString(y, 4)  + "," + FixedToString(z, 4);
-	scale = libapx_scalerapply(scale, u, "scale", user); //Applies scaler
+	scale = LibapxScalerapply(scale, u, "scale", user); //Applies scaler
 
 
-	libapx_apply_actormsg(u, target, argv, "@scale",
+	ApplyActormsg(u, target, argv, "@scale",
 						  "SetScale " + scale + " " + FixedToString(time, 3));
 	return;
 }
-void libapx_define_scale(string command_name) {
-	commands_guide_entry_set(
-		g_commands_guide_entry_actor, 
-		command_name, 
+void LibapxDefineScale(string commandName) {
+	LibapxCommandsGuideEntrySet(
+		gv_CommandsGuideEntryActor, 
+		commandName, 
 		" Changes the scale of an actor. It can be used with target. <br> @scale ->target x y z timescale <br> Examples: <br> @scale 3 2 1 4 <br> @scale 3 <br> @target a;@attach marine head;@scale ->a 5 5 1 3  "
 	);
 }
 
 
-// libapx_command_tint
+// LibapxCommandTint
 // =================
 // sets the tint of a unit's main actor for all units in context
 // Syntax: @tint (->[ref]) [R] [G] [B] [Opacity] [HDR] [time-blend]
 // (modified from Cortex Engine)
-void libapx_command_tint(int user, unitgroup u, string argv, int spawningCount, string bracketText) {
+void LibapxCommandTint(int user, unitgroup u, string argv, int spawningCount, string bracketText) {
 	string paramR;
 	string paramG;
 	string paramB;
@@ -292,21 +292,21 @@ void libapx_command_tint(int user, unitgroup u, string argv, int spawningCount, 
 	fixed duration = 0;
 
 	unitgroup g = u;
-	int param_offset = 0;
-	string target = libapx_ACTOR_REF_MAIN;
+	int paramOffset = 0;
+	string target = LibapxACTORREFMAIN;
 
 	// get actor reference target
-	if( libapx_has_actor_ref(StringWord(argv, 2)) ) {
+	if( LibapxHasActorRef(StringWord(argv, 2)) ) {
 		target = StringWord(argv, 2);
-		param_offset = 1;
+		paramOffset = 1;
 	}
 
-	paramR = StringWord(argv, 2 + param_offset);
-	paramG = StringWord(argv, 3 + param_offset);
-	paramB = StringWord(argv, 4 + param_offset);
-	paramAlpha = StringWord(argv, 5 + param_offset);
-	paramHDR = StringWord(argv, 6 + param_offset);
-	paramT = StringWord(argv, 7 + param_offset);
+	paramR = StringWord(argv, 2 + paramOffset);
+	paramG = StringWord(argv, 3 + paramOffset);
+	paramB = StringWord(argv, 4 + paramOffset);
+	paramAlpha = StringWord(argv, 5 + paramOffset);
+	paramHDR = StringWord(argv, 6 + paramOffset);
+	paramT = StringWord(argv, 7 + paramOffset);
 
 	// get red input
 	if( paramR != "" ) {
@@ -378,7 +378,7 @@ void libapx_command_tint(int user, unitgroup u, string argv, int spawningCount, 
 						FixedToString(hdr, c_fixedPrecisionAny) + "} {" + FixedToString(duration, c_fixedPrecisionAny) + "}");
 			ActorSendTo(libNtve_gf_MainActorofUnit(UnitGroupLoopCurrent()), target,
 						"SetOpacity {" + FixedToString(alpha, c_fixedPrecisionAny) + "} {" + FixedToString(duration, c_fixedPrecisionAny) + "}");
-			libapx_unit_cache_update(UnitGroupLoopCurrent(), "@tint", argv);
+			LibapxUnitCacheUpdate(UnitGroupLoopCurrent(), "@tint", argv);
 			UnitGroupLoopStep();
 		}
 		UnitGroupLoopEnd();
@@ -399,62 +399,62 @@ void libapx_command_tint(int user, unitgroup u, string argv, int spawningCount, 
 
 	return;
 }
-void libapx_define_tint(string command_name) {
-	commands_guide_entry_set(
-		g_commands_guide_entry_actor, 
-		command_name, 
+void LibapxDefineTint(string commandName) {
+	LibapxCommandsGuideEntrySet(
+		gv_CommandsGuideEntryActor, 
+		commandName, 
 		" This command changes the tint of an actor. It can be used with target. <br> @scale ->[target] [r] [g] [b] [Opacity] [HDR] [timescale] <br> Examples: <br> @tint 255 0 0 <br> @tint 0 255 255 1 3 <br> @tint 255 255 255 .3 <br> @tint 255 255 255 1 15 5  "
 	);
 }
 
 
-// libapx_command_decal
+// LibapxCommandDecal
 // ===================
 // Changes the decal of an actor using TextureByID
 // Syntax: @decal [decalname]
-void libapx_command_decal(int user, unitgroup u, string argv, int spawningCount, string bracketText) {
+void LibapxCommandDecal(int user, unitgroup u, string argv, int spawningCount, string bracketText) {
 	string decal;
 	string amsg;
-	int param_offset = 0;
-	string target = libapx_ACTOR_REF_MAIN;
+	int paramOffset = 0;
+	string target = LibapxACTORREFMAIN;
 
 
 	// get actor reference target
-	if( libapx_has_actor_ref(StringWord(argv, 2)) ) {
+	if( LibapxHasActorRef(StringWord(argv, 2)) ) {
 		target = StringWord(argv, 2);
-		param_offset = 1;
+		paramOffset = 1;
 	}
 
-	decal = libapx_catalog_get(c_gameCatalogTexture, StringWord(argv, 2 + param_offset));
+	decal = LibapxCatalogGet(c_gameCatalogTexture, StringWord(argv, 2 + paramOffset));
 	if(decal == null) {
-		libapx_print_output(user, "<c val=\"ff0000\">Unable to change decal</c>: No such decal exists.");
+		LibapxPrintOutput(user, "<c val=\"ff0000\">Unable to change decal</c>: No such decal exists.");
 		return;
 	}
 
 	amsg = "TextureSelectById {" + decal + "}";
-	libapx_apply_actormsg(u, target, argv, "@decal", amsg);
+	ApplyActormsg(u, target, argv, "@decal", amsg);
 
 	return;
 }
-void libapx_define_decal(string command_name) {
-	commands_guide_entry_set(
-		g_commands_guide_entry_actor, 
-		command_name, 
-		" Changes the decal of an actor, can be used with target. <br> @decal ->[target] [image] <br> Examples: <br> @decal decal_none <br> @target a;@attach marine weapon;@decal ->a  "
+void LibapxDefineDecal(string commandName) {
+	LibapxCommandsGuideEntrySet(
+		gv_CommandsGuideEntryActor, 
+		commandName, 
+		" Changes the decal of an actor, can be used with target. <br> @decal ->[target] [image] <br> Examples: <br> @decal decalNone <br> @target a;@attach marine weapon;@decal ->a  "
 	);
 }
 
 
-// libapx_command_modelswap
+// LibapxCommandModelswap
 // ======================
 // Changes the model of the main actor of unit (modified from Cortex Engine)
 // Syntax: @modelswap (->[ref]) [model] [variation]
-void libapx_command_modelswap(int user, unitgroup u, string argv, int spawningCount, string bracketText) {
+void LibapxCommandModelswap(int user, unitgroup u, string argv, int spawningCount, string bracketText) {
 	string model;
 	string variation;
 	string amsg;
-	int param_offset = 0;
-	string target = libapx_ACTOR_REF_MAIN;
+	int paramOffset = 0;
+	string target = LibapxACTORREFMAIN;
 
 
 
@@ -467,7 +467,7 @@ void libapx_command_modelswap(int user, unitgroup u, string argv, int spawningCo
 		if(StringFind(StringWord(argv, colcheker), "colossus", c_stringNoCase) != -1 ) {
 				UnitGroupLoopBegin(p);
 				while(!UnitGroupLoopDone()) {
-					libapx_unit_flag_colossus(UnitGroupLoopCurrent());
+					LibapxUnitFlagColossus(UnitGroupLoopCurrent());
 					UnitGroupLoopStep();
 				}
 				UnitGroupLoopEnd();
@@ -480,65 +480,65 @@ void libapx_command_modelswap(int user, unitgroup u, string argv, int spawningCo
 
 
 	// get actor reference target
-	if( libapx_has_actor_ref(StringWord(argv, 2)) ) {
+	if( LibapxHasActorRef(StringWord(argv, 2)) ) {
 		target = StringWord(argv, 2);
-		param_offset = 1;
+		paramOffset = 1;
 	}
 
-	model = libapx_catalog_get(c_gameCatalogModel, StringWord(argv, 2 + param_offset));
+	model = LibapxCatalogGet(c_gameCatalogModel, StringWord(argv, 2 + paramOffset));
 	if(model == null) {
-		libapx_print_output(user, "<c val=\"ff0000\">Unable to swap model</c>: No such model exists.");
+		LibapxPrintOutput(user, "<c val=\"ff0000\">Unable to swap model</c>: No such model exists.");
 		return;
 	}
 	amsg = "ModelSwap {" + model + "}";
 
-	variation = StringWord(argv, 3 + param_offset);
+	variation = StringWord(argv, 3 + paramOffset);
 	if( variation != "" && StringToInt(variation) >= 0 ) {
 		amsg += " {" + variation + "}";
 	}
 
-	libapx_apply_actormsg(u, target, argv, "@modelswap", amsg);
+	ApplyActormsg(u, target, argv, "@modelswap", amsg);
 
 	return;
 }
-void libapx_define_modelswap(string command_name) {
-	commands_guide_entry_set(
-		g_commands_guide_entry_actor, 
-		command_name, 
-		" This command changes the model of an actor. It can be used with target. <br> @modelswap ->[target] [modelname] [variation] <br> Examples: <br> @modelswap Beacon_Apex <br> @modelswap HavenTree 02 <br> @target 123;@attach beacon_apex head;@modelswap ->123 shapesmileyface "
+void LibapxDefineModelswap(string commandName) {
+	LibapxCommandsGuideEntrySet(
+		gv_CommandsGuideEntryActor, 
+		commandName, 
+		" This command changes the model of an actor. It can be used with target. <br> @modelswap ->[target] [modelname] [variation] <br> Examples: <br> @modelswap BeaconApex <br> @modelswap HavenTree 02 <br> @target 123;@attach beaconApex head;@modelswap ->123 shapesmileyface "
 	);
 }
 
 
 
-// libapx_command_play
+// LibapxCommandPlay
 // ================
 // makes the main actor play an animation by applying an animgroup
 // "@play reset" stops the animation
-void libapx_command_play(int user, unitgroup u, string argv, int spawningCount, string bracketText) {
+void LibapxCommandPlay(int user, unitgroup u, string argv, int spawningCount, string bracketText) {
 	unitgroup g = u;
 	string val;
 	string flags = "";
 	string animgroup;
-	int param_offset = 0;
-	string target = libapx_ACTOR_REF_MAIN;
+	int paramOffset = 0;
+	string target = LibapxACTORREFMAIN;
 
 	// get actor reference target
-	if( libapx_has_actor_ref(StringWord(argv, 2)) ) {
+	if( LibapxHasActorRef(StringWord(argv, 2)) ) {
 		target = StringWord(argv, 2);
-		param_offset = 1;
+		paramOffset = 1;
 	}
 
-	val = StringWord(argv, 2 + param_offset);
+	val = StringWord(argv, 2 + paramOffset);
 	val = StringCase(StringSub(val, 1, 1), true) + StringSub(val, 2, StringLength(val));
 
 	// if @play [anim] [loop] , then set the flags for anim to PlayForever
-	if( StringEqual(StringWord( argv, 3 + param_offset), "loop", c_stringNoCase) ) {
+	if( StringEqual(StringWord( argv, 3 + paramOffset), "loop", c_stringNoCase) ) {
 		flags = "PlayForever";
-		animgroup = StringWord(argv, 4 + param_offset);
+		animgroup = StringWord(argv, 4 + paramOffset);
 	}
 	else {
-		animgroup = StringWord(argv, 3 + param_offset);
+		animgroup = StringWord(argv, 3 + paramOffset);
 	}
 
 	animgroup = StringCase(StringSub(animgroup, 1, 1), true) + StringSub(animgroup, 2, StringLength(animgroup));
@@ -549,16 +549,16 @@ void libapx_command_play(int user, unitgroup u, string argv, int spawningCount, 
 		UnitGroupLoopBegin(g);
 		while(!UnitGroupLoopDone()) {
 			if( StringEqual(val, "reset", c_stringNoCase) ) {
-				ActorSendTo(libNtve_gf_MainActorofUnit(UnitGroupLoopCurrent()), target, "AnimClear " + "libapx_command_play");
+				ActorSendTo(libNtve_gf_MainActorofUnit(UnitGroupLoopCurrent()), target, "AnimClear " + "LibapxCommandPlay");
 			}
 			else {
-				ActorSendTo(libNtve_gf_MainActorofUnit(UnitGroupLoopCurrent()), target, "AnimPlay libapx_command_play " + val + " " + flags);
+				ActorSendTo(libNtve_gf_MainActorofUnit(UnitGroupLoopCurrent()), target, "AnimPlay LibapxCommandPlay " + val + " " + flags);
 				if(animgroup != "") {
 					ActorSendTo(libNtve_gf_MainActorofUnit(UnitGroupLoopCurrent()), target, "AnimGroupRemoveAll");
 					ActorSendTo(libNtve_gf_MainActorofUnit(UnitGroupLoopCurrent()), target, "AnimGroupApply {" + animgroup + "}");
 				}
 			}
-			libapx_unit_cache_update(UnitGroupLoopCurrent(), "@play", argv);
+			LibapxUnitCacheUpdate(UnitGroupLoopCurrent(), "@play", argv);
 			UnitGroupLoopStep();
 		}
 		UnitGroupLoopEnd();
@@ -568,10 +568,10 @@ void libapx_command_play(int user, unitgroup u, string argv, int spawningCount, 
 		UnitGroupLoopBegin(g);
 		while(!UnitGroupLoopDone()) {
 			if( StringEqual(val, "reset", c_stringNoCase) ) {
-				ActorSend(ActorFrom(target), "AnimClear " + "libapx_command_play");
+				ActorSend(ActorFrom(target), "AnimClear " + "LibapxCommandPlay");
 			}
 			else {
-				ActorSendTo(libNtve_gf_MainActorofUnit(UnitGroupLoopCurrent()), target, "AnimPlay libapx_command_play " + val + " " + flags);
+				ActorSendTo(libNtve_gf_MainActorofUnit(UnitGroupLoopCurrent()), target, "AnimPlay LibapxCommandPlay " + val + " " + flags);
 				if(animgroup != "") {
 					ActorSend(ActorFrom(target), "AnimGroupRemoveAll");
 					ActorSend(ActorFrom(target), "AnimGroupApply {" + animgroup + "}");
@@ -583,68 +583,68 @@ void libapx_command_play(int user, unitgroup u, string argv, int spawningCount, 
 	}
 	return;
 }
-void libapx_define_play(string command_name) {
-	commands_guide_entry_set(
-		g_commands_guide_entry_actor, 
-		command_name, 
+void LibapxDefinePlay(string commandName) {
+	LibapxCommandsGuideEntrySet(
+		gv_CommandsGuideEntryActor, 
+		commandName, 
 		" This command plays animations on an actor. It can be used with target. The parameter loop makes the animation loop. <br> @play ->[target] [animations] [animations] <br> Examples: <br> @play attack <br> @play attack loop <br> @play walk loop <br> @play start loop <br> @play cover loop <br> @play burrow loop <br> @play x 00 <br> @play x 01 <br> @play walk,01 loop <br> @play x 02 "
 	);
 }
 
 
 
-// libapx_command_animspeed
+// LibapxCommandAnimspeed
 // ===================
 // changes the animation speed of any animations
 // a unit is playing (range is set as 0-10x default, 1)
-void libapx_command_animspeed(int user, unitgroup u, string argv, int spawningCount, string bracketText) {
+void LibapxCommandAnimspeed(int user, unitgroup u, string argv, int spawningCount, string bracketText) {
 	string speed;
-	fixed anm_speed;
-	int param_offset = 0;
-	string target = libapx_ACTOR_REF_MAIN;
+	fixed anmSpeed;
+	int paramOffset = 0;
+	string target = LibapxACTORREFMAIN;
 
 	// get actor reference target
-	if( libapx_has_actor_ref(StringWord(argv, 2)) ) {
+	if( LibapxHasActorRef(StringWord(argv, 2)) ) {
 		target = StringWord(argv, 2);
-		param_offset = 1;
+		paramOffset = 1;
 	}
 
 	// get animspeed time scale. if % at end, then apply a percent scale
-	speed = StringWord(argv, 2 + param_offset);
+	speed = StringWord(argv, 2 + paramOffset);
 	if( StringContains( speed, "%", c_stringEnd, c_stringCase ) ) {
-		anm_speed = StringToFixed( StringSub(speed, 1, StringLength(speed)-1) ) / 100;
+		anmSpeed = StringToFixed( StringSub(speed, 1, StringLength(speed)-1) ) / 100;
 	} else {
-		anm_speed = StringToFixed( speed );
+		anmSpeed = StringToFixed( speed );
 	}
 
 	// apply bounds for animspeed between 0 and 10
-	if( anm_speed < 0 ) {
-		anm_speed = 0;
+	if( anmSpeed < 0 ) {
+		anmSpeed = 0;
 	}
-	else if(anm_speed > 10) {
-		anm_speed = 10;
+	else if(anmSpeed > 10) {
+		anmSpeed = 10;
 	}
 
 	// apply the animspeed
-	libapx_apply_actormsg(u, target, argv, "@animspeed",
-						  libNtve_gf_AnimSetTimeScaleGlobal(anm_speed));
+	ApplyActormsg(u, target, argv, "@animspeed",
+						  libNtve_gf_AnimSetTimeScaleGlobal(anmSpeed));
 
 	return;
 }
-void libapx_define_animspeed(string command_name) {
-	commands_guide_entry_set(
-		g_commands_guide_entry_actor, 
-		command_name, 
+void LibapxDefineAnimspeed(string commandName) {
+	LibapxCommandsGuideEntrySet(
+		gv_CommandsGuideEntryActor, 
+		commandName, 
 		" This command sets the animation speed of an actor. It can be used with target. <br> @animspeed ->[target] [animationspeed] <br> Examples: <br> @animspeed 3 <br> @animspeed 5 <br> @animspeed 0 <br> @target 6;@attach marauder origin 0 0 3;@animspeed ->6 3 "
 	);
 }
 
-// libapx_command_rotate
+// LibapxCommandRotate
 // ==================
 // applies a rotation on a unit (modified from Cortex Engine)
 // (note: movement removes these rotations,
 // so only really useful for static props)
-void libapx_command_rotate(int user, unitgroup u, string argv, int spawningCount, string bracketText) {
+void LibapxCommandRotate(int user, unitgroup u, string argv, int spawningCount, string bracketText) {
 	fixed yaw;
 	fixed pitch;
 	fixed roll;
@@ -654,19 +654,19 @@ void libapx_command_rotate(int user, unitgroup u, string argv, int spawningCount
 	fixed upX;
 	fixed upY;
 	fixed upZ;
-	int param_offset = 0;
-	string target = libapx_ACTOR_REF_MAIN;
+	int paramOffset = 0;
+	string target = LibapxACTORREFMAIN;
 
 	// get actor reference target
-	if( libapx_has_actor_ref(StringWord(argv, 2)) ) {
+	if( LibapxHasActorRef(StringWord(argv, 2)) ) {
 		target = StringWord(argv, 2);
-		param_offset = 1;
+		paramOffset = 1;
 	}
 
 	// calculate rotation vector parameters
-	yaw = StringToFixed( StringWord(argv, 2 + param_offset) );
-	pitch = StringToFixed( StringWord(argv, 3 + param_offset) );
-	roll = StringToFixed( StringWord(argv, 4 + param_offset) );
+	yaw = StringToFixed( StringWord(argv, 2 + paramOffset) );
+	pitch = StringToFixed( StringWord(argv, 3 + paramOffset) );
+	roll = StringToFixed( StringWord(argv, 4 + paramOffset) );
 
 	forwardX = Sin(yaw);
 	forwardY = -Sin(pitch) * Cos(yaw);
@@ -677,14 +677,14 @@ void libapx_command_rotate(int user, unitgroup u, string argv, int spawningCount
 	upZ = Cos(pitch) * Sin(yaw) * Sin(roll) + Sin(pitch) * Cos(roll);
 
 	// apply the rotation actor msgs
-	libapx_apply_actormsg(u, target, argv, "@rotate",
+	ApplyActormsg(u, target, argv, "@rotate",
 						  libNtve_gf_SetRotation(forwardX, forwardY, forwardZ, upX, upY, upZ));
 	return;
 }
-void libapx_define_rotate(string command_name) {
-	commands_guide_entry_set(
-		g_commands_guide_entry_actor, 
-		command_name, 
+void LibapxDefineRotate(string commandName) {
+	LibapxCommandsGuideEntrySet(
+		gv_CommandsGuideEntryActor, 
+		commandName, 
 		" This command applies a rotation to a unit. It can be used with target. <br> Note: This rotation is removed if a unit moves. <br> @rotate  ->[target] [x] [y] [z] <br> Examples: <br> @rotation 90 <br> @target 123;@attach marine weapon;l@rotation ->123 90 "
 	);
 }
@@ -692,107 +692,107 @@ void libapx_define_rotate(string command_name) {
 
 
 
-// libapx_command_statbars
+// LibapxCommandStatbars
 // ==================
 // sets a unit's statbars
 // by default, turns statbars off.
 // turns on if user specifies by "@statbars on"
-void libapx_command_statbars(int user, unitgroup u, string argv, int spawningCount, string bracketText) {
+void LibapxCommandStatbars(int user, unitgroup u, string argv, int spawningCount, string bracketText) {
 	string state = "";
-	int param_offset = 0;
-	string target = libapx_ACTOR_REF_MAIN;
+	int paramOffset = 0;
+	string target = LibapxACTORREFMAIN;
 
 	// get actor reference target
-	if( libapx_has_actor_ref(StringWord(argv, 2)) ) {
+	if( LibapxHasActorRef(StringWord(argv, 2)) ) {
 		target = StringWord(argv, 2);
-		param_offset = 1;
+		paramOffset = 1;
 	}
 
 	// get statbars state ("on" -> turn on, anything else turns off)
-	if(StringEqual(StringWord(argv, 2 + param_offset), "on", false)) {
+	if(StringEqual(StringWord(argv, 2 + paramOffset), "on", false)) {
 		state = " 1"; // 1 == on
 	}
 
 	// apply the statbars actor msgs
-	libapx_apply_actormsg(u, target, argv, "@statbars", "SetShowStatusBar" + state);
+	ApplyActormsg(u, target, argv, "@statbars", "SetShowStatusBar" + state);
 	return;
 }
-void libapx_define_statbars(string command_name) {
-	commands_guide_entry_set(
-		g_commands_guide_entry_actor, 
-		command_name, 
+void LibapxDefineStatbars(string commandName) {
+	LibapxCommandsGuideEntrySet(
+		gv_CommandsGuideEntryActor, 
+		commandName, 
 		" This command sets an actors statbars on or off. It can be used with target. <br> Note: If you give the command no parameters it, by default, will turn the statbars off on the actor. <br> @statbars  ->[target] [state] <br> Examples: <br> @statbars <br> @statbars on <br> @target 123;@attach marine head;@statbars ->123 "
 	);
 }
 
 
-//libapx_command_setscaler
+//LibapxCommandSetscaler
 //==========================
 //Sets the scale modifier for units, this intern is added in calcultions for
 //@attach translations and scales.
-void libapx_command_setscaler(int user, unitgroup u, string argv, int spawningCount, string bracketText) {
+void LibapxCommandSetscaler(int user, unitgroup u, string argv, int spawningCount, string bracketText) {
 	fixed scaler;
 	if (StringWord(argv,2) == "") {
-		libapx_print(PlayerGroupSingle(user),"Input something");
+		LibapxPrint(PlayerGroupSingle(user),"Input something");
 	}
 	else if (StringWord(argv,3) != "") {
-		libapx_print(PlayerGroupSingle(user),"SetScaler only takes one value");
+		LibapxPrint(PlayerGroupSingle(user),"SetScaler only takes one value");
 	}
-	else if (libapx_is_fixed(StringWord(argv, 2)) == false) {
-		libapx_print(PlayerGroupSingle(user),"SetScaler takes numbers");
+	else if (LibapxIsFixed(StringWord(argv, 2)) == false) {
+		LibapxPrint(PlayerGroupSingle(user),"SetScaler takes numbers");
 	}
 	else {
-		libapx_print(PlayerGroupSingle(user),"Scaler set to "+StringWord(argv,2));
+		LibapxPrint(PlayerGroupSingle(user),"Scaler set to "+StringWord(argv,2));
 		scaler = StringToFixed(StringWord(argv,2));
-		libapx_player[user].scaler = scaler;
+		gv_LibapxPlayer[user].scaler = scaler;
 	}
 
 
 }
-void libapx_define_setscaler(string command_name) {
-	commands_guide_entry_set(
-	 	g_commands_guide_entry_general, 
-		command_name, 
+void LibapxDefineSetscaler(string commandName) {
+	LibapxCommandsGuideEntrySet(
+	 	gv_CommandsGuideEntryGeneral, 
+		commandName, 
 		" This command sets the default scale modifier for all units created after this point. This modifier multiplies against @scale, @actrmsg SetScale, @attach translations, and @actrmsg SetScaleAbsolute. <br> Note: The default scaler is 1 <br> @setscaler [newscale] <br> Examples: <br> @setscaler 3 <br> @setscaler .1 "
 	);
 }
 
 
 
-//libapx_command_setdelay
+//LibapxCommandSetdelay
 //==========================
 //Sets the default delay for attachments
-void libapx_command_setdelay(int user, unitgroup u, string argv, int spawningCount, string bracketText) {
+void LibapxCommandSetdelay(int user, unitgroup u, string argv, int spawningCount, string bracketText) {
 	fixed delay;
 	if (StringWord(argv,2) == "") {
-		libapx_print(PlayerGroupSingle(user),"Input something");
+		LibapxPrint(PlayerGroupSingle(user),"Input something");
 	}
 	else if (StringWord(argv,3) != "") {
-		libapx_print(PlayerGroupSingle(user),"SetDelay only takes one value");
+		LibapxPrint(PlayerGroupSingle(user),"SetDelay only takes one value");
 	}
-	else if (libapx_is_fixed(StringWord(argv, 2)) == false) {
-		libapx_print(PlayerGroupSingle(user),"SetDelay takes numbers");
+	else if (LibapxIsFixed(StringWord(argv, 2)) == false) {
+		LibapxPrint(PlayerGroupSingle(user),"SetDelay takes numbers");
 	}
 	else {
-		libapx_print(PlayerGroupSingle(user),"Delay set to "+StringWord(argv,2));
+		LibapxPrint(PlayerGroupSingle(user),"Delay set to "+StringWord(argv,2));
 		delay = StringToFixed(StringWord(argv,2));
-		libapx_player[user].delay = delay;
+		gv_LibapxPlayer[user].delay = delay;
 	}
 
 
 }
-void libapx_define_setdelay(string command_name) {
-	commands_guide_entry_set(
-	 	g_commands_guide_entry_general, 
-		command_name, 
-		" This command sets the default delay for all @attach commands and _gamesetup loading delays. <br> Note: By default it is .08, additionally the gamesetup delay will never go below a minimium value. Regardless of what you set this. <br> @setdelay [newdelay] <br> Examples: <br> @setdelay 3 <br> @setdelay .1 "
+void LibapxDefineSetdelay(string commandName) {
+	LibapxCommandsGuideEntrySet(
+	 	gv_CommandsGuideEntryGeneral, 
+		commandName, 
+		" This command sets the default delay for all @attach commands and Gamesetup loading delays. <br> Note: By default it is .08, additionally the gamesetup delay will never go below a minimium value. Regardless of what you set this. <br> @setdelay [newdelay] <br> Examples: <br> @setdelay 3 <br> @setdelay .1 "
 	);
 }
 
-// libapx_command_attach_minus
+// LibapxCommandAttachMinus
 // =====================
 // Replicated old attach of Cortex
-void libapx_command_attach_minus(int user, unitgroup u, string argv, int spawningCount, string bracketText) {
+void LibapxCommandAttachMinus(int user, unitgroup u, string argv, int spawningCount, string bracketText) {
 
 	actor sactor;
 	string actr;
@@ -812,7 +812,7 @@ void libapx_command_attach_minus(int user, unitgroup u, string argv, int spawnin
 		if(StringFind(StringWord(argv, colcheker), "colossus", c_stringNoCase) != -1 ) {
 				UnitGroupLoopBegin(p);
 				while(!UnitGroupLoopDone()) {
-					libapx_unit_flag_colossus(UnitGroupLoopCurrent());
+					LibapxUnitFlagColossus(UnitGroupLoopCurrent());
 					UnitGroupLoopStep();
 				}
 				UnitGroupLoopEnd();
@@ -822,7 +822,7 @@ void libapx_command_attach_minus(int user, unitgroup u, string argv, int spawnin
 
 
 
-	libapx_waitDelay(user);
+	LibapxWaitDelay(user);
 
 	actr = StringWord(argv,2);
 	apoint = StringWord(argv,3);
@@ -846,18 +846,18 @@ void libapx_command_attach_minus(int user, unitgroup u, string argv, int spawnin
 
 	if( i != -1 ) {
 		apoint = "Origin";
-		libapx_print_output(user, "Attachpoint was invalid, defaulting to origin");
+		LibapxPrintOutput(user, "Attachpoint was invalid, defaulting to origin");
 	}
 
  // do catalog check for actor
-	actr = libapx_catalog_get(c_gameCatalogActor, actr);
+	actr = LibapxCatalogGet(c_gameCatalogActor, actr);
 	if(actr == null) {
-		libapx_print_output(user, "<c val=\"ff0000\">Unable to attach actor</c>: No such actor exists.");
+		LibapxPrintOutput(user, "<c val=\"ff0000\">Unable to attach actor</c>: No such actor exists.");
 		return;
 	}
 	scope = CatalogEntryScope( c_gameCatalogActor, actr );
 	if( scope == "CActorEventMacro" || scope == "CActorSound" ) {
-		libapx_print_output(user, "<c val=\"ff0000\">Unable to attach actor</c>: Invalid actor.");
+		LibapxPrintOutput(user, "<c val=\"ff0000\">Unable to attach actor</c>: Invalid actor.");
 		return;
 	}
 
@@ -868,16 +868,16 @@ void libapx_command_attach_minus(int user, unitgroup u, string argv, int spawnin
 			// Attach the actor to the unit
 			libNtve_gf_AttachActorToUnit(UnitGroupLoopCurrent(), actr, apoint);
 			if(!StringContains(actr, "TalkIcon", c_stringAnywhere, c_stringNoCase)) {
-					libapx_unit_cache_update(UnitGroupLoopCurrent(), "@attach-", argv);
+					LibapxUnitCacheUpdate(UnitGroupLoopCurrent(), "@attach-", argv);
 			}
 			UnitGroupLoopStep();
 		}
 		UnitGroupLoopEnd();
 }
-void libapx_define_attach_minus(string command_name) {
-	commands_guide_entry_set(
-	 	g_commands_guide_entry_actor, 
-		command_name, 
+void LibapxDefineAttachMinus(string commandName) {
+	LibapxCommandsGuideEntrySet(
+	 	gv_CommandsGuideEntryActor, 
+		commandName, 
 		" This command uses the old attach method, it is depreciated and generally has no reason to be used if you use @target with the modern @attach as they can emulate and surpass what attachdummy could do. <br> It is not compatible with target. <br> @attach- [actor] [point] <br> Examples: <br> @attach- marine head "
 	);
 }
@@ -885,93 +885,93 @@ void libapx_define_attach_minus(string command_name) {
 
 
 
-// libapx_command_attach
+// LibapxCommandAttach
 // =====================
 // Attaches an actor or a model to a unit (modified @attach+ from Cortex Forge)
 // Can optionally specify coordinate offsets, rotations, and site operations
 // syntax: @attach (->[ref]) (-m) [Actor/Model] [Point_#] [offX] [offY] [offZ] (-r [rotX] [rotY] [rotZ]) [SOp1] [SOp2] [SOp3]...
-void libapx_command_attach(int user, unitgroup u, string argv, int spawningCount, string bracketText) {
+void LibapxCommandAttach(int user, unitgroup u, string argv, int spawningCount, string bracketText) {
 	unitgroup g = u;
-	int parse_offset = 0;
+	int parseOffset = 0;
 	int x;
 	string actr = "{}";
 	string model = "{}";
 	string scope;
 	string apoint;
-	string apoint_index = "";
+	string apointIndex = "";
 	string offset = null;
 	string rotation = null;
 	string SOp;
 	string siteops = "";
 	string actormsg;
 	string attachPoints = "Origin Center Damage Engine Hardpoint Head Hit Overhead RallyPoint StatusBar Left Right Target Turret TurretY TurretZ Upgrade Weapon WeaponLeft WeaponRight Left Right";
-	string target = libapx_ACTOR_REF_MAIN;
+	string target = LibapxACTORREFMAIN;
 	unitgroup p = u;
 	int colcheker = 1;
 	bool nocache;
 	if( StringFind(argv, "-nocache" ,c_stringNoCase) != -1 ) {
 		argv =  StringReplaceWord(argv, "-nocache", "", 1, c_stringNoCase);
-		libapx_print_output(user, argv);
+		LibapxPrintOutput(user, argv);
 		nocache = true;
 	}
 	while (StringWord(argv, colcheker) != "") {
 		if(StringFind(StringWord(argv, colcheker), "colossus", c_stringNoCase) != -1 ) {
 				UnitGroupLoopBegin(p);
 				while(!UnitGroupLoopDone()) {
-					libapx_unit_flag_colossus(UnitGroupLoopCurrent());
+					LibapxUnitFlagColossus(UnitGroupLoopCurrent());
 					UnitGroupLoopStep();
 				}
 				UnitGroupLoopEnd();
 		}
 		colcheker = colcheker + 1;
 	}
-	libapx_waitDelay(user);
+	LibapxWaitDelay(user);
 	// get actor reference target
-	if( libapx_has_actor_ref(StringWord(argv, 2)) ) {
+	if( LibapxHasActorRef(StringWord(argv, 2)) ) {
 		target = StringWord(argv, 2);
-		parse_offset = 1;
+		parseOffset = 1;
 	}
 
-	if(StringWord( argv, 2 + parse_offset) == "") {
+	if(StringWord( argv, 2 + parseOffset) == "") {
 		return;
 	}
-	else if(StringWord( argv, 2 + parse_offset) == "-m") {
-		model = StringWord( argv, 3 + parse_offset);
+	else if(StringWord( argv, 2 + parseOffset) == "-m") {
+		model = StringWord( argv, 3 + parseOffset);
 	}
 	else {
-		actr = StringWord( argv, 2 + parse_offset);
+		actr = StringWord( argv, 2 + parseOffset);
 	}
 
 	if( actr == "listpoints" || model =="listpoints" ) {
-		libapx_print(PlayerGroupSingle(user), "<c val=\"00ff00\">Available attach points</c>:<n/>" + attachPoints);
+		LibapxPrint(PlayerGroupSingle(user), "<c val=\"00ff00\">Available attach points</c>:<n/>" + attachPoints);
 		return;
 	}
 
 	// check actor or model is valid
-	if(StringWord( argv, 2 + parse_offset) == "-m") { //do catalog check for model
-		model = libapx_catalog_get(c_gameCatalogModel, model);
+	if(StringWord( argv, 2 + parseOffset) == "-m") { //do catalog check for model
+		model = LibapxCatalogGet(c_gameCatalogModel, model);
 		if(model == null) {
-			libapx_print_output(user, "<c val=\"ff0000\">Unable to attach actor model</c>: No such model exists.");
+			LibapxPrintOutput(user, "<c val=\"ff0000\">Unable to attach actor model</c>: No such model exists.");
 			return;
 		}
-		parse_offset += 1; // increase parse offset since model "-m" flag being used
+		parseOffset += 1; // increase parse offset since model "-m" flag being used
 	}
 	else { // do catalog check for actor
-		actr = libapx_catalog_get(c_gameCatalogActor, actr);
+		actr = LibapxCatalogGet(c_gameCatalogActor, actr);
 		if(actr == null) {
-			libapx_print_output(user, "<c val=\"ff0000\">Unable to attach actor</c>: No such actor exists.");
+			LibapxPrintOutput(user, "<c val=\"ff0000\">Unable to attach actor</c>: No such actor exists.");
 			return;
 		}
 		scope = CatalogEntryScope( c_gameCatalogActor, actr );
 		if( scope == "CActorEventMacro" || scope == "CActorSound" ) {
-			libapx_print_output(user, "<c val=\"ff0000\">Unable to attach actor</c>: Invalid actor.");
+			LibapxPrintOutput(user, "<c val=\"ff0000\">Unable to attach actor</c>: Invalid actor.");
 			return;
 		}
 	}
 
 	//MODIFY ATTACH POINT STRING:
 	//get apoint (attachment point)
-	apoint = StringWord( argv, 3 + parse_offset);
+	apoint = StringWord( argv, 3 + parseOffset);
 	if( apoint == "" ) {
 		apoint = "Origin";
 	}
@@ -980,7 +980,7 @@ void libapx_command_attach(int user, unitgroup u, string argv, int spawningCount
 		while(StringSub(apoint, x, x) != "_") {
 			x -= 1;
 		}
-		apoint_index = " " + StringSub(apoint, x+1, StringLength(apoint));
+		apointIndex = " " + StringSub(apoint, x+1, StringLength(apoint));
 		apoint = StringSub(apoint, 1, x-1);
 	}
 	//check apoint is valid
@@ -996,21 +996,21 @@ void libapx_command_attach(int user, unitgroup u, string argv, int spawningCount
 
 	if( x != -1 ) {
 		apoint = "Origin";
-		libapx_print_output(user, "<c val=\"ff0000\">Warning</c>: Invalid attachment point, defaulting to Origin.<n/>You can obtain a list of attachment points by typing <c val=\"00ff00\">@attach listpoints</c>.");
+		LibapxPrintOutput(user, "<c val=\"ff0000\">Warning</c>: Invalid attachment point, defaulting to Origin.<n/>You can obtain a list of attachment points by typing <c val=\"00ff00\">@attach listpoints</c>.");
 	}
 
 	//remake the apoint string
-	apoint = "{" + apoint + apoint_index + "}";
+	apoint = "{" + apoint + apointIndex + "}";
 
 	//check for offset (if specified)
-	if(StringWord( argv, 4 + parse_offset) != ""
-		&& !StringContains(StringWord( argv, 4 + parse_offset), "SOp", c_stringAnywhere, c_stringNoCase)
-		&& StringWord( argv, 4 + parse_offset) != "-r") {
+	if(StringWord( argv, 4 + parseOffset) != ""
+		&& !StringContains(StringWord( argv, 4 + parseOffset), "SOp", c_stringAnywhere, c_stringNoCase)
+		&& StringWord( argv, 4 + parseOffset) != "-r") {
 		x = 0;
 		offset = "";
 		while(x < 3) {
-			if(StringWord( argv, 4 + parse_offset + x) != "") {
-				offset += "," + FixedToString(StringToFixed(StringWord( argv, 4 + parse_offset + x)), c_fixedPrecisionAny);
+			if(StringWord( argv, 4 + parseOffset + x) != "") {
+				offset += "," + FixedToString(StringToFixed(StringWord( argv, 4 + parseOffset + x)), c_fixedPrecisionAny);
 			}
 			else {
 				offset += ",0";
@@ -1019,20 +1019,20 @@ void libapx_command_attach(int user, unitgroup u, string argv, int spawningCount
 			x += 1;
 		}
 		offset = StringSub(offset, 2, StringLength(offset));
-		parse_offset += 3;
+		parseOffset += 3;
 	}
 
 	//check for local rotation (if specified)
-	if(StringWord( argv, 4 + parse_offset) == "-r") {
-		parse_offset += 1;
+	if(StringWord( argv, 4 + parseOffset) == "-r") {
+		parseOffset += 1;
 		x = 0;
 		rotation = "";
 		if(offset == null) {
 			offset = "0,0,0";
 		}
 		while(x < 3) {
-			if(StringWord( argv, 4 + parse_offset + x) != "") {
-				rotation += "," + FixedToString(StringToFixed(StringWord( argv, 4 + parse_offset + x)), c_fixedPrecisionAny);
+			if(StringWord( argv, 4 + parseOffset + x) != "") {
+				rotation += "," + FixedToString(StringToFixed(StringWord( argv, 4 + parseOffset + x)), c_fixedPrecisionAny);
 			}
 			else {
 				rotation += ",0";
@@ -1041,18 +1041,18 @@ void libapx_command_attach(int user, unitgroup u, string argv, int spawningCount
 			x += 1;
 		}
 		rotation = StringSub(rotation, 2, StringLength(rotation));
-		parse_offset += 3;
+		parseOffset += 3;
 	}
 
 	//keep checking for specified site ops until reached end of string
-	if(StringWord( argv, 4 + parse_offset) != "") {
+	if(StringWord( argv, 4 + parseOffset) != "") {
 		x = 0;
-		while(StringWord( argv, 4 + parse_offset + x) != "") {
-			if(StringContains(StringWord( argv, 4 + parse_offset + x), "SOp", c_stringAnywhere, c_stringNoCase)) {
-				SOp = StringWord( argv, 4 + parse_offset + x);
-				SOp = libapx_catalog_get(c_gameCatalogActor, SOp);
+		while(StringWord( argv, 4 + parseOffset + x) != "") {
+			if(StringContains(StringWord( argv, 4 + parseOffset + x), "SOp", c_stringAnywhere, c_stringNoCase)) {
+				SOp = StringWord( argv, 4 + parseOffset + x);
+				SOp = LibapxCatalogGet(c_gameCatalogActor, SOp);
 				if(SOp == null) {
-					libapx_print_output(user, "<c val=\"ff0000\">Warning: Encounted invalid or unknown Site Op: Skipping");
+					LibapxPrintOutput(user, "<c val=\"ff0000\">Warning: Encounted invalid or unknown Site Op: Skipping");
 				}
 				else {
 					siteops = siteops + " " + SOp;
@@ -1077,7 +1077,7 @@ void libapx_command_attach(int user, unitgroup u, string argv, int spawningCount
 	actormsg = "AttachModelOffset " + actr + " " + model + " " + apoint;
 	if(offset != null) {
 
-		offset = libapx_scalerapply(offset, u, "", user);
+		offset = LibapxScalerapply(offset, u, "", user);
 		actormsg = actormsg + " " + offset;
 	}
 	if(rotation != null) {
@@ -1097,7 +1097,7 @@ void libapx_command_attach(int user, unitgroup u, string argv, int spawningCount
 			// TODO: need to generalize actors that shouldnt update cache
 			if(!StringContains(actr, "TalkIcon", c_stringAnywhere, c_stringNoCase)) {
 				if(!nocache) {
-					libapx_unit_cache_update(UnitGroupLoopCurrent(), "@attach", argv);
+					LibapxUnitCacheUpdate(UnitGroupLoopCurrent(), "@attach", argv);
 				}
 			}
 			UnitGroupLoopStep();
@@ -1115,16 +1115,16 @@ void libapx_command_attach(int user, unitgroup u, string argv, int spawningCount
 	}
 	return;
 }
-void libapx_define_attach(string command_name) {
-	commands_guide_entry_set(
-	 	g_commands_guide_entry_actor, 
-		command_name, 
+void LibapxDefineAttach(string commandName) {
+	LibapxCommandsGuideEntrySet(
+	 	gv_CommandsGuideEntryActor, 
+		commandName, 
 		" This command attaches an actor to another actor. It is compatible with target. <br> @attach ->[target] [actor] [point] [x] [y] [z] -r [x] [y] [z]  <br> To Note: The x y z after -r is largely depreciated and now replaced by @rotation and it's functionality.  <br> You can find a list of actors to attach with _ search actor [name] <br> You can find a list of valid attachpoints with @attach listpoints  <br> You can check what points on a model with @checkpoints <br> the first [x] [y] [z] is how you attach a model with an offset <br> -nocache can be used with this command to stop it from caching in a unit's caches. <br> Examples: <br> (This would attach the actor 3 units ahead of where you attach.) <br> @attach marine origin 0 -3 0 <br>  (This would attach above where you attach) <br> @attach marine origin 0 0 4 <br> (This would go above and ahead of what you attach) <br> @attach marine origin 0 -3 5 <br> @target 123;@attach marine overhead;@attach ->123 marauder weapon 0 -3 "
 	);
 }
 
 
-// libapx_command_rotation
+// LibapxCommandRotation
 // =====================
 //This command uses the "ApexRotator" model and actor with attachmodeloffset to achieve  x y and z rotations.
 // ex @rotation 90x 35z 25x
@@ -1134,30 +1134,30 @@ void libapx_define_attach(string command_name) {
 // -b  : switches actor to beacon scaled actor
 
 //Prototypes
-void attach_rotation_x(int degrees, bool abs_scale, unit u);
-void attach_rotation_y(int degrees, bool abs_scale, unit u);
-void attach_rotation_z(int degrees, bool abs_scale, unit u);
+void attachRotationX(int degrees, bool absScale, unit u);
+void attachRotationY(int degrees, bool absScale, unit u);
+void attachRotationZ(int degrees, bool absScale, unit u);
 
-void libapx_command_attach_rotation(int user, unitgroup u, string argv, int spawningCount, string bracketText) {
-	bool mod_ypr = false;
-	bool mod_b = false;
+void LibapxCommandAttachRotation(int user, unitgroup u, string argv, int spawningCount, string bracketText) {
+	bool modYpr = false;
+	bool modB = false;
 	int i;
 	int j;
 	string temp;
 	bool nocache;
-	unit tmp_unit;
+	unit tmpUnit;
 	if(StringFind( argv, "-nocache",c_stringNoCase) != -1) {
 		argv =  StringReplaceWord(argv, "-nocache", "", 1, c_stringNoCase);
 		nocache = true;
 	}
 	//Remove, and check for, modifiers.
 	if( StringFind(argv, "-ypr", c_stringNoCase) != -1 ) {
-		mod_ypr = true;
+		modYpr = true;
 		argv = StringReplaceWord(argv, "-ypr",  "", 1, c_stringNoCase);
 	} 
 
 	if( StringFind(argv, "-b", c_stringNoCase) != -1 ) {
-		mod_b = true;
+		modB = true;
 		argv = StringReplaceWord(argv, "-b",  "", 1, c_stringNoCase);
 	} 
 
@@ -1168,12 +1168,12 @@ void libapx_command_attach_rotation(int user, unitgroup u, string argv, int spaw
 	while(StringWord(argv, i) != "") {
 		//We break apart
 		temp = StringWord(argv, i);
-		if(mod_ypr) {
+		if(modYpr) {
 			if (StringFind(temp, "y", c_stringNoCase) != -1) {
 				temp = StringReplace(temp, "", StringFind(temp, "y", c_stringNoCase), StringFind(temp, "y", c_stringNoCase) );
 
 				for (j = 1; j <= UnitGroupCount(u, c_unitCountAll); j += 1) {
-					 attach_rotation_z(StringToInt(temp), !mod_b, UnitGroupUnit(u, j));
+					 attachRotationZ(StringToInt(temp), !modB, UnitGroupUnit(u, j));
 				}
 			}
 			if (StringFind(temp, "p", c_stringNoCase) != -1) {
@@ -1181,7 +1181,7 @@ void libapx_command_attach_rotation(int user, unitgroup u, string argv, int spaw
 				temp = StringReplace(temp, "", StringFind(temp, "p", c_stringNoCase), StringFind(temp, "p", c_stringNoCase) );
 	
 				for (j = 1; j <= UnitGroupCount(u, c_unitCountAll); j += 1) {
-					attach_rotation_y(StringToInt(temp), !mod_b, UnitGroupUnit(u, j));
+					attachRotationY(StringToInt(temp), !modB, UnitGroupUnit(u, j));
 			   }
 			}
 			if (StringFind(temp, "r", c_stringNoCase) != -1) {
@@ -1189,7 +1189,7 @@ void libapx_command_attach_rotation(int user, unitgroup u, string argv, int spaw
 				temp = StringReplace(temp, "", StringFind(temp, "r", c_stringNoCase), StringFind(temp, "r", c_stringNoCase) );
 	
 				for (j = 1; j <= UnitGroupCount(u, c_unitCountAll); j += 1) {
-					attach_rotation_x(StringToInt(temp), !mod_b, UnitGroupUnit(u, j));
+					attachRotationX(StringToInt(temp), !modB, UnitGroupUnit(u, j));
 			   }
 			}
 		}
@@ -1199,7 +1199,7 @@ void libapx_command_attach_rotation(int user, unitgroup u, string argv, int spaw
 				temp = StringReplace(temp, "", StringFind(temp, "x", c_stringNoCase), StringFind(temp, "x", c_stringNoCase) );
 	
 				for (j = 1; j <= UnitGroupCount(u, c_unitCountAll); j += 1) {
-					 attach_rotation_x(StringToInt(temp), !mod_b, UnitGroupUnit(u, j));
+					 attachRotationX(StringToInt(temp), !modB, UnitGroupUnit(u, j));
 				}
 				
 			}
@@ -1208,7 +1208,7 @@ void libapx_command_attach_rotation(int user, unitgroup u, string argv, int spaw
 				temp = StringReplace(temp, "", StringFind(temp, "y", c_stringNoCase), StringFind(temp, "y", c_stringNoCase) );
 	
 				for (j = 1; j <= UnitGroupCount(u, c_unitCountAll); j += 1) {
-					attach_rotation_y(StringToInt(temp), !mod_b, UnitGroupUnit(u, j));
+					attachRotationY(StringToInt(temp), !modB, UnitGroupUnit(u, j));
 			   }
 			}
 			if (StringFind(temp, "z", c_stringNoCase) != -1) {
@@ -1216,7 +1216,7 @@ void libapx_command_attach_rotation(int user, unitgroup u, string argv, int spaw
 				temp = StringReplace(temp, "", StringFind(temp, "z", c_stringNoCase), StringFind(temp, "z", c_stringNoCase) );
 	
 				for (j = 1; j <= UnitGroupCount(u, c_unitCountAll); j += 1) {
-					attach_rotation_z(StringToInt(temp), !mod_b, UnitGroupUnit(u, j));
+					attachRotationZ(StringToInt(temp), !modB, UnitGroupUnit(u, j));
 			   }
 			}
 		}
@@ -1224,39 +1224,39 @@ void libapx_command_attach_rotation(int user, unitgroup u, string argv, int spaw
 	}
 
 	//Reform argv
-	if(mod_ypr) {
+	if(modYpr) {
 		argv = argv + " -ypr";
 	}
-	if(mod_b) {
+	if(modB) {
 		argv = argv + " -b";
 	}
 	for (j = 1; j <= UnitGroupCount(u, c_unitCountAll); j += 1) {
 		if(!nocache) {
-			libapx_unit_cache_update(UnitGroupUnit(u, j), "@rotation", argv);
+			LibapxUnitCacheUpdate(UnitGroupUnit(u, j), "@rotation", argv);
 		}
 
 	}
 
 }
-void libapx_define_rotation(string command_name) {
-	commands_guide_entry_set(
-	 	g_commands_guide_entry_actor, 
-		command_name, 
-		" This command creates a new actor on top of what actor it is called on with a specified rotation. It is not compatible with target. <br> @rotation [modifiers] [rotations.. <br> @rotation can have it's functionality and inputs modified with three modifiers, these modifiers are <br> -b: This changes the end actor from a default actor to a Beacon_Apex actor <br> -ypr: This changes it's xyz inputs into yaw pitch roll inputs <br> -nocache: This makes the command no longer store in the units caches. <br> Examples: <br> @rotation 30y <br> @rotation 90y 10z <br> @rotation -b 90x 35z 190y <br> @rotation -ypr 90y 32p 15r "
+void LibapxDefineRotation(string commandName) {
+	LibapxCommandsGuideEntrySet(
+	 	gv_CommandsGuideEntryActor, 
+		commandName, 
+		" This command creates a new actor on top of what actor it is called on with a specified rotation. It is not compatible with target. <br> @rotation [modifiers] [rotations.. <br> @rotation can have it's functionality and inputs modified with three modifiers, these modifiers are <br> -b: This changes the end actor from a default actor to a BeaconApex actor <br> -ypr: This changes it's xyz inputs into yaw pitch roll inputs <br> -nocache: This makes the command no longer store in the units caches. <br> Examples: <br> @rotation 30y <br> @rotation 90y 10z <br> @rotation -b 90x 35z 190y <br> @rotation -ypr 90y 32p 15r "
 	);
 }
 //Helper commands for rotation
-void attach_rotation_x(int degrees, bool abs_scale, unit u) {
-	int point_num;
-	string attach_point = "";
+void attachRotationX(int degrees, bool absScale, unit u) {
+	int pointNum;
+	string attachPoint = "";
 	string rotation = "0,0,0";
 	//X is Target_01-08
 	//Y is Hit_01-08
 	//Z is Hardpoint_01-08
-	string actor_name = "Beacon_Apex";
+	string actorName = "BeaconApex";
 	int degreesAbs = AbsI(degrees);
-	if(abs_scale) {
-		actor_name = "Apex_Actor";
+	if(absScale) {
+		actorName = "ApexActor";
 	}
 	while(degreesAbs > 360 || degreesAbs == 360) {
 		degreesAbs -= 360;
@@ -1270,8 +1270,8 @@ void attach_rotation_x(int degrees, bool abs_scale, unit u) {
 	}
 
 	//Generate Attach Point Based off of rotation amt
-	point_num = degrees/45 + 1;
-	attach_point = "{Target " + IntToString(point_num) + "}";
+	pointNum = degrees/45 + 1;
+	attachPoint = "{Target " + IntToString(pointNum) + "}";
 
 
 	//point handles >45
@@ -1287,25 +1287,25 @@ void attach_rotation_x(int degrees, bool abs_scale, unit u) {
 	}
 
 
-	ActorSendTo(libNtve_gf_MainActorofUnit(u),"::Main", "ModelSwap Apex_Rotator");
+	ActorSendTo(libNtve_gf_MainActorofUnit(u),"::Main", "ModelSwap ApexRotator");
 	ActorSendTo(libNtve_gf_MainActorofUnit(u),"::Main", "SetScaleAbsolute 1");
 	ActorSendTo(libNtve_gf_MainActorofUnit(u),"::Main", "ModelAllowHitTest 0");
 	//AttachModelOffset " +attachment + " {} " + attachPoint + " " + offset + " " + rotation + " " + siteops
-	ActorSendTo(libNtve_gf_MainActorofUnit(u),"::Main", "AttachModelOffset "+actor_name+" {} " + attach_point + " 0,0,0 " + rotation);
-	attach_rotation_z(270, abs_scale, u);
+	ActorSendTo(libNtve_gf_MainActorofUnit(u),"::Main", "AttachModelOffset "+actorName+" {} " + attachPoint + " 0,0,0 " + rotation);
+	attachRotationZ(270, absScale, u);
 }
 
-void attach_rotation_z(int degrees, bool abs_scale, unit u) {
-	int point_num;
-	string attach_point = "";
+void attachRotationZ(int degrees, bool absScale, unit u) {
+	int pointNum;
+	string attachPoint = "";
 	string rotation = "0,0,0";
 	//X is Target_01-08
 	//Y is Hit_01-08
 	//Z is Hardpoint_01-08
-	string actor_name = "Beacon_Apex";
+	string actorName = "BeaconApex";
 	int degreesAbs = AbsI(degrees);
-	if(abs_scale) {
-		actor_name = "Apex_Actor";
+	if(absScale) {
+		actorName = "ApexActor";
 	}
 	while(degreesAbs > 360 || degreesAbs == 360) {
 		degreesAbs -= 360;
@@ -1321,8 +1321,8 @@ void attach_rotation_z(int degrees, bool abs_scale, unit u) {
 
 
 	//Generate Attach Point Based off of rotation amt
-	point_num = degrees/45;
-	attach_point = "{Hardpoint " + IntToString(point_num) + "}";
+	pointNum = degrees/45;
+	attachPoint = "{Hardpoint " + IntToString(pointNum) + "}";
 
 
 	//point handles >45
@@ -1338,23 +1338,23 @@ void attach_rotation_z(int degrees, bool abs_scale, unit u) {
 	}
 
 
-	ActorSendTo(libNtve_gf_MainActorofUnit(u),"::Main", "ModelSwap Apex_Rotator");
+	ActorSendTo(libNtve_gf_MainActorofUnit(u),"::Main", "ModelSwap ApexRotator");
 	ActorSendTo(libNtve_gf_MainActorofUnit(u),"::Main", "SetScaleAbsolute 1");
 	ActorSendTo(libNtve_gf_MainActorofUnit(u),"::Main", "ModelAllowHitTest 0");
 	//AttachModelOffset " +attachment + " {} " + attachPoint + " " + offset + " " + rotation + " " + siteops
-	ActorSendTo(libNtve_gf_MainActorofUnit(u),"::Main", "AttachModelOffset "+actor_name+" {} " + attach_point + " 0,0,0 " + rotation);
+	ActorSendTo(libNtve_gf_MainActorofUnit(u),"::Main", "AttachModelOffset "+actorName+" {} " + attachPoint + " 0,0,0 " + rotation);
 }
-void attach_rotation_y(int degrees, bool abs_scale, unit u) {
-	int point_num;
-	string attach_point = "";
+void attachRotationY(int degrees, bool absScale, unit u) {
+	int pointNum;
+	string attachPoint = "";
 	string rotation = "0,0,0";
 	//X is Target_01-08
 	//Y is Hit_01-08
 	//Z is Hardpoint_01-08
-	string actor_name = "Beacon_Apex";
+	string actorName = "BeaconApex";
 	int degreesAbs = AbsI(degrees);
-	if(abs_scale) {
-		actor_name = "Apex_Actor";
+	if(absScale) {
+		actorName = "ApexActor";
 	}
 	while(degreesAbs > 360 || degreesAbs == 360) {
 		degreesAbs -= 360;
@@ -1370,8 +1370,8 @@ void attach_rotation_y(int degrees, bool abs_scale, unit u) {
 
 
 	//Generate Attach Point Based off of rotation amt
-	point_num = degrees/45+1;
-	attach_point = "{Hit " + IntToString(point_num) + "}";
+	pointNum = degrees/45+1;
+	attachPoint = "{Hit " + IntToString(pointNum) + "}";
 
 
 	//point handles >45
@@ -1387,9 +1387,9 @@ void attach_rotation_y(int degrees, bool abs_scale, unit u) {
 	}
 
 
-	ActorSendTo(libNtve_gf_MainActorofUnit(u),"::Main", "ModelSwap Apex_Rotator");
+	ActorSendTo(libNtve_gf_MainActorofUnit(u),"::Main", "ModelSwap ApexRotator");
 	ActorSendTo(libNtve_gf_MainActorofUnit(u),"::Main", "SetScaleAbsolute 1");
 	ActorSendTo(libNtve_gf_MainActorofUnit(u),"::Main", "ModelAllowHitTest 0");
 	//AttachModelOffset " +attachment + " {} " + attachPoint + " " + offset + " " + rotation + " " + siteops
-	ActorSendTo(libNtve_gf_MainActorofUnit(u),"::Main", "AttachModelOffset "+actor_name+" {} " + attach_point + " 0,0,0 " + rotation);
+	ActorSendTo(libNtve_gf_MainActorofUnit(u),"::Main", "AttachModelOffset "+actorName+" {} " + attachPoint + " 0,0,0 " + rotation);
 }

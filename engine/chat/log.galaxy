@@ -1,6 +1,6 @@
 //=========================================================
 //		Apex Roleplaying Engine
-//		Copyright (c) 2019, Apex Group
+//		Copyright (c) 2022, Apex Group
 //=========================================================
 // This software is distributed under the MIT License:
 // <http://opensource.org/licenses/MIT>
@@ -12,74 +12,74 @@
 // from @say or >narrate that pertain to the roleplay story.
 
 // number of messages to be logged
-const int libapx_NLOGGED_MSG = 512;
+const int gv_LibapxNumberOfLoggedMessages = 512;
 
 // max number of chars in a chat log msg. This should be set so that chat log
 // messages can fit into a ui chatlog reader
 // (not including timestamp or a unit name)
-static const int libapx_LOG_MSG_LENGTH = 60;
+static const int gv_LibapxLogMessageLength = 60;
 
 // guess for the size of a typical unit say msg header (timestamp + unitname)
-static const int libapx_LOG_MSG_HEADER_GUESS = 24;
+static const int gv_LibapxLogMessageHeaderGuess = 24;
 
 // event signal when a new chatlog message is added
-const string libapx_EVENT_CHATLOG = "libapx_EVENT_CHATLOG ";
+const string gv_LibapxEventChatLog = "gv_LibapxEventChatLog ";
 
-// Type: libapx_log_msg
+// Type: LogMsg
 // ==============
 // Message information unit stored in chatlog array
-struct libapx_log_msg {
+struct LogMsg {
 	int author;		// player number of the creator of this msg
 	text timestamp;	// text formatted timestamp [H:M:S]
 	text msg;		// text formatted message
-	bool is_part_of_prev;	// flag for whether this message part of the previous
+	bool isPartOfPrev;	// flag for whether this message part of the previous
 							// useful for multi-line split messages
 };
 
-libapx_log_msg[libapx_NLOGGED_MSG] libapx_chatlog;
+LogMsg[gv_LibapxNumberOfLoggedMessages] gv_LibapxChatLog;
 
 // Counter for the current log index in the chatlog array.
 // The index of chatlog array must be cyclical: that is, after writing to
-// index libapx_NLOGGED_MSG-1, the index will cycle back to 0.
-int libapx_chatlog_counter = 0;
+// index gv_LibapxNumberOfLoggedMessages-1, the index will cycle back to 0.
+int gv_LibapxChatLogCounter = 0;
 
 // flag for whether the chatlog has cycled
-bool libapx_chatlog_cycled = false;
+bool gv_gv_LibapxChatLogCycled = false;
 
-// libapx_chatlog_add
+// ChatlogAdd
 // ================
 // Adds a message to the chatlog at the current counter index
-// (stored in libapx_chatlog_counter). When a new chatlog message saved,
-// sends event signal [libapx_EVENT_CHATLOG + index]. This can be responded
+// (stored in gv_LibapxChatLogCounter). When a new chatlog message saved,
+// sends event signal [gv_LibapxEventChatLog + index]. This can be responded
 // to by any modules that utilize this chatlog. The reason for using events
 // rather than direct function calls is to decouple this module from any
 // clients, so there does not have to be any interlocking dependencies between
 // e.g. a chatlog ui and this engine chatlog system.
 // Though events introduces messiness.
-static void libapx_chatlog_add(int index, int author, text timestamp, text msg, bool part_prev) {
-	libapx_chatlog[index].author = author;
-	libapx_chatlog[index].timestamp = timestamp;
-	libapx_chatlog[index].msg = msg;
-	libapx_chatlog[index].is_part_of_prev = part_prev;
+static void ChatlogAdd(int index, int author, text timestamp, text msg, bool partPrev) {
+	gv_LibapxChatLog[index].author = author;
+	gv_LibapxChatLog[index].timestamp = timestamp;
+	gv_LibapxChatLog[index].msg = msg;
+	gv_LibapxChatLog[index].isPartOfPrev = partPrev;
 
 	// if chat log hasn't cycled and will cycle, check flag for cycled
-	if( !libapx_chatlog_cycled && libapx_chatlog_counter == (libapx_NLOGGED_MSG - 1) ) {
-		libapx_chatlog_cycled = true;
+	if( !gv_gv_LibapxChatLogCycled && gv_LibapxChatLogCounter == (gv_LibapxNumberOfLoggedMessages - 1) ) {
+		gv_gv_LibapxChatLogCycled = true;
 	}
 
 	// send event that this chatlog message has been updated
-	TriggerSendEvent(libapx_EVENT_CHATLOG + IntToString(libapx_chatlog_counter));
+	TriggerSendEvent(gv_LibapxEventChatLog + IntToString(gv_LibapxChatLogCounter));
 
 	// increment counter and take modulus to ensure
-	libapx_chatlog_counter = (libapx_chatlog_counter + 1) % libapx_NLOGGED_MSG;
+	gv_LibapxChatLogCounter = (gv_LibapxChatLogCounter + 1) % gv_LibapxNumberOfLoggedMessages;
 }
 
 
-//libapx_string_space_sub
+//LibapxStringSpaceSub
 //===========
 //Takes msg and target int then divides it by spacing to never reach goal length
 // STructured like StringSub(string s, int start, int end)
-string libapx_string_space_sub(string msg, int start, int end) {
+string LibapxStringSpaceSub(string msg, int start, int end) {
 	int currentCount = start;
 	int estimatedCount = 0;
 	string tempMsg;
@@ -101,11 +101,11 @@ string libapx_string_space_sub(string msg, int start, int end) {
 
 }
 
-//libapx_string_space_sub_i
+//LibapxStringSpaceSubI
 //=========== nabs index 2
 //Takes msg and target int then divides it by spacing to never reach goal length
 // STructured like StringSub(string s, int start, int end)
-int libapx_string_space_sub_i(string msg, int start, int end) {
+int LibapxStringSpaceSubI(string msg, int start, int end) {
 	int currentCount = start;
 	int estimatedCount = 0;
 	string tempMsg;
@@ -129,47 +129,47 @@ int libapx_string_space_sub_i(string msg, int start, int end) {
 
 
 
-// libapx_log
+// LibapxLog
 // ===============
 // Conditions an input message into chunks for saving into the chatlog.
 // Used by client to log messages.
-void libapx_log(int author, text unitname, string msg) {
+void LibapxLog(int author, text unitname, string msg) {
 	int time = FixedToInt(GameGetMissionTime());
 	text timestamp = StringToText("[" + IntToString( time / 3600 ) + ":" + IntToString( ( time % 3600 ) / 60 ) + ":" + IntToString( time % 60 ) + "] ");
 	string chunk;
 	int idx;
 	int i = 0;
 
-		libapx_chatlog_add(libapx_chatlog_counter, author, timestamp, unitname + StringToText(":"), false);
+		ChatlogAdd(gv_LibapxChatLogCounter, author, timestamp, unitname + StringToText(":"), false);
 
 		while( msg != "" ) {
 			i +=1;
 			if( StringFind(msg, " ", c_stringNoCase) == -1 ) {
-				libapx_chatlog_add(libapx_chatlog_counter, author, timestamp, StringToText(msg), true);
+				ChatlogAdd(gv_LibapxChatLogCounter, author, timestamp, StringToText(msg), true);
 				break;
 			}
-			else if( StringLength(msg) > libapx_LOG_MSG_LENGTH ) {
-				chunk = libapx_string_space_sub(msg, 1, libapx_LOG_MSG_LENGTH);
+			else if( StringLength(msg) > gv_LibapxLogMessageLength ) {
+				chunk = LibapxStringSpaceSub(msg, 1, gv_LibapxLogMessageLength);
 				if(chunk == " ") {
 					chunk = msg;
 					msg = "";
-					libapx_chatlog_add(libapx_chatlog_counter, author, timestamp, StringToText(chunk), true);
+					ChatlogAdd(gv_LibapxChatLogCounter, author, timestamp, StringToText(chunk), true);
 					break;
 				}
 				else {
-					idx = libapx_string_space_sub_i(msg, 1, libapx_LOG_MSG_LENGTH);
-					msg = libapx_string_space_sub(msg, idx, StringLength(msg) + 10);
-					libapx_chatlog_add(libapx_chatlog_counter, author, timestamp, StringToText(chunk), true);
+					idx = LibapxStringSpaceSubI(msg, 1, gv_LibapxLogMessageLength);
+					msg = LibapxStringSpaceSub(msg, idx, StringLength(msg) + 10);
+					ChatlogAdd(gv_LibapxChatLogCounter, author, timestamp, StringToText(chunk), true);
 				}
 				
 			} 
 
 			else {
-				libapx_chatlog_add(libapx_chatlog_counter, author, timestamp, StringToText(msg), true);
+				ChatlogAdd(gv_LibapxChatLogCounter, author, timestamp, StringToText(msg), true);
 				break;
 			}
 			if(i > 1000) {
-				libapx_print(PlayerGroupAll(), "Log function error, report to Serobliss on the discord or #engine-discussion");
+				LibapxPrint(PlayerGroupAll(), "Log function error, report to Serobliss on the discord or #engine-discussion");
 				break;
 			}
 		}

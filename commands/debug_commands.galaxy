@@ -1,6 +1,6 @@
 //=========================================================
 //		Apex Roleplaying Engine
-//		Copyright (c) 2019, Apex Group
+//		Copyright (c) 2022, Apex Group
 //=========================================================
 // This software is distributed under the MIT License:
 // <http://opensource.org/licenses/MIT>
@@ -9,43 +9,43 @@
 // These are commands purely for testing modules of the engine.
 // These are not intended for public use in the game itself.
 
-// libapx_command_experiment
+// LibapxCommandExperiment
 // =====================
 // test of new command system using func refs
-void libapx_command_experiment(int user, unitgroup u, string argv, int spawningCount, string bracketText) {
+void LibapxCommandExperiment(int user, unitgroup u, string argv, int spawningCount, string bracketText) {
 	
 }
 
 int strcmp(string k1, string k2) {
-	//libapx_print(PlayerGroupAll(), k1);
-	//libapx_print(PlayerGroupAll(), k2);
+	//LibapxPrint(PlayerGroupAll(), k1);
+	//LibapxPrint(PlayerGroupAll(), k2);
 
 	return StringCompare(DataTableGetString(true, k1), DataTableGetString(true, k2), c_stringCase);
 }
 
 // test sort the input args
-void libapx_command_sort(int user, unitgroup u, string argv, int spawningCount, string bracketText) {
+void LibapxCommandSort(int user, unitgroup u, string argv, int spawningCount, string bracketText) {
 	string var = "TESTVAR";
 	int i = 0;
 	int n;
-	string arg = libapx_arg(argv, 2);
+	string arg = LibapxArg(argv, 2);
 	string s = "";
 
 	// test
-	libapx_print(PlayerGroupAll(), libapx_string_trim(argv));
+	LibapxPrint(PlayerGroupAll(), LibapxStringTrim(argv));
 
 	while( arg != "" ) {
 		DataTableSetString(true, var + " " + IntToString(i), arg);
 		i += 1;
-		arg = libapx_arg(argv, 2 + i);
+		arg = LibapxArg(argv, 2 + i);
 	}
 
-	libx_qsort(var + " 0", i, c_dataTypeString, strcmp);
+	libxQsort(var + " 0", i, c_dataTypeString, strcmp);
 
 	for( n = 0; n < i; n += 1 ) {
 		s = s + DataTableGetString(true, var + " " + IntToString(n)) + " ";
 		DataTableValueRemove(true, var + " " + IntToString(n));
 	}
 
-	libapx_print(PlayerGroupAll(), s);
+	LibapxPrint(PlayerGroupAll(), s);
 }

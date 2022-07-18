@@ -1,6 +1,6 @@
 //=========================================================
 //		Apex Roleplaying Engine
-//		Copyright (c) 2019, Apex Group
+//		Copyright (c) 2022, Apex Group
 //=========================================================
 // This software is distributed under the MIT License:
 // <http://opensource.org/licenses/MIT>
@@ -10,31 +10,31 @@
 
 
 //Dialog for user info
-int libapx_ui_info;
-int libapx_ui_info_exit;
+int LibapxUiInfo;
+int LibapxUiInfoExit;
 
-static int help_btn;
+static int HelpButton;
 
-void libapx_ui_info_init() {
+void LibapxUiInfoInit() {
   //Main Dialog init
-  libapx_ui_info = libapx_create_dialog(670, 310, c_anchorTopLeft, libapx_ui_panel_spacing, 0);
-  libapx_ui_info_exit = libapx_create_dialog_close_btn(libapx_ui_info, 670, 310, c_anchorTopLeft, libapx_ui_panel_spacing, 0);
+  LibapxUiInfo = LibapxCreateDialog(670, 310, c_anchorTopLeft, gv_LibapxUiPanelSpacing, 0);
+  LibapxUiInfoExit = LibapxCreateDialogCloseBtn(LibapxUiInfo, 670, 310, c_anchorTopLeft, gv_LibapxUiPanelSpacing, 0);
 
   //Title
-  libapx_create_dialog_title(libapx_ui_info , 300, 40, 00, 40, "Engine Information", libapx_UI_HEADER1, 210);
+  LibapxCreateDialogTitle(LibapxUiInfo , 300, 40, 00, 40, "Engine Information", gv_LibapxUiHeader1, 210);
 
   //Description
-  libapx_create_dialog_label(libapx_ui_info, 550, 300, c_anchorTopLeft, 25, 90, "<s> Welcome to <c val=\"ff0000\"> Apex Roleplaying</c> v" + IntToString(gv_LibapxBuildVersion) + "." + IntToString(gv_LibapxBuildSubVersion) + gv_LibapxBuildVersionModifier + ".</n> Join the community on the reddit  <c val=\"3498db\">https://www.reddit.com/r/StarCraftRP/></c></n> or more preferably join us on the discord to discuss the engine, create private lobbies, and much more! <c val=\"3498db\">https://discord.gg/mPcjgX5</c> </n> Report bugs to <c val=\"3498db\"> serobliss2@gmail.com </c> \n \n Thank you for playing! ", libapx_UI_HEADER4);
-  help_btn = libapx_create_dialog_btn(libapx_ui_info, 370,50, c_anchorBottomRight, 50,25, "I'm new!","Introduction for new players");
-  TriggerAddEventDialogControl(TriggerCreate("libapx_ui_info_help"), c_playerAny, help_btn, c_triggerControlEventTypeClick);
+  LibapxCreateDialogLabel(LibapxUiInfo, 550, 300, c_anchorTopLeft, 25, 90, "<s> Welcome to <c val=\"ff0000\"> Apex Roleplaying</c> v" + IntToString(gv_LibapxBuildVersion) + "." + IntToString(gv_LibapxBuildSubVersion) + gv_LibapxBuildVersionModifier + ".</n> Join the community on the reddit  <c val=\"3498db\">https://www.reddit.com/r/StarCraftRP/></c></n> or more preferably join us on the discord to discuss the engine, create private lobbies, and much more! <c val=\"3498db\">https://discord.gg/mPcjgX5</c> </n> Report bugs to <c val=\"3498db\"> serobliss2@gmail.com </c> \n \n Thank you for playing! ", gv_LibapxUiHeader4);
+  HelpButton = LibapxCreateDialogBtn(LibapxUiInfo, 370,50, c_anchorBottomRight, 50,25, "I'm new!","Introduction for new players");
+  TriggerAddEventDialogControl(TriggerCreate("LibapxUiInfoHelp"), c_playerAny, HelpButton, c_triggerControlEventTypeClick);
 }
 
-void libapx_ui_info_init_player(int player) {
+void LibapxUiInfoInitPlayer(int player) {
 
 }
-bool libapx_ui_info_help(bool testConds, bool runActions) {
+bool LibapxUiInfoHelp(bool testConds, bool runActions) {
   int p = EventPlayer();
   //Set Active Layout to References
-  libapx_ui_switchto_panel(libapx_ui_panels[7].btn, p);
+  LibapxUiSwitchtoPanel(gv_LibapxUiPanels[7].btn, p);
   return true;
 }

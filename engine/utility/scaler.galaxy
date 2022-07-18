@@ -1,5 +1,5 @@
 
-string libapx_scalerapply(string s, unitgroup g, string category, int user) {
+string LibapxScalerapply(string s, unitgroup g, string category, int user) {
 
 	string moddedOffSet = s;
 	fixed x;
@@ -21,9 +21,9 @@ string libapx_scalerapply(string s, unitgroup g, string category, int user) {
 		z = StringToFixed(StringWord(s, 3));
 	}
 
-		x = x*libapx_player[user].scaler;
-		y = y*libapx_player[user].scaler;
-		z = z*libapx_player[user].scaler;
+		x = x*gv_LibapxPlayer[user].scaler;
+		y = y*gv_LibapxPlayer[user].scaler;
+		z = z*gv_LibapxPlayer[user].scaler;
 
 if (category == "scale") {
 	if (x<0.0006 && x > -0.0006) {
@@ -58,15 +58,15 @@ if (category == "scale") {
 	while( !UnitGroupLoopDone() ) {
 
 		if (x > 8.0) {
-			libapx_unit_flag_col_crashable(UnitGroupLoopCurrent());
+			LibapxUnitFlagColCrashable(UnitGroupLoopCurrent());
 		}
 
 		if (y > 8.0) {
-			libapx_unit_flag_col_crashable(UnitGroupLoopCurrent());
+			LibapxUnitFlagColCrashable(UnitGroupLoopCurrent());
 		}
 
 		if (z > 8.0) {
-			libapx_unit_flag_col_crashable(UnitGroupLoopCurrent());
+			LibapxUnitFlagColCrashable(UnitGroupLoopCurrent());
 		}
 		UnitGroupLoopStep();
 	}

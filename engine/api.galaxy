@@ -1,6 +1,6 @@
 //=========================================================
 //		Apex Roleplaying Engine
-//		Copyright (c) 2019, Apex Group
+//		Copyright (c) 2022, Apex Group
 //=========================================================
 // This software is distributed under the MIT License:
 // <http://opensource.org/licenses/MIT>
@@ -8,90 +8,90 @@
 
 
 
-void libapx_api_start_reading(int p) {
-    libapx_player[p].api_reading = true;
-    libapx_print_output(p, "<c val=\"00eeff\">API</c> | Listening");
+void LibapxApiStartReading(int p) {
+    gv_LibapxPlayer[p].apiReading = true;
+    LibapxPrintOutput(p, "<c val=\"00eeff\">API</c> | Listening");
 }
 
-void libapx_api_stop_reading(int p) {
-    string api_string = libapx_player[p].api_string_input;
-    libapx_player[p].api_reading = false;
-    libapx_player[p].api_string_input = "";
-    libapx_print_output(p, "<c val=\"00eeff\">API</c> | Running And Stopping Listening");
-    libapx_process_chat( api_string, p, UnitGroupSelected(p));
+void LibapxApiStopReading(int p) {
+    string apiString = gv_LibapxPlayer[p].apiStringInput;
+    gv_LibapxPlayer[p].apiReading = false;
+    gv_LibapxPlayer[p].apiStringInput = "";
+    LibapxPrintOutput(p, "<c val=\"00eeff\">API</c> | Running And Stopping Listening");
+    LibapxProcessChat( apiString, p, UnitGroupSelected(p));
 }
 
 
 
-void libpax_api_update(int p) {
+void libpaxApiUpdate(int p) {
     string stream;
     string globalStream;
     string desiredKey;
     int i;
-    string api_string;
+    string apiString;
 
-    if(!libapx_player[p].banksloaded) {
+    if(!gv_LibapxPlayer[p].banksloaded) {
         return;
     }
 
-    BankReload(libapx_player[p].bank_storage);
-    BankWait(libapx_player[p].bank_storage);
+    BankReload(gv_LibapxPlayer[p].bankStorage);
+    BankWait(gv_LibapxPlayer[p].bankStorage);
 
-    if(BankSectionExists(libapx_player[p].bank_storage, "Api")) {
+    if(BankSectionExists(gv_LibapxPlayer[p].bankStorage, "Api")) {
 
         desiredKey = "stream";
-        if(!BankKeyExists(libapx_player[p].bank_storage, "Api", desiredKey)) {
-            libapx_print_output(p, "<c val=\"00eeff\">API</c> | Stream Not Found");
-            BankValueSetFromString(libapx_player[p].bank_storage, "Api", desiredKey, "");
-            BankSave(libapx_player[p].bank_storage);
-            libapx_print_output(p, "<c val=\"00eeff\">API</c> | Creating Stream Key");
+        if(!BankKeyExists(gv_LibapxPlayer[p].bankStorage, "Api", desiredKey)) {
+            LibapxPrintOutput(p, "<c val=\"00eeff\">API</c> | Stream Not Found");
+            BankValueSetFromString(gv_LibapxPlayer[p].bankStorage, "Api", desiredKey, "");
+            BankSave(gv_LibapxPlayer[p].bankStorage);
+            LibapxPrintOutput(p, "<c val=\"00eeff\">API</c> | Creating Stream Key");
             return;
         }
         
 
     
-        stream = BankValueGetAsString(libapx_player[p].bank_storage, "Api", desiredKey);
-        BankValueSetFromString(libapx_player[p].bank_storage, "Api", desiredKey, "");
+        stream = BankValueGetAsString(gv_LibapxPlayer[p].bankStorage, "Api", desiredKey);
+        BankValueSetFromString(gv_LibapxPlayer[p].bankStorage, "Api", desiredKey, "");
 
         if(stream == "") {
             return;
         }
 
-        if(stream == "api_run") {
-            libapx_print_output(p, "<c val=\"ffee00\">API CMD</c> | Running Buffer");
-            api_string = libapx_player[p].api_string_input;
-            libapx_player[p].api_string_input = "";
+        if(stream == "apiRun") {
+            LibapxPrintOutput(p, "<c val=\"ffee00\">API CMD</c> | Running Buffer");
+            apiString = gv_LibapxPlayer[p].apiStringInput;
+            gv_LibapxPlayer[p].apiStringInput = "";
             
-            libapx_process_chat( api_string, p, UnitGroupSelected(p));
-            BankSave(libapx_player[p].bank_storage);
+            LibapxProcessChat( apiString, p, UnitGroupSelected(p));
+            BankSave(gv_LibapxPlayer[p].bankStorage);
             return;
-        } else if(stream == "api_stop") {
-            libapx_print_output(p, "<c val=\"ffee00\">API CMD</c> | Running Buffer and Stopping");
-            libapx_api_stop_reading(p);
-            BankSave(libapx_player[p].bank_storage);
+        } else if(stream == "apiStop") {
+            LibapxPrintOutput(p, "<c val=\"ffee00\">API CMD</c> | Running Buffer and Stopping");
+            LibapxApiStopReading(p);
+            BankSave(gv_LibapxPlayer[p].bankStorage);
             return;
-        } else if(stream == "api_length") {
-            libapx_print_text(PlayerGroupSingle(p), StringToText("> <c val=\"ffee00\">API CMD</c> | Buffer length ") + FormatNumber(StringLength(libapx_player[p].api_string_input)));
+        } else if(stream == "apiLength") {
+            LibapxPrintText(PlayerGroupSingle(p), StringToText("> <c val=\"ffee00\">API CMD</c> | Buffer length ") + FormatNumber(StringLength(gv_LibapxPlayer[p].apiStringInput)));
             
-            BankSave(libapx_player[p].bank_storage);
+            BankSave(gv_LibapxPlayer[p].bankStorage);
             return;
         }
 
 
         
-        libapx_player[p].api_string_input += stream;
+        gv_LibapxPlayer[p].apiStringInput += stream;
     }
     else {
-        libapx_print_output(p, "<c val=\"00eeff\">API</c> | API Section Not Found");
-        libapx_print_output(p, "<c val=\"00eeff\">API</c> | Creating API Section in <c val=\"ff0000\">ApexBank</c>");
-        BankSectionCreate(libapx_player[p].bank_storage, "Api");
+        LibapxPrintOutput(p, "<c val=\"00eeff\">API</c> | API Section Not Found");
+        LibapxPrintOutput(p, "<c val=\"00eeff\">API</c> | Creating API Section in <c val=\"ff0000\">ApexBank</c>");
+        BankSectionCreate(gv_LibapxPlayer[p].bankStorage, "Api");
     }
-    BankSave(libapx_player[p].bank_storage);
+    BankSave(gv_LibapxPlayer[p].bankStorage);
 }
 
 
 
-void libapx_api_start() {
+void LibapxApiStart() {
     int i;
     int p;
 
@@ -101,8 +101,8 @@ void libapx_api_start() {
         for (i = 1; i <= PlayerGroupCount(PlayerGroupActive()); i += 1) {
            
             p = PlayerGroupPlayer(PlayerGroupActive(), i);
-            if(!PlayerIsUnderAIControl(p) && libapx_player[p].api_reading) {
-                libpax_api_update(p);
+            if(!PlayerIsUnderAIControl(p) && gv_LibapxPlayer[p].apiReading) {
+                libpaxApiUpdate(p);
             }
         }
 

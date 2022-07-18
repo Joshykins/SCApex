@@ -1,0 +1,10 @@
+string LibapxVariableFunctionDebug(int p, unitgroup u, string argv) {
+    int i = 1;
+    string cur;
+    while(StringWord(argv, i) != "") {
+        cur = StringWord(argv, i);
+        i += 1;
+        DebugLog(cur + " | WAS PASSED TO DEBUG FUNC");
+    } 
+    return "0";
+}

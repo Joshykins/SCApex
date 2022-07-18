@@ -1,0 +1,140 @@
+
+
+// Bracketing
+// ================
+// Returns the indexes
+int LibapxBracketGetStartPair(string stringToCrawl, int startpoint){
+    return StringFind(stringToCrawl, "[", c_stringNoCase);
+	}
+
+int LibapxBracketGetEndPair(string stringToCrawl, int startpoint){
+    int i = 0;
+		int elevation = 0;
+		bool elevationToggled = false;
+		string comparison;
+
+    while(true) {
+			comparison = StringSub( stringToCrawl, i + 1, i + 1 );
+
+			if(comparison == "[") {
+				elevation +=1;
+				elevationToggled = true;
+			}
+			if (comparison == "]") {
+				elevation -=1;
+			}
+			if (elevation == 0 && elevationToggled == true) {
+				break;
+			}
+
+			i += 1;
+    }
+    return i + 1;
+}
+
+
+bool LibapxBracketsWithinBracketsSimple(string stringToCheck, int currentIndex) {
+	string stringBefore = StringSub(stringToCheck, 1, currentIndex - 1);
+	string stringAfter = StringSub(stringToCheck,  currentIndex + 1, StringLength(stringToCheck));
+	int i = 1;
+	string temp;
+	int openI = 0;
+	int closeI = 0;
+	bool opened = false;
+	bool closed = false;
+    //Checks if prefixed and postfixed ${anything inside this would return true}
+	if ((StringFind(stringBefore, "[", c_stringNoCase)  != -1) 
+    && 
+    (StringFind(stringAfter, "]", c_stringNoCase)  != -1)) {
+        return true;
+	}
+	return false;
+}
+
+bool LibapxBracketWithinBracketCheck(string stringToCheck, int currentIndex) {
+	string stringBefore = StringSub(stringToCheck, 1, currentIndex - 1);
+	string stringAfter = StringSub(stringToCheck,  currentIndex + 1, StringLength(stringToCheck));
+	int i = 1;
+	string temp;
+	int openI = 0;
+	int closeI = 0;
+	bool opened = false;
+	bool closed = false;
+	if ((StringFind(stringBefore, "[", c_stringNoCase)  != -1) && (StringFind(stringAfter, "]", c_stringNoCase)  != -1)) {
+		//Checks if there even is a [  and ] before and after it.
+		//Rolls through before text and sees if there is unmatched bracket.
+		while(StringSub(stringBefore, i, i) != "") {
+			temp = StringSub(stringBefore, i, i);
+			if( temp == "[") {
+				openI += 1;
+			}
+			if( temp == "]") {
+				closeI += 1;
+			}
+			i += 1;
+		}
+		if (openI > closeI) {
+			opened = true;
+		}
+
+		i = 1;
+		openI = 0;
+		closeI = 0;
+
+		while(StringSub(stringAfter, i, i) != "") {
+			temp = StringSub(stringAfter, i, i);
+			if( temp == "[") {
+				openI += 1;
+			}
+			if( temp == "]") {
+				closeI += 1;
+			}
+			i += 1;
+		}
+
+		if (closeI > openI) {
+			closed = true;
+		}
+		
+		if(closed && opened) {
+			return true;
+		}
+		else {
+			return false;
+		}
+	}
+	return false;
+}
+
+
+string gv_BracketSeperator = " --||&&||-- "; //Spaces around it are critical
+
+//Grabs bracket text from specialized format
+string LibapxBracketTextGrab(string bracketText, int arg) {
+	int seperaterPosition;
+	string outputText;
+	int i  = 1;
+	int player = 1;
+	while( i <= arg) {
+		if  (StringFind(bracketText, gv_BracketSeperator, c_stringCase) == -1) {
+			//No other arguement given
+			return "";
+		}
+		seperaterPosition = StringFind(bracketText, gv_BracketSeperator, c_stringCase);
+		bracketText = StringReplace(bracketText, "", 1, seperaterPosition + StringLength(gv_BracketSeperator) - 1);
+		seperaterPosition = StringFind(bracketText, gv_BracketSeperator, c_stringCase);
+
+		if (seperaterPosition != -1) {
+			outputText = StringReplace(bracketText, "", seperaterPosition, StringLength(bracketText));
+		}
+		else {
+			outputText = bracketText;
+		}
+
+
+
+		i += 1;
+	}
+
+	return outputText;
+}

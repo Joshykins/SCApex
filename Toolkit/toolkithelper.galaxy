@@ -1,15 +1,15 @@
 
-const string libapx_toolkit_prefix_weapon = "toolkit_weapon_";
+const string LibapxToolkitPrefixWeapon = "toolkitWeapon_";
 
-void libapx_toolkit_addweapon(string toolKitName, string blizzardName)
+void LibapxToolkitAddweapon(string toolKitName, string blizzardName)
 {
-	string storeAs = StringCase(libapx_toolkit_prefix_weapon + toolKitName, false);
+	string storeAs = StringCase(LibapxToolkitPrefixWeapon + toolKitName, false);
 	DataTableSetString( true, storeAs, blizzardName );
 }
 
-string libapx_toolkit_getweapon(string toolKitName)
+string LibapxToolkitGetweapon(string toolKitName)
 {
-	string lookup = StringCase(libapx_toolkit_prefix_weapon + toolKitName, false);
+	string lookup = StringCase(LibapxToolkitPrefixWeapon + toolKitName, false);
 	string blizzardName = DataTableGetString(true, lookup);
 	if (!blizzardName) {
 		return toolKitName;
@@ -17,4 +17,4 @@ string libapx_toolkit_getweapon(string toolKitName)
 	return blizzardName;
 }
 
-//	weapon = libapx_toolkit_getweapon(weapon);   c_gameCatalogWeapon
+//	weapon = LibapxToolkitGetweapon(weapon);   c_gameCatalogWeapon

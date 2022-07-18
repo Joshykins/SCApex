@@ -1,6 +1,6 @@
 //=========================================================
 //		Apex Roleplaying Engine
-//		Copyright (c) 2019, Apex Group
+//		Copyright (c) 2022, Apex Group
 //=========================================================
 // This software is distributed under the MIT License:
 // <http://opensource.org/licenses/MIT>
@@ -8,10 +8,10 @@
 
 
 
-void libapx_update_camera();
+void LibapxUpdateCamera();
 
-void LibApxManagePermissionUi(int p) { 
-    int permissionLevel = libapx_player[p].permission_level;
+void LibapxManagePermissionUi(int p) { 
+    int permissionLevel = gv_LibapxPlayer[p].permissionLevel;
     string permissionLevelText;
     color permissionLevelColor;
     if(permissionLevel == 0) {
@@ -33,32 +33,32 @@ void LibApxManagePermissionUi(int p) {
         permissionLevelColor = ColorWithAlpha(0,100,100,90);
     }
 
-    libNtve_gf_SetDialogItemColor(libapx_player[p].permissionLevelUi, permissionLevelColor, PlayerGroupSingle(p));
-    libNtve_gf_SetDialogItemText(libapx_player[p].permissionLevelUi, StringToText(permissionLevelText), PlayerGroupSingle(p));
+    libNtve_gf_SetDialogItemColor(gv_LibapxPlayer[p].permissionLevelUi, permissionLevelColor, PlayerGroupSingle(p));
+    libNtve_gf_SetDialogItemText(gv_LibapxPlayer[p].permissionLevelUi, StringToText(permissionLevelText), PlayerGroupSingle(p));
 }
 
-bool libapx_trig_ticker(bool testConds, bool runActions) {
+bool LibapxTrigTicker(bool testConds, bool runActions) {
     int p;
     unitgroup selected;
     unit u;
     int i;
-    int control_bar_ui;
-    libapx_update_camera();
+    int controlBarUi;
+    LibapxUpdateCamera();
     for (i = 1; i <= PlayerGroupCount(PlayerGroupActive()); i += 1) {
         p = PlayerGroupPlayer(PlayerGroupActive(), i);
         selected = UnitGroupSelected(p);
 
-        LibApxManagePermissionUi(p);
+        LibapxManagePermissionUi(p);
 
         if(UnitGroupCount(selected, c_unitCountAll) > 1 || UnitGroupCount(selected, c_unitCountAll) < 1) {
-            libapx_player[p].name_display = false;
+            gv_LibapxPlayer[p].nameDisplay = false;
         }
         else {
-            libapx_player[p].name_display = true;
+            gv_LibapxPlayer[p].nameDisplay = true;
             u = UnitGroupUnit(selected, 1);
         }
-        libapx_update_alllabels(p);
-        libapx_update_statdisplay(p);
+        LibapxUpdateAlllabels(p);
+        LibapxUpdateStatdisplay(p);
     }
 	return true;
 }

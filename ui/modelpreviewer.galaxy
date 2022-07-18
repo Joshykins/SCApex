@@ -1,6 +1,6 @@
 //=========================================================
 //		Apex Roleplaying Engine
-//		Copyright (c) 2019, Apex Group
+//		Copyright (c) 2022, Apex Group
 //=========================================================
 // This software is distributed under the MIT License:
 // <http://opensource.org/licenses/MIT>
@@ -9,224 +9,224 @@
 // guess for the max number of catalog models
 // this is required because an array of model catalog entries must be used
 // the array must be declared with a fixed index size
-static const int libapx_NCATALOGMAX = 24000;
+static const int LibapxMaxCatalogNumber = 24000;
 
 // intitial model preview scale and the scale size increment step
-static const fixed libapx_UI_MODELPREVIEW_SCALE_INIT = 0.15;
-static const string libapx_UI_MODELPREVIEW_SCALE_AMSG = "SetScale 0.15 0.05";
-static const fixed libapx_UI_MODELPREVIEW_SCALE_STEP = 0.01;
-static const fixed libapx_UI_MODELPREVIEW_SCALE_MIN = 0.01;
-static const int libapx_UI_MODELPREVIEW_ANGLE_STEP = 15;
+static const fixed LibapxUiModelPreviewScaleInit = 0.15;
+static const string LibapxUiModelPreviewScaleActrmsg = "SetScale 0.15 0.05";
+static const fixed LibapxUiModelPReviewScaleStep = 0.01;
+static const fixed LibapxUiModelPreviewScaleMin = 0.01;
+static const int LibapxUiModelPreviewAngleStep = 15;
 
 // name of the animgroup play name for the portrait model
-static const string libapx_UI_MODELPREVIEW_ANIMNAME = "MODELPREVIEW_ANIM";
+static const string LibapxUiModelPreviewAnimationGroupName = "MODELPREVIEWANIM";
 
 // actor reference alias for the main actor in the model preview
-static const string libapx_UI_MODELPREVIEW_MODELREF = "MODELPREVIEW";
+static const string LibapxUiModelPreviewRef = "MODELPREVIEW";
 
 // actor reference alias for the attach axis tests
-static const string libapx_UI_MODELPREVIEW_ATTACHREF = "MODELPREVIEW_TEST";
+static const string LibapxUiModelPreviewAttachRef = "MODELPREVIEWTEST";
 
-// list of all catalog models, size libapx_NCATALOGMAX + 1 because index
+// list of all catalog models, size LibapxMaxCatalogNumber + 1 because index
 // will effectively begin with 1 rather than 0 since Catalog index starts at 1
-static string[libapx_NCATALOGMAX+1] libapx_model_catalog;
+static string[LibapxMaxCatalogNumber+1] LibapxModelCatalog;
 
 // index shift for a catalog model while filtering the list
-static int[libapx_MAX_PLAYERS][libapx_NCATALOGMAX+1] libapx_model_catalog_shift;
+static int[gv_LibapxMaxPlayers][LibapxMaxCatalogNumber+1] LibapxModelCatalogShift;
 
 // number of models in the game model catalog
-static int libapx_nmodels;
+static int LibapxNmodels;
 
 // dialog for the model previewer
-int libapx_ui_modelpreviewer;
+int LibapxUiModelpreviewer;
 
 // dialog control items
 // TODO: move most of the buttons to local vars, since they arent needed
 // outside of the function itself
-static int libapx_ui_modelpreview_list;
-static int libapx_ui_modelpreview_rotl_btn;
-static int libapx_ui_modelpreview_rotr_btn;
-static int libapx_ui_modelpreview_scaleup_btn;
-static int libapx_ui_modelpreview_scaledown_btn;
-static int libapx_ui_modelpreview_search;
-static int libapx_ui_modelpreview_search_btn;
-static int libapx_ui_modelpreview_search_reset;
-static int libapx_ui_modelpreview_anim;
-static int libapx_ui_modelpreview_anim_btn;
-static int libapx_ui_modelpreview_anim_reset_btn;
-static int libapx_ui_modelpreview_attach;
-static int libapx_ui_modelpreview_attach_btn;
-static int libapx_ui_modelpreview_attach_reset_btn;
+static int LibapxUiModelpreviewList;
+static int LibapxUiModelpreviewRotlBtn;
+static int LibapxUiModelpreviewRotrBtn;
+static int LibapxUiModelpreviewScaleupBtn;
+static int LibapxUiModelpreviewScaledownBtn;
+static int LibapxUiModelpreviewSearch;
+static int LibapxUiModelpreviewSearchBtn;
+static int LibapxUiModelpreviewSearchReset;
+static int LibapxUiModelpreviewAnim;
+static int LibapxUiModelpreviewAnimBtn;
+static int LibapxUiModelpreviewAnimResetBtn;
+static int LibapxUiModelpreviewAttach;
+static int LibapxUiModelpreviewAttachBtn;
+static int LibapxUiModelpreviewAttachResetBtn;
 
-// Type: libapx_ui_modelpreviewer_model
+// Type: LibapxUiModelpreviewerModel
 // ===========
 // individual player tracked data for model preview actor in the previewer
-struct libapx_ui_modelpreviewer_model {
+struct LibapxUiModelpreviewerModel {
 	int portrait;
 	fixed scale;
 	int angle;
 };
-static libapx_ui_modelpreviewer_model[libapx_MAX_PLAYERS] libapx_ui_modelpreview;
+static LibapxUiModelpreviewerModel[gv_LibapxMaxPlayers] LibapxUiModelpreview;
 
-// libapx_ui_modelpreviewer_init
+// LibapxUiModelpreviewerInit
 // ==================
 // Creates the model previewer ui panel (except portrait, which is separate
 // for each player)
-void libapx_ui_modelpreviewer_init() {
+void LibapxUiModelpreviewerInit() {
 	int i;
 	int nmodels = CatalogEntryCount(c_gameCatalogModel);
 
-	libapx_ui_modelpreviewer = libapx_create_dialog(600, 700, c_anchorRight, 60, -150);
-	libapx_ui_modelpreview_list = libapx_create_dialog_list(libapx_ui_modelpreviewer, 260, 382, c_anchorTopLeft, 14, 44);
+	LibapxUiModelpreviewer = LibapxCreateDialog(600, 700, c_anchorRight, 60, -150);
+	LibapxUiModelpreviewList = LibapxCreateDialogList(LibapxUiModelpreviewer, 260, 382, c_anchorTopLeft, 14, 44);
 
 	// portrait model adjustment buttons
-	libapx_ui_modelpreview_rotr_btn = libapx_create_dialog_btn(libapx_ui_modelpreviewer, 40, 40, c_anchorTopRight, 85, 370, "Rotate right", "" );
-	libapx_ui_modelpreview_scaleup_btn = libapx_create_dialog_btn(libapx_ui_modelpreviewer, 40, 40, c_anchorTopRight, 130, 370, "Scale up", "" );
-	libapx_ui_modelpreview_scaledown_btn = libapx_create_dialog_btn(libapx_ui_modelpreviewer, 40, 40, c_anchorTopRight, 160, 370, "Scale down", "" );
-	libapx_ui_modelpreview_rotl_btn = libapx_create_dialog_btn(libapx_ui_modelpreviewer, 40, 40, c_anchorTopRight, 205, 370, "Rotate left", "" );
+	LibapxUiModelpreviewRotrBtn = LibapxCreateDialogBtn(LibapxUiModelpreviewer, 40, 40, c_anchorTopRight, 85, 370, "Rotate right", "" );
+	LibapxUiModelpreviewScaleupBtn = LibapxCreateDialogBtn(LibapxUiModelpreviewer, 40, 40, c_anchorTopRight, 130, 370, "Scale up", "" );
+	LibapxUiModelpreviewScaledownBtn = LibapxCreateDialogBtn(LibapxUiModelpreviewer, 40, 40, c_anchorTopRight, 160, 370, "Scale down", "" );
+	LibapxUiModelpreviewRotlBtn = LibapxCreateDialogBtn(LibapxUiModelpreviewer, 40, 40, c_anchorTopRight, 205, 370, "Rotate left", "" );
 
 	// search bar
-	libapx_ui_modelpreview_search = libapx_create_dialog_editbox(libapx_ui_modelpreviewer, 480, 50, c_anchorTopLeft, 10, 430);
-	libapx_ui_modelpreview_search_btn = libapx_create_dialog_btn(libapx_ui_modelpreviewer, 50, 50, c_anchorCenter, 0, 0, "Search model", "" );
-	libapx_ui_modelpreview_search_reset = libapx_create_dialog_btn(libapx_ui_modelpreviewer, 50, 50, c_anchorCenter, 0, 0, "Reset list", "" );
-	DialogControlSetPositionRelative(libapx_ui_modelpreview_search_btn, PlayerGroupAll(), c_anchorLeft, libapx_ui_modelpreview_search, c_anchorRight, 0, 0);
-	DialogControlSetPositionRelative(libapx_ui_modelpreview_search_reset, PlayerGroupAll(), c_anchorLeft, libapx_ui_modelpreview_search_btn, c_anchorRight, 0, 0);
+	LibapxUiModelpreviewSearch = LibapxCreateDialogEditbox(LibapxUiModelpreviewer, 480, 50, c_anchorTopLeft, 10, 430);
+	LibapxUiModelpreviewSearchBtn = LibapxCreateDialogBtn(LibapxUiModelpreviewer, 50, 50, c_anchorCenter, 0, 0, "Search model", "" );
+	LibapxUiModelpreviewSearchReset = LibapxCreateDialogBtn(LibapxUiModelpreviewer, 50, 50, c_anchorCenter, 0, 0, "Reset list", "" );
+	DialogControlSetPositionRelative(LibapxUiModelpreviewSearchBtn, PlayerGroupAll(), c_anchorLeft, LibapxUiModelpreviewSearch, c_anchorRight, 0, 0);
+	DialogControlSetPositionRelative(LibapxUiModelpreviewSearchReset, PlayerGroupAll(), c_anchorLeft, LibapxUiModelpreviewSearchBtn, c_anchorRight, 0, 0);
 
 	// play animation
-	libapx_ui_modelpreview_anim = libapx_create_dialog_editbox(libapx_ui_modelpreviewer, 310, 50, c_anchorTopLeft, 180, 540);
-	libapx_ui_modelpreview_anim_btn = libapx_create_dialog_btn(libapx_ui_modelpreviewer, 50, 50, c_anchorCenter, 0, 0, "Go", "" );
-	libapx_ui_modelpreview_anim_reset_btn = libapx_create_dialog_btn(libapx_ui_modelpreviewer, 50, 50, c_anchorCenter, 0, 0, "Reset", "" );
-	DialogControlSetPositionRelative(libapx_ui_modelpreview_anim_btn, PlayerGroupAll(), c_anchorLeft, libapx_ui_modelpreview_anim, c_anchorRight, 0, 0);
-	DialogControlSetPositionRelative(libapx_ui_modelpreview_anim_reset_btn, PlayerGroupAll(), c_anchorLeft, libapx_ui_modelpreview_anim_btn, c_anchorRight, 0, 0);
+	LibapxUiModelpreviewAnim = LibapxCreateDialogEditbox(LibapxUiModelpreviewer, 310, 50, c_anchorTopLeft, 180, 540);
+	LibapxUiModelpreviewAnimBtn = LibapxCreateDialogBtn(LibapxUiModelpreviewer, 50, 50, c_anchorCenter, 0, 0, "Go", "" );
+	LibapxUiModelpreviewAnimResetBtn = LibapxCreateDialogBtn(LibapxUiModelpreviewer, 50, 50, c_anchorCenter, 0, 0, "Reset", "" );
+	DialogControlSetPositionRelative(LibapxUiModelpreviewAnimBtn, PlayerGroupAll(), c_anchorLeft, LibapxUiModelpreviewAnim, c_anchorRight, 0, 0);
+	DialogControlSetPositionRelative(LibapxUiModelpreviewAnimResetBtn, PlayerGroupAll(), c_anchorLeft, LibapxUiModelpreviewAnimBtn, c_anchorRight, 0, 0);
 
 	// attach point axis test
-	libapx_ui_modelpreview_attach = libapx_create_dialog_editbox(libapx_ui_modelpreviewer, 310, 50, c_anchorTopLeft, 180, 590);
-	libapx_ui_modelpreview_attach_btn = libapx_create_dialog_btn(libapx_ui_modelpreviewer, 50, 50, c_anchorCenter, 0, 0, "Go", "" );
-	libapx_ui_modelpreview_attach_reset_btn = libapx_create_dialog_btn(libapx_ui_modelpreviewer, 50, 50, c_anchorCenter, 0, 0, "Reset", "" );
-	DialogControlSetPositionRelative(libapx_ui_modelpreview_attach_btn, PlayerGroupAll(), c_anchorLeft, libapx_ui_modelpreview_attach, c_anchorRight, 0, 0);
-	DialogControlSetPositionRelative(libapx_ui_modelpreview_attach_reset_btn, PlayerGroupAll(), c_anchorLeft, libapx_ui_modelpreview_attach_btn, c_anchorRight, 0, 0);
+	LibapxUiModelpreviewAttach = LibapxCreateDialogEditbox(LibapxUiModelpreviewer, 310, 50, c_anchorTopLeft, 180, 590);
+	LibapxUiModelpreviewAttachBtn = LibapxCreateDialogBtn(LibapxUiModelpreviewer, 50, 50, c_anchorCenter, 0, 0, "Go", "" );
+	LibapxUiModelpreviewAttachResetBtn = LibapxCreateDialogBtn(LibapxUiModelpreviewer, 50, 50, c_anchorCenter, 0, 0, "Reset", "" );
+	DialogControlSetPositionRelative(LibapxUiModelpreviewAttachBtn, PlayerGroupAll(), c_anchorLeft, LibapxUiModelpreviewAttach, c_anchorRight, 0, 0);
+	DialogControlSetPositionRelative(LibapxUiModelpreviewAttachResetBtn, PlayerGroupAll(), c_anchorLeft, LibapxUiModelpreviewAttachBtn, c_anchorRight, 0, 0);
 
 	// create button icons
-	libapx_create_dialog_btn_icon(libapx_ui_modelpreviewer, libapx_ui_modelpreview_rotr_btn, 30, 30, libapx_UI_ICON_RIGHT);
-	libapx_create_dialog_btn_icon(libapx_ui_modelpreviewer, libapx_ui_modelpreview_scaleup_btn, 30, 30, libapx_UI_ICON_PLUS);
-	libapx_create_dialog_btn_icon(libapx_ui_modelpreviewer, libapx_ui_modelpreview_scaledown_btn, 30, 30, libapx_UI_ICON_MINUS);
-	libapx_create_dialog_btn_icon(libapx_ui_modelpreviewer, libapx_ui_modelpreview_rotl_btn, 30, 30, libapx_UI_ICON_LEFT);
-	libapx_create_dialog_btn_icon(libapx_ui_modelpreviewer, libapx_ui_modelpreview_search_btn, 40, 40, libapx_UI_ICON_SEARCH);
-	libapx_create_dialog_btn_icon(libapx_ui_modelpreviewer, libapx_ui_modelpreview_search_reset, 40, 40, libapx_UI_ICON_RESET);
-	libapx_create_dialog_btn_icon(libapx_ui_modelpreviewer, libapx_ui_modelpreview_anim_btn, 40, 40, libapx_UI_ICON_GO);
-	libapx_create_dialog_btn_icon(libapx_ui_modelpreviewer, libapx_ui_modelpreview_anim_reset_btn, 40, 40, libapx_UI_ICON_RESET);
-	libapx_create_dialog_btn_icon(libapx_ui_modelpreviewer, libapx_ui_modelpreview_attach_btn, 40, 40, libapx_UI_ICON_GO);
-	libapx_create_dialog_btn_icon(libapx_ui_modelpreviewer, libapx_ui_modelpreview_attach_reset_btn, 40, 40, libapx_UI_ICON_RESET);
+	LibapxCreateDialogBtnIcon(LibapxUiModelpreviewer, LibapxUiModelpreviewRotrBtn, 30, 30, gv_LibapxUiIconRight);
+	LibapxCreateDialogBtnIcon(LibapxUiModelpreviewer, LibapxUiModelpreviewScaleupBtn, 30, 30, gv_LibapxUiIconPlus);
+	LibapxCreateDialogBtnIcon(LibapxUiModelpreviewer, LibapxUiModelpreviewScaledownBtn, 30, 30, gv_LibapxUiIconMinus);
+	LibapxCreateDialogBtnIcon(LibapxUiModelpreviewer, LibapxUiModelpreviewRotlBtn, 30, 30, gv_LibapxUiIconLeft);
+	LibapxCreateDialogBtnIcon(LibapxUiModelpreviewer, LibapxUiModelpreviewSearchBtn, 40, 40, gv_LibapxUiIconSearch);
+	LibapxCreateDialogBtnIcon(LibapxUiModelpreviewer, LibapxUiModelpreviewSearchReset, 40, 40, gv_LibapxUiIconReset);
+	LibapxCreateDialogBtnIcon(LibapxUiModelpreviewer, LibapxUiModelpreviewAnimBtn, 40, 40, gv_LibapxUiIconGo);
+	LibapxCreateDialogBtnIcon(LibapxUiModelpreviewer, LibapxUiModelpreviewAnimResetBtn, 40, 40, gv_LibapxUiIconReset);
+	LibapxCreateDialogBtnIcon(LibapxUiModelpreviewer, LibapxUiModelpreviewAttachBtn, 40, 40, gv_LibapxUiIconGo);
+	LibapxCreateDialogBtnIcon(LibapxUiModelpreviewer, LibapxUiModelpreviewAttachResetBtn, 40, 40, gv_LibapxUiIconReset);
 
 	// create static labels
-	libapx_create_dialog_label(libapx_ui_modelpreviewer, 240, 30, c_anchorTopLeft, 14, 12, "Preview model:", libapx_UI_HEADER2);
-	libapx_create_dialog_label(libapx_ui_modelpreviewer, 230, 60, c_anchorTopLeft, 14, 510, "Model options:", libapx_UI_HEADER2);
-	libapx_create_dialog_label(libapx_ui_modelpreviewer, 130, 60, c_anchorTopLeft, 0, 0, "Play anim:", libapx_UI_HEADER3);
-	DialogControlSetPositionRelative(DialogControlLastCreated(), PlayerGroupAll(), c_anchorRight, libapx_ui_modelpreview_anim, c_anchorLeft, 0, 0);
-	libapx_create_dialog_label(libapx_ui_modelpreviewer, 160, 60, c_anchorTopLeft, 0, 0, "Attach test:", libapx_UI_HEADER3);
-	DialogControlSetPositionRelative(DialogControlLastCreated(), PlayerGroupAll(), c_anchorRight, libapx_ui_modelpreview_attach, c_anchorLeft, 0, 0);
+	LibapxCreateDialogLabel(LibapxUiModelpreviewer, 240, 30, c_anchorTopLeft, 14, 12, "Preview model:", gv_LibapxUiHeader2);
+	LibapxCreateDialogLabel(LibapxUiModelpreviewer, 230, 60, c_anchorTopLeft, 14, 510, "Model options:", gv_LibapxUiHeader2);
+	LibapxCreateDialogLabel(LibapxUiModelpreviewer, 130, 60, c_anchorTopLeft, 0, 0, "Play anim:", gv_LibapxUiHeader3);
+	DialogControlSetPositionRelative(DialogControlLastCreated(), PlayerGroupAll(), c_anchorRight, LibapxUiModelpreviewAnim, c_anchorLeft, 0, 0);
+	LibapxCreateDialogLabel(LibapxUiModelpreviewer, 160, 60, c_anchorTopLeft, 0, 0, "Attach test:", gv_LibapxUiHeader3);
+	DialogControlSetPositionRelative(DialogControlLastCreated(), PlayerGroupAll(), c_anchorRight, LibapxUiModelpreviewAttach, c_anchorLeft, 0, 0);
 
 	// populate the model preview list
 	// index i starts at 1 because Catalog index begins at 1
-	for(i = 1; i <= nmodels && i <= libapx_NCATALOGMAX; i += 1) {
-		libapx_model_catalog[i] = CatalogEntryGet(c_gameCatalogModel, i);
-		DialogControlAddItem(libapx_ui_modelpreview_list, PlayerGroupAll(), StringToText(libapx_model_catalog[i]));
+	for(i = 1; i <= nmodels && i <= LibapxMaxCatalogNumber; i += 1) {
+		LibapxModelCatalog[i] = CatalogEntryGet(c_gameCatalogModel, i);
+		DialogControlAddItem(LibapxUiModelpreviewList, PlayerGroupAll(), StringToText(LibapxModelCatalog[i]));
 	}
-	libapx_nmodels = i - 1; // set number of models to how many models added to list
+	LibapxNmodels = i - 1; // set number of models to how many models added to list
 
 	// add model previewer trigger events
-	TriggerAddEventDialogControl(TriggerCreate("libapx_ui_model_preview_select"), c_playerAny, libapx_ui_modelpreview_list, c_triggerControlEventTypeSelectionChanged);
-	TriggerAddEventDialogControl(TriggerCreate("libapx_ui_modelpreview_filter"), c_playerAny, libapx_ui_modelpreview_search_btn, c_triggerControlEventTypeClick);
-	TriggerAddEventDialogControl(TriggerCreate("libapx_ui_modelpreview_reset"), c_playerAny, libapx_ui_modelpreview_search_reset, c_triggerControlEventTypeClick);
-	TriggerAddEventDialogControl(TriggerCreate("libapx_ui_modelpreview_scale_inc"), c_playerAny, libapx_ui_modelpreview_scaleup_btn, c_triggerControlEventTypeClick);
-	TriggerAddEventDialogControl(TriggerCreate("libapx_ui_modelpreview_scale_dec"), c_playerAny, libapx_ui_modelpreview_scaledown_btn, c_triggerControlEventTypeClick);
-	TriggerAddEventDialogControl(TriggerCreate("libapx_ui_modelpreview_angle_inc"), c_playerAny, libapx_ui_modelpreview_rotr_btn, c_triggerControlEventTypeClick);
-	TriggerAddEventDialogControl(TriggerCreate("libapx_ui_modelpreview_angle_dec"), c_playerAny, libapx_ui_modelpreview_rotl_btn, c_triggerControlEventTypeClick);
-	TriggerAddEventDialogControl(TriggerCreate("libapx_ui_modelpreview_anim_play"), c_playerAny, libapx_ui_modelpreview_anim_btn, c_triggerControlEventTypeClick);
-	TriggerAddEventDialogControl(TriggerCreate("libapx_ui_modelpreview_anim_reset"), c_playerAny, libapx_ui_modelpreview_anim_reset_btn, c_triggerControlEventTypeClick);
-	TriggerAddEventDialogControl(TriggerCreate("libapx_ui_modelpreview_attach_axis"), c_playerAny, libapx_ui_modelpreview_attach_btn, c_triggerControlEventTypeClick);
-	TriggerAddEventDialogControl(TriggerCreate("libapx_ui_modelpreview_attach_reset"), c_playerAny, libapx_ui_modelpreview_attach_reset_btn, c_triggerControlEventTypeClick);
+	TriggerAddEventDialogControl(TriggerCreate("LibapxUiModelPreviewSelect"), c_playerAny, LibapxUiModelpreviewList, c_triggerControlEventTypeSelectionChanged);
+	TriggerAddEventDialogControl(TriggerCreate("LibapxUiModelpreviewFilter"), c_playerAny, LibapxUiModelpreviewSearchBtn, c_triggerControlEventTypeClick);
+	TriggerAddEventDialogControl(TriggerCreate("LibapxUiModelpreviewReset"), c_playerAny, LibapxUiModelpreviewSearchReset, c_triggerControlEventTypeClick);
+	TriggerAddEventDialogControl(TriggerCreate("LibapxUiModelpreviewScaleInc"), c_playerAny, LibapxUiModelpreviewScaleupBtn, c_triggerControlEventTypeClick);
+	TriggerAddEventDialogControl(TriggerCreate("LibapxUiModelpreviewScaleDec"), c_playerAny, LibapxUiModelpreviewScaledownBtn, c_triggerControlEventTypeClick);
+	TriggerAddEventDialogControl(TriggerCreate("LibapxUiModelpreviewAngleInc"), c_playerAny, LibapxUiModelpreviewRotrBtn, c_triggerControlEventTypeClick);
+	TriggerAddEventDialogControl(TriggerCreate("LibapxUiModelpreviewAngleDec"), c_playerAny, LibapxUiModelpreviewRotlBtn, c_triggerControlEventTypeClick);
+	TriggerAddEventDialogControl(TriggerCreate("LibapxUiModelpreviewAnimPlay"), c_playerAny, LibapxUiModelpreviewAnimBtn, c_triggerControlEventTypeClick);
+	TriggerAddEventDialogControl(TriggerCreate("LibapxUiModelpreviewAnimReset"), c_playerAny, LibapxUiModelpreviewAnimResetBtn, c_triggerControlEventTypeClick);
+	TriggerAddEventDialogControl(TriggerCreate("LibapxUiModelpreviewAttachAxis"), c_playerAny, LibapxUiModelpreviewAttachBtn, c_triggerControlEventTypeClick);
+	TriggerAddEventDialogControl(TriggerCreate("LibapxUiModelpreviewAttachReset"), c_playerAny, LibapxUiModelpreviewAttachResetBtn, c_triggerControlEventTypeClick);
 
 }
 
-// libapx_ui_modelpreviewer_init_player
+// LibapxUiModelpreviewerInitPlayer
 // =============
 // Creates the portrait for each player. Each player must have its own
 // dialog control portrait so that the model in the portrait will be
 // unique for each player
-void libapx_ui_modelpreviewer_init_player(int p) {
-	libapx_ui_modelpreview[p].portrait = libapx_create_dialog_portrait(libapx_ui_modelpreviewer, 250, 300, c_anchorTopRight, 44, 56);
-	libNtve_gf_SetDialogItemUseTransition(libapx_ui_modelpreview[p].portrait, false, PlayerGroupSingle(p));
-	libNtve_gf_SetDialogItemCamera(libapx_ui_modelpreview[p].portrait, "Star2CameraLow01", PlayerGroupSingle(p));
-	DialogControlSetVisible(libapx_ui_modelpreview[p].portrait, PlayerGroupAll(), false);
-	DialogControlSetVisible(libapx_ui_modelpreview[p].portrait, PlayerGroupSingle(p), true);
+void LibapxUiModelpreviewerInitPlayer(int p) {
+	LibapxUiModelpreview[p].portrait = LibapxCreateDialogPortrait(LibapxUiModelpreviewer, 250, 300, c_anchorTopRight, 44, 56);
+	libNtve_gf_SetDialogItemUseTransition(LibapxUiModelpreview[p].portrait, false, PlayerGroupSingle(p));
+	libNtve_gf_SetDialogItemCamera(LibapxUiModelpreview[p].portrait, "Star2CameraLow01", PlayerGroupSingle(p));
+	DialogControlSetVisible(LibapxUiModelpreview[p].portrait, PlayerGroupAll(), false);
+	DialogControlSetVisible(LibapxUiModelpreview[p].portrait, PlayerGroupSingle(p), true);
 
 	// initialize the portrait model
-	libNtve_gf_SetDialogItemModel(libapx_ui_modelpreview[p].portrait, "MercHavenChick", PlayerGroupSingle(p));
-	ActorSend(ActorFromDialogControl(libapx_ui_modelpreview[p].portrait), libapx_UI_MODELPREVIEW_SCALE_AMSG);
+	libNtve_gf_SetDialogItemModel(LibapxUiModelpreview[p].portrait, "MercHavenChick", PlayerGroupSingle(p));
+	ActorSend(ActorFromDialogControl(LibapxUiModelpreview[p].portrait), LibapxUiModelPreviewScaleActrmsg);
 
 	// set player model state
-	libapx_ui_modelpreview[p].scale = libapx_UI_MODELPREVIEW_SCALE_INIT;
-	libapx_ui_modelpreview[p].angle = 0;
+	LibapxUiModelpreview[p].scale = LibapxUiModelPreviewScaleInit;
+	LibapxUiModelpreview[p].angle = 0;
 }
 
-// libapx_ui_modelpreview_list_reset
+// LibapxUiModelpreviewListReset
 // ================
 // Resets the model list for a player:
 // First removes all list items, then readds all models from catalog list
-void libapx_ui_modelpreview_list_reset(int player) {
+void LibapxUiModelpreviewListReset(int player) {
 	int i;
 
-	DialogControlRemoveAllItems(libapx_ui_modelpreview_list, PlayerGroupSingle(player));
-	for( i = 1; i <= libapx_nmodels; i += 1) {
-		DialogControlAddItem(libapx_ui_modelpreview_list, PlayerGroupSingle(player), StringToText(libapx_model_catalog[i]));
-		libapx_model_catalog_shift[player][i] = 0;
+	DialogControlRemoveAllItems(LibapxUiModelpreviewList, PlayerGroupSingle(player));
+	for( i = 1; i <= LibapxNmodels; i += 1) {
+		DialogControlAddItem(LibapxUiModelpreviewList, PlayerGroupSingle(player), StringToText(LibapxModelCatalog[i]));
+		LibapxModelCatalogShift[player][i] = 0;
 	}
 }
 
-// libapx_ui_model_preview_select
+// LibapxUiModelPreviewSelect
 // ==============
 // Event trigger for when a model in the list has been selected
 // -> Sets the model in the portrait, rescales, and resets facing
-bool libapx_ui_model_preview_select(bool testConds, bool runActions) {
+bool LibapxUiModelPreviewSelect(bool testConds, bool runActions) {
 	string model;
 	int player = EventPlayer();
 	int i;
 	int j;
 
-	i = DialogControlGetSelectedItem(libapx_ui_modelpreview_list, player);
-	j = libapx_model_catalog_shift[player][i]; //in case a search was run, the index will be offset
-	model = libapx_model_catalog[i + j];
+	i = DialogControlGetSelectedItem(LibapxUiModelpreviewList, player);
+	j = LibapxModelCatalogShift[player][i]; //in case a search was run, the index will be offset
+	model = LibapxModelCatalog[i + j];
 
 	// remove any attached axis attachpoint testers
-	ActorSendTo(ActorFromDialogControl(libapx_ui_modelpreview[player].portrait), libapx_UI_MODELPREVIEW_ATTACHREF, "Destroy");
+	ActorSendTo(ActorFromDialogControl(LibapxUiModelpreview[player].portrait), LibapxUiModelPreviewAttachRef, "Destroy");
 
 	// create the new actor/model
-	libNtve_gf_SetDialogItemModel(libapx_ui_modelpreview[player].portrait, model, PlayerGroupSingle(EventPlayer()));
-	ActorSend(ActorFromDialogControl(libapx_ui_modelpreview[player].portrait), "ModelSwap {" + model + "}");
-	ActorSend(ActorFromDialogControl(libapx_ui_modelpreview[player].portrait), libapx_UI_MODELPREVIEW_SCALE_AMSG);
-	ActorSend(ActorFromDialogControl(libapx_ui_modelpreview[player].portrait), "SetFacing 0");
-	ActorSend(ActorFromDialogControl(libapx_ui_modelpreview[player].portrait), "AliasAdd " + libapx_UI_MODELPREVIEW_MODELREF);
+	libNtve_gf_SetDialogItemModel(LibapxUiModelpreview[player].portrait, model, PlayerGroupSingle(EventPlayer()));
+	ActorSend(ActorFromDialogControl(LibapxUiModelpreview[player].portrait), "ModelSwap {" + model + "}");
+	ActorSend(ActorFromDialogControl(LibapxUiModelpreview[player].portrait), LibapxUiModelPreviewScaleActrmsg);
+	ActorSend(ActorFromDialogControl(LibapxUiModelpreview[player].portrait), "SetFacing 0");
+	ActorSend(ActorFromDialogControl(LibapxUiModelpreview[player].portrait), "AliasAdd " + LibapxUiModelPreviewRef);
 
-	libapx_ui_modelpreview[player].scale = libapx_UI_MODELPREVIEW_SCALE_INIT;
-	libapx_ui_modelpreview[player].angle = 0;
+	LibapxUiModelpreview[player].scale = LibapxUiModelPreviewScaleInit;
+	LibapxUiModelpreview[player].angle = 0;
 
 	return true;
 }
 
-// libapx_ui_modelpreview_filter
+// LibapxUiModelpreviewFilter
 // ==============
 // Filters the model list for the search terms input.
 // -> Must create offsets for each catalog entry so the player can switch
 //    model to proper model in list, since theres no way to get the string
 //    value from a list item.
-bool libapx_ui_modelpreview_filter(bool testConds, bool runActions) {
-	string filter = libNtve_gf_DialogItemEditValue(libapx_ui_modelpreview_search, EventPlayer());
+bool LibapxUiModelpreviewFilter(bool testConds, bool runActions) {
+	string filter = libNtve_gf_DialogItemEditValue(LibapxUiModelpreviewSearch, EventPlayer());
 	int i;
 	int j = 0;
 
 	// first reset list
-	libapx_ui_modelpreview_list_reset(EventPlayer());
+	LibapxUiModelpreviewListReset(EventPlayer());
 
 	// search bar empty, just reset list and exit
 	if( filter == "" ) {
@@ -234,119 +234,119 @@ bool libapx_ui_modelpreview_filter(bool testConds, bool runActions) {
 	}
 
 	// else, remove entries that dont match filter
-	for( i = 1; i <= libapx_nmodels; i += 1) {
-		if( !StringContains(libapx_model_catalog[i], filter, c_stringAnywhere, c_stringNoCase) ) {
-			DialogControlRemoveItem(libapx_ui_modelpreview_list, PlayerGroupSingle(EventPlayer()), i - j);
+	for( i = 1; i <= LibapxNmodels; i += 1) {
+		if( !StringContains(LibapxModelCatalog[i], filter, c_stringAnywhere, c_stringNoCase) ) {
+			DialogControlRemoveItem(LibapxUiModelpreviewList, PlayerGroupSingle(EventPlayer()), i - j);
 			j += 1;
 		}
 		else {
-			libapx_model_catalog_shift[EventPlayer()][i - j] = j;
+			LibapxModelCatalogShift[EventPlayer()][i - j] = j;
 		}
 	}
 
 	return true;
 }
 
-// libapx_ui_modelpreview_reset
+// LibapxUiModelpreviewReset
 // ==============
 // repopulates the model preview list with model catalog entries
-bool libapx_ui_modelpreview_reset(bool testConds, bool runActions) {
-	libapx_ui_modelpreview_list_reset(EventPlayer());
+bool LibapxUiModelpreviewReset(bool testConds, bool runActions) {
+	LibapxUiModelpreviewListReset(EventPlayer());
 	return true;
 }
 
-// libapx_ui_modelpreview_scale_inc
+// LibapxUiModelpreviewScaleInc
 // ===============
 // Increases the model preview scale size by the increment step defined
-bool libapx_ui_modelpreview_scale_inc(bool testConds, bool runActions) {
-	libapx_ui_modelpreview[EventPlayer()].scale += libapx_UI_MODELPREVIEW_SCALE_STEP;
-	ActorSend(ActorFromDialogControl(libapx_ui_modelpreview[EventPlayer()].portrait), "SetScale " + FixedToString(libapx_ui_modelpreview[EventPlayer()].scale, 3) + " 0.1");
-	ActorSendTo(ActorFromDialogControl(libapx_ui_modelpreview[EventPlayer()].portrait), libapx_UI_MODELPREVIEW_ATTACHREF, "SetScale " + FixedToString(libapx_ui_modelpreview[EventPlayer()].scale, 3) + " 0.1");
+bool LibapxUiModelpreviewScaleInc(bool testConds, bool runActions) {
+	LibapxUiModelpreview[EventPlayer()].scale += LibapxUiModelPReviewScaleStep;
+	ActorSend(ActorFromDialogControl(LibapxUiModelpreview[EventPlayer()].portrait), "SetScale " + FixedToString(LibapxUiModelpreview[EventPlayer()].scale, 3) + " 0.1");
+	ActorSendTo(ActorFromDialogControl(LibapxUiModelpreview[EventPlayer()].portrait), LibapxUiModelPreviewAttachRef, "SetScale " + FixedToString(LibapxUiModelpreview[EventPlayer()].scale, 3) + " 0.1");
 	return true;
 }
 
-// libapx_ui_modelpreview_scale_dec
+// LibapxUiModelpreviewScaleDec
 // ================
 // Decreases the model preview scale size by decrement
 // -> If reached min scale, dont scale any further
-bool libapx_ui_modelpreview_scale_dec(bool testConds, bool runActions) {
-	if( libapx_ui_modelpreview[EventPlayer()].scale > libapx_UI_MODELPREVIEW_SCALE_MIN ) {
-		libapx_ui_modelpreview[EventPlayer()].scale -= libapx_UI_MODELPREVIEW_SCALE_STEP;
-		ActorSend(ActorFromDialogControl(libapx_ui_modelpreview[EventPlayer()].portrait), "SetScale " + FixedToString(libapx_ui_modelpreview[EventPlayer()].scale, 3) + " 0.1");
-		ActorSendTo(ActorFromDialogControl(libapx_ui_modelpreview[EventPlayer()].portrait), libapx_UI_MODELPREVIEW_ATTACHREF, "SetScale " + FixedToString(libapx_ui_modelpreview[EventPlayer()].scale, 4) + " 0.1");
+bool LibapxUiModelpreviewScaleDec(bool testConds, bool runActions) {
+	if( LibapxUiModelpreview[EventPlayer()].scale > LibapxUiModelPreviewScaleMin ) {
+		LibapxUiModelpreview[EventPlayer()].scale -= LibapxUiModelPReviewScaleStep;
+		ActorSend(ActorFromDialogControl(LibapxUiModelpreview[EventPlayer()].portrait), "SetScale " + FixedToString(LibapxUiModelpreview[EventPlayer()].scale, 3) + " 0.1");
+		ActorSendTo(ActorFromDialogControl(LibapxUiModelpreview[EventPlayer()].portrait), LibapxUiModelPreviewAttachRef, "SetScale " + FixedToString(LibapxUiModelpreview[EventPlayer()].scale, 4) + " 0.1");
 	}
 	return true;
 }
 
-// libapx_ui_modelpreview_angle_inc
+// LibapxUiModelpreviewAngleInc
 // ==================
 // Increments the facing angle of the model by the defined step constant
 // (rotates towards right, CCW)
-bool libapx_ui_modelpreview_angle_inc(bool testConds, bool runActions) {
-	libapx_ui_modelpreview[EventPlayer()].angle += libapx_UI_MODELPREVIEW_ANGLE_STEP;
-	ActorSend(ActorFromDialogControl(libapx_ui_modelpreview[EventPlayer()].portrait), "SetFacing " + IntToString(libapx_ui_modelpreview[EventPlayer()].angle));
+bool LibapxUiModelpreviewAngleInc(bool testConds, bool runActions) {
+	LibapxUiModelpreview[EventPlayer()].angle += LibapxUiModelPreviewAngleStep;
+	ActorSend(ActorFromDialogControl(LibapxUiModelpreview[EventPlayer()].portrait), "SetFacing " + IntToString(LibapxUiModelpreview[EventPlayer()].angle));
 	return true;
 }
 
-// libapx_ui_modelpreview_angle_dec
+// LibapxUiModelpreviewAngleDec
 // ==================
 // Decrements the facing angle of the model by the defined step constant
 // (rotates towards left, CW)
-bool libapx_ui_modelpreview_angle_dec(bool testConds, bool runActions) {
-	libapx_ui_modelpreview[EventPlayer()].angle -= libapx_UI_MODELPREVIEW_ANGLE_STEP;
-	ActorSend(ActorFromDialogControl(libapx_ui_modelpreview[EventPlayer()].portrait), "SetFacing " + IntToString(libapx_ui_modelpreview[EventPlayer()].angle));
+bool LibapxUiModelpreviewAngleDec(bool testConds, bool runActions) {
+	LibapxUiModelpreview[EventPlayer()].angle -= LibapxUiModelPreviewAngleStep;
+	ActorSend(ActorFromDialogControl(LibapxUiModelpreview[EventPlayer()].portrait), "SetFacing " + IntToString(LibapxUiModelpreview[EventPlayer()].angle));
 	return true;
 }
 
-// libapx_ui_modelpreview_anim_play
+// LibapxUiModelpreviewAnimPlay
 // ==================
 // Makes the portrait model play an animation input in the anim editbox
-bool libapx_ui_modelpreview_anim_play(bool testConds, bool runActions) {
-	string anim = libNtve_gf_DialogItemEditValue(libapx_ui_modelpreview_anim, EventPlayer());
+bool LibapxUiModelpreviewAnimPlay(bool testConds, bool runActions) {
+	string anim = libNtve_gf_DialogItemEditValue(LibapxUiModelpreviewAnim, EventPlayer());
 
 	// force capitalization of the first letter
 	// since animations have first letter capitalized
 	anim = StringCase(StringSub(anim, 1, 1), true) + StringSub(anim, 2, StringLength(anim));
 
-	ActorSend(ActorFromDialogControl(libapx_ui_modelpreview[EventPlayer()].portrait), "AnimPlay " + libapx_UI_MODELPREVIEW_ANIMNAME + " " + anim + " PlayForever");
+	ActorSend(ActorFromDialogControl(LibapxUiModelpreview[EventPlayer()].portrait), "AnimPlay " + LibapxUiModelPreviewAnimationGroupName + " " + anim + " PlayForever");
 	return true;
 }
 
-// libapx_ui_modelpreview_anim_reset
+// LibapxUiModelpreviewAnimReset
 // ===============
 // Resets (clears) the animation applied to the model preview
-bool libapx_ui_modelpreview_anim_reset(bool testConds, bool runActions) {
-	ActorSend(ActorFromDialogControl(libapx_ui_modelpreview[EventPlayer()].portrait), "AnimClear " + libapx_UI_MODELPREVIEW_ANIMNAME);
+bool LibapxUiModelpreviewAnimReset(bool testConds, bool runActions) {
+	ActorSend(ActorFromDialogControl(LibapxUiModelpreview[EventPlayer()].portrait), "AnimClear " + LibapxUiModelPreviewAnimationGroupName);
 	return true;
 }
 
-// libapx_ui_modelpreview_anim_play
+// LibapxUiModelpreviewAnimPlay
 // ==================
 // Attaches an axis to the input point in the attach point edit box
-bool libapx_ui_modelpreview_attach_axis(bool testConds, bool runActions) {
-	string attachpt = libNtve_gf_DialogItemEditValue(libapx_ui_modelpreview_attach, EventPlayer());
-	if( attachpt == "" ) { // no input, exit
+bool LibapxUiModelpreviewAttachAxis(bool testConds, bool runActions) {
+	string attachPoint = libNtve_gf_DialogItemEditValue(LibapxUiModelpreviewAttach, EventPlayer());
+	if( attachPoint == "" ) { // no input, exit
 		return true;
 	}
 
 	// force capitalization of the first letter (most actor attach points
 	// have capital first letter)
-	attachpt = StringCase(StringSub(attachpt, 1, 1), true) + StringSub(attachpt, 2, StringLength(attachpt));
+	attachPoint = StringCase(StringSub(attachPoint, 1, 1), true) + StringSub(attachPoint, 2, StringLength(attachPoint));
 
 	// Attach an axis to the test point
 	// -> must use ::LastCreatedActual to capture the Axis because it belongs
 	//    to CActorModel scope, which cant be referenced with ActorLastCreated()
-	ActorSendTo(ActorFromDialogControl(libapx_ui_modelpreview[EventPlayer()].portrait), libapx_UI_MODELPREVIEW_MODELREF, "AttachModelOffset {} {Axis} {" + attachpt + "}");
-	ActorSend(ActorFrom("::LastCreatedActual"), "AliasAdd " + libapx_UI_MODELPREVIEW_ATTACHREF);
-	ActorSendTo(ActorFromDialogControl(libapx_ui_modelpreview[EventPlayer()].portrait), libapx_UI_MODELPREVIEW_ATTACHREF, "SetScale " + FixedToString(libapx_ui_modelpreview[EventPlayer()].scale, 4) + " 0.1");
+	ActorSendTo(ActorFromDialogControl(LibapxUiModelpreview[EventPlayer()].portrait), LibapxUiModelPreviewRef, "AttachModelOffset {} {Axis} {" + attachPoint + "}");
+	ActorSend(ActorFrom("::LastCreatedActual"), "AliasAdd " + LibapxUiModelPreviewAttachRef);
+	ActorSendTo(ActorFromDialogControl(LibapxUiModelpreview[EventPlayer()].portrait), LibapxUiModelPreviewAttachRef, "SetScale " + FixedToString(LibapxUiModelpreview[EventPlayer()].scale, 4) + " 0.1");
 
 	return true;
 }
 
-// libapx_ui_modelpreview_attach_reset
+// LibapxUiModelpreviewAttachReset
 // ==================
 // Removes all attached axis from the preview model
-bool libapx_ui_modelpreview_attach_reset(bool testConds, bool runActions) {
-	ActorSendTo(ActorFromDialogControl(libapx_ui_modelpreview[EventPlayer()].portrait), libapx_UI_MODELPREVIEW_ATTACHREF, "Destroy");
+bool LibapxUiModelpreviewAttachReset(bool testConds, bool runActions) {
+	ActorSendTo(ActorFromDialogControl(LibapxUiModelpreview[EventPlayer()].portrait), LibapxUiModelPreviewAttachRef, "Destroy");
 	return true;
 }

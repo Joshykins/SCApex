@@ -1,6 +1,6 @@
 //=========================================================
 //		Apex Roleplaying Engine
-//		Copyright (c) 2019, Apex Group
+//		Copyright (c) 2022, Apex Group
 //=========================================================
 // This software is distributed under the MIT License:
 // <http://opensource.org/licenses/MIT>
@@ -8,11 +8,11 @@
 
 //Destroys a region, (perma removes actors, useful for stain removal)
 // =======================
-void libapx_command_destroy(int user, unitgroup u, string argv, int spawningCount, string bracketText) {
+void LibapxCommandDestroy(int user, unitgroup u, string argv, int spawningCount, string bracketText) {
 	string paramRadius = StringWord(argv, 2 );
 	fixed radius;
-	if( libapx_player[user].permission_level < libapx_PERMISSIONS_LEVEL_MOD ) {
-		libapx_print_error(user, "Only moderators and admins can use !destroy");
+	if( gv_LibapxPlayer[user].permissionLevel < gv_LibapxPermissionLevelMod ) {
+		LibapxPrintError(user, "Only moderators and admins can use !destroy");
 		return;
 	}
 
@@ -29,32 +29,32 @@ void libapx_command_destroy(int user, unitgroup u, string argv, int spawningCoun
 	}
 
 
-	libNtve_gf_SendActorMessageToGameRegion( (RegionCircle( libapx_player[user].mouse_position , radius)), "Destroy");
+	libNtve_gf_SendActorMessageToGameRegion( (RegionCircle( gv_LibapxPlayer[user].mousePosition , radius)), "Destroy");
 
 
 }
-void libapx_define_destroy(string command_name) {
-	commands_guide_entry_set(
-		g_commands_guide_entry_admin, 
-		command_name, 
+void LibapxDefineDestroy(string commandName) {
+	LibapxCommandsGuideEntrySet(
+		gv_CommandsGuideEntryAdmin, 
+		commandName, 
 		" This command destroys all actors and units within a given radius. It permanently removing these actors, never use it unless there is a stain you can't remove with @removearea. <br> This is an admin command so you must be a moderator or an admin to use it. <br> !destroy [radius] <br> Examples: <br> !destroy 3 "
 	);
 }
 
-// libapx_command_ban
+// LibapxCommandBan
 // ====================
 // bans a player (removes all player's units from map too)
-void libapx_command_ban(int user, unitgroup u, string argv, int spawningCount, string bracketText) {
-	int target_player = libapx_color_to_player( StringWord(argv, 2), user ); //GET PLAYER COLOR FROM STRING.
+void LibapxCommandBan(int user, unitgroup u, string argv, int spawningCount, string bracketText) {
+	int targetPlayer = LibapxColorToPlayer( StringWord(argv, 2), user ); //GET PLAYER COLOR FROM STRING.
 	unitgroup g;
 
 	if(StringCase(StringWord(argv, 2), c_stringNoCase) == "me") {
-		libapx_print_text(PlayerGroupAll(), libapx_player_name_colored(target_player) + StringToText(" has been kicked by himself, what a genius!"));
-		GameOver( target_player, c_gameOverVictory, true, true );
+		LibapxPrintText(PlayerGroupAll(), gv_LibapxPlayerNameColored(targetPlayer) + StringToText(" has been kicked by himself, what a genius!"));
+		GameOver( targetPlayer, c_gameOverVictory, true, true );
 
 
 		// remove all of a player's units
-		g = UnitGroup( null, target_player, RegionEntireMap(), UnitFilter(0, 0, 0, 0), 0 );
+		g = UnitGroup( null, targetPlayer, RegionEntireMap(), UnitFilter(0, 0, 0, 0), 0 );
 		UnitGroupLoopBegin(g);
 		while( !UnitGroupLoopDone() ) {
 			UnitRemove( UnitGroupLoopCurrent() );
@@ -65,25 +65,25 @@ void libapx_command_ban(int user, unitgroup u, string argv, int spawningCount, s
 
 	}
 	// check if player is valid
-	if( target_player == -1 || PlayerType(target_player) != c_playerTypeUser ) {
-		libapx_print_error(user, "Invalid player");
+	if( targetPlayer == -1 || PlayerType(targetPlayer) != c_playerTypeUser ) {
+		LibapxPrintError(user, "Invalid player");
 		return;
 	}
 
-	if( libapx_player[user].permission_level < libapx_PERMISSIONS_LEVEL_MOD ) {
-		libapx_print_error(user, "Only moderators and admins can use \\kick");
+	if( gv_LibapxPlayer[user].permissionLevel < gv_LibapxPermissionLevelMod ) {
+		LibapxPrintError(user, "Only moderators and admins can use \\kick");
 		return;
 	}
-	if( libapx_player[user].permission_level <= libapx_player[target_player].permission_level ) {
-		libapx_print_error(user, "You cannot kick someone of equal or greater rank than you");
+	if( gv_LibapxPlayer[user].permissionLevel <= gv_LibapxPlayer[targetPlayer].permissionLevel ) {
+		LibapxPrintError(user, "You cannot kick someone of equal or greater rank than you");
 		return;
 	}
 
-	GameOver( target_player, c_gameOverDefeat, false, true );
+	GameOver( targetPlayer, c_gameOverDefeat, false, true );
 
 
 	// remove all of a player's units
-	g = UnitGroup( null, target_player, RegionEntireMap(), UnitFilter(0, 0, 0, 0), 0 );
+	g = UnitGroup( null, targetPlayer, RegionEntireMap(), UnitFilter(0, 0, 0, 0), 0 );
 	UnitGroupLoopBegin(g);
 	while( !UnitGroupLoopDone() ) {
 		UnitRemove( UnitGroupLoopCurrent() );
@@ -91,262 +91,262 @@ void libapx_command_ban(int user, unitgroup u, string argv, int spawningCount, s
 	}
 	UnitGroupLoopEnd();
 
-	libapx_print_text(PlayerGroupAll(), libapx_player_name_colored(target_player) + StringToText(" has been kicked by ") + libapx_player_name_colored(user));
+	LibapxPrintText(PlayerGroupAll(), gv_LibapxPlayerNameColored(targetPlayer) + StringToText(" has been kicked by ") + gv_LibapxPlayerNameColored(user));
 
 	return;
 }
-void libapx_define_ban(string command_name) {
-	commands_guide_entry_set(
-		g_commands_guide_entry_admin, 
-		command_name, 
+void LibapxDefineBan(string commandName) {
+	LibapxCommandsGuideEntrySet(
+		gv_CommandsGuideEntryAdmin, 
+		commandName, 
 		" This command kicks any player from your lobby. <br> This is an admin command so you must be a moderator or an admin to use it. <br> !ban [playercolor] <br> Examples: <br> !kick purple "
 	);
 }
 
-// libapx_command_disable
+// LibapxCommandDisable
 // ====================
 // prevents player from using commands
 // all chat instead routed directly to OOC
-void libapx_command_disable(int user, unitgroup u, string argv, int spawningCount, string bracketText) {
-	int target_player = libapx_color_to_player( StringWord(argv, 2), user ); //GET PLAYER COLOR FROM STRING.
+void LibapxCommandDisable(int user, unitgroup u, string argv, int spawningCount, string bracketText) {
+	int targetPlayer = LibapxColorToPlayer( StringWord(argv, 2), user ); //GET PLAYER COLOR FROM STRING.
 
 	// check if player is valid
-	if( target_player == -1 || PlayerType(target_player) != c_playerTypeUser ) {
-		libapx_print_error(user, "Invalid player");
+	if( targetPlayer == -1 || PlayerType(targetPlayer) != c_playerTypeUser ) {
+		LibapxPrintError(user, "Invalid player");
 		return;
 	}
 
-	if( libapx_player[user].permission_level < libapx_PERMISSIONS_LEVEL_MOD ) {
-		libapx_print_error(user, "Only moderators and admins can use \\disable");
+	if( gv_LibapxPlayer[user].permissionLevel < gv_LibapxPermissionLevelMod ) {
+		LibapxPrintError(user, "Only moderators and admins can use \\disable");
 		return;
 	}
-	if( libapx_player[user].permission_level <= libapx_player[target_player].permission_level ) {
-		libapx_print_error(user, "You cannot disable/enable someone of equal or greater rank than you");
+	if( gv_LibapxPlayer[user].permissionLevel <= gv_LibapxPlayer[targetPlayer].permissionLevel ) {
+		LibapxPrintError(user, "You cannot disable/enable someone of equal or greater rank than you");
 		return;
 	}
 
-	libapx_player[target_player].disabled = true;
-	libapx_print_text(PlayerGroupAll(), libapx_player_name_colored(target_player) + StringToText(" has been disabled by ") + libapx_player_name_colored(user));
+	gv_LibapxPlayer[targetPlayer].disabled = true;
+	LibapxPrintText(PlayerGroupAll(), gv_LibapxPlayerNameColored(targetPlayer) + StringToText(" has been disabled by ") + gv_LibapxPlayerNameColored(user));
 
 	return;
 }
-void libapx_define_disable(string command_name) {
-	commands_guide_entry_set(
-		g_commands_guide_entry_admin, 
-		command_name, 
+void LibapxDefineDisable(string commandName) {
+	LibapxCommandsGuideEntrySet(
+		gv_CommandsGuideEntryAdmin, 
+		commandName, 
 		" This command disables the target player in your lobby. This means they can't use commands anymore until they are enabled. <br> This is an admin command so you must be a moderator or an admin to use it. <br> !disable [playercolor] <br> Examples: <br> !disable purple "
 	);
 }
-// libapx_command_enable
+// LibapxCommandEnable
 // ====================
 // "enables" a player; allows commands to be used
-void libapx_command_enable(int user, unitgroup u, string argv, int spawningCount, string bracketText) {
-	int target_player = libapx_color_to_player( StringWord(argv, 2), user ); //GET PLAYER COLOR FROM STRING.
+void LibapxCommandEnable(int user, unitgroup u, string argv, int spawningCount, string bracketText) {
+	int targetPlayer = LibapxColorToPlayer( StringWord(argv, 2), user ); //GET PLAYER COLOR FROM STRING.
 
 	// check if player is valid
-	if( target_player == -1 || PlayerType(target_player) != c_playerTypeUser ) {
-		libapx_print_error(user, "Invalid player");
+	if( targetPlayer == -1 || PlayerType(targetPlayer) != c_playerTypeUser ) {
+		LibapxPrintError(user, "Invalid player");
 		return;
 	}
 
-	if( libapx_player[user].permission_level < libapx_PERMISSIONS_LEVEL_MOD ) {
-		libapx_print_error(user, "Only moderators and admins can use \\enable");
+	if( gv_LibapxPlayer[user].permissionLevel < gv_LibapxPermissionLevelMod ) {
+		LibapxPrintError(user, "Only moderators and admins can use \\enable");
 		return;
 	}
-	if( libapx_player[user].permission_level <= libapx_player[target_player].permission_level ) {
-		libapx_print_error(user, "You cannot disable/enable someone of equal or greater rank than you");
+	if( gv_LibapxPlayer[user].permissionLevel <= gv_LibapxPlayer[targetPlayer].permissionLevel ) {
+		LibapxPrintError(user, "You cannot disable/enable someone of equal or greater rank than you");
 		return;
 	}
 
-	libapx_player[target_player].disabled = false;
-	libapx_print_text(PlayerGroupAll(), libapx_player_name_colored(target_player) + StringToText(" has been enabled by ") + libapx_player_name_colored(user));
+	gv_LibapxPlayer[targetPlayer].disabled = false;
+	LibapxPrintText(PlayerGroupAll(), gv_LibapxPlayerNameColored(targetPlayer) + StringToText(" has been enabled by ") + gv_LibapxPlayerNameColored(user));
 
 	return;
 }
-void libapx_define_enable(string command_name) {
-	commands_guide_entry_set(
-		g_commands_guide_entry_admin, 
-		command_name, 
+void LibapxDefineEnable(string commandName) {
+	LibapxCommandsGuideEntrySet(
+		gv_CommandsGuideEntryAdmin, 
+		commandName, 
 		" This command enables the target player in your lobby. This means they can use commands now if they were disable beforehand. <br> This is an admin command so you must be a moderator or an admin to use it. <br> !enable [playercolor] <br> Examples: <br> !enable violet "
 	);
 }
-// libapx_command_mute
+// LibapxCommandMute
 // ====================
 // prevents player's messages appearing in chat
-void libapx_command_mute(int user, unitgroup u, string argv, int spawningCount, string bracketText) {
-	int target_player = libapx_color_to_player( StringWord(argv, 2), user ); //GET PLAYER COLOR FROM STRING.
+void LibapxCommandMute(int user, unitgroup u, string argv, int spawningCount, string bracketText) {
+	int targetPlayer = LibapxColorToPlayer( StringWord(argv, 2), user ); //GET PLAYER COLOR FROM STRING.
 
 	// check if player is valid
-	if( target_player == -1 || PlayerType(target_player) != c_playerTypeUser ) {
-		libapx_print_error(user, "Invalid player");
+	if( targetPlayer == -1 || PlayerType(targetPlayer) != c_playerTypeUser ) {
+		LibapxPrintError(user, "Invalid player");
 		return;
 	}
 
-	if( libapx_player[user].permission_level < libapx_PERMISSIONS_LEVEL_MOD ) {
-		libapx_print_error(user, "Only moderators and admins can use \\mute");
+	if( gv_LibapxPlayer[user].permissionLevel < gv_LibapxPermissionLevelMod ) {
+		LibapxPrintError(user, "Only moderators and admins can use \\mute");
 		return;
 	}
-	if( libapx_player[user].permission_level <= libapx_player[target_player].permission_level ) {
-		libapx_print_error(user, "You cannot mute/unmute someone of equal or greater rank than you");
+	if( gv_LibapxPlayer[user].permissionLevel <= gv_LibapxPlayer[targetPlayer].permissionLevel ) {
+		LibapxPrintError(user, "You cannot mute/unmute someone of equal or greater rank than you");
 		return;
 	}
 
-	libapx_player[target_player].muted = true;
-	libapx_print_text(PlayerGroupAll(), libapx_player_name_colored(target_player) + StringToText(" has been muted by ") + libapx_player_name_colored(user));
+	gv_LibapxPlayer[targetPlayer].muted = true;
+	LibapxPrintText(PlayerGroupAll(), gv_LibapxPlayerNameColored(targetPlayer) + StringToText(" has been muted by ") + gv_LibapxPlayerNameColored(user));
 
 	return;
 }
-void libapx_define_mute(string command_name) {
-	commands_guide_entry_set(
-		g_commands_guide_entry_admin, 
-		command_name, 
+void LibapxDefineMute(string commandName) {
+	LibapxCommandsGuideEntrySet(
+		gv_CommandsGuideEntryAdmin, 
+		commandName, 
 		" This command mutes the target player in your lobby. This means their messages no longer appear in the chat. It can be undone with !unmute <br> This is an admin command so you must be a moderator or an admin to use it. <br> !mute [playercolor] <br> Examples: <br> !mute lightgrey "
 	);
 }
 
-// libapx_command_unmute
+// LibapxCommandUnmute
 // ====================
 // unmutes a player (messages can appear in chat)
-void libapx_command_unmute(int user, unitgroup u, string argv, int spawningCount, string bracketText) {
-	int target_player = libapx_color_to_player( StringWord(argv, 2), user ); //GET PLAYER COLOR FROM STRING.
+void LibapxCommandUnmute(int user, unitgroup u, string argv, int spawningCount, string bracketText) {
+	int targetPlayer = LibapxColorToPlayer( StringWord(argv, 2), user ); //GET PLAYER COLOR FROM STRING.
 
 	// check if player is valid
-	if( target_player == -1 || PlayerType(target_player) != c_playerTypeUser ) {
-		libapx_print_error(user, "Invalid player");
+	if( targetPlayer == -1 || PlayerType(targetPlayer) != c_playerTypeUser ) {
+		LibapxPrintError(user, "Invalid player");
 		return;
 	}
 
-	if( libapx_player[user].permission_level < libapx_PERMISSIONS_LEVEL_MOD ) {
-		libapx_print_error(user, "Only moderators and admins can use \\unmute");
+	if( gv_LibapxPlayer[user].permissionLevel < gv_LibapxPermissionLevelMod ) {
+		LibapxPrintError(user, "Only moderators and admins can use \\unmute");
 		return;
 	}
-	if( libapx_player[user].permission_level <= libapx_player[target_player].permission_level ) {
-		libapx_print_error(user, "You cannot mute/unmute someone of equal or greater rank than you");
+	if( gv_LibapxPlayer[user].permissionLevel <= gv_LibapxPlayer[targetPlayer].permissionLevel ) {
+		LibapxPrintError(user, "You cannot mute/unmute someone of equal or greater rank than you");
 		return;
 	}
 
-	libapx_player[target_player].muted = false;
-	libapx_print_text(PlayerGroupAll(), libapx_player_name_colored(target_player) + StringToText(" has been unmuted by ") + libapx_player_name_colored(user));
+	gv_LibapxPlayer[targetPlayer].muted = false;
+	LibapxPrintText(PlayerGroupAll(), gv_LibapxPlayerNameColored(targetPlayer) + StringToText(" has been unmuted by ") + gv_LibapxPlayerNameColored(user));
 
 	return;
 }
-void libapx_define_unmute(string command_name) {
-	commands_guide_entry_set(
-		g_commands_guide_entry_admin, 
-		command_name, 
+void LibapxDefineUnmute(string commandName) {
+	LibapxCommandsGuideEntrySet(
+		gv_CommandsGuideEntryAdmin, 
+		commandName, 
 		" This command unmutes the target player in your lobby. This means if they were muted their messages can now display in the chat. <br> This is an admin command so you must be a moderator or an admin to use it. <br> !unmute [playercolor] <br> Examples: <br> !unmute blue "
 	);
 }
 
-// libapx_command_promote
+// LibapxCommandPromote
 // ================
 // promotes a player to moderator status
-void libapx_command_promote(int user, unitgroup u, string argv, int spawningCount, string bracketText) {
-	int target_player = libapx_color_to_player( StringWord(argv, 2), user ); //GET PLAYER COLOR FROM STRING.
+void LibapxCommandPromote(int user, unitgroup u, string argv, int spawningCount, string bracketText) {
+	int targetPlayer = LibapxColorToPlayer( StringWord(argv, 2), user ); //GET PLAYER COLOR FROM STRING.
 
 	// check if player is valid
-	if( target_player == -1 || PlayerType(target_player) != c_playerTypeUser ||
-		target_player == user || libapx_player[target_player].permission_level == libapx_PERMISSIONS_LEVEL_ADMIN) {
-		libapx_print_error(user, "Invalid player");
+	if( targetPlayer == -1 || PlayerType(targetPlayer) != c_playerTypeUser ||
+		targetPlayer == user || gv_LibapxPlayer[targetPlayer].permissionLevel == LibapxPERMISSIONSLEVELADMIN) {
+		LibapxPrintError(user, "Invalid player");
 		return;
 	}
 
-	if( libapx_player[user].permission_level < libapx_PERMISSIONS_LEVEL_ADMIN ) {
-		libapx_print_error(user, "Only admins can promote/demote moderators");
+	if( gv_LibapxPlayer[user].permissionLevel < LibapxPERMISSIONSLEVELADMIN ) {
+		LibapxPrintError(user, "Only admins can promote/demote moderators");
 		return;
 	}
 
-	libapx_player[target_player].permission_level = libapx_PERMISSIONS_LEVEL_MOD;
+	gv_LibapxPlayer[targetPlayer].permissionLevel = gv_LibapxPermissionLevelMod;
 
-	libapx_print_text(PlayerGroupAll(), libapx_player_name_colored(target_player) + StringToText(" has been promoted to moderator by ") + libapx_player_name_colored(user));
+	LibapxPrintText(PlayerGroupAll(), gv_LibapxPlayerNameColored(targetPlayer) + StringToText(" has been promoted to moderator by ") + gv_LibapxPlayerNameColored(user));
 
 	return;
 }
-void libapx_define_promote(string command_name) {
-	commands_guide_entry_set(
-		g_commands_guide_entry_admin, 
-		command_name, 
+void LibapxDefinePromote(string commandName) {
+	LibapxCommandsGuideEntrySet(
+		gv_CommandsGuideEntryAdmin, 
+		commandName, 
 		"  This command promotes a player to a moderator. This means they can now use administration commands. <br> This is an admin-only command so you must be an admin to use it. <br> !promote [playercolor] <br> Examples: <br> !promote lightgreen "
 	);
 }
 
-// libapx_command_demote
+// LibapxCommandDemote
 // ================
 // sets a player to default status
-void libapx_command_demote(int user, unitgroup u, string argv, int spawningCount, string bracketText) {
-	int target_player = libapx_color_to_player( StringWord(argv, 2), user ); //GET PLAYER COLOR FROM STRING.
+void LibapxCommandDemote(int user, unitgroup u, string argv, int spawningCount, string bracketText) {
+	int targetPlayer = LibapxColorToPlayer( StringWord(argv, 2), user ); //GET PLAYER COLOR FROM STRING.
 
 	// check if player is valid
-	if( target_player == -1 || PlayerType(target_player) != c_playerTypeUser ||
-		target_player == user || libapx_player[target_player].permission_level == libapx_PERMISSIONS_LEVEL_ADMIN) {
-		libapx_print_error(user, "Invalid player");
+	if( targetPlayer == -1 || PlayerType(targetPlayer) != c_playerTypeUser ||
+		targetPlayer == user || gv_LibapxPlayer[targetPlayer].permissionLevel == LibapxPERMISSIONSLEVELADMIN) {
+		LibapxPrintError(user, "Invalid player");
 		return;
 	}
-	if(libapx_player[target_player].permission_level == libapx_PERMISSIONS_LEVEL_SADMIN) {
-		libapx_print_success(user, "Successfully demoted no one.");
+	if(gv_LibapxPlayer[targetPlayer].permissionLevel == LibapxPERMISSIONSLEVELSADMIN) {
+		LibapxPrintSuccess(user, "Successfully demoted no one.");
 		return;
 	}
-	if( libapx_player[user].permission_level < libapx_player[target_player].permission_level && libapx_player[target_player].permission_level != libapx_PERMISSIONS_LEVEL_DEFAULT ) {
-		libapx_print_error(user, "Only admins can promote/demote moderators");
+	if( gv_LibapxPlayer[user].permissionLevel < gv_LibapxPlayer[targetPlayer].permissionLevel && gv_LibapxPlayer[targetPlayer].permissionLevel != LibapxPERMISSIONSLEVELDEFAULT ) {
+		LibapxPrintError(user, "Only admins can promote/demote moderators");
 		return;
 	}
 
-	libapx_player[target_player].permission_level = libapx_PERMISSIONS_LEVEL_DEFAULT;
+	gv_LibapxPlayer[targetPlayer].permissionLevel = LibapxPERMISSIONSLEVELDEFAULT;
 
-	libapx_print_text(PlayerGroupAll(), libapx_player_name_colored(target_player) + StringToText(" has been demoted by ") + libapx_player_name_colored(user));
+	LibapxPrintText(PlayerGroupAll(), gv_LibapxPlayerNameColored(targetPlayer) + StringToText(" has been demoted by ") + gv_LibapxPlayerNameColored(user));
 
 	return;
 }
-void libapx_define_demote(string command_name) {
-	commands_guide_entry_set(
-		g_commands_guide_entry_admin, 
-		command_name, 
+void LibapxDefineDemote(string commandName) {
+	LibapxCommandsGuideEntrySet(
+		gv_CommandsGuideEntryAdmin, 
+		commandName, 
 		"  This command demote a player to from a moderator to a normal user. This means they can no longer use the administration commands. <br> This is an admin-only command so you must be an admin to use it. <br> !demote [playercolor] <br> Examples: <br> !demote pink "
 	);
 }
 
 
-// libapx_command_skybox
+// LibapxCommandSkybox
 // ==================
 // Changes the map's skybox
-void libapx_command_skybox(int user, unitgroup u, string argv, int spawningCount, string bracketText) {
+void LibapxCommandSkybox(int user, unitgroup u, string argv, int spawningCount, string bracketText) {
 	string model = StringWord(argv, 2);
-	fixed animation_speed = StringToFixed(StringWord(argv, 3));
+	fixed animationSpeed = StringToFixed(StringWord(argv, 3));
 
 	if (StringWord(argv, 3) == "") {
-		animation_speed = 1;
+		animationSpeed = 1;
 	}
 	
-	if( libapx_player[user].permission_level < libapx_PERMISSIONS_LEVEL_MOD  ) {
-		libapx_print_error(user, "Only moderators or admins can change the skybox");
+	if( gv_LibapxPlayer[user].permissionLevel < gv_LibapxPermissionLevelMod  ) {
+		LibapxPrintError(user, "Only moderators or admins can change the skybox");
 		return;
 	}
 
-	model = libapx_catalog_get(c_gameCatalogModel, model);
+	model = LibapxCatalogGet(c_gameCatalogModel, model);
 	if(model == null) {
-		libapx_print_output(user, "<c val=\"ff0000\">Unable to find model</c>: No such model exists.");
+		LibapxPrintOutput(user, "<c val=\"ff0000\">Unable to find model</c>: No such model exists.");
 		return;
 	}
 
-	GameSetBackground(c_backgroundFixed, model, animation_speed);
+	GameSetBackground(c_backgroundFixed, model, animationSpeed);
 }
-void libapx_define_skybox(string command_name) {
-	commands_guide_entry_set(
-		g_commands_guide_entry_admin, 
-		command_name, 
+void LibapxDefineSkybox(string commandName) {
+	LibapxCommandsGuideEntrySet(
+		gv_CommandsGuideEntryAdmin, 
+		commandName, 
 		" This command changes the maps skybox model. <br> This is an admin command so you must be a moderator or an admin to use it. <br> !skybox [model] [animationspeed] <br> Examples: <br> !skybox KorhalFallingSky 1 ");
 }
 
-// libapx_command_light
+// LibapxCommandLight
 // ==================
 // Changes the map's lighting over a specified period of time
 // if no light is specified, defaults to map terrain's lighting
-void libapx_command_light(int user, unitgroup u, string argv, int spawningCount, string bracketText) {
-	string light = StringWord(libapx_player[user].chat_msg, 2);
-	fixed blend_time = StringToFixed(StringWord(libapx_player[user].chat_msg, 3));
+void LibapxCommandLight(int user, unitgroup u, string argv, int spawningCount, string bracketText) {
+	string light = StringWord(gv_LibapxPlayer[user].chatMsg, 2);
+	fixed blendTime = StringToFixed(StringWord(gv_LibapxPlayer[user].chatMsg, 3));
 
-	if( libapx_player[user].permission_level < libapx_PERMISSIONS_LEVEL_MOD  ) {
-		libapx_print_error(user, "Only moderators or admins can change the light");
+	if( gv_LibapxPlayer[user].permissionLevel < gv_LibapxPermissionLevelMod  ) {
+		LibapxPrintError(user, "Only moderators or admins can change the light");
 		return;
 	}
 
@@ -354,50 +354,50 @@ void libapx_command_light(int user, unitgroup u, string argv, int spawningCount,
 		light = CatalogFieldValueGet(c_gameCatalogTerrain,  GameTerrainSet(), "Lighting", user);
 	}
 
-	light = libapx_catalog_get(c_gameCatalogLight, light);
+	light = LibapxCatalogGet(c_gameCatalogLight, light);
 	if(light == null) {
-		libapx_print_error(user, "<c val=\"ff0000\">Unable to change lighting</c>: No such light exists.");
+		LibapxPrintError(user, "<c val=\"ff0000\">Unable to change lighting</c>: No such light exists.");
 		return;
 	}
 
-	if(StringWord(libapx_player[user].chat_msg, 3) == "") {
-		blend_time = 2;
+	if(StringWord(gv_LibapxPlayer[user].chatMsg, 3) == "") {
+		blendTime = 2;
 	}
 
-	GameSetLighting(light, blend_time);
+	GameSetLighting(light, blendTime);
 
 	return;
 }
-void libapx_define_light(string command_name) {
-	commands_guide_entry_set(
-		g_commands_guide_entry_admin, 
-		command_name, 
+void LibapxDefineLight(string commandName) {
+	LibapxCommandsGuideEntrySet(
+		gv_CommandsGuideEntryAdmin, 
+		commandName, 
 		" This command changes the maps lighting. If no light is specific it'll reset the light to the maps default light. <br> This is an admin command so you must be a moderator or an admin to use it. <br> !light [lightname] [duration] <br> Examples: <br> !light tassadar 5 <br> !light hyperion 1 ");
 }
 
-// libapx_command_remove_player
+// LibapxCommandRemovePlayer
 // ===================
 // removes all of a specific players units from the map
-void libapx_command_remove_player(int user, unitgroup u, string argv, int spawningCount, string bracketText) {
-	int target_player = libapx_color_to_player( StringCase( StringWord(libapx_player[user].chat_msg, 2), false ), user ); //GET PLAYER COLOR FROM STRING.
+void LibapxCommandRemovePlayer(int user, unitgroup u, string argv, int spawningCount, string bracketText) {
+	int targetPlayer = LibapxColorToPlayer( StringCase( StringWord(gv_LibapxPlayer[user].chatMsg, 2), false ), user ); //GET PLAYER COLOR FROM STRING.
 	unitgroup g;
 
-	if( target_player == -1 ) {
-		libapx_print_error(user, "Invalid player");
+	if( targetPlayer == -1 ) {
+		LibapxPrintError(user, "Invalid player");
 		return;
 	}
 
-	// if target_player is not yourself or a non-user, do permissions check
-	if ( target_player != user && PlayerType(target_player) == c_playerTypeUser ) {
-		if( libapx_player[user].permission_level < libapx_PERMISSIONS_LEVEL_MOD &&
-			libapx_player[user].permission_level <= libapx_player[target_player].permission_level ) {
-			libapx_print_error(user, "You cannot remove someone of equal or greater rank than you (while not a moderator or admin)");
+	// if targetPlayer is not yourself or a non-user, do permissions check
+	if ( targetPlayer != user && PlayerType(targetPlayer) == c_playerTypeUser ) {
+		if( gv_LibapxPlayer[user].permissionLevel < gv_LibapxPermissionLevelMod &&
+			gv_LibapxPlayer[user].permissionLevel <= gv_LibapxPlayer[targetPlayer].permissionLevel ) {
+			LibapxPrintError(user, "You cannot remove someone of equal or greater rank than you (while not a moderator or admin)");
 			return;
 		}
 	}
 
 	// remove all of target player's units
-	g = UnitGroup( null, target_player, RegionEntireMap(), UnitFilter(0, 0, 0, 0), 0 );
+	g = UnitGroup( null, targetPlayer, RegionEntireMap(), UnitFilter(0, 0, 0, 0), 0 );
 	UnitGroupLoopBegin(g);
 	while( !UnitGroupLoopDone() ) {
 		UnitRemove( UnitGroupLoopCurrent() );
@@ -405,22 +405,22 @@ void libapx_command_remove_player(int user, unitgroup u, string argv, int spawni
 	}
 	UnitGroupLoopEnd();
 
-	libapx_print_text(PlayerGroupAll(), libapx_player_name_colored(target_player) + StringToText(" has been removed by ") + libapx_player_name_colored(user));
+	LibapxPrintText(PlayerGroupAll(), gv_LibapxPlayerNameColored(targetPlayer) + StringToText(" has been removed by ") + gv_LibapxPlayerNameColored(user));
 
 	return;
 }
 
-void libapx_define_remove_player(string command_name) {
-	commands_guide_entry_set(
-		g_commands_guide_entry_admin, 
-		command_name, 
+void LibapxDefineRemovePlayer(string commandName) {
+	LibapxCommandsGuideEntrySet(
+		gv_CommandsGuideEntryAdmin, 
+		commandName, 
 		" This command removes all of a targeted players units. <br> This is an admin command so you must be a moderator or an admin to use it. <br> !remove [playercolor] <br> Examples: <br> !remove teal ");
 }
 
-// libapx_command_fog
+// LibapxCommandFog
 // ===================
 // changes the fog of a map
-void libapx_command_fog(int user, unitgroup u, string argv, int spawningCount, string bracketText) {
+void LibapxCommandFog(int user, unitgroup u, string argv, int spawningCount, string bracketText) {
 	string state = StringWord(argv, 2 );
 	string paramOne;
 	string paramTwo;
@@ -428,8 +428,8 @@ void libapx_command_fog(int user, unitgroup u, string argv, int spawningCount, s
 	fixed red;
 	fixed green;
 	fixed blue;
-	if( libapx_player[user].permission_level < libapx_PERMISSIONS_LEVEL_MOD  ) {
-		libapx_print_error(user, "Only moderators or admins can change the fog");
+	if( gv_LibapxPlayer[user].permissionLevel < gv_LibapxPermissionLevelMod  ) {
+		LibapxPrintError(user, "Only moderators or admins can change the fog");
 		return;
 	}
 	paramOne = StringWord(argv, 3);
@@ -446,9 +446,9 @@ void libapx_command_fog(int user, unitgroup u, string argv, int spawningCount, s
 	}
 	else if(state == "color")
 	{
-		red = libapx_boundsFixed(StringToFixed(paramOne),0,255) * 100 / 255;
-		green = libapx_boundsFixed(StringToFixed(paramTwo),0,255) * 100 / 255;
-		blue = libapx_boundsFixed(StringToFixed(paramThree),0,255) * 100 / 255;
+		red = LibapxBoundsFixed(StringToFixed(paramOne),0,255) * 100 / 255;
+		green = LibapxBoundsFixed(StringToFixed(paramTwo),0,255) * 100 / 255;
+		blue = LibapxBoundsFixed(StringToFixed(paramThree),0,255) * 100 / 255;
 		FogSetColor(Color(red, green, blue));
 	}
 	else if(state == "density")
@@ -465,14 +465,14 @@ void libapx_command_fog(int user, unitgroup u, string argv, int spawningCount, s
 	}
 	else
 	{
-		libapx_print_output( user, "Usage: !fog {on|off|color|density|height|falloff} [value]");
+		LibapxPrintOutput( user, "Usage: !fog {on|off|color|density|height|falloff} [value]");
 	}
 	return;
 }
 
-void libapx_define_fog(string command_name) {
-	commands_guide_entry_set(
-		g_commands_guide_entry_admin, 
-		command_name, 
+void LibapxDefineFog(string commandName) {
+	LibapxCommandsGuideEntrySet(
+		gv_CommandsGuideEntryAdmin, 
+		commandName, 
 		" This command changes the fog of a map. Doing this is a permanent change and cannon't be undone easily. <br> This is an admin command so you must be a moderator or an admin to use it. <br> !fog [state] [parameters... <br> Examples: <br> !fog on <br> !fog off <br> !fog color 255 0 0 <br> !fog density 2 <br> !fog height 12 <br> !fog falloff 50");
 }

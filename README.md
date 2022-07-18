@@ -66,7 +66,7 @@ be found under the import path **Apex/Apex.galaxy**.
 
 ### Data
 Inside the **data/data.galaxy** file, there will be a list of const strings
-prefixed by **libapx_BEHAVIOR**. These are all behaviors that must be
+prefixed by **LibapxBehavior**. These are all behaviors that must be
 created in the SC2Editor for a map that uses Apex. Go to the **Data Editor**
 (F7) and create all these behaviors with the names defined by the constants.
 **If the names do not match, certain commands will not work ingame.**

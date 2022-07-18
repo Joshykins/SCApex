@@ -1,164 +1,164 @@
 //=========================================================
 //		Apex Roleplaying Engine
-//		Copyright (c) 2019, Apex Group
+//		Copyright (c) 2022, Apex Group
 //=========================================================
 // This software is distributed under the MIT License:
 // <http://opensource.org/licenses/MIT>
 //=========================================================
 
 
-static const string libapx_DATA_TABLE_CHATLOG_FILTER = "ui_chatlog_filter ";
+static const string DatatableChatlogFilter = "uiChatlogFilter ";
 
 // indent used for chatlog msg that are part of a previous msg
-static const string libapx_UI_CHATLOG_INDENT = "";
+static const string UiChatlogIndent = "";
 
 // number of players on the filter list
-static int libapx_chatlog_nplayers = 0;
+static int gv_LibapxChatLogNplayers = 0;
 
 // player message author filter for chatlog messages
 // filter checkboxes correspond to filter array index-1
-static int[libapx_MAX_PLAYERS] libapx_ui_chatlog_filter_list;
+static int[gv_LibapxMaxPlayers] UiChatlogFilterList;
 
 // actual flags for whether a player's messages in chatlog are to be filtered
 // format for array is [Player][Flag], where flag is the player int of the
 // target player for filtering.
 // False (default) - not filtered
 // True - filtered (msg does not appear in chat log)
-static bool[libapx_MAX_PLAYERS][libapx_MAX_PLAYERS] libapx_chatlog_filter;
+static bool[gv_LibapxMaxPlayers][gv_LibapxMaxPlayers] gv_LibapxChatLogFilter;
 
 // dialog for the chat log
-int libapx_ui_chatlog;
-int libapx_ui_chatlog_exit;
+int LibapxUiChatlog;
+int LibapxUiChatlogExit;
 
 // dialog controls for the chat log
-int libapx_ui_chatlog_list;
-static int libapx_ui_chatlog_filter_last = 0; // last player check in filter list
+int LibapxUiChatlogList;
+static int LibapxUiChatlogFilterLast = 0; // last player check in filter list
 
-// libapx_ui_chatlog_init
+// LibapxUiChatlogInit
 // ==================
 // Creates the chat log ui panel
-void libapx_ui_chatlog_init() {
+void LibapxUiChatlogInit() {
 	int i;
-	libapx_ui_chatlog = libapx_create_dialog(840, 710, c_anchorTopLeft, libapx_ui_panel_spacing, 0);
-    libapx_ui_chatlog_exit = libapx_create_dialog_close_btn(libapx_ui_chatlog, 840, 710, c_anchorTopLeft, libapx_ui_panel_spacing, 0);
+	LibapxUiChatlog = LibapxCreateDialog(840, 710, c_anchorTopLeft, gv_LibapxUiPanelSpacing, 0);
+    LibapxUiChatlogExit = LibapxCreateDialogCloseBtn(LibapxUiChatlog, 840, 710, c_anchorTopLeft, gv_LibapxUiPanelSpacing, 0);
 
-	libapx_create_dialog_title(libapx_ui_chatlog , 300, 40, 00, 40, "Chat Log", libapx_UI_HEADER1, 160);
+	LibapxCreateDialogTitle(LibapxUiChatlog , 300, 40, 00, 40, "Chat Log", gv_LibapxUiHeader1, 160);
 	// create the list used for chatlog messages as list items
-	libapx_ui_chatlog_list = libapx_create_dialog_list(libapx_ui_chatlog, 600, 580, c_anchorTopLeft, 20, 85);
+	LibapxUiChatlogList = LibapxCreateDialogList(LibapxUiChatlog, 600, 580, c_anchorTopLeft, 20, 85);
 
 	// create "Players:" label for player filter list
-	libapx_create_dialog_label(libapx_ui_chatlog, 120, 40, c_anchorTopRight, 90, 85, "Players", libapx_UI_HEADER3);
+	LibapxCreateDialogLabel(LibapxUiChatlog, 120, 40, c_anchorTopRight, 90, 85, "Players", gv_LibapxUiHeader3);
 
-	for( i = 0; i < libapx_NLOGGED_MSG; i += 1 ) {
-		TriggerAddEventGeneric(TriggerCreate("libapx_ui_chatlog_update"), libapx_EVENT_CHATLOG + IntToString(i));
+	for( i = 0; i < gv_LibapxNumberOfLoggedMessages; i += 1 ) {
+		TriggerAddEventGeneric(TriggerCreate("LibapxUiChatlogUpdate"), gv_LibapxEventChatLog + IntToString(i));
 	}
 }
 
-// libapx_ui_chatlog_init
+// LibapxUiChatlogInit
 // ===================
 // adds a player's name to the list of players to filter in the
-void libapx_ui_chatlog_init_player(int player) {
-	int checkbox = libapx_create_dialog_checkbox(libapx_ui_chatlog, 30, 30, c_anchorTopRight, 175, 120);
-	int playername = libapx_create_dialog_label_text(libapx_ui_chatlog, 200, 20, c_anchorTopRight, 14, 12, libapx_player_name_colored(player), libapx_UI_HEADER5);
+void LibapxUiChatlogInitPlayer(int player) {
+	int checkbox = LibapxCreateDialogCheckbox(LibapxUiChatlog, 30, 30, c_anchorTopRight, 175, 120);
+	int playername = LibapxCreateDialogLabelText(LibapxUiChatlog, 200, 20, c_anchorTopRight, 14, 12, gv_LibapxPlayerNameColored(player), gv_LibapxUiHeader5);
 	DialogControlSetPositionRelative(playername, PlayerGroupAll(), c_anchorLeft, checkbox, c_anchorRight, 0, 0);
 
 	// if a previous checkbox has been created, anchor new checkbox to previous
-	if( libapx_ui_chatlog_filter_last != 0 ) {
-		DialogControlSetPositionRelative(checkbox, PlayerGroupAll(), c_anchorTop, libapx_ui_chatlog_filter_last, c_anchorBottom, 0, 0);
+	if( LibapxUiChatlogFilterLast != 0 ) {
+		DialogControlSetPositionRelative(checkbox, PlayerGroupAll(), c_anchorTop, LibapxUiChatlogFilterLast, c_anchorBottom, 0, 0);
 	}
 
 	// set the checkbox default marked (no players filtered)
 	libNtve_gf_SetDialogItemChecked(checkbox, true, PlayerGroupAll());
 
 	// set the player for this checkbox
-	DataTableSetInt(true, libapx_DATA_TABLE_CHATLOG_FILTER + IntToString(checkbox), player);
-	//libapx_ui_chatlog_filter_list[libapx_chatlog_nplayers] = player;
-	libapx_chatlog_nplayers += 1;
+	DataTableSetInt(true, DatatableChatlogFilter + IntToString(checkbox), player);
+	//UiChatlogFilterList[gv_LibapxChatLogNplayers] = player;
+	gv_LibapxChatLogNplayers += 1;
 
 	// add trigger event for toggling player filter
-	TriggerAddEventDialogControl(TriggerCreate("libapx_ui_chatlog_filter_toggle"), c_playerAny, checkbox, c_triggerControlEventTypeChecked);
+	TriggerAddEventDialogControl(TriggerCreate("LibapxUiChatlogFilterToggle"), c_playerAny, checkbox, c_triggerControlEventTypeChecked);
 
 	// set the global var for the last created checkbox
-	libapx_ui_chatlog_filter_last = checkbox;
+	LibapxUiChatlogFilterLast = checkbox;
 }
 
-// libapx_ui_chatlog_populate
+// UiChatlogPopulate
 // =======================
 // Removes all entries and populates the player chatlog ui list from
 // the Apex chatlog
-static void libapx_ui_chatlog_populate(int player) {
+static void UiChatlogPopulate(int player) {
 	int nmsgs;	// number of messages to read
 	int count;	// counter
 	int i;		// chatlog read index
 	text msg;
 
 	// remove all existing messages
-	DialogControlRemoveAllItems(libapx_ui_chatlog_list, PlayerGroupSingle(player));
+	DialogControlRemoveAllItems(LibapxUiChatlogList, PlayerGroupSingle(player));
 
 	// chatlog read index
-	if( libapx_chatlog_cycled ) {
-		i = (libapx_chatlog_counter + 1) % libapx_NLOGGED_MSG;
-		nmsgs = libapx_NLOGGED_MSG;
-	} else { // hasnt cycled, nmsgs < MAX_NMSGS
+	if( gv_gv_LibapxChatLogCycled ) {
+		i = (gv_LibapxChatLogCounter + 1) % gv_LibapxNumberOfLoggedMessages;
+		nmsgs = gv_LibapxNumberOfLoggedMessages;
+	} else { // hasnt cycled, nmsgs < MAXNMSGS
 		i = 0;
-		nmsgs = libapx_chatlog_counter;
+		nmsgs = gv_LibapxChatLogCounter;
 	}
 
 	// populate chat log with messages from non-filtered players
 	for( count = 0; count < nmsgs; count += 1 ) {
-		if( !libapx_chatlog_filter[player][libapx_chatlog[i].author] ) {
-			if( libapx_chatlog[i].is_part_of_prev ) {
-				msg = StringToText(libapx_UI_CHATLOG_INDENT) + libapx_chatlog[i].msg;
+		if( !gv_LibapxChatLogFilter[player][gv_LibapxChatLog[i].author] ) {
+			if( gv_LibapxChatLog[i].isPartOfPrev ) {
+				msg = StringToText(UiChatlogIndent) + gv_LibapxChatLog[i].msg;
 			} else {
-				msg = libapx_chatlog[i].timestamp + libapx_chatlog[i].msg;
+				msg = gv_LibapxChatLog[i].timestamp + gv_LibapxChatLog[i].msg;
 			}
-			DialogControlAddItem(libapx_ui_chatlog_list, PlayerGroupSingle(player), msg);
+			DialogControlAddItem(LibapxUiChatlogList, PlayerGroupSingle(player), msg);
 		}
 
-		i = (i + 1) % libapx_NLOGGED_MSG;
+		i = (i + 1) % gv_LibapxNumberOfLoggedMessages;
 	}
 
 }
 
-// libapx_ui_chatlog_filter_toggle
+// LibapxUiChatlogFilterToggle
 // ==================
 // Event trigger for when player toggle a player for the chatlog filter:
 // Must update player's filter list, then repopulate chatlog based on
 // new filter.
-bool libapx_ui_chatlog_filter_toggle(bool testConds, bool runActions) {
+bool LibapxUiChatlogFilterToggle(bool testConds, bool runActions) {
 	int checkbox = EventDialogControl();
 	int player = EventPlayer();
-	int filtered = 	DataTableGetInt(true, libapx_DATA_TABLE_CHATLOG_FILTER + IntToString(checkbox));
-	libapx_chatlog_filter[player][filtered] = !libNtve_gf_DialogItemIsChecked(checkbox, player);
+	int filtered = 	DataTableGetInt(true, DatatableChatlogFilter + IntToString(checkbox));
+	gv_LibapxChatLogFilter[player][filtered] = !libNtve_gf_DialogItemIsChecked(checkbox, player);
 
 	// update chat log based on filter
-	libapx_ui_chatlog_populate(player);
+	UiChatlogPopulate(player);
 
 	return true;
 }
 
-// libapx_ui_chatlog_update
+// LibapxUiChatlogUpdate
 // ==================
-// Responds to a libapx_EVENT_CHATLOG updated chatlog event, where event
-// is in format "[CHATLOG_EVENT] [# index to update]":
+// Responds to a gv_LibapxEventChatLog updated chatlog event, where event
+// is in format "[CHATLOGEVENT] [# index to update]":
 // Adds just the newest added entry to each players' chatlog
-bool libapx_ui_chatlog_update(bool testConds, bool runActions) {
+bool LibapxUiChatlogUpdate(bool testConds, bool runActions) {
 	int i = StringToInt(StringWord(EventGenericName(), 2));
 	int player;
 	text msg;
-	bool[libapx_MAX_PLAYERS] chatlog_filter;
+	bool[gv_LibapxMaxPlayers] chatlogFilter;
 
-	if( libapx_chatlog[i].is_part_of_prev ) {
-		msg = StringToText(libapx_UI_CHATLOG_INDENT) + libapx_chatlog[i].msg;
+	if( gv_LibapxChatLog[i].isPartOfPrev ) {
+		msg = StringToText(UiChatlogIndent) + gv_LibapxChatLog[i].msg;
 	} else {
-		msg = libapx_chatlog[i].timestamp + libapx_chatlog[i].msg;
+		msg = gv_LibapxChatLog[i].timestamp + gv_LibapxChatLog[i].msg;
 	}
 
 	// add new message to all active players' chatlogs
-	for( player = 1; player < libapx_MAX_PLAYERS; player += 1 ) {
+	for( player = 1; player < gv_LibapxMaxPlayers; player += 1 ) {
 		if( PlayerType(player) == c_playerTypeUser && PlayerStatus(player) == c_playerStatusActive ) {
-			if( !libapx_chatlog_filter[player][libapx_chatlog[i].author] ) {
-				DialogControlAddItem(libapx_ui_chatlog_list, PlayerGroupSingle(player), msg);
+			if( !gv_LibapxChatLogFilter[player][gv_LibapxChatLog[i].author] ) {
+				DialogControlAddItem(LibapxUiChatlogList, PlayerGroupSingle(player), msg);
 			}
 		}
 	}

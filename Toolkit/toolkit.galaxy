@@ -1,13 +1,13 @@
 //=========================================================
 //		Apex Roleplaying Engine
-//		Copyright (c) 2019, Apex Group
+//		Copyright (c) 2022, Apex Group
 //=========================================================
 // This software is distributed under the MIT License:
 // <http://opensource.org/licenses/MIT>
 //=========================================================
 include "apex/toolkit/toolkithelper.galaxy"
 include "apex/toolkit/weapons.galaxy"
-void libapx_toolkit_initialize()
+void LibapxToolkitInitialize()
 {
-  libapx_toolkit_default_initweapons();
+  LibapxToolkitDefaultInitweapons();
 }

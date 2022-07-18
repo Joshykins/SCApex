@@ -1,0 +1,113 @@
+
+//Gets UnitX
+string LibapxVariableFunctionUnitX(int p, unitgroup u, string argv) {
+
+
+    if (UnitGroupCount(u, c_unitCountAlive) < 1) {
+        LibapxPrintError(p, "UnitX can only be used with at least one unit selected");
+        return "0";
+    }
+
+    return FixedToString(PointGetX(UnitGetPosition(UnitGroupUnit(u, 1))), 6 );
+}
+
+//Gets UnitY
+string LibapxVariableFunctionUnitY(int p, unitgroup u, string argv) {
+
+    if (UnitGroupCount(u, c_unitCountAlive) < 1) {
+        LibapxPrintError(p, "UnitY can only be used with at least one unit selected");
+        return "0";
+    }
+
+    return FixedToString(PointGetY(UnitGetPosition(UnitGroupUnit(u, 1))), 6 );
+}
+
+//Gets MouseX
+string LibapxVariableFunctionMouseX(int p, unitgroup u, string argv) {
+
+    return FixedToString(PointGetX(gv_LibapxPlayer[p].mousePosition), 6 );
+}
+
+
+//Gets MouseY
+string LibapxVariableFunctionMouseY(int p, unitgroup u, string argv) {
+
+    return FixedToString(PointGetY(gv_LibapxPlayer[p].mousePosition), 6 );
+}
+
+//Sin
+string LibapxVariableFunctionSin(int p, unitgroup u, string argv) {
+    fixed input = StringToFixed(StringWord(argv, 1));
+    return FixedToString(Sin(input), 6 );
+}
+
+//Sin
+string LibapxVariableFunctionCos(int p, unitgroup u, string argv) {
+    fixed input = StringToFixed(StringWord(argv, 1));
+    return FixedToString(Cos(input), 6 );
+}
+
+//Tan
+string LibapxVariableFunctionTan(int p, unitgroup u, string argv) {
+    fixed input = StringToFixed(StringWord(argv, 1));
+    return FixedToString(Tan(input), 6 );
+}
+
+//Floor
+string LibapxVariableFunctionFloor(int p, unitgroup u, string argv) {
+    fixed input = StringToFixed(StringWord(argv, 1));
+    return IntToString(FloorI(input));
+}
+
+//Round
+string LibapxVariableFunctionRound(int p, unitgroup u, string argv) {
+    fixed input = StringToFixed(StringWord(argv, 1));
+    return FixedToString(Round(input), 6);
+}
+
+
+//Gets Random Real between two inputs
+string LibapxVariableFunctionRandomFixed(int p, unitgroup u, string argv) {
+    fixed in1;
+    fixed in2;
+    if(StringWord(argv, 1) != "") {
+        in1 = StringToFixed(StringWord(argv, 1));
+    }
+    else {
+        in1  = 0;
+    }
+
+    
+    if(StringWord(argv, 2) != "") {
+        in2 = StringToFixed(StringWord(argv, 2));
+    }
+    else {
+        in2  = 1;
+    }
+
+    return FixedToString(RandomFixed(in1, in2),6);
+}
+
+
+
+//Gets Random Integer between two inputs
+string LibapxVariableFunctionRandomInt(int p, unitgroup u, string argv) {
+    int in1;
+    int in2;
+    if(StringWord(argv, 1) != "") {
+        in1 = StringToInt(StringWord(argv, 1));
+    }
+    else {
+        in1  = 0;
+    }
+
+    
+    if(StringWord(argv, 2) != "") {
+        in2 = StringToInt(StringWord(argv, 2));
+    }
+    else {
+        in2  = 100;
+    }
+
+    return IntToString(RandomInt(in1, in2));
+}

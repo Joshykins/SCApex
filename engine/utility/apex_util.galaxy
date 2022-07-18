@@ -1,0 +1,420 @@
+
+bool LibapxIsFixed(string s)
+{
+	int x = 1;
+	string c1 = "";
+	while( x != (StringLength(s)+1) )
+	{
+		c1 = StringSub(s, x, x);
+		if( !(c1 == "0" || c1 == "-" || c1 == "1" || c1 == "2" || c1 == "3" || c1 == "4" || c1 == "5" || c1 == "6" || c1 == "7" || c1 == "8" || c1 == "9" || c1 == ".") ) {
+			return false;
+		}
+		x += 1;
+	}
+	return true;
+}
+
+
+// @spawn marine 25;>repeat 25 [ @position ${$UnitX()+$RandReal(-2,2)} ${$UnitY()+$RandReal(-2,2)};dl .3]
+
+//Function to blacklist a set of strings
+//========================================
+//ex Replace unit Interceptor Carrier
+bool LibapxBlacklistparms(int catalog, string source, string replace, int p) {
+	bool stringOkay = true;
+	int test;
+	if (catalog == c_gameCatalogUnit) {
+		//D8Charge D8ClusterBomb deleted
+		if (source == "Interceptor" && replace == "Carrier") {
+			//I'll need to make an array with all of the interceptor names and all of the carrier names. I could od a string contains but that would result in over-blockage on some things that are probably not useful, but who knows am i rite
+			//For now, the base carrier interceptor crash is done for.
+			stringOkay = false;
+		}
+		//Replace unit BroodlingEscort BroodLord
+		else if (source == "BroodlingEscort" && replace == "BroodLord") {
+			stringOkay = false;
+		}
+
+	}
+	test = StringFind(source, "d8", c_stringNoCase);
+	if (test != -1) {
+		stringOkay = false;
+	}
+
+
+	if (stringOkay) {
+		return false;
+	} else {
+		LibapxPrintOutput(p, "Replacing "+source+" with "+replace+" is a viable way to crash a game. Command halted");
+		return true;
+	}
+
+}
+// y=a(x-h)^2+k
+// solving for a
+//
+fixed LibapxUtilParabolaCalc(point vertex, point pointGiven, fixed targetX) {
+	fixed xh;
+	fixed yk;
+	fixed a;
+	fixed y;
+	xh = PointGetX(pointGiven)-PointGetX(vertex);
+	xh = AbsF(xh*xh);
+	// y=a(xh)+k
+	// y-k=a(xh)
+	yk = PointGetY(pointGiven)-PointGetY(vertex);
+	//yk=a(xh)
+	//yk/xh=a
+	a = yk/xh;	
+	//y=a(x-h)^2+k
+	//using targetX
+	//
+	xh = targetX - PointGetX(vertex);
+	xh = AbsF(xh*xh);
+	y = (a*xh)+PointGetY(vertex);
+	return y;
+};
+fixed util_255To_100(fixed num) {
+	num = (100*num)/255;
+	if(num <= 0) {
+		return 0.0;
+	}
+	return num;
+}
+
+color utilHsbToRgb(fixed h, fixed s, fixed b) {
+	fixed rgbR;
+	fixed rgbG;
+	fixed rgbB;
+	fixed t1;
+	fixed t2;
+	fixed t3;
+	fixed v;
+	h = Round(h);
+	s = Round(s * 255 / 100);
+	v = Round(b * 255 / 100);
+	if (s == 0) {
+		rgbB = v;
+		rgbG = rgbB;
+		rgbR = rgbG;
+
+	} 
+	else {
+		t1 = v;
+		t2 = (255 - s) * v / 255;
+		t3 = (t1 - t2) * (h % 60) / 60;
+		if (h == 360){ h = 0;};
+		if (h < 60) {
+			rgbR = t1;
+			rgbB = t2;
+			rgbG = t2 + t3;
+		} else if (h < 120) {
+			rgbG = t1;
+			rgbB = t2;
+			rgbR = t1 - t3;
+		} else if (h < 180) {
+			rgbG = t1;
+			rgbR = t2;
+			rgbB = t2 + t3;
+		} else if (h < 240) {
+			rgbB = t1;
+			rgbR = t2;
+			rgbG = t1 - t3;
+		} else if (h < 300) {
+			rgbB = t1;
+			rgbG = t2;
+			rgbR = t2 + t3;
+		} else if (h < 360) {
+			rgbR = t1;
+			rgbG = t2;
+			rgbB = t1 - t3;
+		} else {
+			rgbR = 0;
+			rgbG = 0;
+			rgbB = 0;
+		}
+	}
+	return Color(
+		util_255To_100(rgbR),
+		util_255To_100(rgbG),
+		util_255To_100(rgbB)
+		);
+	
+}
+
+
+
+static const int gv_LibapxStackLimit = 999;
+static int gv_LibapxStackLimitCurrent = 0;
+
+string[gv_LibapxStackLimit] gv_LibapxStacks;
+
+int LibapxUtilsCreateStack() {
+	int output = gv_LibapxStackLimitCurrent; 
+	gv_LibapxStackLimitCurrent += 1;
+
+	if(gv_LibapxStackLimitCurrent >= gv_LibapxStackLimit) {
+		gv_LibapxStackLimitCurrent = 0;
+	}
+
+	
+	// DebugLog("Created Stack [ "+IntToString(output)+" ]");
+	return output;
+}
+
+void LibapxUtilsStackPush(int stack, string value) {
+	gv_LibapxStacks[stack] = LibapxStringTrim(value+" "+gv_LibapxStacks[stack]);
+}
+
+string LibapxUtilsStackPop(int stack) {
+	string output = StringWord(gv_LibapxStacks[stack], 1);
+	gv_LibapxStacks[stack] = LibapxStringTrim(StringReplaceWord(gv_LibapxStacks[stack], output, "", 1, c_stringNoCase));
+
+	return output;
+}
+
+string LibapxUtilsStackGetTop(int stack) {
+	string output = StringWord(gv_LibapxStacks[stack], 1);
+	
+	return output;
+}
+
+bool LibapxUtilsIsStackEmpty(int stack) {
+	if( LibapxStringTrim(gv_LibapxStacks[stack]) == "") {
+		return true;
+	}
+	
+	return false;
+}
+
+static string gv_ValidOperators = "* / + - ^"; 
+static string gv_ValidOperands = "0 1 2 3 4 5 6 7 8 9 ."; 
+
+string gv_LibapxValidOperatorsWithParen = gv_ValidOperators + " ( ) ";
+string gv_LibapxValidOperatorsAndOperands = gv_ValidOperators + " ( ) " + gv_ValidOperands; 
+
+
+
+static int GetPrecedence(string c) {
+	if(c == "^") {
+		return 3;
+	}
+	if(c == "/" || c == "*") {
+		return 2;
+	}
+	if(c == "+" || c == "-") {
+		return 1;
+	}
+
+	return 0;
+}
+
+static string CleanStringOfNoneOperandsAndOperators(string input) {
+	int i = 1;
+	int j = 1;
+	string current;
+	string output = "";
+
+	for (i = 1; StringSub(input, i, i) != ""; i += 1) {
+		current = StringSub(input, i, i);
+		j = 1;
+		while(StringWord(gv_LibapxValidOperatorsAndOperands, j) != "") {
+
+			if(current == StringWord(gv_LibapxValidOperatorsAndOperands, j)) {
+				output += StringWord(gv_LibapxValidOperatorsAndOperands, j);
+
+				break;
+			}
+			j += 1;
+		}
+	}
+
+	return output;
+}
+
+static bool LibapxUtilsIsOperand(string c) {
+
+	return 	LibapxIsFixed(c);
+} 
+
+static bool LibapxUtilsIsOperator(string c) {
+	int i = 1;
+	string currentOperator;
+	while(StringWord(gv_ValidOperators, i) != "") {
+		currentOperator = StringWord(gv_ValidOperators, i);
+		
+		if(currentOperator == c) {
+			return true;
+		}
+		i += 1;
+	}
+
+	return false;
+} 
+
+
+// Pop-out two values from the operand stack, let’s say it is A and B.
+// Pop-out operation from operator stack. let’s say it is ‘+’.
+// Do  A + B and push the result to the operand stack.
+static bool ProcessForLowerPrecendence(int operandStack, int operatorStack) {
+
+	string debugText = "";
+	string operator;
+	fixed left;
+	fixed right;
+	while(true) {
+		if(LibapxUtilsIsStackEmpty(operatorStack)) {
+			debugText += "OPT STACK EMPTY";
+			return false;
+		}
+
+		operator = LibapxUtilsStackPop(operatorStack);
+		if(operator == "(") {
+			debugText += "( popped operator";
+			break;
+		}
+
+		left = StringToFixed(LibapxUtilsStackPop(operandStack));
+		right = StringToFixed(LibapxUtilsStackPop(operandStack));
+		
+		if(operator == "^") {
+			LibapxUtilsStackPush(operandStack, FixedToString( Pow(right,left), gv_LibapxVariableFunctionPrecision));
+			debugText +=  "\nDo "+FixedToString(left, gv_LibapxVariableFunctionPrecision)+operator+FixedToString(right, gv_LibapxVariableFunctionPrecision);
+		}
+		if(operator == "+") {
+			LibapxUtilsStackPush(operandStack, FixedToString( left + right, gv_LibapxVariableFunctionPrecision));
+			debugText +=  "\nDo "+FixedToString(left, gv_LibapxVariableFunctionPrecision)+operator+FixedToString(right, gv_LibapxVariableFunctionPrecision);
+		}
+		if(operator == "-") {
+			LibapxUtilsStackPush(operandStack, FixedToString( right - left, gv_LibapxVariableFunctionPrecision));
+			debugText +=  "\nDo "+FixedToString(right, gv_LibapxVariableFunctionPrecision)+operator+FixedToString(left, gv_LibapxVariableFunctionPrecision);
+		}
+		if(operator == "/") {
+			if(left == 0) {
+				LibapxPrintError(EventPlayer(),"Cannont Divide by Zero");
+				left = 1;
+			}
+			LibapxUtilsStackPush(operandStack, FixedToString( right / left, gv_LibapxVariableFunctionPrecision));
+			debugText +=  "\nDo "+FixedToString(right, gv_LibapxVariableFunctionPrecision)+operator+FixedToString(left, gv_LibapxVariableFunctionPrecision);
+		}
+		if(operator == "*") {
+			LibapxUtilsStackPush(operandStack, FixedToString( left * right, gv_LibapxVariableFunctionPrecision));
+			debugText +=  "\nDo "+FixedToString(left, gv_LibapxVariableFunctionPrecision)+operator+FixedToString(right, gv_LibapxVariableFunctionPrecision);
+		}
+	}
+	// DebugLog(debugText);
+	return true;
+}
+
+string LibapxUtilsTrimExcessZeros(string input) {
+	int i;
+	string current;
+	int amountOfZerosOnEnd = 0;
+	for (i = StringLength(input); i > 0; i -= 1) {
+		current = StringSub(input, i,i);
+		if(current == "0") {
+			amountOfZerosOnEnd += 1;
+		}
+		else if(current == ".") {
+			amountOfZerosOnEnd += 1;
+			break;
+		}
+		else {
+			break;
+		}
+	}
+
+	return StringSub(input, 1, StringLength(input) - amountOfZerosOnEnd);
+}
+
+//EXAMPLE : 
+//    ${(2 * (5 *(3+6)) / 15 -2)}
+string LibapxUtilsInfixEvaluator(string s) {
+	int operandStack = LibapxUtilsCreateStack();
+	int operatorStack = LibapxUtilsCreateStack();
+	int i = 1;
+	int j = 1;
+	int step = 1;
+	string currentChar;
+	string nextChar;
+	int currentPrecedence;
+	int topPrecedence;
+	string stackDebugger = "";
+	s = "("+CleanStringOfNoneOperandsAndOperators(s)+")";
+
+
+	for (i = 1; StringSub(s, i, i) != ""; i += step) {
+		currentChar = StringSub(s, i, i);
+		//Get number, otherwise return operator
+		step = 1;
+
+		j = i + 1;
+		//If it's a number, get all operands following it until interrupted by operator
+		if(LibapxUtilsIsOperand(currentChar)) {
+			while(true) {
+				nextChar = StringSub(s, j, j);
+				if(LibapxUtilsIsOperand(nextChar)) {
+					currentChar += nextChar;
+					j += 1;
+					step += 1;
+				}
+				else {
+					break;
+				}
+			}
+		}
+
+
+		// stackDebugger += "Token("+currentChar+")";
+		if(LibapxUtilsIsOperand(currentChar)) {
+			
+			// stackDebugger += " Action(Push to Operand Stack)";
+			//If the character is an operand, push to the operand stack
+			LibapxUtilsStackPush(operandStack, currentChar);
+		}
+		else if(LibapxUtilsIsOperator(currentChar)) {
+			//If operator is empty, push to operator stack
+			if(LibapxUtilsIsStackEmpty(operatorStack)) {
+				
+				// stackDebugger += " Action(Push to Operator Stack)";
+				LibapxUtilsStackPush(operatorStack, currentChar);
+			}
+			else {
+				currentPrecedence = GetPrecedence(currentChar);
+				topPrecedence = GetPrecedence(LibapxUtilsStackGetTop(operatorStack));
+				if(currentPrecedence >= topPrecedence) {
+					
+					// stackDebugger += " Action(Push to Operator Stack)";
+					LibapxUtilsStackPush(operatorStack, currentChar);
+				}
+				else {
+					// stackDebugger += " Action(PROCESS STARTED1)\n";
+					//Do some process
+					ProcessForLowerPrecendence(operandStack, operatorStack);
+					LibapxUtilsStackPush(operatorStack, currentChar);
+				}
+			}
+
+
+		}
+		else if(currentChar == "(") {
+			LibapxUtilsStackPush(operatorStack, currentChar);
+			
+			// stackDebugger += " Action(Push to Operator Stack)";
+		}
+		else if(currentChar == ")") {
+			// stackDebugger += " Action(PROCESS STARTED2)\n";
+			//Do some process
+			if(!ProcessForLowerPrecendence(operandStack, operatorStack)) {
+				return LibapxUtilsStackPop(operandStack);
+			};
+		}
+		stackDebugger = "";
+	}
+
+
+	// LibapxUtilsStackPush(operatorStack);
+	// DebugLog("Operand Stack : [" + gv_LibapxStacks[operandStack] + "]");
+
+	return LibapxUtilsStackPop(operandStack);
+}

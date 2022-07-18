@@ -1,6 +1,6 @@
 //=========================================================
 //		Apex Roleplaying Engine
-//		Copyright (c) 2019, Apex Group
+//		Copyright (c) 2022, Apex Group
 //=========================================================
 // This software is distributed under the MIT License:
 // <http://opensource.org/licenses/MIT>
@@ -17,87 +17,87 @@
 // Key: (string) "[HANDLE]" | Value: (text) PlayerName
 // e.g. "1-S2-1-841872" : "SomeGuy"
 
-const string libapx_BANK_SECTION_BLACKLIST = "blacklist";
+const string gv_LibapxBankSectionBlacklist = "blacklist";
 
-// libapx_blacklist_add
+// LibapxBlacklistAdd
 // =================
 // handles adding a blacklisted player to player bank
 // stored value is the text of the player's name
-void libapx_blacklist_add(int player, string blacklisted_handle, text blacklisted_name) {
-	BankValueSetFromText( libapx_player[player].bank_storage, libapx_BANK_SECTION_BLACKLIST, blacklisted_handle, blacklisted_name);
-	BankSave( libapx_player[player].bank_storage );
+void LibapxBlacklistAdd(int player, string blacklistedHandle, text blacklistedName) {
+	BankValueSetFromText( gv_LibapxPlayer[player].bankStorage, gv_LibapxBankSectionBlacklist, blacklistedHandle, blacklistedName);
+	BankSave( gv_LibapxPlayer[player].bankStorage );
 }
 
-// libapx_blacklist_remove
+// LibapxBlacklistRemove
 // ==================
 // bank functions, removes a blacklisted handle
 // from the player's bank.
-void libapx_blacklist_remove(int player, string blacklisted_handle) {
-	BankKeyRemove( libapx_player[player].bank_storage, libapx_BANK_SECTION_BLACKLIST, blacklisted_handle );
-	BankSave( libapx_player[player].bank_storage );
+void LibapxBlacklistRemove(int player, string blacklistedHandle) {
+	BankKeyRemove( gv_LibapxPlayer[player].bankStorage, gv_LibapxBankSectionBlacklist, blacklistedHandle );
+	BankSave( gv_LibapxPlayer[player].bankStorage );
 }
 
-// libapx_blacklist_list
+// LibapxBlacklistList
 // ===============
 // displays list of a player's blacklist in format
 // [ID] [handle] [player-name (text)]
 // where the ID is simply the bank section index of the entry
-void libapx_blacklist_list (int player) {
+void LibapxBlacklistList (int player) {
 	int index = 0;
-	string blist_handle;
+	string blistHandle;
 	text list = StringToText("Blacklisted Players:");
 
-	while( index < BankKeyCount(libapx_player[player].bank_storage, libapx_BANK_SECTION_BLACKLIST) ) {
-		blist_handle = BankKeyName(libapx_player[player].bank_storage, libapx_BANK_SECTION_BLACKLIST, index);
-		list = list + StringToText( "\n[ID: " + IntToString(index + 1) + "] " + blist_handle + " : " )
-					+ BankValueGetAsText(libapx_player[player].bank_storage, libapx_BANK_SECTION_BLACKLIST, blist_handle);
+	while( index < BankKeyCount(gv_LibapxPlayer[player].bankStorage, gv_LibapxBankSectionBlacklist) ) {
+		blistHandle = BankKeyName(gv_LibapxPlayer[player].bankStorage, gv_LibapxBankSectionBlacklist, index);
+		list = list + StringToText( "\n[ID: " + IntToString(index + 1) + "] " + blistHandle + " : " )
+					+ BankValueGetAsText(gv_LibapxPlayer[player].bankStorage, gv_LibapxBankSectionBlacklist, blistHandle);
 
 		index += 1;
 	}
 
-	libapx_print_text(PlayerGroupSingle(player), list);
+	LibapxPrintText(PlayerGroupSingle(player), list);
 }
 
-// libapx_blacklist_update
+// LibapxBlacklistUpdate
 // ==================
 // updates the blacklist of a specific player by checking a lobby
 // for players with matching handles. if a handle in the lobby
 // is on the player's blacklist, re-adds this handle with the
 // name of the handle's player (to deal with possible player name changes)
-void libapx_blacklist_update(int player) {
+void LibapxBlacklistUpdate(int player) {
 	int p; 	// other players ingame
 	int count;
 	int updates = 0;
 
-	while( p < libapx_MAX_PLAYERS ) {
-		if( PlayerStatus(p) == c_playerStatusActive && BankKeyExists(libapx_player[player].bank_storage, libapx_BANK_SECTION_BLACKLIST, PlayerHandle(p)) ) {
-			libapx_blacklist_remove(player, PlayerHandle(p));
-			libapx_blacklist_add(player, PlayerHandle(p), StringToText("<d Player=\"" + IntToString(player) + "\" GameValue=\"PlayerClanTag\"/> ") + PlayerName(p));
+	while( p < gv_LibapxMaxPlayers ) {
+		if( PlayerStatus(p) == c_playerStatusActive && BankKeyExists(gv_LibapxPlayer[player].bankStorage, gv_LibapxBankSectionBlacklist, PlayerHandle(p)) ) {
+			LibapxBlacklistRemove(player, PlayerHandle(p));
+			LibapxBlacklistAdd(player, PlayerHandle(p), StringToText("<d Player=\"" + IntToString(player) + "\" GameValue=\"PlayerClanTag\"/> ") + PlayerName(p));
 			updates += 1;
 		}
 		p += 1;
 	}
 
 	if (updates != 0) {
-		libapx_print_output(player, "Updated " + IntToString(updates) + " blacklist entries");
+		LibapxPrintOutput(player, "Updated " + IntToString(updates) + " blacklist entries");
 	}
 }
 
-// libapx_blacklist_run
+// LibapxBlacklistRun
 // =================
 // runs the admin's blacklist (assumed running at initialization)
 // -> any players in game with handles on admins blacklist are disabled
-void libapx_blacklist_run(int admin) {
+void LibapxBlacklistRun(int admin) {
 	int player = 1;
 
-	if( BankKeyCount(libapx_player[admin].bank_storage, libapx_BANK_SECTION_BLACKLIST) == 0 ) {
+	if( BankKeyCount(gv_LibapxPlayer[admin].bankStorage, gv_LibapxBankSectionBlacklist) == 0 ) {
 		return;
 	}
 
-	while( player < libapx_MAX_PLAYERS ) {
-		if( PlayerStatus(player) == c_playerStatusActive && BankKeyExists(libapx_player[admin].bank_storage, libapx_BANK_SECTION_BLACKLIST, PlayerHandle(player)) ) {
-			libapx_player[player].disabled = true;
-			libapx_print_text(PlayerGroupAll(), libapx_player_name_colored(player) + StringToText(" has been blacklisted and disabled by host ") + libapx_player_name_colored(admin));
+	while( player < gv_LibapxMaxPlayers ) {
+		if( PlayerStatus(player) == c_playerStatusActive && BankKeyExists(gv_LibapxPlayer[admin].bankStorage, gv_LibapxBankSectionBlacklist, PlayerHandle(player)) ) {
+			gv_LibapxPlayer[player].disabled = true;
+			LibapxPrintText(PlayerGroupAll(), gv_LibapxPlayerNameColored(player) + StringToText(" has been blacklisted and disabled by host ") + gv_LibapxPlayerNameColored(admin));
 		}
 		player += 1;
 	}

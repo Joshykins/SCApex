@@ -1,50 +1,50 @@
 //=========================================================
 //		Apex Roleplaying Engine
-//		Copyright (c) 2019, Apex Group
+//		Copyright (c) 2022, Apex Group
 //=========================================================
 // This software is distributed under the MIT License:
 // <http://opensource.org/licenses/MIT>
 //=========================================================
 
 
-// libapx_settings_definition
+// gv_LibapxSettingsDefinition
 // ============================
 // contains a games parameters
-struct libapx_settings_definition {
+struct gv_LibapxSettingsDefinition {
 	int flags;
 
-	// map_revealed
+	// mapRevealed
 	// ========
 	// flag for whether the map is revealed
-	bool map_revealed;
+	bool mapRevealed;
 
 	// commands
 	// ========
 	// string containing all of the game's commands, separated by commas ", "
 	string commands;
 
-	// min_scale / max_scale
+	// minScale / maxScale
 	// ===============
 	// minimum and max scale of a unit that player can use from @scale
 	// (not actually that useful because @actrmsg will allow arbitrary scale)
-	fixed min_scale;
-	fixed max_scale;
+	fixed minScale;
+	fixed maxScale;
 
-	// max_spawn_count
+	// maxSpawnCount
 	// =============
 	// max units a player can spawn in one instance
-	int max_spawn_count;
+	int maxSpawnCount;
 };
 
 // create instance of settings:
-libapx_settings_definition libapx_settings;
+gv_LibapxSettingsDefinition gv_LibapxSettings;
 
 // initializes default settings
-void libapx_settings_initialize() {
-	libapx_settings.map_revealed = true;
-	libapx_settings.commands = "alias, macro, var";
-	libapx_settings.min_scale = 0.001;
-	libapx_settings.max_scale = 20.0;
+void gv_LibapxSettingsInitialize() {
+	gv_LibapxSettings.mapRevealed = true;
+	gv_LibapxSettings.commands = "alias, macro, var";
+	gv_LibapxSettings.minScale = 0.001;
+	gv_LibapxSettings.maxScale = 20.0;
 
-	libapx_settings.max_spawn_count = 20;
+	gv_LibapxSettings.maxSpawnCount = 20;
 }

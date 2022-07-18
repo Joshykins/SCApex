@@ -1,6 +1,6 @@
 //=========================================================
 //		Apex Roleplaying Engine
-//		Copyright (c) 2019, Apex Group
+//		Copyright (c) 2022, Apex Group
 //=========================================================
 // This software is distributed under the MIT License:
 // <http://opensource.org/licenses/MIT>
@@ -8,58 +8,58 @@
 
 // special data entries used for certain commands
 // (TODO: replace with custom abilities in a mod file)
-const string libapx_BEHAVIOR_SUPPRESS_COLLISION = "SuppressCollision";
+const string LibapxBehaviorSUPPRESSCOLLISION = "SuppressCollision";
 
 // Veterancy behavior (levels)
-const string libapx_BEHAVIOR_LEVELS = "ApexLevels";
+const string LibapxBehaviorLEVELS = "ApexLevels";
 
 // Behaviors to add/subtract damage
-const string libapx_BEHAVIOR_ADD_DAMAGE_1 = "ApexDamageAdd1";
-const string libapx_BEHAVIOR_ADD_DAMAGE_10 = "ApexDamageAdd10";
-const string libapx_BEHAVIOR_ADD_DAMAGE_100 = "ApexDamageAdd100";
-const string libapx_BEHAVIOR_ADD_DAMAGE_1000 = "ApexDamageAdd1000";
-const string libapx_BEHAVIOR_SUBTRACT_DAMAGE_1 = "ApexDamageSubtract1";
-const string libapx_BEHAVIOR_SUBTRACT_DAMAGE_10 = "ApexDamageSubtract10";
-const string libapx_BEHAVIOR_SUBTRACT_DAMAGE_100 = "ApexDamageSubtract100";
-const string libapx_BEHAVIOR_SUBTRACT_DAMAGE_1000 = "ApexDamageSubtract1000";
+const string LibapxBehaviorAddDamage_1 = "ApexDamageAdd1";
+const string LibapxBehaviorAddDamage_10 = "ApexDamageAdd10";
+const string LibapxBehaviorAddDamage_100 = "ApexDamageAdd100";
+const string LibapxBehaviorAddDamage_1000 = "ApexDamageAdd1000";
+const string LibapxBehaviorSubtractDamage_1 = "ApexDamageSubtract1";
+const string LibapxBehaviorSubtractDamage_10 = "ApexDamageSubtract10";
+const string LibapxBehaviorSubtractDamage_100 = "ApexDamageSubtract100";
+const string LibapxBehaviorSubtractDamage_1000 = "ApexDamageSubtract1000";
 
 // Behavior to add/subtract armor (life and shields separate)
-const string libapx_BEHAVIOR_ADD_LIFEARMOR_P1 = "ApexLifeArmorAddP1";
-const string libapx_BEHAVIOR_ADD_LIFEARMOR_1 = "ApexLifeArmorAdd1";
-const string libapx_BEHAVIOR_ADD_LIFEARMOR_10 = "ApexLifeArmorAdd10";
-const string libapx_BEHAVIOR_SUBTRACT_LIFEARMOR_P1 = "ApexLifeArmorSubtractP1";
-const string libapx_BEHAVIOR_SUBTRACT_LIFEARMOR_1 = "ApexLifeArmorSubtract1";
-const string libapx_BEHAVIOR_SUBTRACT_LIFEARMOR_10 = "ApexLifeArmorSubtract10";
-const string libapx_BEHAVIOR_ADD_SHIELDSARMOR_P1 = "ApexShieldsArmorAddP1";
-const string libapx_BEHAVIOR_ADD_SHIELDSARMOR_1 = "ApexShieldsArmorAdd1";
-const string libapx_BEHAVIOR_ADD_SHIELDSARMOR_10 = "ApexShieldsArmorAdd10";
-const string libapx_BEHAVIOR_SUBTRACT_SHIELDSARMOR_P1 = "ApexShieldsArmorSubtractP1";
-const string libapx_BEHAVIOR_SUBTRACT_SHIELDSARMOR_1 = "ApexShieldsArmorSubtract1";
-const string libapx_BEHAVIOR_SUBTRACT_SHIELDSARMOR_10 = "ApexShieldsArmorSubtract10";
+const string LibapxBehaviorAddLifeArmorP1 = "ApexLifeArmorAddP1";
+const string LibapxBehaviorAddLifeArmor_1 = "ApexLifeArmorAdd1";
+const string LibapxBehaviorAddLifeArmor_10 = "ApexLifeArmorAdd10";
+const string LibapxBehaviorSubtractLifeArmorP1 = "ApexLifeArmorSubtractP1";
+const string LibapxBehaviorSubtractLifeArmor_1 = "ApexLifeArmorSubtract1";
+const string LibapxBehaviorSubtractLifeArmor_10 = "ApexLifeArmorSubtract10";
+const string LibapxBehaviorAddShieldsArmorP1 = "ApexShieldsArmorAddP1";
+const string LibapxBehaviorAddShieldsArmor_1 = "ApexShieldsArmorAdd1";
+const string LibapxBehaviorAddShieldsArmor_10 = "ApexShieldsArmorAdd10";
+const string LibapxBehaviorSubtractShieldsArmorP1 = "ApexShieldsArmorSubtractP1";
+const string LibapxBehaviorSubtractShieldsArmor_1 = "ApexShieldsArmorSubtract1";
+const string LibapxBehaviorSubtractShieldsArmor_10 = "ApexShieldsArmorSubtract10";
 
 // Behaviors to add/subtract weapon range
-const string libapx_BEHAVIOR_ADD_RANGE_1 = "ApexRangeAdd1";
-const string libapx_BEHAVIOR_ADD_RANGE_10 = "ApexRangeAdd10";
-const string libapx_BEHAVIOR_SUBTRACT_RANGE_1 = "ApexRangeSubtract1";
-const string libapx_BEHAVIOR_SUBTRACT_RANGE_10 = "ApexRangeSubtract10";
+const string LibapxBehaviorAddRange_1 = "ApexRangeAdd1";
+const string LibapxBehaviorAddRange_10 = "ApexRangeAdd10";
+const string LibapxBehaviorSubtractRange_1 = "ApexRangeSubtract1";
+const string LibapxBehaviorSubtractRange_10 = "ApexRangeSubtract10";
 
 // Behaviors to increase/decrease weapon speed
-const string libapx_BEHAVIOR_WEAPONSPEED_MULT_1P1 = "ApexWeaponSpeedMultiplier1P1";
-const string libapx_BEHAVIOR_WEAPONSPEED_MULT_P9 = "ApexWeaponSpeedMultiplierP9";
+const string LibapxBehaviorWeaponsSpeedMult_1P1 = "ApexWeaponSpeedMultiplier1P1";
+const string LibapxBehaviorWeaponsSpeedMultP9 = "ApexWeaponSpeedMultiplierP9";
 
 // used for unit chat related commands
-const string libapx_TALK_ICON_ACTOR = "TalkIconBubble";
-const string libapx_TALK_SOUND = "";
+const string LibapxTalkIconActor = "TalkIconBubble";
+const string LibapxTalkSound = "";
 
 // unit used as the default region waygate dialog anchor
 // (see regions.galaxy)
-const string libapx_WAYGATE_DIALOG_ANCHOR_UNIT = "Beacon_Zerg";
+const string LibapxWaygateDialogAnchorUnit = "BeaconZerg";
 
-// librtpr_catalog_get
+// librtprCatalogGet
 // ====================
 // takes the given word and finds it in the catalog.
 // if it is not in the catalog, returns null.
-string libapx_catalog_get(int catalog, string word) {
+string LibapxCatalogGet(int catalog, string word) {
 	int i;
 	string test;
 
