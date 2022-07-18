@@ -132,7 +132,12 @@ string LibapxAliasSub(string msg, int player, int recursionDepth) {
 	}
 
 	while( alias != "" ) {
-		if( BankKeyExists( gv_LibapxPlayer[player].bankStorage, gv_LibapxBankSectionAlias, alias ) ) {
+		if( 
+			!LibapxVariableWithinBraceCheck(msg, StringFind(msg, alias, c_stringNoCase))
+			&& 
+			BankKeyExists( gv_LibapxPlayer[player].bankStorage, gv_LibapxBankSectionAlias, alias ) 
+		
+		) {
 			subbed = subbed + " " + LibapxAliasSub(BankValueGetAsString(gv_LibapxPlayer[player].bankStorage, gv_LibapxBankSectionAlias, alias), player, recursionDepth + 1);
 		}
 		else {

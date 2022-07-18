@@ -36,7 +36,7 @@ void LibapxCommandSpawn(int user, unitgroup u, string argv, int spawningCount, s
 				spawnPoint = RegionGetCenter( gv_LibapxPlayer[user].spawnInstanceLocation );
 			}
 
-			gv_gv_LibapxPlayerParser[user][spawningCount].context = UnitGroupEmpty();
+			gv_LibapxPlayerParser[user][spawningCount].context = UnitGroupEmpty();
 			while (count > 0) {
 				LibapxUnitCreate(type, player, spawnPoint, 270.0, spawningCount);
 				count -= 1;
@@ -138,9 +138,9 @@ void LibapxCommandSpawn(int user, unitgroup u, string argv, int spawningCount, s
 	gv_LibapxPlayer[user].spawnInstanceLocation = location;
 
 	// make spawned units
-	gv_gv_LibapxPlayerParser[user][spawningCount].context = UnitGroupEmpty();
+	gv_LibapxPlayerParser[user][spawningCount].context = UnitGroupEmpty();
 	while (count > 0) {
-		UnitGroupAddUnitGroup(gv_gv_LibapxPlayerParser[user][spawningCount].context, LibapxUnitCreate(type, player, spawnPoint, 270.0, spawningCount));
+		UnitGroupAddUnitGroup(gv_LibapxPlayerParser[user][spawningCount].context, LibapxUnitCreate(type, player, spawnPoint, 270.0, spawningCount));
 		count -= 1;
 	}
 
@@ -176,7 +176,7 @@ void LibapxCommandSpawnPlus(int user, unitgroup u, string argv, int spawningCoun
 				spawnPoint = RegionGetCenter( gv_LibapxPlayer[user].spawnInstanceLocation );
 			}
 
-			gv_gv_LibapxPlayerParser[user][spawningCount].context = UnitGroupEmpty();
+			gv_LibapxPlayerParser[user][spawningCount].context = UnitGroupEmpty();
 			while (count > 0) {
 				LibapxUnitCreate(type, player, spawnPoint, 270.0, spawningCount);
 				count -= 1;
@@ -291,9 +291,9 @@ void LibapxCommandSpawnPlus(int user, unitgroup u, string argv, int spawningCoun
 	gv_LibapxPlayer[user].spawnInstanceLocation = location;
 
 	// make spawned units
-	gv_gv_LibapxPlayerParser[user][spawningCount].context = UnitGroupEmpty();
+	gv_LibapxPlayerParser[user][spawningCount].context = UnitGroupEmpty();
 	while (count > 0) {
-		UnitGroupAddUnitGroup(gv_gv_LibapxPlayerParser[user][spawningCount].context, LibapxUnitCreate(type, player, spawnPoint, 270.0, spawningCount));
+		UnitGroupAddUnitGroup(gv_LibapxPlayerParser[user][spawningCount].context, LibapxUnitCreate(type, player, spawnPoint, 270.0, spawningCount));
 		count -= 1;
 	}
 

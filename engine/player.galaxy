@@ -321,7 +321,7 @@ gv_LibapxPlayerProperties[gv_LibapxMaxPlayers] gv_LibapxPlayer;
 // ====================================
 // global array for parser with index corresponding to player index and parsing count
 //10 theoretical threads able to run in sequence, I'm going to be a super indian.
-gv_LibapxPlayerParserProperties[gv_LibapxMaxPlayers][ParserThreadCount] gv_gv_LibapxPlayerParser;
+gv_LibapxPlayerParserProperties[gv_LibapxMaxPlayers][ParserThreadCount] gv_LibapxPlayerParser;
 
 
 // LibapxSortAliases (prototype)
@@ -528,7 +528,7 @@ void LibapxChatParseIncrement(int p) {
 }
 
 void LibapxSetTarget(int player, unitgroup target, int spawningCount) {
-	gv_gv_LibapxPlayerParser[player][spawningCount].context = target;
+	gv_LibapxPlayerParser[player][spawningCount].context = target;
 }
 
 void LibapxWaitDelay(int player) {

@@ -22,6 +22,7 @@ int gv_CommandsGuideEntryUnit = 2; //@spawn
 int gv_CommandsGuideEntryActor = 3; //@attach
 int gv_CommandsGuideEntryRegion = 4; //#create
 int gv_CommandsGuideEntryStats = 5; //@maxlife
+int gv_CommandsGuideEntryVariableFunctions = 6; //$RandInt
 
 //Wireframe
 //Definition of each layer
@@ -132,6 +133,9 @@ string LibapxCommandsGuideGetEntryType(int entryType) {
     if(entryType == gv_CommandsGuideEntryStats) {
         return "Stats";
     } 
+    if(entryType == gv_CommandsGuideEntryVariableFunctions) {
+        return "Variable Functions";
+    } 
     return "";
 }
 
@@ -148,6 +152,7 @@ struct commandGuideTypeCount {
     int Actor;
     int Region;
     int Stats;
+    int VarFuncs;
 };
 
 void commandGuideFormatDescription(int dialog, playergroup pg, string description) {
@@ -217,6 +222,9 @@ void LibapxCommandsGuideEntrySet(int type, string name, string description) {
     if (type == gv_CommandsGuideEntryStats) {
         gCommandGuideTypeCount.Stats += 1;
     }
+    if (type == gv_CommandsGuideEntryVariableFunctions) {
+        gCommandGuideTypeCount.VarFuncs += 1;
+    }
     gv_CommandsGuideEntries[gv_CommandsGuideEntryCount].type = type;
     gv_CommandsGuideEntries[gv_CommandsGuideEntryCount].name = name;
     gv_CommandsGuideEntries[gv_CommandsGuideEntryCount].description = description;
@@ -249,5 +257,18 @@ void LibapxGuidePresetDescriptions() {
 		";", 
         " Semicolens break apart statements and commands. It's is vital to entering more than one command at a time or creating complicated aliases.  "
     );
-
 }
+
+//Variable Functions
+//-----------------------------
+const int gv_LibapxVariableFunctionPrecision = 4;
+const string gv_LibapxVariableFunctionPrefix = "$";
+
+void LibapxCommandsGuideSetVariableFunctionEntry(string title, string body) {
+    LibapxCommandsGuideEntrySet(
+        gv_CommandsGuideEntryVariableFunctions, 
+        title, 
+        body
+    );
+}
+

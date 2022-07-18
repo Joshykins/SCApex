@@ -6,12 +6,13 @@
 // <http://opensource.org/licenses/MIT>
 //=========================================================
 
+include "apex/engine/chat/brackets.galaxy"
+include "apex/engine/chat/parser.variables.galaxy"
 include "apex/engine/chat/alias.galaxy"
 include "apex/engine/chat/macro.galaxy"
-include "apex/engine/chat/variables.galaxy"
 
 const string gv_LibapxChatcommandPrefix = "LibapxCommand_";
-static const string BracketCommands = "@cache Delay Api >repeat >chance >random >keypress >moveto";
+static const string BracketCommands = "@cache Delay Api >condition >repeat >chance >random >keypress >moveto";
 
 
 // LibapxArg
@@ -22,130 +23,6 @@ string LibapxArg(string argv, int index) {
 	return StringWord(argv, index);
 }
 
-
-
-// Bracketing
-// ================
-// Returns the indexes
-static int LibapxBracketGetStartPair(string stringToCrawl, int startpoint){
-    return StringFind(stringToCrawl, "[", c_stringNoCase);
-	}
-
-static int LibapxBracketGetEndPair(string stringToCrawl, int startpoint){
-    int i = 0;
-		int elevation = 0;
-		bool elevationToggled = false;
-		string comparison;
-
-    while(true) {
-			comparison = StringSub( stringToCrawl, i + 1, i + 1 );
-
-			if(comparison == "[") {
-				elevation +=1;
-				elevationToggled = true;
-			}
-			if (comparison == "]") {
-				elevation -=1;
-			}
-			if (elevation == 0 && elevationToggled == true) {
-				break;
-			}
-
-			i += 1;
-    }
-    return i + 1;
-}
-
-
-
-//LibapxBracketWithinBracketCheck( msg, player, semicolenIndex)
-static bool LibapxBracketWithinBracketCheck(string stringToCheck, int player, int semicolonIndex) {
-	string stringBefore = StringSub(stringToCheck, 1, semicolonIndex - 1);
-	string stringAfter = StringSub(stringToCheck,  semicolonIndex + 1, StringLength(stringToCheck));
-	int i = 1;
-	string temp;
-	int openI = 0;
-	int closeI = 0;
-	bool opened = false;
-	bool closed = false;
-	if ((StringFind(stringBefore, "[", c_stringNoCase)  != -1) && (StringFind(stringAfter, "]", c_stringNoCase)  != -1)) {
-		//Checks if there even is a [  and ] before and after it.
-		//Rolls through before text and sees if there is unmatched bracket.
-		while(StringSub(stringBefore, i, i) != "") {
-			temp = StringSub(stringBefore, i, i);
-			if( temp == "[") {
-				openI += 1;
-			}
-			if( temp == "]") {
-				closeI += 1;
-			}
-			i += 1;
-		}
-		if (openI > closeI) {
-			opened = true;
-		}
-
-		i = 1;
-		openI = 0;
-		closeI = 0;
-
-		while(StringSub(stringAfter, i, i) != "") {
-			temp = StringSub(stringAfter, i, i);
-			if( temp == "[") {
-				openI += 1;
-			}
-			if( temp == "]") {
-				closeI += 1;
-			}
-			i += 1;
-		}
-
-		if (closeI > openI) {
-			closed = true;
-		}
-		
-		if(closed && opened) {
-			return true;
-		}
-		else {
-			return false;
-		}
-	}
-	return false;
-}
-
-
-static string BracketSeperater = " --||&&||-- "; //Spaces around it are critical
-
-//Grabs bracket text from specialized format
-string LibapxBracketTextGrab(string bracketText, int arg) {
-	int seperaterPosition;
-	string outputText;
-	int i  = 1;
-	int player = 1;
-	while( i <= arg) {
-		if  (StringFind(bracketText, BracketSeperater, c_stringCase) == -1) {
-			//No other arguement given
-			return "";
-		}
-		seperaterPosition = StringFind(bracketText, BracketSeperater, c_stringCase);
-		bracketText = StringReplace(bracketText, "", 1, seperaterPosition + StringLength(BracketSeperater) - 1);
-		seperaterPosition = StringFind(bracketText, BracketSeperater, c_stringCase);
-
-		if (seperaterPosition != -1) {
-			outputText = StringReplace(bracketText, "", seperaterPosition, StringLength(bracketText));
-		}
-		else {
-			outputText = bracketText;
-		}
-
-
-
-		i += 1;
-	}
-
-	return outputText;
-}
 
 // function signature for Apex chat commands
 void LibapxCommandSignature(int user, unitgroup u, string argv, int spawningCount, string bracketText);
@@ -226,7 +103,7 @@ void LibapxChatParse(string msg, int player, unitgroup target, int spawningCount
 	
 	LibapxCommandType func; // command ref test
 	LibapxChatParseIncrement(player);
-	gv_gv_LibapxPlayerParser[player][spawningCount].context = target; //Sets Target of cmd
+	gv_LibapxPlayerParser[player][spawningCount].context = target; //Sets Target of cmd
 
 
 
@@ -250,7 +127,22 @@ void LibapxChatParse(string msg, int player, unitgroup target, int spawningCount
 
 			if( semicolonIndex ) {
 				//If semicolon is within brackets, skip to next
-				if( LibapxBracketWithinBracketCheck( msg, player, semicolonIndex) ) {
+				if( LibapxBracketWithinBracketCheck( msg, semicolonIndex) ) {
+					nextSemicolonIndex = StringFind( StringSub( msg, semicolonIndex + 1, StringLength(msg) ), ";", c_stringNoCase );
+					if( nextSemicolonIndex > 0 ) {
+						// must add because nextSemicolonIndex is relative to a substring
+						semicolonIndex = semicolonIndex + nextSemicolonIndex;
+						continue;
+					}
+
+					else { // at end of msg
+						current = msg;
+						msg = "";
+						break;
+					}
+				}
+				//If semicolon is within brackets, skip to next
+				if( LibapxVariableWithinBraceCheck( msg, semicolonIndex) ) {
 					nextSemicolonIndex = StringFind( StringSub( msg, semicolonIndex + 1, StringLength(msg) ), ";", c_stringNoCase );
 					if( nextSemicolonIndex > 0 ) {
 						// must add because nextSemicolonIndex is relative to a substring
@@ -296,10 +188,7 @@ void LibapxChatParse(string msg, int player, unitgroup target, int spawningCount
 
 		}
 
-		//Logic for breaking down Brackets
-		//If > is the first, meaning it's a command that needs brackets, then grab them, otherwize resume parsing.
-		//while there is another open bracket remianing, if so
-		//pull pairs and remove
+		//pull bracket pairs and remove
 		i = 1;
 		bracketText = "";
 		currentTemp = current;
@@ -318,9 +207,9 @@ void LibapxChatParse(string msg, int player, unitgroup target, int spawningCount
 				pairStart = LibapxBracketGetStartPair(currentTemp, 0);
 
 
-				if(LibapxBracketWithinBracketCheck( currentTemp, player, pairStart+1)) {
+				if(LibapxBracketWithinBracketCheck( currentTemp, pairStart+1)) {
 					pairEnd = LibapxBracketGetEndPair(currentTemp, 0);
-					bracketText += BracketSeperater + StringSub(currentTemp, pairStart + 1, pairEnd - 1);
+					bracketText += gv_BracketSeperator + StringSub(currentTemp, pairStart + 1, pairEnd - 1);
 					currentTemp = StringReplace(currentTemp, "", pairStart, pairEnd);
 				}
 				else {
@@ -337,6 +226,8 @@ void LibapxChatParse(string msg, int player, unitgroup target, int spawningCount
 
 
 
+		//Logic for breaking down variables
+		current = LibapxVariableParse(current, gv_LibapxPlayerParser[player][spawningCount].context, player);
 
 
 
@@ -349,7 +240,7 @@ void LibapxChatParse(string msg, int player, unitgroup target, int spawningCount
 		}
 
 		// check if performing reserved keyword commands (alias, macro, var)
-		if ( StringEqual( StringWord(current, 1), "Alias", c_stringNoCase) || StringEqual( StringWord(current, 1), "alias", c_stringNoCase) ) {
+		if ( StringEqual( StringWord(current, 1), "alias", c_stringNoCase) || StringEqual( StringWord(current, 1), "alias", c_stringNoCase) ) {
 			//Bank validation
 			if(!gv_LibapxPlayerbankHasloaded(player)) {
 				break;
@@ -417,7 +308,7 @@ void LibapxChatParse(string msg, int player, unitgroup target, int spawningCount
 				i+=1;
 			}
 
-			target = gv_gv_LibapxPlayerParser[player][spawningCount].context;
+			target = gv_LibapxPlayerParser[player][spawningCount].context;
 			func( player, target, current, spawningCount, bracketText);
 		}
 		else if ( !gv_LibapxPlayer[player].muted ) {

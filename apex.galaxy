@@ -8,6 +8,7 @@
 include "apex/engine/globals.galaxy"
 include "apex/engine/engine.galaxy"
 include "apex/commands/commands.galaxy"
+include "apex/variables/variables.galaxy"
 include "apex/ui/ui.galaxy"
 // include "apex/uiLib/uiLibrary.galaxy"
 include "apex/toolkit/toolkit.galaxy"
@@ -15,6 +16,8 @@ include "apex/toolkit/toolkit.galaxy"
 // welcome message
 static string[7] InspirationalQuotes;
 
+//TODO: Add a function to make units not save with gamesetup
+//TODO: 3
 
 //THIS HAS TO BE SNAKE, TRIGGER TIES INTO THIS
 //DO NOT CHANGE, EVER
@@ -23,6 +26,7 @@ void libapx_initialize() {
 	LibapxToolkitInitialize();
 	LibapxEngineInitialize();
 	LibapxCommandsInitialize();
+	LibapxVariableFunctionInitialize();
 	LibapxUiInitialize();
 	LibapxGlobalsInit();
 	LibapxStatbarsInit();

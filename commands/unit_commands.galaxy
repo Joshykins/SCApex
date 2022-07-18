@@ -162,7 +162,7 @@ void LibapxCommandUnitswap(int user, unitgroup u, string argv, int spawningCount
 	else {
 		targetUnit = "BeaconNova";
 	}
-	gv_gv_LibapxPlayerParser[user][spawningCount].context = UnitGroupEmpty();
+	gv_LibapxPlayerParser[user][spawningCount].context = UnitGroupEmpty();
 	//Loops through unitgroup,
 	UnitGroupLoopBegin(u);
 	while(!UnitGroupLoopDone()) {
@@ -172,7 +172,7 @@ void LibapxCommandUnitswap(int user, unitgroup u, string argv, int spawningCount
 		height = UnitGetHeight(UnitGroupLoopCurrent());
 		pos = Point(x,y);
 		UnitRemove(UnitGroupLoopCurrent());
-		UnitGroupAddUnitGroup(gv_gv_LibapxPlayerParser[user][spawningCount].context, LibapxUnitCreate(targetUnit, user, pos , face, spawningCount));
+		UnitGroupAddUnitGroup(gv_LibapxPlayerParser[user][spawningCount].context, LibapxUnitCreate(targetUnit, user, pos , face, spawningCount));
 		g = UnitLastCreated(); // store the unit, since spawned is a unit group
 		UnitSetHeight(g, height, 0);
 		UnitGroupAdd(NewUnitG, g);
@@ -230,7 +230,7 @@ void LibapxCommandUnitmimic (int user, unitgroup u, string argv, int spawningCou
 	else {
 		targetUnit = "BeaconNova";
 	}
-	gv_gv_LibapxPlayerParser[user][spawningCount].context = UnitGroupEmpty();
+	gv_LibapxPlayerParser[user][spawningCount].context = UnitGroupEmpty();
 	//Loops through unitgroup,
 	UnitGroupLoopBegin(u);
 	while(!UnitGroupLoopDone()) {
@@ -239,7 +239,7 @@ void LibapxCommandUnitmimic (int user, unitgroup u, string argv, int spawningCou
 		face = UnitGetFacing(UnitGroupLoopCurrent());
 		height = UnitGetHeight(UnitGroupLoopCurrent());
 		pos = Point(x,y);
-		UnitGroupAddUnitGroup(gv_gv_LibapxPlayerParser[user][spawningCount].context, LibapxUnitCreate(targetUnit, user, pos , face, spawningCount));
+		UnitGroupAddUnitGroup(gv_LibapxPlayerParser[user][spawningCount].context, LibapxUnitCreate(targetUnit, user, pos , face, spawningCount));
 		g = UnitLastCreated(); // store the unit, since spawned is a unit group
 		UnitSetHeight(g, height, 0);
 		UnitGroupAdd(NewUnitG, g);
@@ -552,7 +552,7 @@ void LibapxCommandSelectarea(int user, unitgroup u, string argv, int spawningCou
 	g = LibapxEnforceUnitPermissions(g, user);
 
 
-	gv_gv_LibapxPlayerParser[user][spawningCount].context = g;
+	gv_LibapxPlayerParser[user][spawningCount].context = g;
 	UnitGroupSelect(g, user, true);
 }
 void LibapxDefineSelectarea(string commandName) {
@@ -583,7 +583,7 @@ void LibapxCommandCache(int user, unitgroup u, string argv, int spawningCount, s
 		bracketCache = LibapxBracketTextGrab(bracketText, 1);
 		for (i = 1; i <= UnitGroupCount(u, c_unitCountAll); i += 1) {
 			tmpUnit = UnitGroupUnit(u, i);
-			LibapxUnitCacheSet(tmpUnit, bracketCache);
+			LibapxUnitCacheSet(tmpUnit, bracketCache + ";" + argv + " [" +bracketCache+ "]");
 		}
 		return;
 	}

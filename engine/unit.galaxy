@@ -231,7 +231,7 @@ void LibapxSpawnCreateSplat(string type, int player, int spawningCount) {
 
 	// set context to spawn splat, so commands applied to it
 	UnitGroupAdd(splat, gv_LibapxPlayer[player].spawnSplat);
-	gv_gv_LibapxPlayerParser[player][spawningCount].context = splat;
+	gv_LibapxPlayerParser[player][spawningCount].context = splat;
 }
 
 // LibapxSpawnSplatUpdatePos

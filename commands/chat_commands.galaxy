@@ -156,6 +156,7 @@ void LibapxDefineRepeat(string commandName) {
 		" This command repeats a given set of commands a given amount of times. <br> >repeat [amountOfTimesToRepeat] [[commands]] <br> Examples: <br> >repeat 5 [Hi how are you!;I repeated this a lot!] "
 	);
 }
+
 // LibapxCommandKeypres
 // =======================
 // Assigns a string to a certain key for the selected unit
@@ -574,4 +575,100 @@ void LibapxDefineMoveto(string commandName) {
         commandName, 
         " This command moves a unit to your mousepoint and runs the input you give it when it arrives at it's destination. The unit can travel in a parabolic way by using -arc, or it can it move to a desired height with -height. Can instead patrol with -patrol. Using relative offset instead of mouse, use -rel but for fixed offset instead use -offset. <br> >moveto [modifier] [heightofparabola] [[commands;whateverelse]] <br> Examples: <br> >moveto -height 5 [Landed!] <br> >moveto -arc 12 [wee!] <br> >moveto -rel +5 +5 [Diagonal movement is cool] <br> >moveto -offset 0 -5 [Going down!] <br> >moveto -patrol +2 +5 [It's a nice day to go out on patrol]"
     );
+}
+
+
+
+// LibapxCommandCondition
+// =======================
+// Runs based on if the condition is true or not
+void LibapxCommandCondition(int user, unitgroup u, string argv, int spawningCount, string bracketText) {
+    string input1 = StringWord(argv, 2); 
+    string condition = StringWord(argv, 3);
+    string input2 = StringWord(argv, 4);
+
+	if(input1 == "") {
+		LibapxPrintError(user, "Must have first input");
+        return;
+    }
+
+	if(condition == "") {
+		LibapxPrintError(user, "Must have condition input");
+        return;
+    }
+
+	if(input2 == "") {
+		LibapxPrintError(user, "Must have second input");
+        return;
+    }
+
+    if(!LibapxIsFixed(input1)) {
+		LibapxPrintError(user, "Inputs must be numeric");
+        return;
+    }
+    
+    if(!LibapxIsFixed(input2)) {
+		LibapxPrintError(user, "Inputs must be numeric");
+        return;
+    }
+
+    if(!(condition == "=" || condition == ">" || condition == ">=" || condition == "<" || condition == "<=")) {
+		LibapxPrintError(user, "Condition must be one of these \"=, >, >=, <, <=\"");
+        return;
+    }
+
+    if(condition == "=") {
+        if(input1 == input2) {
+            LibapxChatParse(LibapxBracketTextGrab(bracketText, 1), user, u, spawningCount);
+        }
+        else {
+            LibapxChatParse(LibapxBracketTextGrab(bracketText, 2), user, u, spawningCount);
+        }
+    }
+
+
+    if(condition == ">") {
+        if( StringToFixed( input1) > StringToFixed( input2)) {
+            LibapxChatParse(LibapxBracketTextGrab(bracketText, 1), user, u, spawningCount);
+        }
+        else {
+            LibapxChatParse(LibapxBracketTextGrab(bracketText, 2), user, u, spawningCount);
+        }
+    }
+
+    if(condition == ">=") {
+        if( StringToFixed( input1) >= StringToFixed( input2)) {
+            LibapxChatParse(LibapxBracketTextGrab(bracketText, 1), user, u, spawningCount);
+        }
+        else {
+            LibapxChatParse(LibapxBracketTextGrab(bracketText, 2), user, u, spawningCount);
+        }
+    }
+
+    if(condition == "<") {
+        if( StringToFixed( input1) < StringToFixed( input2)) {
+            LibapxChatParse(LibapxBracketTextGrab(bracketText, 1), user, u, spawningCount);
+        }
+        else {
+            LibapxChatParse(LibapxBracketTextGrab(bracketText, 2), user, u, spawningCount);
+        }
+    }
+
+    if(condition == "<=") {
+        if( StringToFixed( input1) <= StringToFixed( input2)) {
+            LibapxChatParse(LibapxBracketTextGrab(bracketText, 1), user, u, spawningCount);
+        }
+        else {
+            LibapxChatParse(LibapxBracketTextGrab(bracketText, 2), user, u, spawningCount);
+        }
+    }
+
+	return;
+}
+void LibapxDefineCondition(string commandName) {
+	LibapxCommandsGuideEntrySet(
+		gv_CommandsGuideEntryGeneral, 
+		commandName, 
+		" This command compares to values with either =, >, >=, <, or <= and then runs either of two options passed with brackets <br> >condition input1 > input2 [if Condition True] [if Condition False] "
+	);
 }

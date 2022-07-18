@@ -23,7 +23,7 @@ struct patchNotesDesign {
     string version;
     string[200] patches; //Max patches
 };
-static const int patchCount = 9;
+static const int patchCount = 10;
 static patchNotesDesign[17][patchCount] patchNotes;
 
 
@@ -74,6 +74,25 @@ void LibapxUiPatchnotesInitPlayer(int player) {
     int j = 0;
 
     i = 0;
+    patchNotes[player][j].version = "2.3.0";
+    patchNotes[player][j].patches[i] = "<c val=\"9b59b6\">ENG: Parser ${}</c> Variable Functions added.";
+    i+=1;patchNotes[player][j].patches[i] = "<c val=\"3498db\">CMD: _varset</c> added";
+    i+=1;patchNotes[player][j].patches[i] = "<c val=\"3498db\">CMD: >condition</c> added";
+    i+=1;patchNotes[player][j].patches[i] = "<c val=\"00ffc3\">VAR_FN: $MouseX</c> added";
+    i+=1;patchNotes[player][j].patches[i] = "<c val=\"00ffc3\">VAR_FN: $MouseY</c> added";
+    i+=1;patchNotes[player][j].patches[i] = "<c val=\"00ffc3\">VAR_FN: $UnitX</c> added";
+    i+=1;patchNotes[player][j].patches[i] = "<c val=\"00ffc3\">VAR_FN: $UnitY</c> added";
+    i+=1;patchNotes[player][j].patches[i] = "<c val=\"00ffc3\">VAR_FN: $RandReal</c> added";
+    i+=1;patchNotes[player][j].patches[i] = "<c val=\"00ffc3\">VAR_FN: $RandInt</c> added";
+    i+=1;patchNotes[player][j].patches[i] = "<c val=\"00ffc3\">VAR_FN: $Sin</c> added";
+    i+=1;patchNotes[player][j].patches[i] = "<c val=\"00ffc3\">VAR_FN: $Cos</c> added";
+    i+=1;patchNotes[player][j].patches[i] = "<c val=\"00ffc3\">VAR_FN: $Tan</c> added";
+    i+=1;patchNotes[player][j].patches[i] = "<c val=\"00ffc3\">VAR_FN: $Floor</c> added";
+    i+=1;patchNotes[player][j].patches[i] = "<c val=\"00ffc3\">VAR_FN: $Round</c> added";
+
+
+    i = 0;
+    j = j + 1;
     patchNotes[player][j].version = "2.2.1";
     patchNotes[player][j].patches[i] = "<c val=\"3498db\">CMD: @cache</c> -add [] added";
     i+=1;patchNotes[player][j].patches[i] = "<c val=\"3498db\">CMD: @cache</c> -set [] added";

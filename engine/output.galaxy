@@ -8,6 +8,10 @@
 
 const string LibapxOUTPUTSOUNDSUCCESS = "UICampaignNPCSelect";
 const string LibapxOUTPUTSOUNDERROR = "UIGenericError";
+ 
+
+
+
 
 // LibapxPrint
 // ===========================
@@ -70,4 +74,10 @@ void LibapxChatPrintOOC(int player, string msg) {
 	}
 	output = StringToText("[OOC] ") + gv_LibapxPlayerNameColored(player) + StringToText(": ") + StringToText(msg);
 	UIDisplayMessage(PlayerGroupAll(), c_messageAreaDebug, output);
+}
+
+
+// Debug Log
+void DebugLog(string s) {
+	LibapxPrintOutput(EventPlayer(),"debug-log : "+ s);
 }

@@ -210,7 +210,7 @@ void LibapxDefineRegionTeleport(string commandName) {
 void LibapxCommandRegionAttach(int user, unitgroup u, string argv, int spawningCount, string bracketText) {
 	string name = StringWord(argv, 2);
 	region rgn = null;
-	unitgroup g = gv_gv_LibapxPlayerParser[user][spawningCount].context;
+	unitgroup g = gv_LibapxPlayerParser[user][spawningCount].context;
 	point offset;
 	int waygateDialog; // waygate dialog for region
 

@@ -51,7 +51,8 @@ void LibapxCommandsInitialize() {
 	LibapxChatCommandCreate("_camerapan", LibapxCommandCamerapan, LibapxDefineCamerapan);
 	LibapxChatCommandCreate("_print", libpaxCommandPrint, LibapxDefinePrint);
 	LibapxChatCommandCreate("_dataedit", LibapxCommandDataedit, LibapxDefineDataedit);
-	
+	LibapxChatCommandCreate("_varset", LibapxCommandSetVar, LibapxDefineSetVar);
+
 	//API commands
 	LibapxChatCommandCreate("_api", LibapxCommandApi, LibapxDefineApi);
 
@@ -184,6 +185,7 @@ void LibapxCommandsInitialize() {
 	LibapxChatCommandCreate(">random", LibapxCommandRandom, LibapxDefineRandom);
 	LibapxChatCommandCreate(">keypress", LibapxCommandKeypress, LibapxDefineKeypress);
 	LibapxChatCommandCreate(">moveto", LibapxCommandMoveto, LibapxDefineMoveto);
+	LibapxChatCommandCreate(">condition", LibapxCommandCondition, LibapxDefineCondition);
 
 
 	//seroCmds
