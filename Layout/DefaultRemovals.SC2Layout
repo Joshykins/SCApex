@@ -4,5 +4,9 @@
 	<Frame type="HeroPanel" name="GameUI/UIContainer/FullscreenUpperContainer/HeroPanel">
 		<Anchor side="Bottom" relative="$parent" pos="Max" offset="-200"/>
 	</Frame>
-	
+
+	<!-- Getting rid of control groups, uneeded -->
+	<Frame type="Frame" name="GameUI/UIContainer/ConsoleUIContainer/ControlGroupPanel" file="GameUI">
+            <Anchor relative="$parent" side="Bottom" pos="Max" offset="-27000"/>
+    </Frame>
 </Desc>

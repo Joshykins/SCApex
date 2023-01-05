@@ -25,31 +25,31 @@ string LibapxScalerapply(string s, unitgroup g, string category, int user) {
 		y = y*gv_LibapxPlayer[user].scaler;
 		z = z*gv_LibapxPlayer[user].scaler;
 
-if (category == "scale") {
-	if (x<0.0006 && x > -0.0006) {
-		x = 0.0005;
-	}
+	if (category == "scale") {
+		if (x<0.0006 && x > -0.0006) {
+			x = 0.0005;
+		}
 
-	if (y < 0.0006  && y > -0.0006) {
-		y = 0.0005;
-	}
+		if (y < 0.0006  && y > -0.0006) {
+			y = 0.0005;
+		}
 
-	if (z < 0.0006  && z > -0.0006) {
-		z = 0.0005;
-	}
-} else {
-	if (x<0.0006 && x > -0.0006) {
-		x = 0;
-	}
+		if (z < 0.0006  && z > -0.0006) {
+			z = 0.0005;
+		}
+	} else {
+		if (x<0.0006 && x > -0.0006) {
+			x = 0;
+		}
 
-	if (y < 0.0006  && y > -0.0006) {
-		y = 0;
-	}
+		if (y < 0.0006  && y > -0.0006) {
+			y = 0;
+		}
 
-	if (z < 0.0006  && z > -0.0006) {
-		z = 0;
+		if (z < 0.0006  && z > -0.0006) {
+			z = 0;
+		}
 	}
-}
 
 
 

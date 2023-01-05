@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<Desc>
+
+    <Frame type="Frame" name="GameUI/UIContainer/ConsoleUIContainer" file="GameUI">
+        <Frame type="Frame" name="ApexUnitStatPanel">
+            <!--tbd 166 -->
+            <Anchor side="Top" relative="$parent/ApexUnitPanel" pos="Min" offset="23"/>
+            <Anchor side="Left" relative="$parent/ApexUnitPanel" pos="Min" offset="23"/>
+            <Height val="80"/>
+            <Width val="100"/>
+            <Visible val="true"/>
+            
+            <Frame type="Label" name="ApexStatLabel">
+                <Anchor side="Bottom" relative="$parent" pos="Max" offset="-6"/>
+                <Anchor side="Left" relative="$parent" pos="Min" offset="6"/>
+                <Anchor side="Top" relative="$parent" pos="Min" offset="6"/>
+                <Anchor side="Right" relative="$parent" pos="Max" offset="-6"/>
+                <Style val="apx_regular_left_top"/>
+                <Text val="35/45"/>
+                <RenderPriority val="15"/>
+            </Frame>
+
+        </Frame>
+    </Frame>
+</Desc>

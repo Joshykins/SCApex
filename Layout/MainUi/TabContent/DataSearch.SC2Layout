@@ -1,0 +1,354 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<Desc>
+    <!-- Templates -->
+    <Frame type="Button" name="SearchResultListItem" template="ApexTemplates/ApexListItem">
+        <Toggled val="True"/>
+
+
+        <StateGroup name="AcceptMouseToggle">
+            <DefaultState val="Default"/>
+            <State name="1">
+                <When type="Property" Toggled="True" frame="$this" operator="Equal"/>
+                <Action type="SetProperty" AcceptsMouse="True" frame="$this/ApplyButton" />
+                <Action type="SetProperty" AcceptsMouse="True" frame="$this/CopyButton" />
+            </State>
+            <State name="Default">
+                <Action type="SetProperty" AcceptsMouse="False" frame="$this/ApplyButton" />
+                <Action type="SetProperty" AcceptsMouse="False" frame="$this/CopyButton" />
+            </State>
+        </StateGroup>
+
+        <Frame type="Label" name="ListItemContent">
+            <Anchor side="Right" relative="$parent" pos="Max" offset="-80"/>
+            <Anchor side="Left" relative="$parent/ListItemImage" pos="Max" offset="0"/>
+        </Frame>
+
+        
+        <Frame type="Image" name="ListItemImage">
+            <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
+            <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+            <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+            <Height val="37"/>
+            <ScaleWidthToTexture val="True"/>
+            <Texture val="{$parent/ListItemContent/@Text}"/>
+        </Frame>
+
+        <Frame type="Button" name="ApplyButton" template="ApexTemplates/ApexIconButtonNoOutline">
+            <Anchor side="Left" relative="$parent" pos="Max" offset="-80"/>
+            <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+            <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
+            <Width val="40"/>
+            <Frame type="Image" name="Icon">
+                <Texture val="Apex/Assets/Textures/btn_triangle.png"/>
+            </Frame>
+            <Frame type="Label" name="Tooltip">
+                <Text val="Apply"/>
+            </Frame>
+        </Frame>
+        
+        <Frame type="CopyClipboardButton" name="CopyButton" template="ApexTemplates/ApexIconButtonNoOutline">
+            <ClipboardText val="{$parent/ListItemContent/@Text}"/>
+            <Anchor side="Left" relative="$parent" pos="Max" offset="-40"/>
+            <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+            <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
+            <Width val="40"/>
+            <Frame type="Image" name="Icon">
+                <Texture val="Apex/Assets/Textures/btn_copy.png"/>
+            </Frame>
+            <Frame type="Label" name="Tooltip">
+                <Text val="Copy"/>
+            </Frame>
+        </Frame>
+    </Frame>
+    <!-- End of templates -->
+
+
+
+    <Frame type="Frame" name="GameUI/UIContainer/ConsoleUIContainer" file="GameUI">
+        <!-- Catalogs -->
+		<Frame type="Button" name="PanelCatalogs" template="MainUiTemplates/SubPanelTemplate">
+			<Frame type="Frame" name="Content">
+
+                <!-- Tab Label -->
+				<Frame type="Label" name="PanelTitle">
+					<Text val="Data Search"/>
+				</Frame>
+
+                <!-- Search Query -->
+                <Frame type="Frame" name="SearchQuery" template="ApexTemplates/ApexInput">
+                    <Anchor side="Left" relative="$parent" pos="Mid" offset="0"/>
+                    <Anchor side="Right" relative="$parent" pos="Mid" offset="0"/>
+                    <Anchor side="Top" relative="$parent" pos="Min" offset="30"/>
+                    <Width val="450"/>
+                    
+                    
+                    <Frame type="EditBox" name="Editbox">
+                        <HighlightOnFocus val="False"/>
+                    </Frame>
+
+                    <Frame type="Label" name="Name">
+                        <Anchor side="Right" relative="$parent" pos="Min" offset="150"/>
+                        <Text val="Search Query"/>
+                    </Frame>
+                </Frame>
+
+                <!-- Divier -->
+                <Frame type="Image" name="Divider">
+                    <Anchor side="Top" relative="$parent/SearchQuery" pos="Max" offset="0"/>
+                    <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
+                    <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+                    <Height val="1"/>
+                    <Alpha val="165"/>
+                    <Width val="450"/>
+                    <Texture val="Assets/Textures/white32.dds"/>
+                </Frame>
+
+                <!-- Scrollable Frame -->
+				<Frame type="ScrollableFrame" name="ScrollableContent" template="ApexTemplates/ScrollableFrame">
+					<Anchor side="Top" relative="$parent/SearchQuery" pos="Max" offset="10"/>
+					<Anchor side="Left" relative="$parent" pos="Min" offset="46"/>
+					<Anchor side="Right" relative="$parent" pos="Max" offset="-46"/>
+					<Anchor side="Bottom" relative="$parent" pos="Max" offset="-130"/>
+                    <Width val="450"/>
+					<Frame type="Frame" name="ContainerFrame">
+						<Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+						<!-- Ensure bottom anchor is always lowest content -->
+						<Anchor side="Bottom" relative="$this/FootprintCheck" pos="Max" offset="0"/>
+						<Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+						<Anchor side="Right" relative="$parent" pos="Max" offset="-30"/>
+                        
+                        <!-- Listbox -->
+                        <Frame type="Frame" name="SearchResults" template="ApexTemplates/ApexListBox">
+                            <Anchor side="Top" relative="$parent" pos="Min" offset="10"/>
+                            <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+                            <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
+                            <Height val="400"/>
+                            <!-- No Results -->
+                            <Frame type="Label" name="NoResultsText" template="ApexTemplates/ApexRectangularButton">
+                                <Anchor side="Top" relative="$parent" pos="Min" offset="10"/>
+                                <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+                                <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
+                                <Visible val="False"/>
+
+                                <Width val="250"/>
+                                <Height val="40"/>
+                                <Style val="apx_regular_center_mid"/>
+                                <Text val="No Results"/>
+                                <AcceptsMouse val="False"/>
+                            </Frame>
+
+                            <!-- List items -->
+                            <Frame type="Button" name="Item1" template="DataSearch/SearchResultListItem">
+                                <Toggled val="True"/>
+                            </Frame>
+                            <Frame type="Button" name="Item2" template="DataSearch/SearchResultListItem">
+                                <Anchor side="Top" relative="$parent/Item1" pos="Max" offset="0"/>
+                                <Toggled val="True"/>
+                            </Frame>
+                            <Frame type="Button" name="Item3" template="DataSearch/SearchResultListItem">
+                                <Anchor side="Top" relative="$parent/Item2" pos="Max" offset="0"/>
+                                <Toggled val="True"/>
+                            </Frame>
+                            <Frame type="Button" name="Item4" template="DataSearch/SearchResultListItem">
+                                <Anchor side="Top" relative="$parent/Item3" pos="Max" offset="0"/>
+                                <Toggled val="True"/>
+                            </Frame>
+                            <Frame type="Button" name="Item5" template="DataSearch/SearchResultListItem">
+                                <Anchor side="Top" relative="$parent/Item4" pos="Max" offset="0"/>
+                                <Toggled val="True"/>
+                            </Frame>
+                            <Frame type="Button" name="Item6" template="DataSearch/SearchResultListItem">
+                                <Anchor side="Top" relative="$parent/Item5" pos="Max" offset="0"/>
+                                <Toggled val="True"/>
+                            </Frame>
+                            <Frame type="Button" name="Item7" template="DataSearch/SearchResultListItem">
+                                <Anchor side="Top" relative="$parent/Item6" pos="Max" offset="0"/>
+                                <Toggled val="True"/>
+                            </Frame>
+                            <Frame type="Button" name="Item8" template="DataSearch/SearchResultListItem">
+                                <Anchor side="Top" relative="$parent/Item7" pos="Max" offset="0"/>
+                                <Toggled val="True"/>
+                            </Frame>
+                            <Frame type="Button" name="Item9" template="DataSearch/SearchResultListItem">
+                                <Anchor side="Top" relative="$parent/Item8" pos="Max" offset="0"/>
+                                <Toggled val="True"/>
+                            </Frame>
+                            <Frame type="Button" name="Item10" template="DataSearch/SearchResultListItem">
+                                <Anchor side="Top" relative="$parent/Item9" pos="Max" offset="0"/>
+                                <Toggled val="True"/>
+                            </Frame>
+                        </Frame>
+
+                        <!-- Column 1 checks -->
+                        <Frame type="Frame" name="ModelCheck" template="ApexTemplates/ApexCheckbox">
+							<Anchor side="Top" relative="$parent/SearchResults" pos="Max" offset="0"/>
+							<Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+							<Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
+							<RenderPriority val="25"/>
+                            <Width val="450"/>
+                            <Frame type="Label" name="Name">
+                                <Text val="Model"/>
+                            </Frame>
+						</Frame>
+                        <Frame type="Frame" name="ActorCheck" template="ApexTemplates/ApexCheckbox">
+							<Anchor side="Top" relative="$parent/ModelCheck" pos="Max" offset="-20"/>
+							<Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+							<Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
+							<RenderPriority val="25"/>
+                            <Width val="450"/>
+                            <Frame type="Label" name="Name">
+                                <Text val="Actor"/>
+                            </Frame>
+						</Frame>
+                        <Frame type="Frame" name="BehaviorCheck" template="ApexTemplates/ApexCheckbox">
+							<Anchor side="Top" relative="$parent/ActorCheck" pos="Max" offset="-20"/>
+							<Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+							<Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
+							<RenderPriority val="25"/>
+                            <Width val="450"/>
+                            <Frame type="Label" name="Name">
+                                <Text val="Behavior"/>
+                            </Frame>
+						</Frame>
+                        <Frame type="Frame" name="EffectCheck" template="ApexTemplates/ApexCheckbox">
+							<Anchor side="Top" relative="$parent/BehaviorCheck" pos="Max" offset="-20"/>
+							<Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+							<Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
+							<RenderPriority val="25"/>
+                            <Width val="450"/>
+                            <Frame type="Label" name="Name">
+                                <Text val="Effect"/>
+                            </Frame>
+						</Frame>
+                        <Frame type="Frame" name="UnitCheck" template="ApexTemplates/ApexCheckbox">
+							<Anchor side="Top" relative="$parent/EffectCheck" pos="Max" offset="-20"/>
+							<Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+							<Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
+							<RenderPriority val="25"/>
+                            <Width val="450"/>
+                            <Frame type="Label" name="Name">
+                                <Text val="Unit"/>
+                            </Frame>
+						</Frame>
+                        <Frame type="Frame" name="DecalCheck" template="ApexTemplates/ApexCheckbox">
+							<Anchor side="Top" relative="$parent/UnitCheck" pos="Max" offset="-20"/>
+							<Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+							<Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
+							<RenderPriority val="25"/>
+                            <Width val="450"/>
+                            <Frame type="Label" name="Name">
+                                <Text val="Decal"/>
+                            </Frame>
+						</Frame>
+                        <Frame type="Frame" name="WeaponCheck" template="ApexTemplates/ApexCheckbox">
+							<Anchor side="Top" relative="$parent/DecalCheck" pos="Max" offset="-20"/>
+							<Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+							<Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
+							<RenderPriority val="25"/>
+                            <Width val="450"/>
+                            <Frame type="Label" name="Name">
+                                <Text val="Weapon"/>
+                            </Frame>
+						</Frame>
+                        <Frame type="Frame" name="FootprintCheck" template="ApexTemplates/ApexCheckbox">
+							<Anchor side="Top" relative="$parent/WeaponCheck" pos="Max" offset="-20"/>
+							<Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+							<Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
+							<RenderPriority val="25"/>
+                            <Width val="450"/>
+                            <Frame type="Label" name="Name">
+                                <Text val="Footprint"/>
+                            </Frame>
+						</Frame>
+                        <!-- Column 2 checks -->
+                        <Frame type="Frame" name="SoundCheck" template="ApexTemplates/ApexCheckbox">
+                            <Anchor side="Top" relative="$parent/SearchResults" pos="Max" offset="0"/>
+							<Anchor side="Left" relative="$parent/ModelCheck" pos="Min" offset="200"/>
+							<Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
+							<RenderPriority val="25"/>
+                            <Width val="450"/>
+                            <Frame type="Label" name="Name">
+                                <Text val="Sound"/>
+                            </Frame>
+						</Frame>
+                        <Frame type="Frame" name="LightCheck" template="ApexTemplates/ApexCheckbox">
+							<Anchor side="Top" relative="$parent/SoundCheck" pos="Max" offset="-20"/>
+							<Anchor side="Left" relative="$parent/ModelCheck" pos="Min" offset="200"/>
+							<Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
+							<RenderPriority val="25"/>
+                            <Width val="450"/>
+                            <Frame type="Label" name="Name">
+                                <Text val="Light"/>
+                            </Frame>
+						</Frame>
+                        <Frame type="Frame" name="UpgradeCheck" template="ApexTemplates/ApexCheckbox">
+							<Anchor side="Top" relative="$parent/LightCheck" pos="Max" offset="-20"/>
+							<Anchor side="Left" relative="$parent/ModelCheck" pos="Min" offset="200"/>
+							<Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
+							<RenderPriority val="25"/>
+                            <Width val="450"/>
+                            <Frame type="Label" name="Name">
+                                <Text val="Upgrade"/>
+                            </Frame>
+						</Frame>
+                        <Frame type="Frame" name="ValidatorCheck" template="ApexTemplates/ApexCheckbox">
+							<Anchor side="Top" relative="$parent/UpgradeCheck" pos="Max" offset="-20"/>
+							<Anchor side="Left" relative="$parent/ModelCheck" pos="Min" offset="200"/>
+							<Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
+							<RenderPriority val="25"/>
+                            <Width val="450"/>
+                            <Frame type="Label" name="Name">
+                                <Text val="Validator"/>
+                            </Frame>
+						</Frame>
+                        <Frame type="Frame" name="AbilityCheck" template="ApexTemplates/ApexCheckbox">
+							<Anchor side="Top" relative="$parent/ValidatorCheck" pos="Max" offset="-20"/>
+							<Anchor side="Left" relative="$parent/ModelCheck" pos="Min" offset="200"/>
+							<Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
+							<RenderPriority val="25"/>
+                            <Width val="450"/>
+                            <Frame type="Label" name="Name">
+                                <Text val="Ability"/>
+                            </Frame>
+						</Frame>
+                        <Frame type="Frame" name="TurretCheck" template="ApexTemplates/ApexCheckbox">
+							<Anchor side="Top" relative="$parent/AbilityCheck" pos="Max" offset="-20"/>
+							<Anchor side="Left" relative="$parent/ModelCheck" pos="Min" offset="200"/>
+							<Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
+							<RenderPriority val="25"/>
+                            <Width val="450"/>
+                            <Frame type="Label" name="Name">
+                                <Text val="Turret"/>
+                            </Frame>
+						</Frame>
+                        <Frame type="Frame" name="SoundtrackCheck" template="ApexTemplates/ApexCheckbox">
+							<Anchor side="Top" relative="$parent/TurretCheck" pos="Max" offset="-20"/>
+							<Anchor side="Left" relative="$parent/ModelCheck" pos="Min" offset="200"/>
+							<Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
+							<RenderPriority val="25"/>
+                            <Width val="450"/>
+                            <Frame type="Label" name="Name">
+                                <Text val="Soundtrack"/>
+                            </Frame>
+						</Frame>
+                        <Frame type="Frame" name="ImageCheck" template="ApexTemplates/ApexCheckbox">
+							<Anchor side="Top" relative="$parent/SoundtrackCheck" pos="Max" offset="-20"/>
+							<Anchor side="Left" relative="$parent/ModelCheck" pos="Min" offset="200"/>
+							<Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
+							<RenderPriority val="25"/>
+                            <Width val="450"/>
+                            <Frame type="Label" name="Name">
+                                <Text val="Images"/>
+                            </Frame>
+						</Frame>
+                        <!-- End of checkboxes -->
+					</Frame>
+					<!-- End of container frame -->
+				</Frame>
+                <!-- End of scrollable Frame -->
+
+			</Frame>
+            <!-- End of panel content -->
+        </Frame>
+    </Frame>
+</Desc>

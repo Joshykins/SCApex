@@ -1,0 +1,125 @@
+//=========================================================
+//		Apex Roleplaying Engine
+//		Copyright (c) 2022, Apex Group
+//=========================================================
+// This software is distributed under the MIT License:
+// <http://opensource.org/licenses/MIT>
+//=========================================================
+
+
+
+include "apex/variables/debug_var_functions.galaxy"
+include "apex/variables/general_var_functions.galaxy"
+
+void LibapxVariableFunctionInitialize() {
+
+
+    LibapxVariableFunctionCreate("Debug", LibapxVariableFunctionDebug);
+
+
+    
+    LibapxCommandsGuideSetVariableFunctionEntry(
+        "MouseX()", 
+        "Returns the current mouse X position </n> Example: </n> ${MouseX()}"
+    ); 
+    LibapxCommandsGuideSetVariableFunctionEntry(
+        "MouseY()", 
+        "Returns the current mouse Y position </n> Example: </n> ${MouseY()}"
+    );
+    LibapxVariableFunctionCreate("MouseX", LibapxVariableFunctionMouseX);
+    LibapxVariableFunctionCreate("MouseY", LibapxVariableFunctionMouseY);
+
+
+
+    LibapxCommandsGuideSetVariableFunctionEntry(
+        "UnitAttribute()", 
+        "Returns a given attribute of a unit </n> Available Attributes:"+gv_LibapxAvailableUnitProps+" </n> </n> Example: </n> ${UnitAttribute(1)}"
+    );
+    LibapxVariableFunctionCreate("UnitAttribute", LibapxVariableFunctionUnitAttribute);
+    LibapxVariableFunctionCreate("UnitAttr", LibapxVariableFunctionUnitAttribute);
+    
+
+    LibapxCommandsGuideSetVariableFunctionEntry(
+        "WorldHeight()", 
+        "Returns a given world height of a position </n> Available Height Values:"+gv_LibapxAvailableHeightTypes+" </n> </n> Example: </n> ${WorldHeight(25,62,1)}"
+    );
+    LibapxVariableFunctionCreate("WorldHeight", LibapxVariableFunctionWorldHeight);
+
+    LibapxCommandsGuideSetVariableFunctionEntry(
+        "UnitCount()", 
+        "Returns the current context's unit count </n> Example: </n> ${UnitCount()}"
+    );
+    LibapxVariableFunctionCreate("UnitCount", LibapxVariableFunctionUnitCount);
+    LibapxCommandsGuideSetVariableFunctionEntry(
+        "UnitFacing()", 
+        "Returns the current unit facing </n> Example: </n> ${UnitFacing()}"
+    );
+    LibapxVariableFunctionCreate("UnitFacing", LibapxVariableFunctionUnitFacing);
+
+
+
+    LibapxCommandsGuideSetVariableFunctionEntry(
+        "UnitX()", 
+        "Returns the current unit X position </n> Example: </n> ${UnitX()}"
+    ); 
+    LibapxCommandsGuideSetVariableFunctionEntry(
+        "UnitY()", 
+        "Returns the current unit Y position </n> Example: </n> ${UnitY()}"
+    );
+    LibapxVariableFunctionCreate("UnitX", LibapxVariableFunctionUnitX);
+    LibapxVariableFunctionCreate("UnitY", LibapxVariableFunctionUnitY);
+
+    
+    LibapxCommandsGuideSetVariableFunctionEntry(
+        "RandReal(min,max)", 
+        "Returns a random real number between the two inputs, if no inputs are provided it's between 0 and 1. </n> Example: </n> ${RandReal(1,5)}"
+    );
+    LibapxVariableFunctionCreate("RandomReal", LibapxVariableFunctionRandomFixed);
+    LibapxVariableFunctionCreate("RandReal", LibapxVariableFunctionRandomFixed);
+    LibapxVariableFunctionCreate("RandFixed", LibapxVariableFunctionRandomFixed);
+    LibapxVariableFunctionCreate("RandF", LibapxVariableFunctionRandomFixed);
+    LibapxVariableFunctionCreate("RandR", LibapxVariableFunctionRandomFixed);
+
+
+    LibapxCommandsGuideSetVariableFunctionEntry(
+        "RandInt(min,max)", 
+        "Returns a random integer number between the two inputs, if no inputs are provided it's between 0 and 100 </n> Example: </n> ${RandReal(1,5)}"
+    );
+    LibapxVariableFunctionCreate("RandomInt", LibapxVariableFunctionRandomInt);
+    LibapxVariableFunctionCreate("RandInt", LibapxVariableFunctionRandomInt);
+    LibapxVariableFunctionCreate("RandI", LibapxVariableFunctionRandomInt);
+
+
+    LibapxCommandsGuideSetVariableFunctionEntry(
+        "Sin(degrees)", 
+        "Returns the sin of the input number </n> Example: </n> ${Sin(1)}"
+    );
+    LibapxVariableFunctionCreate("Sin", LibapxVariableFunctionSin);
+    LibapxCommandsGuideSetVariableFunctionEntry(
+        "Cos(degrees)", 
+        "Returns the cos of the input number </n> Example: </n> ${Cos(1)}"
+    );
+    LibapxVariableFunctionCreate("Cos", LibapxVariableFunctionCos);
+    LibapxCommandsGuideSetVariableFunctionEntry(
+        "Tan(degrees)", 
+        "Returns the tan of the input number </n> Example: </n> ${Tan(1)}"
+    );
+    LibapxVariableFunctionCreate("Tan", LibapxVariableFunctionTan);
+
+
+    LibapxCommandsGuideSetVariableFunctionEntry(
+        "Floor(number)", 
+        "Rounds value to smallest whole number</n> Example: </n> ${Floor(1.2)} // 1"
+    );
+    LibapxVariableFunctionCreate("Floor", LibapxVariableFunctionFloor);
+
+
+    LibapxCommandsGuideSetVariableFunctionEntry(
+        "Round(number)", 
+        "Rounds value to nearest whole number</n> Example: </n> ${Round(1.2)} // 1"
+    );
+    LibapxVariableFunctionCreate("Round", LibapxVariableFunctionRound);
+
+    
+
+}

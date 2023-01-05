@@ -1,0 +1,190 @@
+const string gv_LibapxPreviousAttachDataTableIdentifier = "PREVIOUS_ATTACH_";
+const string gv_LibapxPreviousRotationDataTableIdentifier = "PREVIOUS_ROTATION_";
+
+// LibapxSetPreviousRotationCache
+// ================================================
+// Sets Previous Rotation Cache
+void LibapxSetPreviousRotationCache(unit u, string argv, int p) {
+	string unitId = FixedToString(UnitGetCustomValue(u, gv_LibapxUnitIndexId), 0);
+
+	DataTableSetString(true, gv_LibapxPreviousRotationDataTableIdentifier + unitId, argv);
+}
+
+const int c_LibpaxRotationCacheActor = 0;
+const int c_LibpaxRotationCacheRotX = 1;
+const int c_LibpaxRotationCacheRotY = 2;
+const int c_LibpaxRotationCacheRotZ = 3;
+
+// LibapxGetPreviousRotationCache
+//==================================
+//Gets a parameter from previous rotation cache
+string LibapxGetPreviousRotationCache(unit u, int rotationParameter) {
+	string unitId = FixedToString(UnitGetCustomValue(u, gv_LibapxUnitIndexId), 0);
+    string argv = DataTableGetString(true, gv_LibapxPreviousRotationDataTableIdentifier + unitId);
+    bool modYpr;
+	string actorName = "Apex_Actor";
+    int i;
+    string temp;
+
+
+    if( StringFind(argv, "-ypr", c_stringNoCase) != -1 ) {
+		modYpr = true;
+		argv = StringReplaceWord(argv, "-ypr",  "", 1, c_stringNoCase);
+	} 
+    
+    if( StringFind(argv, "-b", c_stringNoCase) != -1 ) {
+		actorName = "Beacon_Apex";
+		argv = StringReplaceWord(argv, "-b",  "", 1, c_stringNoCase);
+	} 
+
+	if( StringFind(argv, "-a", c_stringNoCase) != -1 ) {
+		actorName = StringWord(StringSub(argv, StringFind(argv, "-a", c_stringNoCase), StringLength(argv)), 2);
+		argv = StringReplaceWord(argv, "-a",  "", 1, c_stringNoCase);
+		argv = StringReplaceWord(argv, actorName,  "", 1, c_stringNoCase);
+	} 
+    if(rotationParameter == c_LibpaxRotationCacheActor) {
+        if(argv == "") {
+            return "";
+        }
+        return actorName;
+    }
+
+	i = 2;
+	while(StringWord(argv, i) != "") {
+		temp = StringWord(argv, i);
+		if(modYpr) {
+            if (StringFind(temp, "y", c_stringNoCase) != -1) {
+                temp = StringReplace(temp, "", StringFind(temp, "y", c_stringNoCase), StringFind(temp, "y", c_stringNoCase) );
+                if(rotationParameter == c_LibpaxRotationCacheRotZ) {
+                    return temp;
+                }
+            }
+            if (StringFind(temp, "p", c_stringNoCase) != -1) {
+                temp = StringReplace(temp, "", StringFind(temp, "p", c_stringNoCase), StringFind(temp, "p", c_stringNoCase) );
+                if(rotationParameter == c_LibpaxRotationCacheRotY) {
+                    return temp;
+                }
+            }
+            if (StringFind(temp, "r", c_stringNoCase) != -1) {
+                temp = StringReplace(temp, "", StringFind(temp, "r", c_stringNoCase), StringFind(temp, "r", c_stringNoCase) );
+                if(rotationParameter == c_LibpaxRotationCacheRotX) {
+                    return temp;
+                }
+            }
+        }
+        else {
+            if (StringFind(temp, "x", c_stringNoCase) != -1) {
+                temp = StringReplace(temp, "", StringFind(temp, "x", c_stringNoCase), StringFind(temp, "x", c_stringNoCase) );
+                if(rotationParameter == c_LibpaxRotationCacheRotX) {
+                    return temp;
+                }
+            }
+            if (StringFind(temp, "y", c_stringNoCase) != -1) {
+                temp = StringReplace(temp, "", StringFind(temp, "y", c_stringNoCase), StringFind(temp, "y", c_stringNoCase) );
+                if(rotationParameter == c_LibpaxRotationCacheRotY) {
+                    return temp;
+                }
+            }
+            if (StringFind(temp, "z", c_stringNoCase) != -1) {
+                temp = StringReplace(temp, "", StringFind(temp, "z", c_stringNoCase), StringFind(temp, "z", c_stringNoCase) );
+                if(rotationParameter == c_LibpaxRotationCacheRotZ) {
+                    return temp;
+                }
+            }
+        }
+		i += 1;
+    }
+
+
+    return "0";
+}
+
+// LibapxSetPreviousAttachCache
+// ================================================
+// Sets Previous Attach Cache
+// Clears Rotation Cache
+void LibapxSetPreviousAttachCache(unit u, string argv, int p) {
+	string unitId = FixedToString(UnitGetCustomValue(u, gv_LibapxUnitIndexId), 0);
+	if(StringFind( argv, "-nouireset",c_stringNoCase) != -1) {
+		argv =  StringReplaceWord(argv, "-nouireset", "", 1, c_stringNoCase);
+    }
+	DataTableSetString(true, gv_LibapxPreviousAttachDataTableIdentifier + unitId, argv);
+	LibapxSetPreviousRotationCache(u, "", p);
+}
+
+
+//LibapxClearAttachAndRotationPreviousCaches
+//==================================
+void LibapxClearAttachAndRotationPreviousCaches(unit u) {
+	string unitId = FixedToString(UnitGetCustomValue(u, gv_LibapxUnitIndexId), 0);
+
+	DataTableValueRemove(true,  gv_LibapxPreviousRotationDataTableIdentifier + unitId);
+	DataTableValueRemove(true,  gv_LibapxPreviousAttachDataTableIdentifier + unitId);
+}
+
+const int c_LibapxAttachCacheTarget = 0;
+const int c_LibapxAttachCacheActor = 1;
+const int c_LibapxAttachCacheAttachpoint = 2;
+const int c_LibapxAttachCacheTransX = 3;
+const int c_LibapxAttachCacheTransY = 4;
+const int c_LibapxAttachCacheTransZ = 5;
+
+//LibapxGetPreviousAttachCache
+//==================================
+//Gets a parameter from previous attach cache
+string LibapxGetPreviousAttachCache(unit u, int attachParameter) {
+	string unitId = FixedToString(UnitGetCustomValue(u, gv_LibapxUnitIndexId), 0);
+    string argv = DataTableGetString(true, gv_LibapxPreviousAttachDataTableIdentifier + unitId);
+    int parseOffset = 0;
+    string target;
+
+    // @attach marine origin 0 2 3
+        
+    if( LibapxHasActorRef(StringWord(argv, 2)) ) {
+        target = StringSub(
+            argv,
+             StringFind(argv, StringWord(argv, 2), c_stringNoCase)+2, 
+             StringFind(argv, StringWord(argv, 2), c_stringNoCase)+
+             StringLength(StringWord(argv, 2))
+        );
+        parseOffset = 1;
+    }
+    else {
+        target = "";
+    }
+
+    if(attachParameter == c_LibapxAttachCacheTarget) {
+        return target;
+    }
+
+    if(attachParameter == c_LibapxAttachCacheActor) {
+        return StringWord(argv, 2 + parseOffset);
+    }
+
+    if(attachParameter == c_LibapxAttachCacheAttachpoint) {
+        return StringWord(argv, 3 + parseOffset);
+    }
+
+    
+    if(attachParameter == c_LibapxAttachCacheTransX) {
+        if(StringWord(argv, 4 + parseOffset) == "") {
+            return "0";
+        }
+        return StringWord(argv, 4 + parseOffset);
+    }
+    if(attachParameter == c_LibapxAttachCacheTransY) {
+        if(StringWord(argv, 5 + parseOffset) == "") {
+            return "0";
+        }
+        return StringWord(argv, 5 + parseOffset);
+    }
+    if(attachParameter == c_LibapxAttachCacheTransZ) {
+        if(StringWord(argv, 6 + parseOffset) == "") {
+            return "0";
+        }
+        return StringWord(argv, 6 + parseOffset);
+    }
+
+    return "TYPE NOT SUPPORTED";
+}
+

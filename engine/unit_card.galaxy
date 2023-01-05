@@ -1,0 +1,118 @@
+//=========================================================
+//		Apex Roleplaying Engine
+//		Copyright (c) 2022, Apex Group
+//=========================================================
+// This software is distributed under the MIT License:
+// <http://opensource.org/licenses/MIT>
+//=========================================================
+
+static const string gv_UnitCardImageLayerIdentifier =  "LibapxUnitCardLayer_";
+static const string gv_UnitCardImageLayerListIdentifier = "LibapxUnitCardList_";
+
+//Sets the bank for the wireframe
+static void LibapxUnitcardSetProperties(
+    //Not wireframe attr
+    string identifier, 
+    unit u,
+    //Wireframe attrs
+    string path, int r, int g, int b, bool saturation, int renderPriority, int OffsetX, int OffsetY, int width, int height, int rotation, int alpha
+) {
+    string id = LibapxUnitId(u);
+    string settings = 
+    path + "," +
+    IntToString(r) + "," +
+    IntToString(g) + "," +
+    IntToString(b) + "," +
+    IntToString(BoolToInt(saturation)) + "," +
+    IntToString(renderPriority) + "," +
+    IntToString(OffsetX) + "," +
+    IntToString(OffsetY) + "," +
+    IntToString(width) + "," +
+    IntToString(height) + "," +
+    IntToString(rotation) + "," +
+    IntToString(alpha);
+
+    DataTableSetString(true, gv_UnitCardImageLayerIdentifier+id+"_"+identifier, settings);
+}
+
+//Get Invididuals
+string LibapxGetUnitCardPath(bool defaultValue, unit u, string identifier) {
+    string id = LibapxUnitId(u);
+    string properties;
+    if(defaultValue) {
+        return "Apex/Assets/Texutres/info.png";
+    }
+    properties = DataTableGetString(true, gv_UnitCardImageLayerIdentifier+id+"_"+identifier);
+    //Space Seperate
+    while(StringFind(properties, ",", c_stringNoCase) != -1) {
+        //TODO: FIX
+        properties = StringReplace(properties, ",",1, StringLength(properties));
+    }
+    
+    return StringWord(properties, 1); // 1 is Path
+}
+
+
+// UnitcardSetListIdentifier
+// ==================
+//This sets a unit's unitcard layer
+//(checks if valid beforehand)
+//Returns if it's a new identifier
+static bool IsNewIdentifier(unit u, string idenifier) {
+    string id = LibapxUnitId(u);
+    int p = UnitGetOwner(u);
+    string currentList;
+    int i = 1;
+
+    if(DataTableValueExists(true, gv_UnitCardImageLayerListIdentifier + id)) {
+        currentList = DataTableGetString(true, gv_UnitCardImageLayerListIdentifier + id);
+        
+        while(StringWord(currentList, i) != "") {
+
+            if(StringWord(currentList, i) ==  idenifier) {
+                //List already has it
+                DebugLog("UnitCard already has layer LIST : " + currentList);
+                return false;
+            }
+
+            i += 1;
+        }
+
+        DebugLog("UnitCard datatable existing - adding: " + idenifier);
+        currentList = currentList + " " + idenifier;
+    }
+    else {
+        DebugLog("UnitCard datatable empty - adding: " + idenifier);
+        currentList = idenifier;
+    }
+    
+    DebugLog("Unit card list set to : "+ currentList);
+    DataTableSetString(true, gv_UnitCardImageLayerListIdentifier + id, currentList);
+    return true;
+}
+
+static void SetDefaultValues(unit u, string identifier) {
+    //Set defaults
+    LibapxUnitcardSetProperties(
+        identifier,
+        u,
+        "Apex/Assets/Texutres/info.png",
+        255,
+        255,
+        255,
+        true,
+        2,
+        55,
+        55,
+        500,
+        100,
+        3,
+        255
+    );
+}
+
+void LibapxSetUnitCardPath(unit u, string identifier, string path) {
+    bool newIdentifier = IsNewIdentifier(u, identifier);
+    if(newIdentifier) { SetDefaultValues(u, identifier); }
+
+}

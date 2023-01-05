@@ -1,0 +1,113 @@
+//Output.galaxy
+void DebugLog(string s);
+void LibapxLogText(int p, text message);
+void LibapxLog(int p, string message);
+void LibapxChatPrintOOC(int inputP, string msg);
+void LibapxLogPlayerGroupText(playergroup players, text msg);
+void LibapxLogPlayerGroup(playergroup players, string msg);
+void LibapxLogInfoText(int p, text msg);
+void LibapxLogInfo(int p, string msg);
+void LibapxLogError(int p, string msg);
+void LibapxLogSuccess(int p, string msg);
+
+//Utils
+fixed LibapxUtil255To100(fixed num);
+int LibapxStrcmp(string k1, string k2);
+
+//ui
+void LibapxMainUiSelectGuide(int p);
+void LibapxSubUiSelectDataSearch(int p);
+void LibapxDataSearchUiSetSearchQuery(string results, int p, string type, string query);
+void LibapxVariablesUiRefresh(int p);
+
+//all_images
+void LibapxInitImageStrings();
+
+//datasearch ui
+void LibapxSelectSearchQuery(int panel, int p, string query);
+
+//Alias ui
+void LibapxSearchAliasesUiSetSearchQuery(int p); 
+
+//ui.attach_adjust.galaxy
+void LibapxAttachAdjusterReset(int p, unit u);
+
+//Settings
+bool LibapxAdminSettingIsPlayerEnforceable(int p);
+
+//Parser
+void LibapxChatParse(string msg, int player, unitgroup target, int spawningCount);
+void LibapxChatParseSimplified(string msg, int p);
+string LibapxParseOutBracketText(string input);
+string LibapxRemoveBracketTextFromString(string input, string bracketText, int limit);
+
+
+
+// gv_LibapxSettingsDefinition
+// ============================
+// contains a games parameters
+struct gv_LibapxSettingsDefinition {
+	int flags;
+
+	// mapRevealed
+	// ========
+	// flag for whether the map is revealed
+	bool mapRevealed;
+
+	// commands
+	// ========
+	// string containing all of the game's commands, separated by commas ", "
+	string commands;
+
+	// minScale / maxScale
+	// ===============
+	// minimum and max scale of a unit that player can use from @scale
+	// (not actually that useful because @actrmsg will allow arbitrary scale)
+	fixed minScale;
+	fixed maxScale;
+
+	// maxSpawnCount
+	// =============
+	// max units a player can spawn in one instance
+	int maxSpawnCount;
+
+	// Admin Settings
+	bool allowRepeatNoDelay;
+	bool allowReplace;
+	bool allowReloadBank;
+	bool allowDataEdit;
+	bool allowGamesetup;
+	bool allowLoan;
+};
+
+// create instance of settings:
+gv_LibapxSettingsDefinition gv_LibapxSettings;
+
+//actor_commands.galaxy
+bool LibapxHasActorRef(string ref);
+
+// unit.galaxy
+void LibapxUnitSetId(unit u);
+void LibapxUnitDataRemove(unit u);
+void LibapxUnitCacheUpdate(unit subject, string command, string userCommand);
+void LibapxClearAttachAndRotationPreviousCaches(unit u);
+
+// permissions.galaxy
+unitgroup LibapxEnforceUnitPermissions(unitgroup g, int player);
+int LibapxEnforceLoanPlayer(unitgroup ug, int p);
+
+
+//data_table_manager.galaxy
+string LibapxTManagerGetList(string baseTableString);
+int LibapxTManagerGetCount(string baseTableString);
+void LibapxTManagerCleanup(string baseTableString);
+bool LibapxTManagerRemoveValue(string baseTableString, string specifiedTableString);
+void LibapxTManagerSetInt(string baseTableString, string specifiedTableString, int value );
+void LibapxTManagerSetString(string baseTableString, string specifiedTableString, string value );
+void LibapxTManagerSetFixed(string baseTableString, string specifiedTableString, fixed value );
+void LibapxTManagerSetUnitgroup(string baseTableString, string specifiedTableString, unitgroup value );
+int LibapxTManagerGetInt(string baseTableString, string specifiedTableString );
+string LibapxTManagerGetString(string baseTableString, string specifiedTableString );
+fixed LibapxTManagerGetFixed(string baseTableString, string specifiedTableString );
+unitgroup LibapxTManagerGetUnitGroup(string baseTableString, string specifiedTableString );
+bool LibapxTManagerExists(string baseTableString, string specifiedTableString);

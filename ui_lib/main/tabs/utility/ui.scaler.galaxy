@@ -1,0 +1,177 @@
+static fixed[gv_LibapxMaxPlayers] xValue;
+static int gv_x;
+static int gv_xLabel;
+static fixed[gv_LibapxMaxPlayers] yValue;
+static int gv_y;
+static int gv_yLabel;
+static fixed[gv_LibapxMaxPlayers] zValue;
+static int gv_z;
+static int gv_zLabel;
+
+static fixed[gv_LibapxMaxPlayers] scaleMultiplier;
+static int gv_scaleMultiplier;
+
+static bool[gv_LibapxMaxPlayers] apply;
+static int gv_apply;
+static int gv_output;
+
+static const fixed gv_MINSCALE = 0.01;
+
+
+void LibapxUiInitScaler() {
+    int base = DialogControlHookupStandard(
+        c_triggerControlTypePanel,
+        "UIContainer/ConsoleUIContainer/PanelScaler/Content"
+    );
+
+
+    gv_x = DialogControlHookup(
+        base, c_triggerControlTypeSlider,
+        "XSlider/Slider"
+    );
+    gv_xLabel = DialogControlHookup(
+        gv_x, c_triggerControlTypeLabel,
+        "Tooltip"
+    );
+
+
+    gv_y = DialogControlHookup(
+        base, c_triggerControlTypeSlider,
+        "YSlider/Slider"
+    );
+    gv_yLabel = DialogControlHookup(
+        gv_y, c_triggerControlTypeLabel,
+        "Tooltip"
+    );
+
+
+    gv_z = DialogControlHookup(
+        base, c_triggerControlTypeSlider,
+        "ZSlider/Slider"
+    );
+    gv_zLabel = DialogControlHookup(
+        gv_z, c_triggerControlTypeLabel,
+        "Tooltip"
+    );
+
+    gv_scaleMultiplier = DialogControlHookup(
+        base, c_triggerControlTypeEditBox,
+        "ScaleMultiplier/EditBoxPadding/Editbox"
+    ); 
+    
+
+    gv_apply = DialogControlHookup(
+        base, c_triggerControlTypeButton,
+        "Apply/Checkbox"
+    );
+    gv_output = DialogControlHookup(
+        base, c_triggerControlTypeEditBox,
+        "Output/EditBoxPadding/Editbox"
+    );
+}
+
+static string MakeOutputScale(int p) {
+    string output = "@scale";
+    output += " "+FixedToString(xValue[p], 2);
+    output += " "+FixedToString(yValue[p], 2);
+    output += " "+FixedToString(zValue[p], 2) + " .15";
+
+    return output;
+} 
+
+
+void LibapxUiInitScalerPlayer(int p) {
+    xValue[p] = 1;
+    LibapxUiSetSlider(xValue[p], gv_MINSCALE, 2, gv_x, gv_xLabel, p, 2);
+    yValue[p] = 1;
+    LibapxUiSetSlider(yValue[p], gv_MINSCALE, 2, gv_y, gv_yLabel, p, 2);
+    zValue[p] = 1;
+    LibapxUiSetSlider(zValue[p], gv_MINSCALE, 2, gv_z, gv_zLabel, p, 2);
+
+    
+    scaleMultiplier[p] = 2;
+    libNtve_gf_SetDialogItemEditorValue(gv_scaleMultiplier, "2", PlayerGroupSingle(p));
+
+    apply[p] = false;
+    libNtve_gf_SetDialogItemEditorValue(gv_output, MakeOutputScale(p), PlayerGroupSingle(p));
+    
+    
+    TriggerAddEventDialogControl(TriggerCreate("TrigXSlider"), p, gv_x, c_triggerControlEventTypeValueChanged);
+    TriggerAddEventDialogControl(TriggerCreate("TrigYSlider"), p, gv_y, c_triggerControlEventTypeValueChanged);
+    TriggerAddEventDialogControl(TriggerCreate("TrigZSlider"), p, gv_z, c_triggerControlEventTypeValueChanged);
+    TriggerAddEventDialogControl(TriggerCreate("TrigScaleMultiplier"), p, gv_scaleMultiplier, c_triggerControlEventTypeTextChanged);
+    TriggerAddEventDialogControl(TriggerCreate("TrigApplyScale"), p, gv_apply, c_triggerControlEventTypeClick);
+}
+
+static void ApplyNewScale(int p) {
+    unitgroup ug = UnitGroupSelected(p);
+    int i;
+    
+    libNtve_gf_SetDialogItemEditorValue(gv_output, MakeOutputScale(p), PlayerGroupSingle(p));
+    if(apply[p]) {
+        LibapxChatParse(MakeOutputScale(p), p, ug, gv_LibapxPlayer[p].spawningCount);
+    }
+}
+
+
+bool TrigApplyScale(bool testConds, bool runActions) {
+    int p = EventPlayer();
+    apply[p] = !apply[p];
+
+    DialogControlSetPropertyAsBool(gv_apply, c_triggerControlPropertyToggled, PlayerGroupSingle(p), apply[p]);
+
+    ApplyNewScale(p);
+    return true;
+}
+
+bool TrigScaleMultiplier(bool testConds, bool runActions) {
+    int p = EventPlayer();
+    fixed typed = LibapxGetEditBoxValueAsFixed(gv_scaleMultiplier, p, 1);
+
+    if(typed > 20) {
+        typed = 20; //MAX Scale
+    }
+    scaleMultiplier[p] = typed;
+
+    LibapxUiSetSlider(xValue[p], gv_MINSCALE, 1*scaleMultiplier[p], gv_x, gv_xLabel, p, 2);
+    LibapxUiSetSlider(yValue[p], gv_MINSCALE, 1*scaleMultiplier[p], gv_y, gv_yLabel, p, 2);
+    LibapxUiSetSlider(zValue[p], gv_MINSCALE, 1*scaleMultiplier[p], gv_z, gv_zLabel, p, 2);
+    ApplyNewScale(p);
+
+    return true;
+}
+
+bool TrigXSlider(bool testConds, bool runActions) {
+    int p = EventPlayer();
+    fixed value = DialogControlGetPropertyAsFixed(gv_x, c_triggerControlPropertyValue, p);
+
+    value = LibapxSliderGetInput(value, gv_MINSCALE, 1*scaleMultiplier[p], gv_xLabel, p, 2);
+
+    xValue[p] = value;
+
+    ApplyNewScale(p);
+    return true;
+}
+
+bool TrigYSlider(bool testConds, bool runActions) {
+    int p = EventPlayer();
+    fixed value = DialogControlGetPropertyAsFixed(gv_y, c_triggerControlPropertyValue, p);
+
+    value = LibapxSliderGetInput(value, gv_MINSCALE, 1*scaleMultiplier[p], gv_yLabel, p, 2);
+
+    yValue[p] = value;
+
+    ApplyNewScale(p);
+    return true;
+}
+bool TrigZSlider(bool testConds, bool runActions) {
+    int p = EventPlayer();
+    fixed value = DialogControlGetPropertyAsFixed(gv_z, c_triggerControlPropertyValue, p);
+
+    value = LibapxSliderGetInput(value, gv_MINSCALE, 1*scaleMultiplier[p], gv_zLabel, p, 2);
+
+    zValue[p] = value;
+
+    ApplyNewScale(p);
+    return true;
+}

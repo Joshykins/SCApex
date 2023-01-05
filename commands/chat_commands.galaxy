@@ -15,10 +15,9 @@ void LibapxCommandNarrate(int user, unitgroup u, string argv, int spawningCount,
 	string msg = argv;
 	msg = StringSub( msg, StringFind(msg, " ", c_stringCase) + 1, StringLength(msg) ); // remainder of chat message
 
-	LibapxPrint(PlayerGroupAll(), LibapxStringTrim(msg));
 
 	// log msg in chatlog
-	LibapxLog(user, StringToText(""), msg);
+	LibapxLogSay( StringToText("<c val=\"0,255,255\">Narration </n><c val=\"255,255,255\">" + msg));
 
 	return;
 }
@@ -27,7 +26,7 @@ void LibapxDefineNarrate(string commandName) {
 	LibapxCommandsGuideEntrySet(
 		gv_CommandsGuideEntryGeneral, 
 		commandName, 
-		"Prints out anonymous text to everyone in the game. <br> @narrate [TextToBeNarrated] <br> Examples: <br> @narrate The Sheep jumped over the Moon.  "
+		"Prints out anonymous text to everyone in the game. </n> _narrate Text To Be Narrated </n></n><c val=\"255,229,201\">Examples</c>: </n> _narrate The Sheep jumped over the Moon.  "
 	);
 }
 
@@ -45,7 +44,7 @@ void LibapxCommandSay(int user, unitgroup u, string argv, int spawningCount, str
 
 
 	if (UnitGroupCount(u, c_unitCountAlive) > 1) {
-		LibapxPrintError(user, "Command can only be used on one unit.");
+		LibapxLogError(user, "Command can only be used on one unit.");
 		return;
 	}
 
@@ -57,10 +56,15 @@ void LibapxCommandSay(int user, unitgroup u, string argv, int spawningCount, str
 		UnitFlashSelection(UnitGroupLoopCurrent(), 2.0);
 		ActorSend(libNtve_gf_MainActorofUnit(UnitGroupLoopCurrent()), "AttachModel " + LibapxTalkIconActor + "{} Overhead");
 
-		LibapxPrintText(PlayerGroupAll(), unitName + unitMsg);
+
 
 		// log msg in chatlog
-		LibapxLog(user, unitName, cmdMsg);
+		LibapxLogSay( StringToText("<c val=\"175,175,175\">")+unitName + StringToText("</n><c val=\"255,255,255\">" + cmdMsg));
+        LibapxUnitLogSetEntry(
+            UnitGroupLoopCurrent(), 
+            unitName,
+            StringToText(cmdMsg)
+        );
 
 		UnitGroupLoopStep();
 	}
@@ -72,7 +76,7 @@ void LibapxDefineSay(string commandName) {
 	LibapxCommandsGuideEntrySet(
 		gv_CommandsGuideEntryUnit, 
 		commandName, 
-		"This command emotes through a unit. <br> @say [texttobesaid] <br> Examples: <br> @say This is me, a marine, talking to you guys! People! "
+		"This command emotes through a unit. </n> @say [texttobesaid] </n></n><c val=\"255,229,201\">Examples</c>: </n> @say This is me, a marine, talking to you guys! People! "
 	);
 }
 
@@ -88,7 +92,7 @@ void LibapxCommandSetname(int user, unitgroup u, string argv, int spawningCount,
 
 
 		LibapxUnitSetName(name, UnitGroupLoopCurrent());
-		LibapxPrintOutput(user, "Unit [ID: " + LibapxUnitId(UnitGroupLoopCurrent()) + "] name set to: " + name);
+		LibapxLogInfo(user, "Unit [ID: " + LibapxUnitId(UnitGroupLoopCurrent()) + "] name set to: " + name);
 		LibapxUnitCacheUpdate(UnitGroupLoopCurrent(), "@setname", argv);
 		UnitGroupLoopStep();
 	}
@@ -100,40 +104,12 @@ void LibapxDefineSetname(string commandName) {
 	LibapxCommandsGuideEntrySet(
 		gv_CommandsGuideEntryUnit, 
 		commandName, 
-		"This command sets the name of a unit used in say. Not the display name. <br> @setname [name] <br> Examples: <br> @setname Bob Ross "
+		"This command sets the name of a unit used in say. Not the display name. </n> @setname [name] </n></n><c val=\"255,229,201\">Examples</c>: </n> @setname Bob Ross "
 	);
 }
 
-// LibapxCommandSetnamecolor
-// ==================
-// sets a units name to a specific color, where
-// @setnamecolor [red] [green] [blue]
-// input RGB between 0-256 (by convention), but Color() takes fixed between 0-100,
-// so must normalize RGB to 0-100
-void LibapxCommandSetnamecolor(int user, unitgroup u, string argv, int spawningCount, string bracketText) {
-	fixed r = StringToFixed( StringWord(argv, 2 ) );
-	fixed g = StringToFixed( StringWord(argv, 3 ) );
-	fixed b = StringToFixed( StringWord(argv, 4 ) );
-	color col = Color( r*100/256 , g*100/256 , b*100/256 ); // normalize to 100
 
-	UnitGroupLoopBegin(u);
-	while(!UnitGroupLoopDone()) {
-		LibapxUnitSetNameColor(col, UnitGroupLoopCurrent());
-		LibapxPrintText(PlayerGroupSingle(user), StringToText("> Unit [ID: " + LibapxUnitId(UnitGroupLoopCurrent()) + "] name set to: ") + LibapxUnitGetName(UnitGroupLoopCurrent()));
-		LibapxUnitCacheUpdate(UnitGroupLoopCurrent(), "@setnamecolor", argv);
-		UnitGroupLoopStep();
-	}
-	UnitGroupLoopEnd();
 
-	return;
-}
-void LibapxDefineSetnamecolor(string commandName) {
-	LibapxCommandsGuideEntrySet(
-		gv_CommandsGuideEntryUnit, 
-		commandName, 
-		" Sets a unit's setname to a specific color <br> @setnamecolor [red] [green] [blue] <br> Examples: <br> @setnamecolor 255 125 50 "
-	);
-}
 // LibapxCommandRepeat
 // =======================
 // Repeats a strings
@@ -143,7 +119,8 @@ void LibapxCommandRepeat(int user, unitgroup u, string argv, int spawningCount, 
 	int i;
 	for(i = 0; i < iterations; i += 1) {
 		LibapxChatParse(LibapxBracketTextGrab(bracketText, 1), user, u, spawningCount);
-	}
+        LibapxWaitDelayRepeat(user);
+    }
 
 
 
@@ -153,7 +130,7 @@ void LibapxDefineRepeat(string commandName) {
 	LibapxCommandsGuideEntrySet(
 		gv_CommandsGuideEntryGeneral, 
 		commandName, 
-		" This command repeats a given set of commands a given amount of times. <br> >repeat [amountOfTimesToRepeat] [[commands]] <br> Examples: <br> >repeat 5 [Hi how are you!;I repeated this a lot!] "
+		" This command repeats a given set of commands a given amount of times. </n> >repeat [amountOfTimesToRepeat] [[commands]] </n></n><c val=\"255,229,201\">Examples</c>: </n> >repeat 5 [Hi how are you!;I repeated this a lot!] "
 	);
 }
 
@@ -170,7 +147,7 @@ void LibapxCommandKeypress(int user, unitgroup u, string argv, int spawningCount
 
 
 	if (StringCase(StringWord(argv, 2), c_stringNoCase) == "help") {
-		LibapxPrintOutput(user, "The current keys able to be used are \" <c val=\"00ff00\">" + gv_LibapxAllKeys + " \"</c> </n> The format for the command is >keypress key [commandshere] ");
+		LibapxLogInfo(user, "The current keys able to be used are \" <c val=\"00ff00\">" + gv_LibapxAllKeys + " \"</c> </n> The format for the command is >keypress key [commandshere] ");
 		return;
 	}
 	while(StringWord(gv_LibapxAllKeys, i) != "") {
@@ -187,14 +164,15 @@ void LibapxCommandKeypress(int user, unitgroup u, string argv, int spawningCount
 		while(!UnitGroupLoopDone()) {
 
 			LibapxUnitSetVal(UnitGroupLoopCurrent(), StringWord(argv, 2), keypressString);
-
-			LibapxPrintOutput(user, "Set keypress <c val=\"d63031\">\"" + StringWord(argv, 2) + "\"</c> on unit to this text: \n <c val=\"00cec9\">"+keypressString+"</c>");
+            if(gv_LibapxPlayer[user].helpMessages) {
+                LibapxLogInfo(user, "Set keypress <c val=\"d63031\">\"" + StringWord(argv, 2) + "\"</c> on unit to this text: \n <c val=\"00cec9\">"+keypressString+"</c>");
+            }
 			UnitGroupLoopStep();
 		}
 		UnitGroupLoopEnd();
 	}
 	else {
-		LibapxPrintError(user, "Invalid key inputted, type </c>\" >keypress help \"<c val=\"ff0000\"> to list all assignable keys.");
+		LibapxLogError(user, "Invalid key inputted, type </c>\" >keypress help \"<c val=\"ff0000\"> to list all assignable keys.");
 	}
 
 	return;
@@ -203,7 +181,7 @@ void LibapxDefineKeypress(string commandName) {
 	LibapxCommandsGuideEntrySet(
 		gv_CommandsGuideEntryGeneral, 
 		commandName, 
-		" This command assigns commands to a key on a unit. <br> >keypress [keyname] [[commands]] <br> Possible keys are "+gv_LibapxAllKeys+" <br> Examples: <br> >keypress keyW [@position -rel +0 +3] <br> >keypress keyQ [@move;>moveto -arc 2 [boom]]; "
+		" This command assigns commands to a key on a unit. </n> >keypress [keyname] [[commands]] </n> Possible keys are "+gv_LibapxAllKeys+" </n></n><c val=\"255,229,201\">Examples</c>: </n> >keypress keyW [@position -rel +0 +3] </n> >keypress keyQ [@move;>moveto -arc 2 [boom]]; "
 	);
 }
 
@@ -232,7 +210,7 @@ void LibapxDefineChance(string commandName) {
 	LibapxCommandsGuideEntrySet(
 		gv_CommandsGuideEntryGeneral, 
 		commandName, 
-		" This command gives a chance to display one of two inputs. Chance percentage is determined by division. <br> >chance [dividen]/[divisor] [[commands1]] [[commands2]] <br> Examples: <br> >chance 1/3 [I have a 33% chance of displaying!] [I have a 66% chance of displaying!] "
+		" This command gives a chance to display one of two inputs. Chance percentage is determined by division. </n> >chance [dividen]/[divisor] [[commands1]] [[commands2]] </n></n><c val=\"255,229,201\">Examples</c>: </n> >chance 1/3 [I have a 33% chance of displaying!] [I have a 66% chance of displaying!] "
 	);
 }
 
@@ -251,7 +229,7 @@ void LibapxCommandRandom(int user, unitgroup u, string argv, int spawningCount, 
 			break;
 		}
 	} 
-	pickedEntry = RandomInt(1,i);
+	pickedEntry = RandomInt(1,i-1);
 
 	LibapxChatParse(LibapxBracketTextGrab(bracketText, pickedEntry), user, u, spawningCount);
 	return;
@@ -260,7 +238,7 @@ void LibapxDefineRandom(string commandName) {
 	LibapxCommandsGuideEntrySet(
 		gv_CommandsGuideEntryGeneral, 
 		commandName, 
-		" This command gives a random chance to display one of a undefined quantity of inputs. <br> >random [[entries] [entries]..  ..]] <br> Examples: <br> >random [@spawn marine] [@spawn marauder] [@spawn ghost] [@spawn battlecruiser] "
+		" This command gives a random chance to display one of a undefined quantity of inputs. </n> >random [[entries] [entries]..  ..]] </n></n><c val=\"255,229,201\">Examples</c>: </n> >random [@spawn marine] [@spawn marauder] [@spawn ghost] [@spawn battlecruiser] "
 	);
 }
 
@@ -326,7 +304,7 @@ void LibapxCommandMoveto(int user, unitgroup u, string argv, int spawningCount, 
 
 
     if (UnitGroupCount(u, c_unitCountAlive) > 1) {
-        LibapxPrintError(user, "Command can only be used on one unit.");
+        LibapxLogError(user, "Command can only be used on one unit.");
         return;
     }
     if (StringWord(argv, 2) == "-height") {
@@ -510,7 +488,7 @@ void LibapxCommandMoveto(int user, unitgroup u, string argv, int spawningCount, 
     if(offset == true) {
         target = UnitGroupUnit(u, 1);
         pt = PointWithOffset(UnitGetPosition(target),StringToFixed(argX),StringToFixed(argY));
-        LibapxPrintError(user, libNtve_gf_ConvertPointToString(pt));
+        LibapxLogError(user, libNtve_gf_ConvertPointToString(pt));
     }
 
     target = UnitGroupUnit(u, 1);
@@ -573,7 +551,7 @@ void LibapxDefineMoveto(string commandName) {
 	LibapxCommandsGuideEntrySet(
 		gv_CommandsGuideEntryGeneral, 
         commandName, 
-        " This command moves a unit to your mousepoint and runs the input you give it when it arrives at it's destination. The unit can travel in a parabolic way by using -arc, or it can it move to a desired height with -height. Can instead patrol with -patrol. Using relative offset instead of mouse, use -rel but for fixed offset instead use -offset. <br> >moveto [modifier] [heightofparabola] [[commands;whateverelse]] <br> Examples: <br> >moveto -height 5 [Landed!] <br> >moveto -arc 12 [wee!] <br> >moveto -rel +5 +5 [Diagonal movement is cool] <br> >moveto -offset 0 -5 [Going down!] <br> >moveto -patrol +2 +5 [It's a nice day to go out on patrol]"
+        " This command moves a unit to your mousepoint and runs the input you give it when it arrives at it's destination. The unit can travel in a parabolic way by using -arc, or it can it move to a desired height with -height. Can instead patrol with -patrol. Using relative offset instead of mouse, use -rel but for fixed offset instead use -offset. </n> >moveto [modifier] [heightofparabola] [[commands;whateverelse]] </n></n><c val=\"255,229,201\">Examples</c>: </n> >moveto -height 5 [Landed!] </n> >moveto -arc 12 [wee!] </n> >moveto -rel +5 +5 [Diagonal movement is cool] </n> >moveto -offset 0 -5 [Going down!] </n> >moveto -patrol +2 +5 [It's a nice day to go out on patrol]"
     );
 }
 
@@ -588,32 +566,32 @@ void LibapxCommandCondition(int user, unitgroup u, string argv, int spawningCoun
     string input2 = StringWord(argv, 4);
 
 	if(input1 == "") {
-		LibapxPrintError(user, "Must have first input");
+		LibapxLogError(user, "Must have first input");
         return;
     }
 
 	if(condition == "") {
-		LibapxPrintError(user, "Must have condition input");
+		LibapxLogError(user, "Must have condition input");
         return;
     }
 
 	if(input2 == "") {
-		LibapxPrintError(user, "Must have second input");
+		LibapxLogError(user, "Must have second input");
         return;
     }
 
     if(!LibapxIsFixed(input1)) {
-		LibapxPrintError(user, "Inputs must be numeric");
+		LibapxLogError(user, "Inputs must be numeric");
         return;
     }
     
     if(!LibapxIsFixed(input2)) {
-		LibapxPrintError(user, "Inputs must be numeric");
+		LibapxLogError(user, "Inputs must be numeric");
         return;
     }
 
     if(!(condition == "=" || condition == ">" || condition == ">=" || condition == "<" || condition == "<=")) {
-		LibapxPrintError(user, "Condition must be one of these \"=, >, >=, <, <=\"");
+		LibapxLogError(user, "Condition must be one of these \"=, >, >=, <, <=\"");
         return;
     }
 
@@ -667,8 +645,8 @@ void LibapxCommandCondition(int user, unitgroup u, string argv, int spawningCoun
 }
 void LibapxDefineCondition(string commandName) {
 	LibapxCommandsGuideEntrySet(
-		gv_CommandsGuideEntryGeneral, 
+		gv_CommandsGuideEntryVariableFunctions, 
 		commandName, 
-		" This command compares to values with either =, >, >=, <, or <= and then runs either of two options passed with brackets <br> >condition input1 > input2 [if Condition True] [if Condition False] "
+		" This command compares to values with either =, >, >=, <, or <= and then runs either of two options passed with brackets </n> >condition input1 > input2 [if Condition True] [if Condition False] "
 	);
 }

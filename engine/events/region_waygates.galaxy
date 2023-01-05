@@ -38,12 +38,12 @@ bool LibapxRegionEntered(bool testConds, bool runActions) {
 
 	// check if entering or leaving region
 	if( libNtve_gf_UnitInRegion(EventUnit(), EventUnitRegion()) ) { // unit entered region
-		//LibapxPrintOutput("Region entered", UnitGetOwner(EventUnit()) );
+		//LibapxLogInfo("Region entered", UnitGetOwner(EventUnit()) );
 
 		// get linked region
 		waygateId = DataTableGetInt(true, LibapxREGIONLINKDATATABLEIDENTIFIER + " " + rgnName );
 		UnitSetCustomValue(EventUnit(), gv_LibapxUnitIndexWaygate, IntToFixed(waygateId));
-		//LibapxPrintOutput(FixedToString(UnitGetCustomValue(EventUnit(), gv_LibapxUnitIndexWaygate), 1), UnitGetOwner(EventUnit()) );
+		//LibapxLogInfo(FixedToString(UnitGetCustomValue(EventUnit(), gv_LibapxUnitIndexWaygate), 1), UnitGetOwner(EventUnit()) );
 
 		// turn on dialog "enter" button for region
 		DialogSetVisible(DataTableGetDialog(true, LibapxWAYGATEDIALOGDATATABLEIDENTIFIER + " " + rgnName), PlayerGroupSingle(UnitGetOwner(EventUnit())), true);
@@ -176,7 +176,7 @@ bool LibapxWaygateDialogClicked(bool testConds, bool runActions) {
 	string s;
 
 	// Waygate teleport system
-	if( DataTableValueExists(true, LibapxWAYGATEDIALOGREGDATATABLEIDENTIFIER + " " + IntToString(DialogControlGetDialog(EventDialogControl()) ) ) ) {
+	if( DataTableValueExists(true, gv_LibapxWaygateDialogRegDataTableIdentifier + " " + IntToString(DialogControlGetDialog(EventDialogControl()) ) ) ) {
 		g = UnitGroupSelected(EventPlayer());
 		g = LibapxEnforceUnitPermissions(g, EventPlayer());
 		nalive = UnitGroupCount(g, c_unitCountAlive);
@@ -197,7 +197,7 @@ bool LibapxWaygateDialogClicked(bool testConds, bool runActions) {
 						r = DataTableGetRegion(true, s);
 						if( r != null ) { // move units to linked region
 							UnitSetPosition( u, RegionGetCenter( r ), false );
-							//LibapxPrintOutput("Leaving: " + FixedToString(UnitGetCustomValue(EventUnit(), gv_LibapxUnitIndexWaygate), 1), UnitGetOwner(u) );
+							//LibapxLogInfo("Leaving: " + FixedToString(UnitGetCustomValue(EventUnit(), gv_LibapxUnitIndexWaygate), 1), UnitGetOwner(u) );
 
 						}
 					}

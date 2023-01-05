@@ -1,6 +1,13 @@
 
-bool LibapxIsFixed(string s)
-{
+// LibapxStrcmp
+// =============
+// String comparison function for use with qsort
+int LibapxStrcmp(string k1, string k2) {
+	return StringCompare(DataTableGetString(true, k1), DataTableGetString(true, k2), c_stringCase);
+}
+
+
+bool LibapxIsFixed(string s){
 	int x = 1;
 	string c1 = "";
 	while( x != (StringLength(s)+1) )
@@ -45,7 +52,7 @@ bool LibapxBlacklistparms(int catalog, string source, string replace, int p) {
 	if (stringOkay) {
 		return false;
 	} else {
-		LibapxPrintOutput(p, "Replacing "+source+" with "+replace+" is a viable way to crash a game. Command halted");
+		LibapxLogInfo(p, "Replacing "+source+" with "+replace+" is a viable way to crash a game. Command halted");
 		return true;
 	}
 
@@ -74,7 +81,8 @@ fixed LibapxUtilParabolaCalc(point vertex, point pointGiven, fixed targetX) {
 	y = (a*xh)+PointGetY(vertex);
 	return y;
 };
-fixed util_255To_100(fixed num) {
+
+fixed LibapxUtil255To100(fixed num) {
 	num = (100*num)/255;
 	if(num <= 0) {
 		return 0.0;
@@ -82,7 +90,7 @@ fixed util_255To_100(fixed num) {
 	return num;
 }
 
-color utilHsbToRgb(fixed h, fixed s, fixed b) {
+static color utilHsbToRgb(fixed h, fixed s, fixed b) {
 	fixed rgbR;
 	fixed rgbG;
 	fixed rgbB;
@@ -135,9 +143,9 @@ color utilHsbToRgb(fixed h, fixed s, fixed b) {
 		}
 	}
 	return Color(
-		util_255To_100(rgbR),
-		util_255To_100(rgbG),
-		util_255To_100(rgbB)
+		LibapxUtil255To100(rgbR),
+		LibapxUtil255To100(rgbG),
+		LibapxUtil255To100(rgbB)
 		);
 	
 }
@@ -215,6 +223,8 @@ static string CleanStringOfNoneOperandsAndOperators(string input) {
 	string current;
 	string output = "";
 
+	input = StringReplaceWord(input, "-", "+-", c_noMaxCount, false);
+
 	for (i = 1; StringSub(input, i, i) != ""; i += 1) {
 		current = StringSub(input, i, i);
 		j = 1;
@@ -291,7 +301,7 @@ static bool ProcessForLowerPrecendence(int operandStack, int operatorStack) {
 		}
 		if(operator == "/") {
 			if(left == 0) {
-				LibapxPrintError(EventPlayer(),"Cannont Divide by Zero");
+				LibapxLogError(EventPlayer(),"Cannont Divide by Zero");
 				left = 1;
 			}
 			LibapxUtilsStackPush(operandStack, FixedToString( right / left, gv_LibapxVariableFunctionPrecision));

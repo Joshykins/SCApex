@@ -1,21 +1,157 @@
+const string gv_LibapxAvailableHeightTypes = "Ground(1), Air(2), Gliade(3)";
+
+string LibapxVariableFunctionWorldHeight(int p, unitgroup u, string argv) {
+    int heightType = -1;
+    string heightTypeString = StringCase(StringWord(argv, 3), false);
+    point target = Point(StringToFixed(StringWord(argv, 1)), StringToFixed(StringWord(argv, 2)));
+
+
+    if(heightTypeString == "") {
+        LibapxLogError(p, "Height type must be provided.\n Available Height Types: "+gv_LibapxAvailableHeightTypes);
+        return "0";
+    }
+    if(heightTypeString == "1") {
+        heightType = c_heightMapGround;
+    }
+    if(heightTypeString == "2") {
+        heightType = c_heightMapAir;
+    }
+    if(heightTypeString == "3") {
+        heightType = c_heightMapGlide;
+    }
+
+    if(heightType == -1) {
+        LibapxLogInfo(p, "Invalid height type. \n Available Height Types: <c val=\"00ffff\">"+gv_LibapxAvailableHeightTypes+"</c>");
+        return "0";
+    }
+
+    return FixedToString( WorldHeight(heightType, target), 6 );
+}
+
+const string gv_LibapxAvailableUnitProps = "MovementSpeed(1), Armor(2), Life(3), LifeRegen(4), MaxLife(5), Shields(6), ShieldsArmor(7), ShieldsRegen(8), MaxShields(9), Energy(10), EnergyRegen(11), MaxEnergy(12), Height(13), Kills(14), KillsXp(15), Level(16), Speed(17), CurrentSpeed(18), Acceleration(19), Turnrate(20), Radius(21)";
+
+//Gets UnitAttribute
+string LibapxVariableFunctionUnitAttribute(int p, unitgroup u, string argv) {
+    int attribute = -1;
+    string attributeString = StringCase(StringWord(argv, 1), false);
+    
+    if (UnitGroupCount(u, c_unitCountAlive) < 1) {
+        LibapxLogError(p, "Attribute can only be used with at least one unit selected");
+        return "0";
+    }
+
+    if(attributeString != "") {
+        if(attributeString == "1") {
+            attribute = c_unitPropBaseMovementSpeed;
+        }
+        if(attributeString == "2") {
+            attribute = c_unitPropLifeArmor;
+        }
+        if(attributeString == "3") {
+            attribute = c_unitPropLife;
+        }
+        if(attributeString == "4") {
+            attribute = c_unitPropLifeRegen;
+        }
+        if(attributeString == "5") {
+            attribute = c_unitPropLifeMax;
+        }
+        if(attributeString == "6") {
+            attribute = c_unitPropShields;
+        }
+        if(attributeString == "7") {
+            attribute = c_unitPropShieldArmor;
+        }
+        if(attributeString == "8") {
+            attribute = c_unitPropShieldsRegen;
+        }
+        if(attributeString == "9") {
+            attribute = c_unitPropShieldsMax;
+        }
+        if(attributeString == "10") {
+            attribute = c_unitPropEnergy;
+        }
+        if(attributeString == "11") {
+            attribute = c_unitPropEnergyRegen;
+        }
+        if(attributeString == "12") {
+            attribute = c_unitPropEnergyMax;
+        }
+        if(attributeString == "13") {
+            attribute = c_unitPropHeight;
+        }
+        if(attributeString == "14") {
+            attribute = c_unitPropKills;
+        }
+        if(attributeString == "15") {
+            attribute = c_unitPropKillXP;
+        }
+        if(attributeString == "16") {
+            attribute = c_unitPropLevel;
+        }
+        if(attributeString == "17") {
+            attribute = c_unitPropMovementSpeed;
+        }
+        if(attributeString == "18") {
+            attribute = c_unitPropMovementSpeedCurrent;
+        }
+        if(attributeString == "19") {
+            attribute = c_unitPropAcceleration;
+        }
+        if(attributeString == "20") {
+            attribute = c_unitPropTurnRate;
+        }
+        if(attributeString == "21") {
+            attribute = c_unitPropRadius;
+        }
+    }
+
+    
+    if (attribute == -1) {
+        LibapxLogInfo(p, "Attribute must be provided. \n Available Attribute types: <c val=\"00ffff\">" +gv_LibapxAvailableUnitProps+"</c>");
+        return "0";
+    }
+
+
+    return FixedToString( UnitGetPropertyFixed(UnitGroupUnit(u, 1), attribute, true), 6 );
+}
+
+//Gets Unit Count
+string LibapxVariableFunctionUnitCount(int p, unitgroup u, string argv) {
+
+    return IntToString(UnitGroupCount(u, c_unitCountAlive));
+}
+
+
+//Gets UnitFacing
+string LibapxVariableFunctionUnitFacing(int p, unitgroup u, string argv) {
+
+    if (UnitGroupCount(u, c_unitCountAlive) < 1) {
+        LibapxLogError(p, "UnitFacing can only be used with at least one unit selected");
+        return "0";
+    }
+
+    return FixedToString( UnitGetFacing(UnitGroupUnit(u, 1)), 6 );
+}
 
 //Gets UnitX
 string LibapxVariableFunctionUnitX(int p, unitgroup u, string argv) {
 
 
     if (UnitGroupCount(u, c_unitCountAlive) < 1) {
-        LibapxPrintError(p, "UnitX can only be used with at least one unit selected");
+        LibapxLogError(p, "UnitX can only be used with at least one unit selected");
         return "0";
     }
 
     return FixedToString(PointGetX(UnitGetPosition(UnitGroupUnit(u, 1))), 6 );
 }
 
+
 //Gets UnitY
 string LibapxVariableFunctionUnitY(int p, unitgroup u, string argv) {
 
     if (UnitGroupCount(u, c_unitCountAlive) < 1) {
-        LibapxPrintError(p, "UnitY can only be used with at least one unit selected");
+        LibapxLogError(p, "UnitY can only be used with at least one unit selected");
         return "0";
     }
 

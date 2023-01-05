@@ -13,14 +13,45 @@
 // =====================
 // test of new command system using func refs
 void LibapxCommandExperiment(int user, unitgroup u, string argv, int spawningCount, string bracketText) {
-	
-}
+	string param = StringWord(argv, 2);
+	string param2 = StringWord(argv, 3);
+	string param3 = StringWord(argv, 4);
+	string baseValue = "debug_datatable_" + IntToString(user);
+	string specifiedValue = param2;
 
-int strcmp(string k1, string k2) {
-	//LibapxPrint(PlayerGroupAll(), k1);
-	//LibapxPrint(PlayerGroupAll(), k2);
+	if(param == "count") {
+		DebugLog("counting values");
+		DebugLog(IntToString(LibapxTManagerGetCount(baseValue)));
+		return;
+	}
 
-	return StringCompare(DataTableGetString(true, k1), DataTableGetString(true, k2), c_stringCase);
+	if(param == "list") {
+		DebugLog("listing values");
+		DebugLog(LibapxTManagerGetList(baseValue));
+		return;
+	}
+
+	if(param == "value") {
+		DebugLog("Getting value");
+        DebugLog(baseValue + specifiedValue + " : KEYNAME OUTFUNC HERE");
+		DebugLog(IntToString(DataTableGetInt(true, baseValue + specifiedValue)));
+		return;
+	}
+
+	if(param == "cleanup") {
+		LibapxTManagerCleanup(baseValue);
+		DebugLog("cleaning up all");
+	}
+
+	if(param == "set") {
+		LibapxTManagerSetInt(baseValue, specifiedValue, StringToInt(param3));
+		DebugLog("Set value");
+	}
+
+	if(param == "remove") {
+		LibapxTManagerRemoveValue(baseValue, specifiedValue);
+		DebugLog("remove value");
+	}
 }
 
 // test sort the input args
@@ -32,7 +63,7 @@ void LibapxCommandSort(int user, unitgroup u, string argv, int spawningCount, st
 	string s = "";
 
 	// test
-	LibapxPrint(PlayerGroupAll(), LibapxStringTrim(argv));
+	LibapxLogPlayerGroup(PlayerGroupAll(), LibapxStringTrim(argv));
 
 	while( arg != "" ) {
 		DataTableSetString(true, var + " " + IntToString(i), arg);
@@ -40,12 +71,12 @@ void LibapxCommandSort(int user, unitgroup u, string argv, int spawningCount, st
 		arg = LibapxArg(argv, 2 + i);
 	}
 
-	libxQsort(var + " 0", i, c_dataTypeString, strcmp);
+	libxQsort(var + " 0", i, c_dataTypeString, LibapxStrcmp);
 
 	for( n = 0; n < i; n += 1 ) {
 		s = s + DataTableGetString(true, var + " " + IntToString(n)) + " ";
 		DataTableValueRemove(true, var + " " + IntToString(n));
 	}
 
-	LibapxPrint(PlayerGroupAll(), s);
+	LibapxLogPlayerGroup(PlayerGroupAll(), s);
 }

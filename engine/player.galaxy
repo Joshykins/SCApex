@@ -12,20 +12,11 @@ void LibapxChkAllAliases(int player);
 // basic game player constants
 const int gv_LibapxMaxPlayers = 16; // max players supported is 16 (0 - neutral, 15 - hostile)
 static const int ParserThreadCount = 500; // Max thread count for parser
-const string gv_gv_LibapxPlayerBankName = "ApexBank";
+const string gv_LibapxPlayerBankName = "ApexBank";
 const int gv_gv_LibapxPlayerNeutral = 0;
 const int gv_LibapxPLayerHostile = 15;
 const int gv_LibapxUiPanelNone = -1;
 
-
-//DEBUG
-//Sets the bank for the wireframe
-void LibapxWireframeBankLayerSet(
-    //Not wireframe attr
-    int p, string wireframe, bool create, int layer, 
-    //Wireframe attrs
-    string path, int r, int g, int b, bool saturation, int renderPriority, int OffsetX, int OffsetY, int width, int height, int rotation, int alpha
-);
 
 
 // gv_LibapxPlayerStruct
@@ -46,11 +37,6 @@ struct gv_LibapxPlayerProperties {
 	point mousePositionUi;	// x,y position in the game UI
 	point mousePositionLasttickUi;
 
-	//Wireframe specifics.
-	string wireframe;
-
-	// Permission Level UI
-	int permissionLevelUi;
 
 	// keys + mouse flags
 	// ================
@@ -230,9 +216,21 @@ struct gv_LibapxPlayerProperties {
 	// ==============
 	// used to mark player's search catalog, index, and query
 	// when using the "\search" command
-	int searchCatalog;			// current search catalog
-	int searchIndex;			// current search index (> 0)
-	string searchLastQuery;	// current search term
+	string searchType;
+	string searchQuery;
+	int searchPage;
+	bool searchNextPage;
+
+	//Aliases
+	bool aliasSearchNextPage;
+	int aliasSearchPage;
+	string aliasSearchQuery;
+
+	//Weapon Applying
+	string lastWeaponApplied;
+
+	//Unit Applying
+	unitgroup lastUnitApplied;
 
 	// waygateDialog
 	// ============
@@ -240,13 +238,6 @@ struct gv_LibapxPlayerProperties {
 	int waygateDialog;
 	int waygateDialogControlBtn;
 
-	// activeUiPanel
-	// ============
-	// for use with ui module: the current active ui panel dialog, where
-	// one panel is allowed to be active at a time.
-	// The value here is in terms of the ARRAY list of panels, NOT the
-	// dialog integer value itself.
-	int activeUiPanel;
 
 	//Scaler for units
 	fixed scaler;
@@ -307,6 +298,12 @@ struct gv_LibapxPlayerParserProperties {
 	// ===============
 	// unitgroup target for running commands
 	unitgroup context;
+
+	// aliasPlayerTarget // TODO:
+	// =============================
+	// allows for running aliases of another player
+	int aliasPlayerTarget;
+
 };
 
 
@@ -331,9 +328,6 @@ gv_LibapxPlayerParserProperties[gv_LibapxMaxPlayers][ParserThreadCount] gv_Libap
 string LibapxSortAliases(int player);
 
 
-//Retrieves the name of all the wireframes.
-string LibapxWireframesGetAll(int player);
-
 
 // LibapxInitializePlayer
 // ==============================
@@ -350,20 +344,25 @@ void gv_LibapxPlayerInitialize(int player) {
 	gv_LibapxPlayer[player].editorToggled = false;
 	gv_LibapxPlayer[player].spawnSplat = null;
 	gv_LibapxPlayer[player].spawningCount = 1;
-	gv_LibapxPlayer[player].delay =  0.08;
+	gv_LibapxPlayer[player].delay =  0.33;
 	gv_LibapxPlayer[player].waygateDialog = 0;
 	gv_LibapxPlayer[player].clanTag = "";
 	gv_LibapxPlayer[player].name = "";
 	gv_LibapxPlayer[player].apiStringInput = "";
 	gv_LibapxPlayer[player].editorHeightoffset = 0.0;
-	gv_LibapxPlayer[player].wireframe = gv_DefaultWireframeString;
-	gv_LibapxPlayer[player].activeUiPanel = gv_LibapxUiPanelNone;
 	gv_LibapxPlayer[player].banksloaded = false;
 	gv_LibapxPlayer[player].displayColor = false;
 	gv_LibapxPlayer[player].rainbow = false;
 	gv_LibapxPlayer[player].helpMessages = true;
+	//init
+	gv_LibapxPlayer[player].searchPage = -1;
+	//init
+	gv_LibapxPlayer[player].aliasSearchPage = -1;
 
-	CameraPan( player, RegionGetCenter(RegionEntireMap()), 0.0, 10.0, 10.0, false );
+	gv_LibapxPlayer[player].lastWeaponApplied = "";
+	gv_LibapxPlayer[player].lastUnitApplied = UnitGroupEmpty();
+
+	CameraPan( player, RegionGetCenter(RegionEntireMap()), 1.0, 10.0, 10.0, false );
 }
 
 
@@ -534,6 +533,18 @@ void LibapxSetTarget(int player, unitgroup target, int spawningCount) {
 void LibapxWaitDelay(int player) {
 	fixed time = gv_LibapxPlayer[player].delay;
 	if(time < .0625) {
+		return;
+	}
+	Wait(time, c_timeGame);
+}
+
+void LibapxWaitDelayRepeat(int player) {
+	fixed time = gv_LibapxPlayer[player].delay;
+	if(time < .0625) {
+		if(gv_LibapxSettings.allowRepeatNoDelay && LibapxAdminSettingIsPlayerEnforceable(player)) {
+			return;
+		}	
+		Wait(time, c_timeGame);
 		return;
 	}
 	Wait(time, c_timeGame);

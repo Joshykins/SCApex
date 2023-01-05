@@ -1,0 +1,128 @@
+
+const int gv_LibapxTotalSearchItemsInPage = 10;
+
+string LibapxSearch(int p, string catalog, string query, int page, bool log) {
+    int type;
+    int totalResults;
+    int cap = gv_LibapxTotalSearchItemsInPage;
+    int skip = (page-1)*cap;
+    int i;
+    int j;
+    string results;
+    string individualQuery;
+    string potentialResult;
+    bool matchedAll;
+    int attemptedAdds;
+
+	if(catalog == "ability" || catalog == "abilities") {
+		type = c_gameCatalogAbil;
+	}
+	else if(catalog == "actor" || catalog == "actors") {
+		type = c_gameCatalogActor;
+	}
+	else if(catalog == "behavior" || catalog == "behaviors") {
+		type = c_gameCatalogBehavior;
+	}
+	else if(catalog == "effect" || catalog == "effects") {
+		type = c_gameCatalogEffect;
+	}
+	else if(catalog == "footprint" || catalog == "footprints") {
+		type = c_gameCatalogFootprint;
+	}
+	else if(catalog == "light" || catalog == "lights") {
+		type = c_gameCatalogLight;
+	}
+	else if(catalog == "model" || catalog == "models") {
+		type = c_gameCatalogModel;
+	}
+	else if(catalog == "decal" || catalog == "decals") {
+		type = c_gameCatalogTexture;
+	}
+	else if(catalog == "turret" || catalog == "turrets") {
+		type = c_gameCatalogTurret;
+	}
+	else if(catalog == "unit" || catalog == "units") {
+		type = c_gameCatalogUnit;
+	}
+	else if(catalog == "upgrade" || catalog == "upgrades") {
+		type = c_gameCatalogUpgrade;
+	}
+	else if(catalog == "validator" || catalog == "validators") {
+		type = c_gameCatalogValidator;
+	}
+	else if(catalog == "weapon" || catalog == "weapons") {
+		type = c_gameCatalogWeapon;
+	}
+	else if(catalog == "sound" || catalog == "sounds") {
+		type = c_gameCatalogSound;
+	}
+	else if(catalog == "soundtrack" || catalog == "soundtracks") {
+		type = c_gameCatalogSoundtrack;
+	}
+	else if(catalog == "image" || catalog == "images") { 
+        type = -1;
+        //Handle Images
+    }
+	else {
+		LibapxLogInfo(p, "Usage: Search [ability|actor|behavior|weapon|validator|upgrade|unit|turret|light|footprint|model|decal|image] [what to search for]");
+		return "";
+	}
+    if(log) {
+        LibapxLogInfo(p, "Page "+IntToString(page)+" results for: \"" + query + "\":");
+    }
+
+    results = "";
+    if(type == -1) {
+        results = LibapxQueryImages(query, page, cap, p);
+    }
+    else {
+        attemptedAdds = 0;
+        //+1 is for next page, if there is a single result on next page, set next page to true for player
+        for (i = 1; i <= cap+1; i += 1) {
+            potentialResult = CatalogEntryGet(type, skip+i);
+            j = 1;
+            matchedAll = true;
+            while(StringWord(query, j) != "") {
+                individualQuery = StringWord(query, j);
+                j+=1;
+                
+                if (StringFind(potentialResult, individualQuery, c_stringNoCase) == -1) {
+                    matchedAll = false;
+                    break;
+                }
+            }
+
+            if(matchedAll) {
+                if (attemptedAdds < skip) {
+                    attemptedAdds += 1;
+                    cap += 1;
+                }
+                else {
+                    if(i == cap+1) {
+                        gv_LibapxPlayer[p].searchNextPage = true;
+                    }
+                    else {
+                        results += potentialResult + " ";
+
+                    }
+                }
+            }
+            else if (potentialResult == "") {
+                //Break if no more potential results
+                gv_LibapxPlayer[p].searchNextPage = false;
+                break;
+                
+            }
+            else {
+                //Increase cap to continue searching;
+                cap += 1;
+            }
+        }
+    }
+
+    LibapxMainUiSelectGuide(p);
+    LibapxSubUiSelectDataSearch(p);
+    LibapxDataSearchUiSetSearchQuery(results, p, catalog, query);
+
+    return results;
+}

@@ -10,12 +10,12 @@
 const string LibapxREGIONDATATABLEIDENTIFIER = "reg";
 const string LibapxREGIONIDDATATABLEIDENTIFIER = "reg";
 const string LibapxREGIONLINKDATATABLEIDENTIFIER = "regLink";
-const string LibapxREGIONANCHORDATATABLEIDENTIFIER = "regUnit"; // for #attach
+const string gv_LibapxRegionAnchorMapPrefix = "regUnit"; // for #attach
 
 const string LibapxWAYGATEDATATABLEIDENTIFIER = "waygate";
 const string LibapxWAYGATEDIALOGDATATABLEIDENTIFIER = "waygateDiag";
-const string LibapxWAYGATEDIALOGREGDATATABLEIDENTIFIER = "waygateDiagReg"; //region from dialog
-const string LibapxWAYGATEANCHORDATATABLEIDENTIFIER = "waygateDiagUnit";
+const string gv_LibapxWaygateDialogRegDataTableIdentifier = "waygateDiagReg"; //region from dialog
+const string gv_LibapxWaygateAnchorDataTableIdentifier = "waygateDiagUnit";
 
 // the dummy unit type used to anchor the waygate dialog "ENTER" button
 // (actual declaration occurs in data.galaxy, due to include order issues)
@@ -66,12 +66,12 @@ void LibapxCreateWaygateDialog(string rgnName) {
 	int i = 1;
 	LibapxCreateDialogBtn(dialog, 90, 44, c_anchorCenter, 0, 0, "Click to teleport these unit(s).", "Enter");
 	DataTableSetDialog(true, LibapxWAYGATEDIALOGDATATABLEIDENTIFIER + " " + rgnName, dialog);
-	DataTableSetString(true, LibapxWAYGATEDIALOGREGDATATABLEIDENTIFIER + " " + IntToString(dialog), rgnName);
+	DataTableSetString(true, gv_LibapxWaygateDialogRegDataTableIdentifier + " " + IntToString(dialog), rgnName);
 
 	// anchor the waygate dialog onto the unit
 	// first check if a region is attached to a unit:
-	if( DataTableValueExists(true, LibapxREGIONANCHORDATATABLEIDENTIFIER + " " + rgnName) ) {
-		anchor = DataTableGetUnit(true, LibapxREGIONANCHORDATATABLEIDENTIFIER + " " + rgnName);
+	if( DataTableValueExists(true, gv_LibapxRegionAnchorMapPrefix + " " + rgnName) ) {
+		anchor = DataTableGetUnit(true, gv_LibapxRegionAnchorMapPrefix + " " + rgnName);
 		if( anchor != null && UnitIsAlive(anchor) ) { // attach waygate dialog to region's unit anchor
 			UnitSetCustomValue(anchor, gv_LibapxUnitIndexWaygateDialog, IntToFixed(dialog));
 			DialogSetPositionRelativeToUnit(dialog, anchor, "RefOrigin", -60, 0);
@@ -79,7 +79,7 @@ void LibapxCreateWaygateDialog(string rgnName) {
 			return;
 		}
 		else { // anchor == null, unit doesn't exist, e.g. unit has been killed/removed
-			DataTableValueRemove(true, LibapxREGIONANCHORDATATABLEIDENTIFIER + " " + rgnName);
+			DataTableValueRemove(true, gv_LibapxRegionAnchorMapPrefix + " " + rgnName);
 		}
 	}
 	// else, create a static unit anchor on ground
@@ -90,7 +90,7 @@ void LibapxCreateWaygateDialog(string rgnName) {
 		ActorSend(libNtve_gf_MainActorofUnit(UnitLastCreated()), "SetFilterPlayers " + IntToString(i));
 	}
 	UnitSetCustomValue(UnitLastCreated(), gv_LibapxUnitIndexWaygateAnchor, 1.0);
-	DataTableSetUnit(true, LibapxWAYGATEANCHORDATATABLEIDENTIFIER + " " + rgnName, UnitLastCreated());
+	DataTableSetUnit(true, gv_LibapxWaygateAnchorDataTableIdentifier + " " + rgnName, UnitLastCreated());
 
 	DialogSetPositionRelativeToUnit(dialog, UnitLastCreated(), "RefOverhead", -60, 0);
 	//DialogSetVisible(dialog, PlayerGroupAll(), true);
@@ -143,23 +143,23 @@ void LibapxRegionRemoveLinks(string rgn1Name, int player) {
 		reg2Dialog = DataTableGetDialog(true, LibapxWAYGATEDIALOGDATATABLEIDENTIFIER + " " + rgn2Name);
 		DialogDestroy(reg1Dialog);
 		DialogDestroy(reg2Dialog);
-		DataTableValueRemove(true, LibapxWAYGATEDIALOGREGDATATABLEIDENTIFIER + " " + IntToString(reg1Dialog));
-		DataTableValueRemove(true, LibapxWAYGATEDIALOGREGDATATABLEIDENTIFIER + " " + IntToString(reg2Dialog));
+		DataTableValueRemove(true, gv_LibapxWaygateDialogRegDataTableIdentifier + " " + IntToString(reg1Dialog));
+		DataTableValueRemove(true, gv_LibapxWaygateDialogRegDataTableIdentifier + " " + IntToString(reg2Dialog));
 
 		// remove waygate static anchor units
-		if( DataTableValueExists(true, LibapxWAYGATEANCHORDATATABLEIDENTIFIER + " " + rgn1Name) ) {
-			UnitRemove(DataTableGetUnit(true, LibapxWAYGATEANCHORDATATABLEIDENTIFIER + " " + rgn1Name));
+		if( DataTableValueExists(true, gv_LibapxWaygateAnchorDataTableIdentifier + " " + rgn1Name) ) {
+			UnitRemove(DataTableGetUnit(true, gv_LibapxWaygateAnchorDataTableIdentifier + " " + rgn1Name));
 		}
-		if( DataTableValueExists(true, LibapxWAYGATEANCHORDATATABLEIDENTIFIER + " " + rgn2Name) ) {
-			UnitRemove(DataTableGetUnit(true, LibapxWAYGATEANCHORDATATABLEIDENTIFIER + " " + rgn2Name));
+		if( DataTableValueExists(true, gv_LibapxWaygateAnchorDataTableIdentifier + " " + rgn2Name) ) {
+			UnitRemove(DataTableGetUnit(true, gv_LibapxWaygateAnchorDataTableIdentifier + " " + rgn2Name));
 		}
 
 		// reset custom value (for waygate dialog id) for units that had waygate attached
-		if( DataTableValueExists(true, LibapxREGIONANCHORDATATABLEIDENTIFIER + " " + rgn1Name) ) {
-			UnitSetCustomValue(DataTableGetUnit(true, LibapxREGIONANCHORDATATABLEIDENTIFIER + " " + rgn1Name), gv_LibapxUnitIndexWaygateDialog, 0);
+		if( DataTableValueExists(true, gv_LibapxRegionAnchorMapPrefix + " " + rgn1Name) ) {
+			UnitSetCustomValue(DataTableGetUnit(true, gv_LibapxRegionAnchorMapPrefix + " " + rgn1Name), gv_LibapxUnitIndexWaygateDialog, 0);
 		}
-		if( DataTableValueExists(true, LibapxREGIONANCHORDATATABLEIDENTIFIER + " " + rgn2Name) ) {
-			UnitSetCustomValue(DataTableGetUnit(true, LibapxREGIONANCHORDATATABLEIDENTIFIER + " " + rgn2Name), gv_LibapxUnitIndexWaygateDialog, 0);
+		if( DataTableValueExists(true, gv_LibapxRegionAnchorMapPrefix + " " + rgn2Name) ) {
+			UnitSetCustomValue(DataTableGetUnit(true, gv_LibapxRegionAnchorMapPrefix + " " + rgn2Name), gv_LibapxUnitIndexWaygateDialog, 0);
 		}
 	}
 }

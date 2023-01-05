@@ -14,7 +14,7 @@ bool LibapxPlayerLeaves(bool testConds, bool runActions) {
 	int player = 1;
 	playergroup activePlayers = PlayerGroupActive();
 
-	LibapxPrintText(PlayerGroupAll(), gv_LibapxPlayerNameColored(EventPlayer()) + StringToText(" has left the game"));
+	LibapxLogPlayerGroupText(PlayerGroupAll(), gv_LibapxPlayerNameColored(EventPlayer()) + StringToText(" has left the game"));
 	
 	//Disable them
 	gv_LibapxPlayer[EventPlayer()].disabled = true;
@@ -28,7 +28,9 @@ bool LibapxPlayerLeaves(bool testConds, bool runActions) {
 		while( player < gv_LibapxMaxPlayers ) {
 			if ( gv_LibapxPlayer[player].permissionLevel == gv_LibapxPermissionLevelMod ) {
 				gv_LibapxPlayer[player].permissionLevel = LibapxPERMISSIONSLEVELADMIN;
-				LibapxPrintText(PlayerGroupAll(), gv_LibapxPlayerNameColored(player) + StringToText(" has been promoted to admin"));
+				LibapxPopulateSettingsFromPlayer(player);
+				gv_LibapxCurrentAdmin = player;
+				LibapxLogPlayerGroupText(PlayerGroupAll(), gv_LibapxPlayerNameColored(player) + StringToText(" has been promoted to admin"));
 				return true;
 			}
 			player += 1;
@@ -40,7 +42,9 @@ bool LibapxPlayerLeaves(bool testConds, bool runActions) {
 		}
 		player = PlayerGroupPlayer( activePlayers, RandomInt(1, PlayerGroupCount(activePlayers)) );
 		gv_LibapxPlayer[player].permissionLevel = LibapxPERMISSIONSLEVELADMIN;
-		LibapxPrintText(PlayerGroupAll(), gv_LibapxPlayerNameColored(player) + StringToText(" has been promoted to admin"));
+		LibapxLogPlayerGroupText(PlayerGroupAll(), gv_LibapxPlayerNameColored(player) + StringToText(" has been promoted to admin"));
+		LibapxPopulateSettingsFromPlayer(player);
+		gv_LibapxCurrentAdmin = player;
 	}
 	// also demote any moderators
 	else if( gv_LibapxPlayer[EventPlayer()].permissionLevel == gv_LibapxPermissionLevelMod ) {

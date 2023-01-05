@@ -1,0 +1,270 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<Desc>
+    <!-- Templates -->
+    <Frame type="Button" name="AliasSearchResultListItem" template="ApexTemplates/ApexListItem">
+        <Toggled val="True"/>
+
+
+        <StateGroup name="AcceptMouseToggle">
+            <DefaultState val="Default"/>
+            <State name="1">
+                <When type="Property" Toggled="True" frame="$this" operator="Equal"/>
+                <Action type="SetProperty" AcceptsMouse="True" frame="$this/SelectAliasButton" />
+                <Action type="SetProperty" AcceptsMouse="True" frame="$this/DeleteAliasButton" />
+            </State>
+            <State name="Default">
+                <Action type="SetProperty" AcceptsMouse="False" frame="$this/SelectAliasButton" />
+                <Action type="SetProperty" AcceptsMouse="False" frame="$this/DeleteAliasButton" />
+            </State>
+        </StateGroup>
+
+        <Frame type="Label" name="ListItemContent">
+            <Anchor side="Right" relative="$parent" pos="Max" offset="-40"/>
+            <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+        </Frame>
+
+
+        <Frame type="Button" name="SelectAliasButton" template="ApexTemplates/ApexIconButtonNoOutline">
+            <Anchor side="Left" relative="$parent" pos="Max" offset="-40"/>
+            <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+            <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
+            <Width val="35"/>
+            <Height val="35"/>
+            <Frame type="Image" name="Icon">
+                <Texture val="Apex/Assets/Textures/btn_circle.png"/>
+            </Frame>
+            <Frame type="Label" name="Tooltip">
+                <Text val="Select Alias"/>
+            </Frame>
+        </Frame>
+    
+        <Frame type="Button" name="DeleteAliasButton" template="ApexTemplates/ApexIconButtonNoOutline">
+            <Anchor side="Left" relative="$parent" pos="Max" offset="-80"/>
+            <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+            <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
+            <Width val="35"/>
+            <Height val="35"/>
+            <Color val="255,255,255"/>
+            <Frame type="Image" name="Icon">
+                <Texture val="Apex/Assets/Textures/btn_cancel.png"/>
+            </Frame>
+            <Frame type="Label" name="Tooltip">
+                <Text val="Delete Alias"/>
+            </Frame>
+        </Frame>
+
+    </Frame>
+    <!-- End of templates -->
+
+
+    <Frame type="Frame" name="GameUI/UIContainer/ConsoleUIContainer" file="GameUI">
+        <!-- Aliases -->
+		<Frame type="Button" name="PanelAliases" template="MainUiTemplates/SubPanelTemplate">
+			<Frame type="Frame" name="Content">
+
+                <!-- Tab Label -->
+				<Frame type="Label" name="PanelTitle">
+					<Text val="Aliases"/> 
+				</Frame>
+
+                <!-- Alias Search -->
+                <Frame type="Frame" name="AliasSearch" template="ApexTemplates/ApexInput">
+                    <Anchor side="Left" relative="$parent" pos="Mid" offset="0"/>
+                    <Anchor side="Right" relative="$parent" pos="Mid" offset="0"/>
+                    <Anchor side="Top" relative="$parent" pos="Min" offset="30"/>
+                    <Width val="450"/>
+                    
+                    
+                    <Frame type="EditBox" name="Editbox">
+                        <HighlightOnFocus val="False"/>
+                    </Frame>
+
+                    <Frame type="Label" name="Name">
+                        <Anchor side="Right" relative="$parent" pos="Min" offset="150"/>
+                        <Text val="Alias Search "/>
+                    </Frame>
+                </Frame>
+                <!-- Divier -->
+                <Frame type="Image" name="Divider">
+                    <Anchor side="Top" relative="$parent/AliasSearch" pos="Max" offset="0"/>
+                    <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
+                    <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+                    <Height val="1"/>
+                    <Alpha val="165"/>
+                    <Width val="450"/>
+                    <Texture val="Assets/Textures/white32.dds"/>
+                </Frame>
+
+                <!-- Scrollable Frame -->
+                <Frame type="ScrollableFrame" name="ScrollableContent" template="ApexTemplates/ScrollableFrame">
+                    <Anchor side="Top" relative="$parent/AliasSearch" pos="Max" offset="10"/>
+                    <Anchor side="Left" relative="$parent" pos="Min" offset="46"/>
+                    <Anchor side="Right" relative="$parent" pos="Max" offset="-46"/>
+                    <Anchor side="Bottom" relative="$parent" pos="Max" offset="-130"/>
+                    <Width val="450"/>
+                    <!-- Start of container frame -->
+                    <Frame type="Frame" name="ContainerFrame">
+                        <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+                        <!-- Ensure bottom anchor is always lowest content -->
+                        <Anchor side="Bottom" relative="$this/AliasValue" pos="Max" offset="0"/>
+                        <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+                        <Anchor side="Right" relative="$parent" pos="Max" offset="-30"/>
+                        
+                        <!-- Listbox -->
+                        <Frame type="Frame" name="SearchResults" template="ApexTemplates/ApexListBox">
+                            <Anchor side="Top" relative="$parent" pos="Min" offset="10"/>
+                            <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+                            <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
+                            <Height val="400"/>
+                            <!-- No Results -->
+                            <Frame type="Label" name="NoResultsText" template="ApexTemplates/ApexRectangularButton">
+                                <Anchor side="Top" relative="$parent" pos="Min" offset="10"/>
+                                <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+                                <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
+                                <Visible val="False"/>
+
+                                <Width val="250"/>
+                                <Height val="40"/>
+                                <Style val="apx_regular_center_mid"/>
+                                <Text val="No Results"/>
+                                <AcceptsMouse val="False"/>
+                            </Frame>
+
+                            <!-- List items -->
+                            <Frame type="Button" name="Item1" template="Aliases/AliasSearchResultListItem">
+                                <Toggled val="True"/>
+                            </Frame>
+                            <Frame type="Button" name="Item2" template="Aliases/AliasSearchResultListItem">
+                                <Anchor side="Top" relative="$parent/Item1" pos="Max" offset="0"/>
+                                <Toggled val="True"/>
+                            </Frame>
+                            <Frame type="Button" name="Item3" template="Aliases/AliasSearchResultListItem">
+                                <Anchor side="Top" relative="$parent/Item2" pos="Max" offset="0"/>
+                                <Toggled val="True"/>
+                            </Frame>
+                            <Frame type="Button" name="Item4" template="Aliases/AliasSearchResultListItem">
+                                <Anchor side="Top" relative="$parent/Item3" pos="Max" offset="0"/>
+                                <Toggled val="True"/>
+                            </Frame>
+                            <Frame type="Button" name="Item5" template="Aliases/AliasSearchResultListItem">
+                                <Anchor side="Top" relative="$parent/Item4" pos="Max" offset="0"/>
+                                <Toggled val="True"/>
+                            </Frame>
+                            <Frame type="Button" name="Item6" template="Aliases/AliasSearchResultListItem">
+                                <Anchor side="Top" relative="$parent/Item5" pos="Max" offset="0"/>
+                                <Toggled val="True"/>
+                            </Frame>
+                            <Frame type="Button" name="Item7" template="Aliases/AliasSearchResultListItem">
+                                <Anchor side="Top" relative="$parent/Item6" pos="Max" offset="0"/>
+                                <Toggled val="True"/>
+                            </Frame>
+                            <Frame type="Button" name="Item8" template="Aliases/AliasSearchResultListItem">
+                                <Anchor side="Top" relative="$parent/Item7" pos="Max" offset="0"/>
+                                <Toggled val="True"/>
+                            </Frame>
+                            <Frame type="Button" name="Item9" template="Aliases/AliasSearchResultListItem">
+                                <Anchor side="Top" relative="$parent/Item8" pos="Max" offset="0"/>
+                                <Toggled val="True"/>
+                            </Frame>
+                            <Frame type="Button" name="Item10" template="Aliases/AliasSearchResultListItem">
+                                <Anchor side="Top" relative="$parent/Item9" pos="Max" offset="0"/>
+                                <Toggled val="True"/>
+                            </Frame>
+                        </Frame>
+
+
+                        <Frame type="Frame" name="AliasOutput" template="ApexTemplates/ApexInput">
+                            <Anchor side="Top" relative="$parent/SearchResults" pos="Max" offset="20"/>
+        
+                            <Frame type="Label" name="Name">
+                                <Text val="Command"/>
+                            </Frame>
+                            <Frame type="Frame" name="EditBoxPadding">
+                                
+                                <Frame type="EditBox" name="Editbox">
+                                    <!-- 65 - 7, 7 being padding, 65 being distance of divider -->
+                                    <Anchor side="Right" relative="$parent" pos="Max" offset="-72"/>
+                                </Frame>
+                            </Frame>
+                        </Frame>
+
+
+                        <!-- Apply Alias Button -->
+                        <Frame type="Button" name="RunCommand" template="ApexTemplates/ApexIconButtonNoOutline">
+                            <Anchor side="Right" relative="$parent/AliasOutput" pos="Max" offset="-5"/>
+                            <Anchor side="Top" relative="$parent/AliasOutput" pos="Min" offset="0"/>
+                            <Anchor side="Bottom" relative="$parent/AliasOutput" pos="Max" offset="0"/>
+                            
+                            <Width val="30"/>
+                            <Height val="30"/>
+                            <Frame type="Image" name="Icon">
+                                <Texture val="Apex/Assets/Textures/btn_triangle.png"/>
+                            </Frame>
+                            <Frame type="Label" name="Tooltip">
+                                <Text val="Create Alias"/>
+                            </Frame>
+                        </Frame>
+
+                        <Frame type="CopyClipboardButton" name="CopyButton" template="ApexTemplates/ApexIconButtonNoOutline">
+                            <ClipboardText val="{$parent/AliasOutput/EditBoxPadding/Editbox/LabelContainerFrame/Label/@Text}"/>
+                            <Anchor side="Right" relative="$parent/AliasOutput" pos="Max" offset="-35"/>
+                            <Anchor side="Top" relative="$parent/AliasOutput" pos="Min" offset="0"/>
+                            <Anchor side="Bottom" relative="$parent/AliasOutput" pos="Max" offset="0"/>
+                            <Width val="30"/>
+                            <Height val="30"/>
+                            <Frame type="Image" name="Icon">
+                                <Texture val="Apex/Assets/Textures/btn_copy.png"/>
+                            </Frame>
+                            <Frame type="Label" name="Tooltip">
+                                <Text val="Copy"/>
+                            </Frame>
+                        </Frame>
+
+                        <Frame type="Image" name="ApplyButtonDivider">
+                            <Anchor side="Right" relative="$parent/AliasOutput" pos="Max" offset="-65"/>
+                            <Anchor side="Top" relative="$parent/AliasOutput/EditBoxPadding" pos="Min" offset="3"/>
+                            <Anchor side="Bottom" relative="$parent/AliasOutput/EditBoxPadding" pos="Max" offset="-3"/>
+                            <Width val="1"/>
+                            <Alpha val="65"/>
+                            <Texture val="Assets/Textures/white32.dds"/>
+                        </Frame>
+
+
+
+                        <Frame type="Frame" name="AliasKey" template="ApexTemplates/ApexInput">
+                            <Anchor side="Top" relative="$parent/AliasOutput" pos="Max" offset="0"/>
+        
+                            <Frame type="Label" name="Name">
+                                <Text val="Key"/>
+                            </Frame>
+                        </Frame>
+
+                        
+                        <Frame type="Frame" name="AliasParameters" template="ApexTemplates/ApexTextarea">
+                            <Height val="100"/>
+                            <Anchor side="Top" relative="$parent/AliasKey" pos="Max" offset="-20"/>
+        
+                            <Frame type="Label" name="Name">
+                                <Text val="Parameters"/>
+                            </Frame>
+                        </Frame>
+
+                        
+                        <Frame type="Frame" name="AliasValue" template="ApexTemplates/ApexTextarea">
+                            <Anchor side="Top" relative="$parent/AliasParameters" pos="Max" offset="-20"/>
+                            
+                            <Frame type="Label" name="Name">
+                                <Text val="Value"/>
+                            </Frame>
+                        </Frame>
+
+                    </Frame>
+                    <!-- End of container frame -->
+                </Frame>
+                <!-- End of scrollable Frame -->
+                
+
+			</Frame>
+        </Frame>
+    </Frame>
+</Desc>

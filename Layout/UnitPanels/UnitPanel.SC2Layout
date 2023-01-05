@@ -3,22 +3,305 @@
 
     <!--Resizes all units selected images-->
     <Include path="Apex/Layout/UnitPanels/SelectedPages.SC2Layout"/>
-		<!--Apex Wireframe And StatsBars-->
-		<Include path="Apex/Layout/UnitPanels/Wireframe.SC2Layout"/>
-
-		<!--False Apex Wireframe And StatsBars-->
-		<Include path="Apex/Layout/UnitPanels/FalseWireframe.SC2Layout"/>
+	<!--Apex Wireframe And StatsBars-->
+	<Include path="Apex/Layout/UnitPanels/UnitStats.SC2Layout"/>
+	<!--False Apex Wireframe And StatsBars-->
+	<Include path="Apex/Layout/UnitPanels/FalseWireframe.SC2Layout"/>
 
 
     <Frame type="Frame" name="GameUI/UIContainer/ConsoleUIContainer" file="GameUI">
+		
+		<Frame type="Button" name="ApexUnitPanel" template="ApexTemplates/ApexFrameTemplate">
 
-		<!-- Unit name-->
+			<Anchor side="Top" relative="$parent" pos="Min" offset="40"/>
+			<Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+			<Height val="800"/>
+			<Width val="555"/>
+
+			<!-- Jump-in Animation -->
+			<Animation name="Show">
+				<Event event="Toggled" action="Restart,Play" frame="$this"/>
+				<Controller type="Anchor" side="Left" relative="True" end="Pause" frame="$this">
+					<Key type="Curve" time="0.0" value="0"/>
+					<Key type="Curve" time=".15" value="40"/>
+				</Controller>
+			</Animation>
+			<Animation name="Hide">
+				<Event event="Normal" action="Restart,Play" frame="$this"/>
+				<Controller type="Anchor" side="Left" relative="True" end="Pause" frame="$this">
+					<Key type="Curve" time="0.0" value="40"/>
+					<Key type="Curve" time=".15" value="0"/>
+				</Controller>
+			</Animation>
+
+			<Frame type="Frame" name="Content">
+
+				<Frame type="Frame" name="WireframeArea">
+					<Anchor side="Left" relative="$parent" pos="Min" offset="21"/>
+					<Anchor side="Right" relative="$parent" pos="Max" offset="-21"/>
+					<Anchor side="Top" relative="$parent" pos="Min" offset="21"/>
+					<Height val="215"/>
+					<RenderPriority val="9"/>
+					<Visible val="true"/>
+					<Frame type="Frame" name="Frame"></Frame>
+					<Frame type="Image" name="WireframeImageMask">
+						<Anchor side="Bottom" relative="$parent" pos="Max" offset="298"/>
+						<Anchor side="Left" relative="$parent" pos="Min" offset="2"/>
+						<Anchor side="Top" relative="$parent" pos="Min" offset="2"/>
+						<Anchor side="Right" relative="$parent" pos="Max" offset="-2"/>
+						<AlphaMaskSiblings val="True"/>
+						<AlphaMaskTexture val="Apex\Assets\Textures\unit_image_mask.dds"/>
+						<Color val="255,255,255"/>
+						<Texture val="Assets\Textures\blank.dds"/>
+						<Alpha val="125"/>
+						<RenderPriority val="25"/>
+					</Frame>
+					<Frame type="Frame" name="WireframeImageHolder">
+						<Anchor side="Left" relative="$parent" pos="Min" offset="2"/>
+						<Anchor side="Top" relative="$parent" pos="Min" offset="2"/>
+						<Anchor side="Right" relative="$parent" pos="Max" offset="-2"/>
+						<Anchor side="Bottom" relative="$parent" pos="Max" offset="-2"/>
+						<Frame type="Image" name="DefaultWireframeImageBg">
+							<Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
+							<Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
+							<Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+							<Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+							<Texture val="Assets\Textures\briefingportrait_tvalerian01_charmatte_emissive.dds"/>
+							<Color val="255,255,255"/>
+							<TextureType val="Normal"/>
+							<RenderPriority val="25"/>
+							<Alpha val="255"/>
+						</Frame>
+						<Frame type="Image" name="DefaultWireframeImage">
+							<Anchor side="Bottom" relative="$parent" pos="Mid" offset="0"/>
+							<Anchor side="Right" relative="$parent" pos="Mid" offset="0"/>
+							<Anchor side="Top" relative="$parent" pos="Mid" offset="0"/>
+							<Anchor side="Left" relative="$parent" pos="Mid" offset="0"/>
+							<Texture val="Apex\Assets\Textures\Info.png"/>
+							<TextureType val="Normal"/>
+							<RenderPriority val="25"/>
+							<Color val="255,255,255"/>
+							<Height val="120"/>
+							<Width val="120"/>
+							<Alpha val="255"/>
+						</Frame>
+					</Frame>
+				</Frame>
+				<!-- Name -->
+				<Frame type="Label" name="UnitName">
+					<Text val="This Should Never Display"/>
+					<Style val="apx_heading_center_mid"/>
+					<Anchor side="Left" relative="$parent" pos="Min" offset="16"/>
+					<Anchor side="Right" relative="$parent" pos="Max" offset="-16"/>
+					<Anchor side="Top" relative="$parent" pos="Min" offset="200"/>
+					<RenderPriority val="25"/>
+				</Frame>
+	
+				<Frame type="Frame" name="TitleBackground" template="ApexTemplates/ApexOutlineTemplate">
+					<Anchor side="Bottom" relative="$parent/UnitName" pos="Max" offset="0"/>
+					<Anchor side="Right" relative="$parent/UnitName" pos="Max" offset="0"/>
+					<Anchor side="Top" relative="$parent/UnitName" pos="Min" offset="0"/>
+					<Anchor side="Left" relative="$parent/UnitName" pos="Min" offset="0"/>
+				</Frame>
+				
+				<!-- Subtitle -->
+				<Frame type="Label" name="UnitSubtitle">
+					<Text val="This should never display"/>
+					<Style val="apx_subtitle"/>
+					<Anchor side="Left" relative="$parent/UnitName" pos="Mid" offset="00"/>
+					<Anchor side="Right" relative="$parent/UnitName" pos="Mid" offset="0"/>
+					<Anchor side="Top" relative="$parent/UnitName" pos="Max" offset="-25"/>
+					<RenderPriority val="25"/>
+				</Frame>
+				<Frame type="Frame" name="SubtitleBackground">	
+					<Anchor side="Top" relative="$parent/UnitSubtitle" pos="Min" offset="-5"/>
+					<Anchor side="Left" relative="$parent/UnitSubtitle" pos="Min" offset="-5"/>
+					<Anchor side="Bottom" relative="$parent/UnitSubtitle" pos="Max" offset="5"/>
+					<Anchor side="Right" relative="$parent/UnitSubtitle" pos="Max" offset="5"/>
+	
+					<RenderPriority val="8"/>
+					<Frame type="Image" name="BackgroundColor">
+						<TextureType val="Border"/>
+						<Texture val="Apex/Assets/Textures/GenericFrame/simple_outline_background.dds"/>
+						<Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+						<Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+						<Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
+						<Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
+						<RenderPriority val="7"/>
+					</Frame>
+		
+					<Frame type="Image" name="Border">
+						<TextureType val="Border"/>
+						<Texture val="Apex/Assets/Textures/GenericFrame/simple_outline_border.dds"/>
+						<Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+						<Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+						<Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
+						<Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
+						<RenderPriority val="9"/>
+					</Frame>
+				</Frame>
+	
+				<!-- Unit Tabs/Options -->
+				<Frame type="Frame" name="UnitOptions">
+					<Anchor side="Top" relative="$parent/SubtitleBackground" pos="Max" offset="4"/>
+					<Anchor side="Left" relative="$parent" pos="Mid" offset="0"/>
+					<Anchor side="Right" relative="$parent" pos="Mid" offset="0"/>
+					<Width val="512"/>
+					<Height val="40"/>
+					<!-- Available Options -->
+	
+					<!-- Bottom Line -->
+					<Frame type="Image" name="BottomLine">
+						<TextureType val="Border"/>
+						<Texture val="Apex/Assets/Textures/GenericFrame/simple_outline_background.dds"/>
+						<Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+						<Anchor side="Top" relative="$parent" pos="Max" offset="0"/>
+						<Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
+						<Height val="3"/>
+						<Alpha val="115"/>
+						<Color val="255,255,255"/>
+						<RenderPriority val="9"/>
+						<Unclipped val="True"/>
+					</Frame>
+	
+					<!-- Selection of unit options -->
+					<Frame type="Button" name="UnitOptionControl" template="ApexTemplates/ApexRectangularButton">
+						<Width val="120"/>
+						<Height val="50"/>
+						<Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+						<Anchor side="Left" relative="$parent" pos="Min" offset="4"/>
+						<Tooltip val="Has all control related buttons and information"/>
+						<Frame type="Label" name="ButtonText">
+							<Style val="apx_regular_center_mid"/>
+							<Anchor side="Bottom" relative="$parent" pos="Max" offset="-10"/>
+							<Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
+							<Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+							<Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+							<Text val="Control"/>
+						</Frame>
+					</Frame>
+					<Frame type="Button" name="UnitOptionDescription" template="ApexTemplates/ApexRectangularButton">
+						<Width val="120"/>
+						<Height val="50"/>
+						<Anchor side="Left" relative="$parent/UnitOptionControl" pos="Max" offset="8"/>
+						<Anchor side="Top" relative="$parent/UnitOptionControl" pos="Min" offset="0"/>
+						<Tooltip val="Description about the unit."/>
+						<Frame type="Label" name="ButtonText">
+							<Style val="apx_regular_center_mid"/>
+							<Anchor side="Bottom" relative="$parent" pos="Max" offset="-10"/>
+							<Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
+							<Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+							<Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+							<Text val="Description"/>
+						</Frame>
+					</Frame>
+					<Frame type="Button" name="UnitOptionLog" template="ApexTemplates/ApexRectangularButton">
+						<Width val="120"/>
+						<Height val="50"/>
+						<Anchor side="Left" relative="$parent/UnitOptionDescription" pos="Max" offset="8"/>
+						<Anchor side="Top" relative="$parent/UnitOptionDescription" pos="Min" offset="0"/>
+						<Tooltip val="Things the unit has said with @say"/>
+						<Frame type="Label" name="ButtonText">
+							<Style val="apx_regular_center_mid"/>
+							<Anchor side="Bottom" relative="$parent" pos="Max" offset="-10"/>
+							<Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
+							<Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+							<Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+							<Text val="Log"/>
+						</Frame>
+					</Frame>
+					<Frame type="Button" name="UnitOptionProperties" template="ApexTemplates/ApexRectangularButton">
+						<Width val="120"/>
+						<Height val="50"/>
+						<Anchor side="Left" relative="$parent/UnitOptionLog" pos="Max" offset="8"/>
+						<Anchor side="Top" relative="$parent/UnitOptionLog" pos="Min" offset="0"/>
+						<Tooltip val="Unit properties"/>
+						<Frame type="Label" name="ButtonText">
+							<Style val="apx_regular_center_mid"/>
+							<Anchor side="Bottom" relative="$parent" pos="Max" offset="-10"/>
+							<Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
+							<Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+							<Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+							<Text val="Properties"/>
+						</Frame>
+					</Frame>
+	
+	
+				</Frame>
+				<!-- Unit Tabs -->
+				<!-- Control Handled with InfoPanel & CommandPanel Below -->
+				
+				<!-- Description Tab -->
+				<Frame type="ScrollableFrame" name="UnitOptionDescriptionPanel" template="ApexTemplates/ScrollableFrame">
+					<Anchor side="Top" relative="$parent/UnitOptions" pos="Max" offset="10"/>
+					<Anchor side="Left" relative="$parent" pos="Min" offset="46"/>
+					<Anchor side="Right" relative="$parent" pos="Max" offset="-46"/>
+					<Anchor side="Bottom" relative="$parent" pos="Max" offset="-46"/>
+		
+					<Frame type="Frame" name="ContainerFrame">
+						<Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+						<!-- Ensure bottom anchor is always lowest content -->
+						<Anchor side="Bottom" relative="$this/Description" pos="Max" offset="0"/>
+						<Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+						<Anchor side="Right" relative="$parent" pos="Max" offset="-30"/>
+	
+						<Frame type="Label" name="Description">
+							<Style val="apx_regular_left_top"/>
+							<Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+							<Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+							<Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
+							<RenderPriority val="25"/>
+							
+						</Frame>
+					</Frame>
+					
+				</Frame>
+	
+				<!-- Log Tab -->
+				<Frame type="ScrollableFrame" name="UnitOptionLogPanel" template="ApexTemplates/ScrollableFrame">
+					<Anchor side="Top" relative="$parent/UnitOptions" pos="Max" offset="10"/>
+					<Anchor side="Left" relative="$parent" pos="Min" offset="46"/>
+					<Anchor side="Right" relative="$parent" pos="Max" offset="-46"/>
+					<Anchor side="Bottom" relative="$parent" pos="Max" offset="-46"/>
+		
+					<Frame type="Frame" name="ContainerFrame">
+						<Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+						<!-- Ensure bottom anchor is always lowest content -->
+						<Anchor side="Bottom" relative="$this/Log" pos="Max" offset="0"/>
+						<Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+						<Anchor side="Right" relative="$parent" pos="Max" offset="-30"/>
+	
+						<Frame type="Label" name="Log">
+							<Style val="apx_regular_left_top"/>
+							<Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+							<Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+							<Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
+							<RenderPriority val="25"/>
+							<Text val="Big label"/>
+						</Frame>
+					</Frame>
+	
+				</Frame>
+	
+	
+				<!-- Properties Tab -->
+	
+
+
+			</Frame>			
+
+
+		</Frame>
+
+		<!-- Unit Info-->
 		<Frame type="InfoPanel" name="InfoPanel">
-			<Anchor side="Right" relative="$parent" pos="1" offset="-322"/>
-			<Anchor side="Left" relative="$parent" pos="1" offset="-920"/>
-			<Anchor side="Bottom" relative="$parent" pos="Max" offset="-20"/>
+			<Anchor side="Right" relative="$parent/ApexUnitPanel" pos="Max" offset="-16"/> <!-- Offset is 300+width -->
+			<Anchor side="Left" relative="$parent/ApexUnitPanel" pos="Min" offset="16"/> <!-- Offset is 300+width -->
+			<Anchor side="Top" relative="$parent/ApexUnitPanel/Content/UnitOptions" pos="Max" offset="10"/>
 			<Height val="250"/>
-			<Frame name="background" type="Image">
+			<Visible val="False"/>
+			<Unclipped val="True"/>
+			<!-- <Frame name="background" type="Image">
 				<IgnoreParentAlpha val="true"/>
 				<RenderPriority val="2"/>
 				<DisabledAlpha val="0"/>
@@ -41,7 +324,7 @@
 					<Texture val="Apex\Assets\Textures\ApexUI.dds"/>
 					<TextureType val="Border"/>
 					<Tiled val="true"/>
-			</Frame>
+			</Frame> -->
 			<!--Stats positioning-->
 			<Frame type="Frame" name="UnitPanel">
 					<Visible val="true"/>
@@ -56,44 +339,21 @@
 			</Frame>
 			<!--Normal unit-->
 			<Frame type="InfoPaneUnit" name="InfoPaneUnit">
-				<Width val="450"/>
 
 				<Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
 				<Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
-				
-				<Height val="250"/>
+				<Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
+				<Width val="0"/>
+
 				<Frame type="Label" name="NameLabel">
 					<Visible val="false"/>
 					<Anchor side="Top" relative="$parent" pos="Max" offset="100"/>
 					<Anchor side="Bottom" relative="$parent" pos="Max" offset="100"/>
 				</Frame>
-				<Frame type="EquipmentIcon" name="EquipmentIconTemplate">
-					<Frame type="Image" name="EquipmentIconBorder">
-						<Texture val="Assets\Textures\btn-border-equipment_help.dds"/>
-						<Color val="255,255,255"/>
-						<Desaturated val="true"/>
-					</Frame>
-				</Frame>
-				<Frame type="Label" name="ApexNameLabel">
-					<Style val="@@@InfoPaneUnitName"/>
-					<Text val="Nametest"/>
-					<Anchor side="Top" relative="$parent" pos="Min" offset="10"/>
-					<Anchor side="Left" relative="$parent" pos="Min" offset="6"/>
-					<Anchor side="Bottom" relative="" pos="Max" offset="0"/>
-					<Anchor side="Right" relative="$parent" pos="1" offset="0"/>
-				</Frame>
 				<Frame type="Label" name="Subtitle">
 					<Visible val="false"/>
 					<Anchor side="Top" relative="$parent" pos="Max" offset="100"/>
 					<Anchor side="Bottom" relative="$parent" pos="Max" offset="100"/>
-				</Frame>
-				<Frame type="Label" name="ApexSubtitle">
-					<Anchor side="Top" relative="$parent/ApexNameLabel" pos="Max" offset="0"/>
-					<Text val="helpme! I am a big subtitle"/>
-					<Style val="@@@InfoPaneUnitSubtitle"/>
-					<Anchor side="Left" relative="$parent" pos="Min" offset="6"/>
-					<Anchor side="Bottom" relative="" pos="Max" offset="0"/>
-					<Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
 				</Frame>
 				<Frame type="Label" name="InfoLabel">
 						<Visible val="false"/>
@@ -101,36 +361,30 @@
 						<Anchor side="Bottom" relative="$parent" pos="Max" offset="100"/>
 				</Frame>
 				<Frame type="Frame" name="EquipmentPanel">
-						<Anchor side="Top" relative="$parent/ApexSubtitle" pos="Max" offset="10"/>
+						<Anchor side="Top" relative="$parent" pos="Min" offset="40"/>
 
 				</Frame>
 				<Frame type="Label" name="TypeLabel">
-						<Visible val="false"/>
-						<Anchor side="Top" relative="$parent" pos="Max" offset="100"/>
-						<Anchor side="Bottom" relative="$parent" pos="Max" offset="100"/>
+						<Color val="ffffff"/>
+						<Style val="apx_regular_center_mid"/>
+						<Visible val="True"/>
+						<Anchor side="Top" relative="$parent/EquipmentPanel" pos="Max" offset="20"/>
+						<Anchor side="Bottom" relative="$parent/EquipmentPanel" pos="Max" offset="40"/>
 				</Frame>
 			</Frame>
 			<!-- Hero Unit -->
 			<Frame type="InfoPaneHero" name="InfoPaneHero">
-				<Width val="450"/>
-				<Anchor side="Left" relative="$parent" pos="Min" offset="6"/>
-				<Anchor side="Bottom" relative="$parent" pos="Max" offset="6"/>
-				<Height val="250"/>
+				<Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+				<Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+				<Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
+				<Width val="400"/>
 				<Frame type="Label" name="NameLabel">
 					<Visible val="false"/>
 					<Anchor side="Top" relative="$parent" pos="Max" offset="100"/>
 					<Anchor side="Bottom" relative="$parent" pos="Max" offset="100"/>
 				</Frame>
-				<Frame type="Label" name="ApexNameLabel">
-					<Style val="@@@InfoPaneUnitName"/>
-					<Text val="Nametest"/>
-					<Anchor side="Top" relative="$parent" pos="Min" offset="10"/>
-					<Anchor side="Left" relative="$parent" pos="Min" offset="6"/>
-					<Anchor side="Bottom" relative="" pos="Max" offset="0"/>
-					<Anchor side="Right" relative="$parent" pos="1" offset="0"/>
-				</Frame>
 				<Frame type="ProgressBar" name="ExperienceBar">
-					<Anchor side="Top" relative="$parent/ApexNameLabel" pos="Min" offset="100"/>
+					<Anchor side="Top" relative="$parent" pos="Min" offset="10"/>
 				</Frame>
 				<Frame type="Label" name="InfoLabel">
 					<Visible val="false"/>
@@ -150,65 +404,37 @@
 				<Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
 				<Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
 				<Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
-				<Height val="250"/>
+				<Height val="00"/>
 				<Width val="600"/>
 				<Frame type="Label" name="CurrentCargoLabel">
-					<Anchor side="Top" relative="$parent/ApexNameLabel" pos="Max" offset="0"/>
+					<Anchor side="Top" relative="$parent" pos="Max" offset="0"/>
 					<Visible val="false"/>
 				</Frame>
 				<Frame type="Frame" name="CargoContainer">
-					<Anchor side="Top" relative="$parent/CurrentCargoLabel" pos="Max" offset="0"/>
-				</Frame>
-				<Frame type="Label" name="ApexNameLabel">
-					<Style val="@@@InfoPaneUnitName"/>
-					<Text val=""/>
 					<Anchor side="Top" relative="$parent" pos="Min" offset="10"/>
-					<Anchor side="Left" relative="$parent" pos="Min" offset="6"/>
-					<Anchor side="Right" relative="$parent" pos="1" offset="-6"/>
 				</Frame>
 				<Frame type="Label" name="NameLabel">
 						<Visible val="false"/>
 				</Frame>
 			</Frame>
 		</Frame>
-		<!-- name Button container -->
-		<Frame type="Frame" name="CommandPanelHelper">
-				<Anchor side="Right" relative="$parent" pos="1" offset="-20"/>
-				<Height val="68.5"/>
-				<Width val="302"/>
-				<Anchor side="Bottom" relative="$parent" pos="Max" offset="-201"/>
-				<Frame name="background" type="Image">
-						<IgnoreParentAlpha val="true"/>
-						<RenderPriority val="1"/>
-						<DisabledAlpha val="0"/>
-						<Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
-						<Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
-						<Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
-						<Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
-						<Texture val="Assets\Textures\border-protoss-transportslot-filled.dds"/>
-						<TextureType val="Border"/>
-						<Tiled val="true"/>
-					</Frame>
-					<Frame name="backgroundGrey" type="Image">
-							<IgnoreParentAlpha val="true"/>
-							<RenderPriority val="2"/>
-							<DisabledAlpha val="0"/>
-							<Anchor side="Left" relative="$parent" pos="Min" offset="-100"/>
-							<Anchor side="Right" relative="$parent" pos="Max" offset="100"/>
-							<Anchor side="Top" relative="$parent" pos="Min" offset="-100"/>
-							<Anchor side="Bottom" relative="$parent" pos="Max" offset="100"/>
-							<Texture val="Apex\Assets\Textures\ApexUI.dds"/>
-							<TextureType val="Border"/>
-							<Tiled val="true"/>
-					</Frame>
-		</Frame>
 		<!-- Unit abilities/command panel -->
 		<Frame type="CommandPanel" name="CommandPanel">
-			<Anchor side="Right" relative="$parent" pos="1" offset="-20"/> <!-- Offset is 300+width -->
 			<Height val="181.5"/>
+			<RenderPriority val="15"/>
+			<Anchor side="Right" relative="$parent/ApexUnitPanel" pos="Mid" offset="0"/> <!-- Offset is 300+width -->
+			<Anchor side="Left" relative="$parent/ApexUnitPanel" pos="Mid" offset="0"/> <!-- Offset is 300+width -->
+			<Anchor side="Bottom" relative="$parent/ApexUnitPanel" pos="Max" offset="-80"/>
+			<Animation name="Show">
+				<Event event="OnShown" action="Restart,Play" frame="$this"/>
+				<Controller type="Fade" side="Bottom" relative="False" frame="$this">
+					<Key type="Curve" time="0.0" value="0"/>
+					<Key type="Curve" time=".15" value="155"/>
+				</Controller>
+			</Animation>
 			<Width val="302"/>
-			<Anchor side="Bottom" relative="$parent" pos="Max" offset="-20"/>
-			<Frame name="background" type="Image">
+
+			<!-- <Frame name="background" type="Image">
 				<IgnoreParentAlpha val="true"/>
 				<RenderPriority val="1"/>
 				<DisabledAlpha val="0"/>
@@ -231,7 +457,7 @@
 					<Texture val="Apex\Assets\Textures\ApexUI.dds"/>
 					<TextureType val="Border"/>
 					<Tiled val="true"/>
-			</Frame>
+			</Frame> -->
 			<Frame type="CommandButton" name="CommandButton00">
 				<Height val="57"/> <!--Default size is 76 x 76-->
 				<Width val="57"/>

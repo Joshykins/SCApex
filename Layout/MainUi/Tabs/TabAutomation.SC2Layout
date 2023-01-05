@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<Desc>
+    <Include path="Apex/Layout/MainUi/TabContent/Aliases.SC2Layout"/>
+    <Frame type="Button" name="Tabs" template="MainUiTemplates/SubTab">
+
+        <StateGroup name="tab1">
+            <DefaultState val="Default"/>
+            <State name="1">
+                <When type="Property" Toggled="True" frame="$parent/$parent/MainPanelBackground/Automation/Tab1" operator="Equal"/>
+                <Action type="SetProperty" Toggled="True" frame="$parent/$parent/PanelAliases" />
+            </State>
+            <State name="Default">
+                <Action type="SetProperty" Toggled="False" frame="$parent/$parent/PanelAliases" />
+            </State>
+        </StateGroup>
+
+
+
+        <StateGroup name="tab2">
+            <DefaultState val="Default"/>
+            <State name="1">
+                <When type="Property" Toggled="True" frame="$parent/$parent/MainPanelBackground/Automation/Tab2" operator="Equal"/>
+                <Action type="SetProperty" Toggled="True" frame="$parent/$parent/PanelVariables" />
+            </State>
+            <State name="Default">
+                <Action type="SetProperty" Toggled="False" frame="$parent/$parent/PanelVariables" />
+            </State>
+        </StateGroup>
+
+        <!-- SubButtons -->
+        <Frame type="Button" name="Tab1" template="MainUiTemplates/SubTabButton">
+            <Frame type="Image" name="Icon">
+                <Texture val="Apex/Assets/Textures/BottomUi/btn_automation_macros.png"/>
+                <Color val="204,59,49"/>
+            </Frame>
+
+            <Frame type="Label" name="ButtonText">
+                <Text val="Aliases"/>
+            </Frame>
+        </Frame>
+
+        <Frame type="Button" name="Tab2" template="MainUiTemplates/SubTabButton">
+            <Anchor side="Right" relative="$parent/Tab1" pos="Min" offset="-20"/>
+            <Frame type="Image" name="Icon">
+                <Texture val="Apex/Assets/Textures/BottomUi/btn_automation_variables.png"/>
+                <Color val="0,255,195"/>
+            </Frame>
+
+            <Frame type="Label" name="ButtonText">
+                <Text val="Variables"/>
+            </Frame>
+        </Frame>
+    </Frame>
+
+
+
+
+    <Frame type="Frame" name="GameUI/UIContainer/ConsoleUIContainer" file="GameUI">
+        <!-- Variables -->
+		<Frame type="Button" name="PanelVariables" template="MainUiTemplates/SubPanelTemplate">
+			<Frame type="Frame" name="Content">
+
+                <!-- Tab Label -->
+				<Frame type="Label" name="PanelTitle">
+					<Text val="Variables"/>
+				</Frame>
+
+                <!-- Scrollable Frame -->
+                <Frame type="ScrollableFrame" name="ScrollableContent" template="ApexTemplates/ScrollableFrame">
+                    <Anchor side="Top" relative="$parent" pos="Min" offset="46"/>
+                    <Anchor side="Left" relative="$parent" pos="Min" offset="46"/>
+                    <Anchor side="Right" relative="$parent" pos="Max" offset="-46"/>
+                    <Anchor side="Bottom" relative="$parent" pos="Max" offset="-130"/>
+                    <Width val="450"/>
+                    <!-- Start of container frame -->
+                    <Frame type="Frame" name="ContainerFrame">
+                        <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+                        <!-- Ensure bottom anchor is always lowest content -->
+                        <Anchor side="Bottom" relative="$this/Content" pos="Max" offset="0"/>
+                        <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+                        <Anchor side="Right" relative="$parent" pos="Max" offset="-30"/>
+                        
+                        <!-- No Results -->
+                        <Frame type="Label" name="Content">
+                            <Anchor side="Top" relative="$parent" pos="Min" offset="10"/>
+                            <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+                            <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
+                            <Options val="NewLineIfTruncated"/>
+                            <Text val="Variables Content"/>
+                            <AcceptsMouse val="False"/>
+                        </Frame>
+                    </Frame>
+                    <!-- End of container frame -->
+                </Frame>
+                <!-- End of scrollable Frame -->
+
+			</Frame>
+        </Frame>
+        
+    </Frame>
+
+
+</Desc>

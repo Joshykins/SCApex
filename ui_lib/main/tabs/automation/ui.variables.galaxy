@@ -1,0 +1,156 @@
+static int gv_ContentLabel;
+
+void LibapxUiInitVariables() {
+    string baseTemplate = "UIContainer/ConsoleUIContainer/PanelVariables/Content/";
+    gv_ContentLabel = DialogControlHookupStandard(c_triggerControlTypeLabel, baseTemplate + "ScrollableContent/ContainerFrame/Content");
+    
+
+}
+
+static bool[gv_LibapxMaxPlayers] gv_UnitVariablesActive;
+static bool[gv_LibapxMaxPlayers] gv_UnitVariablesActiveLastTick;
+static unitgroup[gv_LibapxMaxPlayers] gv_PreviouslySelected;
+static string[gv_LibapxMaxPlayers] gv_UnitVariableError;
+//Handles whether or not should activate
+
+static string gvColor = "<c val=\"00ffff\">";
+static string lvColor = "<c val=\"ffd700\">";
+static string resetColor = "<c val=\"eeeeee\">";
+static string whiteColor = "<c val=\"ffffff\">";
+
+
+static void CanDisplayUnitVariables(int p) {
+    unitgroup selected = UnitGroupSelected(p);
+    unit current = UnitGroupUnit(selected, 1); 
+    string errorMessage = "";
+    while (true) {
+        if(UnitGroupCount(selected, c_unitCountAlive) < 1) {
+            errorMessage = "No unit Selected. Spawn a unit and use"+lvColor+"_unitvar"+resetColor+" to set a variable on it!";
+             break;
+        }
+
+        break;
+    }
+    gv_UnitVariableError[p] = errorMessage; 
+
+    if(errorMessage == "") {
+        gv_UnitVariablesActive[p] = true;
+    }
+    else {
+        gv_UnitVariablesActive[p] = false;
+    }
+
+
+
+    if(current != UnitGroupUnit(gv_PreviouslySelected[p], 1) && errorMessage == "") {
+        gv_UnitVariablesActiveLastTick[p] = false; //This'll trigger re-activation
+    } 
+    gv_PreviouslySelected[p] = selected;
+}
+
+static void SetVaribleUiText(int p) {
+    string output = "<s val=\"apx_regular_left_mid\">";
+    string globalVariablesBankKey = gv_LibapxVariableMapPrefix + IntToString(p);
+    string globalVariablesList = LibapxTManagerGetList(globalVariablesBankKey);
+    string localVariablesBankKey;
+    string localVariablesList;
+    int i = 1;
+    string current;
+    unit selected = UnitGroupUnit(UnitGroupSelected(p), 1);
+    string unitId;
+
+    if(globalVariablesList == "") {
+        output += resetColor; 
+        output += "No global variables. Use "+gvColor+"_var"+resetColor+ ".";
+    }
+    else {
+        output += whiteColor; 
+        output += "Global Variables. </n>";
+        while(true) {
+            current = LibapxTManagerGetString(globalVariablesBankKey, StringWord(globalVariablesList, i));
+            if(current == "") {
+                break;
+            }
+            output += gvColor;
+            output += LibapxStringTrim(StringWord(globalVariablesList, i));
+            output += resetColor + " = "; 
+            output += current +"</n>";
+            i += 1;
+
+        }
+    }
+
+
+
+
+    if(gv_UnitVariableError[p] != "") {
+        output += resetColor; 
+        output += "</n> </n> "+gv_UnitVariableError[p]+".";
+    }
+    else {
+
+
+        unitId = FixedToString(UnitGetCustomValue(selected, 0), 0); // 0 is index for unit id
+        localVariablesBankKey = gv_LibapxUnitVariableMapPrefix + unitId;
+        localVariablesList = LibapxTManagerGetList(localVariablesBankKey);
+        i = 1;
+
+        if(localVariablesList == "") {
+            output += resetColor; 
+            output += "</n></n>No unit variables assigned to this unit. Use "+lvColor+"_unitvar"+resetColor+ " to set this unit's variables!";
+        }
+        else {
+            output += whiteColor; 
+            output += "</n> </n> Local Variables. </n>";
+    
+            while(true) {
+                current = LibapxTManagerGetString(localVariablesBankKey, StringWord(localVariablesList, i));
+                if(current == "") {
+                    break;
+                }
+                output += lvColor;
+                output += LibapxStringTrim(StringWord(localVariablesList, i));
+                output += resetColor + " = "; 
+                output += current +"</n>";
+                i += 1;
+            }
+        }
+        
+    }
+    DialogControlSetPropertyAsText(
+        gv_ContentLabel, 
+        c_triggerControlPropertyText, 
+        PlayerGroupSingle(p),
+        StringToText(output)
+    );
+}
+
+
+//Runs when var commands are ran
+void LibapxVariablesUiRefresh(int p) {
+    SetVaribleUiText(p);
+}
+
+void LibapxUiInitVariablesPlayer(int p) {
+    gv_UnitVariablesActiveLastTick[p] = true;
+    CanDisplayUnitVariables(p);
+    SetVaribleUiText(p);
+}
+
+
+
+void LibapxUiUpdateVariables(int p) {
+    //Modifys error message
+    CanDisplayUnitVariables(p);
+
+    if(gv_UnitVariablesActive[p] && !gv_UnitVariablesActiveLastTick[p]) {
+        //Runs once on activation
+        SetVaribleUiText(p);
+        gv_UnitVariablesActiveLastTick[p] = true;
+    }
+    if(!gv_UnitVariablesActive[p] && gv_UnitVariablesActiveLastTick[p]) {
+        //Runs once on deactivation (cleanup)
+        SetVaribleUiText(p);
+        gv_UnitVariablesActiveLastTick[p] = false;
+    }
+}

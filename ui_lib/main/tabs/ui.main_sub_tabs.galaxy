@@ -1,0 +1,232 @@
+
+//Settings
+include "apex/ui_lib/main/tabs/settings/ui.admin_settings.galaxy"
+
+//Automation
+include "apex/ui_lib/main/tabs/automation/ui.variables.galaxy"
+include "apex/ui_lib/main/tabs/automation/ui.aliases.galaxy"
+
+//Guides
+include "apex/ui_lib/main/tabs/guides/ui.data_search.galaxy"
+include "apex/ui_lib/main/tabs/guides/ui.command_lookup.galaxy"
+
+//Utils
+include "apex/ui_lib/main/tabs/utility/ui.color_picker.galaxy"
+include "apex/ui_lib/main/tabs/utility/ui.attach_adjuster.galaxy"
+include "apex/ui_lib/main/tabs/utility/ui.scaler.galaxy"
+
+
+static int gv_tab1Btn1;
+
+static int gv_tab2Btn1;
+static int gv_tab2Btn2;
+
+static int gv_tab3Btn1;
+static int gv_tab3Btn2;
+
+static int gv_tab4Btn1;
+static int gv_tab4Btn2;
+static int gv_tab4Btn3;
+static int gv_tab4Btn4;
+
+
+
+void LibapxUiInitSubTabs() {
+    // Utils Init
+    LibapxUiInitColorPicker();
+    LibapxUiInitAttachAdjuster();
+    LibapxUiInitScaler();
+    //Guide init
+    LibapxUiInitDataSearch();
+    LibapxUiInitCommandLookup();
+    //Automation
+    LibapxUiInitAliases();
+    LibapxUiInitVariables();
+    //Settings init
+    LibapxUiInitAdminSettings();
+
+    //Grab Tab Buttons
+    gv_tab1Btn1 = DialogControlHookupStandard(
+        c_triggerControlTypeButton,
+        "UIContainer/ConsoleUIContainer/MainPanelBackground/Settings/Tab1"
+    );
+
+    gv_tab2Btn1 = DialogControlHookupStandard(
+        c_triggerControlTypeButton,
+        "UIContainer/ConsoleUIContainer/MainPanelBackground/Automation/Tab1"
+    );
+    gv_tab2Btn2 = DialogControlHookupStandard(
+        c_triggerControlTypeButton,
+        "UIContainer/ConsoleUIContainer/MainPanelBackground/Automation/Tab2"
+    );
+    
+    gv_tab3Btn1 = DialogControlHookupStandard(
+        c_triggerControlTypeButton,
+        "UIContainer/ConsoleUIContainer/MainPanelBackground/Guides/Tab1"
+    );
+    gv_tab3Btn2 = DialogControlHookupStandard(
+        c_triggerControlTypeButton,
+        "UIContainer/ConsoleUIContainer/MainPanelBackground/Guides/Tab2"
+    );
+    
+    gv_tab4Btn1 = DialogControlHookupStandard(
+        c_triggerControlTypeButton,
+        "UIContainer/ConsoleUIContainer/MainPanelBackground/Utilities/Tab1"
+    );
+    gv_tab4Btn2 = DialogControlHookupStandard(
+        c_triggerControlTypeButton,
+        "UIContainer/ConsoleUIContainer/MainPanelBackground/Utilities/Tab2"
+    );
+    gv_tab4Btn3 = DialogControlHookupStandard(
+        c_triggerControlTypeButton,
+        "UIContainer/ConsoleUIContainer/MainPanelBackground/Utilities/Tab3"
+    );
+    gv_tab4Btn4 = DialogControlHookupStandard(
+        c_triggerControlTypeButton,
+        "UIContainer/ConsoleUIContainer/MainPanelBackground/Utilities/Tab4"
+    );
+
+}
+
+void LibapxUiInitSubTabsPlayer(int p) {
+    // Utils init
+    LibapxUiInitColorPickerPlayer(p);
+    LibapxUiInitAttachAdjusterPlayer(p);
+    LibapxUiInitScalerPlayer(p);
+    // Guides init
+    LibapxUiInitDataSearchPlayer(p);
+    LibapxUiInitCommandLookupPlayer(p);
+    LibapxUiinitAdminSettingsPlayer(p);
+    // Automation Init
+    LibapxUiInitVariablesPlayer(p);
+    LibapxUiInitAliasesPlayer(p);
+
+    TriggerAddEventDialogControl(TriggerCreate("LibapxTrigMainPanelButtonTab1Btn1"), p, gv_tab1Btn1, c_triggerControlEventTypeClick);
+    
+    TriggerAddEventDialogControl(TriggerCreate("LibapxTrigMainPanelButtonTab2Btn1"), p, gv_tab2Btn1, c_triggerControlEventTypeClick);
+    TriggerAddEventDialogControl(TriggerCreate("LibapxTrigMainPanelButtonTab2Btn2"), p, gv_tab2Btn2, c_triggerControlEventTypeClick);
+    
+    TriggerAddEventDialogControl(TriggerCreate("LibapxTrigMainPanelButtonTab3Btn1"), p, gv_tab3Btn1, c_triggerControlEventTypeClick);
+    TriggerAddEventDialogControl(TriggerCreate("LibapxTrigMainPanelButtonTab3Btn2"), p, gv_tab3Btn2, c_triggerControlEventTypeClick);
+    
+    TriggerAddEventDialogControl(TriggerCreate("LibapxTrigMainPanelButtonTab4Btn1"), p, gv_tab4Btn1, c_triggerControlEventTypeClick);
+    TriggerAddEventDialogControl(TriggerCreate("LibapxTrigMainPanelButtonTab4Btn2"), p, gv_tab4Btn2, c_triggerControlEventTypeClick);
+    TriggerAddEventDialogControl(TriggerCreate("LibapxTrigMainPanelButtonTab4Btn3"), p, gv_tab4Btn3, c_triggerControlEventTypeClick);
+    TriggerAddEventDialogControl(TriggerCreate("LibapxTrigMainPanelButtonTab4Btn4"), p, gv_tab4Btn4, c_triggerControlEventTypeClick);
+
+}
+
+
+static void ManageSubPanelTabs(int clickedPanel, int p) {
+    //Tab1 (settings)
+    DialogControlSetPropertyAsBool(clickedPanel, c_triggerControlPropertyToggled, PlayerGroupSingle(p), true);
+    if(clickedPanel != gv_tab1Btn1) {
+        DialogControlSetPropertyAsBool(gv_tab1Btn1, c_triggerControlPropertyToggled, PlayerGroupSingle(p), false);
+    }
+
+    //Tab2 (automation)
+    if(clickedPanel != gv_tab2Btn1) {
+        DialogControlSetPropertyAsBool(gv_tab2Btn1, c_triggerControlPropertyToggled, PlayerGroupSingle(p), false);
+    }
+    if(clickedPanel != gv_tab2Btn2) {
+        DialogControlSetPropertyAsBool(gv_tab2Btn2, c_triggerControlPropertyToggled, PlayerGroupSingle(p), false);
+    }
+
+    
+    //Tab2 (guides)
+    if(clickedPanel != gv_tab3Btn1) {
+        DialogControlSetPropertyAsBool(gv_tab3Btn1, c_triggerControlPropertyToggled, PlayerGroupSingle(p), false);
+    }
+    if(clickedPanel != gv_tab3Btn2) {
+        DialogControlSetPropertyAsBool(gv_tab3Btn2, c_triggerControlPropertyToggled, PlayerGroupSingle(p), false);
+    }
+
+    
+    
+    //Tab4 (utilities)
+    if(clickedPanel != gv_tab4Btn1) {
+        DialogControlSetPropertyAsBool(gv_tab4Btn1, c_triggerControlPropertyToggled, PlayerGroupSingle(p), false);
+    }
+    if(clickedPanel != gv_tab4Btn2) {
+        DialogControlSetPropertyAsBool(gv_tab4Btn2, c_triggerControlPropertyToggled, PlayerGroupSingle(p), false);
+    }
+    if(clickedPanel != gv_tab4Btn3) {
+        DialogControlSetPropertyAsBool(gv_tab4Btn3, c_triggerControlPropertyToggled, PlayerGroupSingle(p), false);
+    }
+    if(clickedPanel != gv_tab4Btn4) {
+        DialogControlSetPropertyAsBool(gv_tab4Btn4, c_triggerControlPropertyToggled, PlayerGroupSingle(p), false);
+    }
+
+
+}
+static bool[gv_LibapxMaxPlayers] gv_PanelOpenLastTick;
+void LibapxUiUpdateSubTabsPlayer(int p) {
+    // Update Panels
+    LibapxUiUpdateColorPicker(p);
+    LibapxUiUpdateAttachAdjuster(p);
+    LibapxUiUpdateVariables(p);
+
+    if(!gv_LibapxMainPanelOpen[p] && gv_PanelOpenLastTick[p]) {
+        ManageSubPanelTabs(0, p);
+        gv_PanelOpenLastTick[p] = false;
+    }
+    else if(gv_LibapxMainPanelOpen[p] && !gv_PanelOpenLastTick[p]) {
+        gv_PanelOpenLastTick[p] = true;
+    }
+}
+
+
+void LibapxSubUiSelectDataSearch(int p) {
+    DialogControlSetPropertyAsBool(gv_tab3Btn1, c_triggerControlPropertyToggled, PlayerGroupSingle(p), true);
+    ManageSubPanelTabs(gv_tab3Btn1, p);
+}
+
+bool LibapxTrigMainPanelButtonTab1Btn1(bool testConds, bool runActions) {
+    int p = EventPlayer();
+    ManageSubPanelTabs(gv_tab1Btn1, p);
+    return true;
+}
+
+bool LibapxTrigMainPanelButtonTab2Btn1(bool testConds, bool runActions) {
+    int p = EventPlayer();
+    ManageSubPanelTabs(gv_tab2Btn1, p);
+    return true;
+}
+bool LibapxTrigMainPanelButtonTab2Btn2(bool testConds, bool runActions) {
+    int p = EventPlayer();
+    ManageSubPanelTabs(gv_tab2Btn2, p);
+    return true;
+}
+
+bool LibapxTrigMainPanelButtonTab3Btn1(bool testConds, bool runActions) {
+    int p = EventPlayer();
+    ManageSubPanelTabs(gv_tab3Btn1, p);
+    return true;
+}
+bool LibapxTrigMainPanelButtonTab3Btn2(bool testConds, bool runActions) {
+    int p = EventPlayer();
+    ManageSubPanelTabs(gv_tab3Btn2, p);
+    return true;
+}
+
+bool LibapxTrigMainPanelButtonTab4Btn1(bool testConds, bool runActions) {
+    int p = EventPlayer();
+    ManageSubPanelTabs(gv_tab4Btn1, p);
+    return true;
+}
+bool LibapxTrigMainPanelButtonTab4Btn2(bool testConds, bool runActions) {
+    int p = EventPlayer();
+    ManageSubPanelTabs(gv_tab4Btn2, p);
+    return true;
+}
+bool LibapxTrigMainPanelButtonTab4Btn3(bool testConds, bool runActions) {
+    int p = EventPlayer();
+    ManageSubPanelTabs(gv_tab4Btn3, p);
+    return true;
+}
+bool LibapxTrigMainPanelButtonTab4Btn4(bool testConds, bool runActions) {
+    int p = EventPlayer();
+    ManageSubPanelTabs(gv_tab4Btn4, p);
+    return true;
+}
+

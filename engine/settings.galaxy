@@ -7,44 +7,100 @@
 //=========================================================
 
 
-// gv_LibapxSettingsDefinition
-// ============================
-// contains a games parameters
-struct gv_LibapxSettingsDefinition {
-	int flags;
-
-	// mapRevealed
-	// ========
-	// flag for whether the map is revealed
-	bool mapRevealed;
-
-	// commands
-	// ========
-	// string containing all of the game's commands, separated by commas ", "
-	string commands;
-
-	// minScale / maxScale
-	// ===============
-	// minimum and max scale of a unit that player can use from @scale
-	// (not actually that useful because @actrmsg will allow arbitrary scale)
-	fixed minScale;
-	fixed maxScale;
-
-	// maxSpawnCount
-	// =============
-	// max units a player can spawn in one instance
-	int maxSpawnCount;
-};
-
-// create instance of settings:
-gv_LibapxSettingsDefinition gv_LibapxSettings;
-
 // initializes default settings
 void gv_LibapxSettingsInitialize() {
 	gv_LibapxSettings.mapRevealed = true;
 	gv_LibapxSettings.commands = "alias, macro, var";
 	gv_LibapxSettings.minScale = 0.001;
 	gv_LibapxSettings.maxScale = 20.0;
-
 	gv_LibapxSettings.maxSpawnCount = 20;
+
+	//Defaults(if not set by admin)
+	gv_LibapxSettings.allowRepeatNoDelay = false;
+	gv_LibapxSettings.allowReplace = false;
+	gv_LibapxSettings.allowReloadBank = false;
+	gv_LibapxSettings.allowDataEdit = false;
+	gv_LibapxSettings.allowGamesetup = false;
+	gv_LibapxSettings.allowLoan = false;
+}
+
+const string c_AdminSettingAllowRepeatNoDelay = "allowRepeatNoDelay";
+const string c_AdminSettingAllowReplace = "allowReplace";
+const string c_AdminSettingAllowReloadBank = "allowREBank";
+const string c_AdminSettingAllowDataEdit = "allowDE";
+const string c_AdminSettingAllowGamesetup = "allowGS";
+const string c_AdminSettingAllowLoan = "allowLoan";
+
+//This command is called whenever an admin is promoted or game is initialized with admin
+void LibapxPopulateSettingsFromPlayer(int p) {
+	gv_LibapxSettings.allowRepeatNoDelay = false;
+	gv_LibapxSettings.allowReplace = false;
+	gv_LibapxSettings.allowReloadBank = false;
+	gv_LibapxSettings.allowDataEdit = false;
+	gv_LibapxSettings.allowGamesetup = false;
+	gv_LibapxSettings.allowGamesetup = false;
+	gv_LibapxSettings.allowLoan = false;
+
+	
+
+	if(BankKeyExists(gv_LibapxPlayer[p].bankStorage, "AdminSettings", c_AdminSettingAllowRepeatNoDelay)) {
+		gv_LibapxSettings.allowRepeatNoDelay = true;
+	}
+	if(BankKeyExists(gv_LibapxPlayer[p].bankStorage, "AdminSettings", c_AdminSettingAllowReplace)) {
+		gv_LibapxSettings.allowReplace = true;
+	}
+	if(BankKeyExists(gv_LibapxPlayer[p].bankStorage, "AdminSettings", c_AdminSettingAllowReloadBank)) {
+		gv_LibapxSettings.allowReloadBank = true;
+	}
+	if(BankKeyExists(gv_LibapxPlayer[p].bankStorage, "AdminSettings", c_AdminSettingAllowDataEdit)) {
+		gv_LibapxSettings.allowDataEdit = true;
+	}
+	if(BankKeyExists(gv_LibapxPlayer[p].bankStorage, "AdminSettings", c_AdminSettingAllowGamesetup)) {
+		gv_LibapxSettings.allowGamesetup = true;
+	}
+	if(BankKeyExists(gv_LibapxPlayer[p].bankStorage, "AdminSettings", c_AdminSettingAllowLoan)) {
+		gv_LibapxSettings.allowLoan = true;
+	}
+}
+
+void LibapxSetAdminSetting(int p, string setting, bool state) {
+	if (!BankSectionExists(gv_LibapxPlayer[p].bankStorage, "AdminSettings")) {
+		BankSectionCreate(gv_LibapxPlayer[p].bankStorage, "AdminSettings");
+	}
+
+	if(!state && BankKeyExists(gv_LibapxPlayer[p].bankStorage, "AdminSettings", setting)) {
+		BankKeyRemove(gv_LibapxPlayer[p].bankStorage, "AdminSettings", setting);
+	}
+	if(state) {
+		BankValueSetFromString(gv_LibapxPlayer[p].bankStorage, "AdminSettings", setting, "");
+	}
+
+	BankSave(gv_LibapxPlayer[p].bankStorage);
+	if(gv_LibapxPlayer[p].permissionLevel == 2) {
+		LibapxPopulateSettingsFromPlayer(p);
+	}
+}
+
+bool LibapxAdminSettingIsPlayerEnforceable(int p) {
+	if(gv_LibapxPlayer[p].permissionLevel < 1) { 
+		return true;
+	}
+	else {
+		return false;
+	}
+}
+
+bool LibapxGetAdminSetting(int p, string setting) { 
+	if(!BankSectionExists(gv_LibapxPlayer[p].bankStorage, "AdminSettings")) {
+		BankSectionCreate(gv_LibapxPlayer[p].bankStorage, "AdminSettings");
+		BankSave(gv_LibapxPlayer[p].bankStorage);
+	}
+
+	if(BankKeyExists(gv_LibapxPlayer[p].bankStorage, "AdminSettings", setting)) {
+		return true;
+	}
+	else {
+		return false;
+	}
+	
 }

@@ -1,0 +1,234 @@
+
+static int[gv_LibapxMaxPlayers] redValue;
+static int gv_red;
+static int gv_redLabel;
+static int[gv_LibapxMaxPlayers] greenValue;
+static int gv_green;
+static int gv_greenLabel;
+static int[gv_LibapxMaxPlayers] blueValue;
+static int gv_blue;
+static int gv_blueLabel;
+static fixed[gv_LibapxMaxPlayers] alphaValue;
+static int gv_alpha;
+static int gv_alphaLabel;
+static fixed[gv_LibapxMaxPlayers] hdrValue;
+static int gv_hdr;
+static int gv_hdrLabel;
+static fixed[gv_LibapxMaxPlayers] hdrMultiplier;
+static int gv_hdrMultiplier;
+static fixed[gv_LibapxMaxPlayers] timescale;
+static int gv_timescale;
+static bool[gv_LibapxMaxPlayers] apply;
+static int gv_apply;
+static int gv_output;
+
+void LibapxUiInitColorPicker() {
+    int base = DialogControlHookupStandard(
+        c_triggerControlTypePanel,
+        "UIContainer/ConsoleUIContainer/PanelPicker/Content"
+    );
+    gv_red = DialogControlHookup(
+        base, c_triggerControlTypeSlider,
+        "RedSlider/Slider"
+    );
+    gv_redLabel = DialogControlHookup(
+        gv_red, c_triggerControlTypeLabel,
+        "Tooltip"
+    );
+    gv_green = DialogControlHookup(
+        base, c_triggerControlTypeSlider,
+        "GreenSlider/Slider"
+    );
+    gv_greenLabel = DialogControlHookup(
+        gv_green, c_triggerControlTypeLabel,
+        "Tooltip"
+    );
+    gv_blue = DialogControlHookup(
+        base, c_triggerControlTypeSlider,
+        "BlueSlider/Slider"
+    );
+    gv_blueLabel = DialogControlHookup(
+        gv_blue, c_triggerControlTypeLabel,
+        "Tooltip"
+    );
+    gv_alpha = DialogControlHookup(
+        base, c_triggerControlTypeSlider,
+        "AlphaSlider/Slider"
+    );
+    gv_alphaLabel = DialogControlHookup(
+        gv_alpha, c_triggerControlTypeLabel,
+        "Tooltip"
+    );
+    gv_hdr = DialogControlHookup(
+        base, c_triggerControlTypeSlider,
+        "HDRSlider/Slider"
+    );
+    gv_hdrLabel = DialogControlHookup(
+        gv_hdr, c_triggerControlTypeLabel,
+        "Tooltip"
+    );
+    gv_hdrMultiplier = DialogControlHookup(
+        base, c_triggerControlTypeEditBox,
+        "HDRMultiplier/EditBoxPadding/Editbox"
+    ); 
+    gv_timescale = DialogControlHookup(
+        base, c_triggerControlTypeEditBox,
+        "Timescale/EditBoxPadding/Editbox"
+    );
+    gv_apply = DialogControlHookup(
+        base, c_triggerControlTypeButton,
+        "Apply/Checkbox"
+    );
+    gv_output = DialogControlHookup(
+        base, c_triggerControlTypeEditBox,
+        "Output/EditBoxPadding/Editbox"
+    );
+}
+
+static string MakeOutputTint(int p) {
+    string output = "@tint";
+    output += " "+IntToString(redValue[p]);
+    output += " "+IntToString(greenValue[p]);
+    output += " "+IntToString(blueValue[p]);
+    if(timescale[p] != 0 || hdrValue[p] != 1 || alphaValue[p] != 1) {
+        output += " "+LibapxUtilsTrimExcessZeros(FixedToString(alphaValue[p], 2));
+    }
+    if(timescale[p] != 0 || hdrValue[p] != 1) {
+        output += " "+LibapxUtilsTrimExcessZeros(FixedToString(hdrValue[p], 2));
+    }
+    if(timescale[p] != 0) {
+        output += " "+LibapxUtilsTrimExcessZeros(FixedToString(timescale[p], 2));
+    }
+
+    return output;
+} 
+
+void LibapxUiInitColorPickerPlayer(int p) {
+    redValue[p] = 255;
+    LibapxUiSetSlider(redValue[p], 0, 255, gv_red, gv_redLabel, p, 0);
+    greenValue[p] = 255;
+    LibapxUiSetSlider(greenValue[p], 0, 255, gv_green, gv_greenLabel, p, 0);
+    blueValue[p] = 255;
+    LibapxUiSetSlider(greenValue[p], 0, 255, gv_blue, gv_blueLabel, p, 0);
+    alphaValue[p] = 1;
+    LibapxUiSetSlider(alphaValue[p], 0, 1, gv_alpha, gv_alphaLabel, p, 2);
+    hdrValue[p] = 1;
+    LibapxUiSetSlider(hdrValue[p], -1, 1, gv_hdr, gv_hdrLabel, p, 2);
+    hdrMultiplier[p] = 1;
+    libNtve_gf_SetDialogItemEditorValue(gv_hdrMultiplier, "1", PlayerGroupSingle(p));
+    timescale[p] = 0;
+    libNtve_gf_SetDialogItemEditorValue(gv_timescale, "0", PlayerGroupSingle(p));
+    apply[p] = false;
+    libNtve_gf_SetDialogItemEditorValue(gv_output, MakeOutputTint(p), PlayerGroupSingle(p));
+
+    TriggerAddEventDialogControl(TriggerCreate("TrigRedSlider"), p, gv_red, c_triggerControlEventTypeValueChanged);
+    TriggerAddEventDialogControl(TriggerCreate("TrigGreenSlider"), p, gv_green, c_triggerControlEventTypeValueChanged);
+    TriggerAddEventDialogControl(TriggerCreate("TrigBlueSlider"), p, gv_blue, c_triggerControlEventTypeValueChanged);
+    TriggerAddEventDialogControl(TriggerCreate("TrigAlphaSlider"), p, gv_alpha, c_triggerControlEventTypeValueChanged);
+    TriggerAddEventDialogControl(TriggerCreate("TrigHDRSlider"), p, gv_hdr, c_triggerControlEventTypeValueChanged);
+    TriggerAddEventDialogControl(TriggerCreate("TrigHDRMultiplier"), p, gv_hdrMultiplier, c_triggerControlEventTypeTextChanged);
+    TriggerAddEventDialogControl(TriggerCreate("TrigTimescale"), p, gv_timescale, c_triggerControlEventTypeTextChanged);
+    TriggerAddEventDialogControl(TriggerCreate("TrigApplyTint"), p, gv_apply, c_triggerControlEventTypeClick);
+}
+
+void ApplyNewTint(int p) {
+    unitgroup ug = UnitGroupSelected(p);
+    int i;
+
+    libNtve_gf_SetDialogItemEditorValue(gv_output, MakeOutputTint(p), PlayerGroupSingle(p));
+
+    if(apply[p]) {
+        LibapxChatParse(MakeOutputTint(p), p, ug, gv_LibapxPlayer[p].spawningCount);
+    }
+}
+
+void LibapxUiUpdateColorPicker(int p) {
+    // Does nothing each tick
+}
+
+bool TrigApplyTint(bool testConds, bool runActions) {
+    int p = EventPlayer();
+    apply[p] = !apply[p];
+
+    DialogControlSetPropertyAsBool(gv_apply, c_triggerControlPropertyToggled, PlayerGroupSingle(p), apply[p]);
+
+    ApplyNewTint(p);
+    return true;
+}
+
+bool TrigTimescale(bool testConds, bool runActions) {
+    int p = EventPlayer();
+    fixed typed = LibapxGetEditBoxValueAsFixed(gv_timescale, p, 0);
+    if(typed < 0) {
+        typed = 0;
+    }
+    timescale[p] = typed;
+
+    ApplyNewTint(p);
+    return true;
+}
+
+
+bool TrigHDRMultiplier(bool testConds, bool runActions) {
+    int p = EventPlayer();
+    fixed typed = LibapxGetEditBoxValueAsFixed(gv_hdrMultiplier, p, 1);
+
+    hdrMultiplier[p] = typed;
+
+    LibapxUiSetSlider(hdrValue[p], -1*hdrMultiplier[p], 1*hdrMultiplier[p], gv_hdr, gv_hdrLabel, p, 4);
+    ApplyNewTint(p);
+
+    return true;
+}
+
+bool TrigHDRSlider(bool testConds, bool runActions) {
+    int p = EventPlayer();
+    fixed value = DialogControlGetPropertyAsFixed(gv_hdr, c_triggerControlPropertyValue, p);
+
+    value = LibapxSliderGetInput(value, -1*hdrMultiplier[p], 1*hdrMultiplier[p], gv_hdrLabel, p, 2);
+
+
+    hdrValue[p] = value;
+    ApplyNewTint(p);
+    return true;
+}
+
+bool TrigAlphaSlider(bool testConds, bool runActions) {
+    int p = EventPlayer();
+    fixed value = DialogControlGetPropertyAsFixed(gv_alpha, c_triggerControlPropertyValue, p);
+
+    value = LibapxSliderGetInput( value, 0, 1, gv_alphaLabel, p, 2);
+    alphaValue[p] = value;
+    ApplyNewTint(p);
+    return true;
+}
+
+bool TrigBlueSlider(bool testConds, bool runActions) {
+    int p = EventPlayer();
+    int value = RoundI(DialogControlGetPropertyAsFixed(gv_blue, c_triggerControlPropertyValue, p));
+    
+    value = RoundI(LibapxSliderGetInput( IntToFixed(value), 0, 255, gv_blueLabel, p, 0));
+    blueValue[p] = value;
+    ApplyNewTint(p);
+    return true;
+}
+
+bool TrigGreenSlider(bool testConds, bool runActions) {
+    int p = EventPlayer();
+    int value = RoundI(DialogControlGetPropertyAsFixed(gv_green, c_triggerControlPropertyValue, p));
+    
+    value = RoundI(LibapxSliderGetInput( IntToFixed(value), 0, 255, gv_greenLabel, p, 0));
+    greenValue[p] = value;
+    ApplyNewTint(p);
+    return true;
+}
+
+bool TrigRedSlider(bool testConds, bool runActions) {
+    int p = EventPlayer();
+    int value = RoundI(DialogControlGetPropertyAsFixed(gv_red, c_triggerControlPropertyValue, p));
+
+    value = RoundI(LibapxSliderGetInput( IntToFixed(value), 0, 255, gv_redLabel, p, 0));
+    redValue[p] = value;
+    ApplyNewTint(p);
+    return true;
+}

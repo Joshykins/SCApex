@@ -2,7 +2,7 @@
 <Desc>
     <Frame type="Frame" name="GameUI/UIContainer/ConsoleUIContainer" file="GameUI">
 		<!-- Grouped units -->
-		<Frame type="Frame" name="InfoPanel/InfoPaneGroup/PageFrame0" file="InfoPaneGroup">
+		<Frame type="Frame" name="InfoPanel/InfoPaneGroup/PageFrame0">
 			<Frame type="UnitButton" name="GroupUnitButton0">
 				<Width val="45"/>
 				<Height val="45"/>
@@ -100,7 +100,7 @@
 					<Height val="45"/>
 			</Frame>
 		</Frame>
-		<Frame type="Frame" name="InfoPanel/InfoPaneGroup/PageFrame1" file="InfoPaneGroup">
+		<Frame type="Frame" name="InfoPanel/InfoPaneGroup/PageFrame1">
 
 			<Frame type="UnitButton" name="GroupUnitButton0">
 				<Width val="45"/>
@@ -199,7 +199,7 @@
 					<Height val="45"/>
 			</Frame>
 		</Frame>
-		<Frame type="Frame" name="InfoPanel/InfoPaneGroup/PageFrame2" file="InfoPaneGroup">
+		<Frame type="Frame" name="InfoPanel/InfoPaneGroup/PageFrame2">
 			<Frame type="UnitButton" name="GroupUnitButton0">
 				<Width val="45"/>
 				<Height val="45"/>
@@ -297,7 +297,7 @@
 					<Height val="45"/>
 			</Frame>
 		</Frame>
-		<Frame type="Frame" name="InfoPanel/InfoPaneGroup/PageFrame3" file="InfoPaneGroup">
+		<Frame type="Frame" name="InfoPanel/InfoPaneGroup/PageFrame3">
 			<Frame type="UnitButton" name="GroupUnitButton0">
 				<Width val="45"/>
 				<Height val="45"/>
@@ -395,7 +395,7 @@
 					<Height val="45"/>
 			</Frame>
 		</Frame>
-		<Frame type="Frame" name="InfoPanel/InfoPaneGroup/PageFrame4" file="InfoPaneGroup">
+		<Frame type="Frame" name="InfoPanel/InfoPaneGroup/PageFrame4">
 			<Frame type="UnitButton" name="GroupUnitButton0">
 				<Width val="45"/>
 				<Height val="45"/>
@@ -493,7 +493,7 @@
 					<Height val="45"/>
 			</Frame>
 		</Frame>
-		<Frame type="Frame" name="InfoPanel/InfoPaneGroup/PageFrame5" file="InfoPaneGroup">
+		<Frame type="Frame" name="InfoPanel/InfoPaneGroup/PageFrame5">
 			<Frame type="UnitButton" name="GroupUnitButton0">
 				<Width val="45"/>
 				<Height val="45"/>

@@ -25,8 +25,8 @@ void LibapxEventsList(int player) {
 	string type;
 	text txt;
 
-	LibapxPrintOutput(player, "Events:");
-	LibapxPrint(PlayerGroupSingle(player), "[ID]   [Creator]                   [Type]");
+	LibapxLogInfo(player, "Events:");
+	LibapxLogPlayerGroup(PlayerGroupSingle(player), "[ID]   [Creator]                   [Type]");
 
 	for(i = 1; i < EventCount; i += 1) {
 		// skip deleted event entries
@@ -42,7 +42,7 @@ void LibapxEventsList(int player) {
 		      + gv_LibapxPlayerNameColored(creator)
 			  + StringToText("           " + type);
 
-		LibapxPrintText(PlayerGroupSingle(player), txt);
+		LibapxLogPlayerGroupText(PlayerGroupSingle(player), txt);
 	}
 }
 
@@ -71,7 +71,7 @@ void LibapxEventTriggerRemove(int player, int id) {
 	int owner = DataTableGetInt(true, EventOwnerDatatableIdentifier + IntToString(id));
 
 	if( player != owner && gv_LibapxPlayer[player].permissionLevel < gv_LibapxPermissionLevelMod ) {
-		LibapxPrintError(player, "You do not have permission to remove this event.");
+		LibapxLogError(player, "You do not have permission to remove this event.");
 	} else {
 		t = DataTableGetTrigger(true, EventTriggerDataTableIdentifier + IntToString(id));
 		TriggerDestroy(t);
@@ -83,7 +83,7 @@ void LibapxEventTriggerRemove(int player, int id) {
 		DataTableValueRemove(true, EventCommandsDatatableIdentifier + IntToString(id));
 		DataTableValueRemove(true, EventCounterDatatableIdentifier + IntToString(id));
 
-		LibapxPrintSuccess(player, "Event deleted!");
+		LibapxLogSuccess(player, "Event deleted!");
 	}
 
 }
@@ -133,7 +133,7 @@ bool LibapxEventUnit(bool testConds, bool runActions) {
 	UnitGroupAdd(u, EventUnit());
 
 	// debug: print event commands
-	//LibapxPrintOutput(EventPlayer(), "UNIT EVENT COMMANDS: " + cmds);
+	//LibapxLogInfo(EventPlayer(), "UNIT EVENT COMMANDS: " + cmds);
 
 	// decrement counter (if event is to run a finite number of times)
 	if( count >= 0 ) {

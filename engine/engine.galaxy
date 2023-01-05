@@ -10,6 +10,12 @@
 // (dependency order matters)
 
 
+// globals
+// =============
+// Contains global constants, variables, prototypes, structs, and functions
+include "apex/engine/globals/globals.galaxy"
+
+
 // uiHelper
 // =============
 // Contains various helper functions for creating ui dialogs:
@@ -17,18 +23,13 @@
 // the theme for all dialogs
 include "apex/engine/ui_helper.galaxy"
 
+
 // data
 // =============
 // defines SCII data catalog constants used for certain commands,
 // and include data catalog search and catalog alias functions
 include "apex/engine/data/data.galaxy"
 
-// settings
-// =============
-// Contains ingame global settings
-// These are used as parameters in certain commands
-// Ideally most of these should be adjustable in game
-include "apex/engine/settings.galaxy"
 
 // player
 // =============
@@ -37,6 +38,25 @@ include "apex/engine/settings.galaxy"
 // Contains string name for player bank
 include "apex/engine/player.galaxy"
 
+
+// settings
+// =============
+// Contains ingame global settings
+// These are used as parameters in certain commands
+// Ideally most of these should be adjustable in game
+include "apex/engine/settings.galaxy"
+
+
+//Include images
+include "apex/engine/data/all_images.galaxy"
+// =============
+// Contains all images in an array of strings (lol). And methods to query them. Why doesn't sc2 allow us to search strings ;( 
+
+
+// search
+// =============
+// defines searching and how it works
+include "apex/engine/data/search.galaxy"
 
 // output
 // =============
@@ -54,14 +74,6 @@ include "apex/engine/utility/scripts.galaxy"
 // Contains custom functions for writing to player banks
 include "apex/engine/bank.galaxy"
 
-// log (chat)
-// =============
-// (chat) log deals with messages that should be logged and able to be accessed
-// elsewhere, specifically for a message log reading ui module (chatlog).
-// These messages logged should be those from a @say or >narrate type command,
-// e.g. commands that print messages pertaining to the roleplay's story.
-include "apex/engine/chat/log.galaxy"
-
 // parser
 // =============
 // Parser for player chat commands and built-in chat system functions:
@@ -72,20 +84,20 @@ include "apex/engine/chat/parser.galaxy"
 // =============
 // Unit spawn related functions, unit death/creation data management,
 // unit command caching functionality
-include "apex/engine/unit.galaxy"
+include "apex/engine/unit/unit.galaxy"
 
 
-// unitRename
+// unit_panel_info
 //===============
-// functions to handle unit renaming and subtitling
+// functions to handle unit renaming, subtitling, subtitle colors, and descriptions
 // Stores name and subtitle to datatable to be used in ui.
-include "apex/engine/unit_rename"
+include "apex/engine/unit_panel_info.galaxy"
 
-// unitWireframe
-//===============
-// functions to handle unit's wireframe
-// Stores wireframe parameters to datatable to be used in ui.
-include "apex/engine/unit_wireframe"
+
+// unit_card
+// =============
+// Contains functions to edit and change the unitcard
+include "apex/engine/unit_card.galaxy"
 
 
 // scaler
@@ -129,6 +141,15 @@ include "apex/engine/events/events.galaxy"
 include "apex/engine/blacklist.galaxy"
 
 
+// data_table_manager
+// =============
+// contains functions assisting with data tables, including creation, cleanup, deletion, and exists
+// Global data tables
+// Player related data tables
+// Unit related data tables
+include "apex/engine/data_table_manager.galaxy"
+
+
 // debug
 // =============
 // tools for debugging
@@ -137,7 +158,8 @@ include "apex/engine/debug.galaxy"
 // engine version
 const int gv_LibapxBuildVersion = 2;
 const int gv_LibapxBuildSubVersion = 3;
-const string gv_LibapxBuildVersionModifier = ".0";
+const string gv_LibapxBuildVersionModifier = ".1";
+
 
 void LibapxEngineInitialize() {
 	int player = 1;
@@ -155,17 +177,26 @@ void LibapxEngineInitialize() {
 		if( PlayerType(player) == c_playerTypeUser && PlayerStatus(player) == c_playerStatusActive ) {
 			gv_LibapxPlayerInitialize(player);			// player settings
 			LibapxPLayerEventsInitiallize(player);	// player specific events
-
+			LibapxBlacklistDeprecatedRemoveBank(player);
 			// give admin to first active player (assumes player 1 is lobby host and should be default admin)
 			// then run admin's blacklist
 			if( !adminSet ) {
 				gv_LibapxPlayer[player].permissionLevel = LibapxPERMISSIONSLEVELADMIN;
-				LibapxBlacklistRun(player);
+				gv_LibapxCurrentAdmin = player;
 				adminSet = true;
+				TriggerAddEventTimeElapsed(TriggerCreate("LibapxDelayAdminMessageTrigger"), 7, c_timeGame);
 			}
 		}
 		player += 1;
 	}
-	
+
 	LibapxEventsInitialize();			// creates global event triggers
+}
+
+
+bool LibapxDelayAdminMessageTrigger(bool testConds,bool runActions) {
+	
+	LibapxLogInfoPlayerGroup(PlayerGroupActive(), gv_LibapxPlayerNameColored(gv_LibapxCurrentAdmin) + StringToText(" is the admin."));
+
+	return true;
 }

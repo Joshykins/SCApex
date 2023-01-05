@@ -14,20 +14,32 @@
 //    along with custom name/name color
 // -> if unit has region waygate dialog attached, must anchor the waygate
 //    dialog to position where unit died
+// TODO: ALL new Unit info
+//Desc, name, subtitle, subtitle border/bg colors, setname, unitcard, log, keypress
 bool LibapxUnitDeathCleanup(bool testConds, bool runActions) {
-	int waygateDialog = FixedToInt( UnitGetCustomValue(EventUnit(), gv_LibapxUnitIndexWaygateDialog) );
 	string rgnName;
 	int i;
-
+	unit u = EventUnit();
+	int waygateDialog = FixedToInt( UnitGetCustomValue(u, gv_LibapxUnitIndexWaygateDialog) );
+	string unitId = FixedToString(UnitGetCustomValue(u, 0), 0); // 0 is index for unit id
+	int owner = UnitGetOwner(u);
 	// remove data table data (see unit.galaxy)
-	LibapxUnitDataRemove(EventUnit());
+	LibapxUnitDataRemove(u);
+	LibapxClearAttachAndRotationPreviousCaches(u);
+
+	//Remove unit variables
+	LibapxTManagerCleanup(gv_LibapxUnitVariableMapPrefix + unitId);
+	//If matches current selection
+	if(UnitGroupUnit(UnitGroupSelected(owner), 1) == u) {
+		LibapxVariablesUiRefresh(owner);
+	}
 
 	// if waygate dialog exists, anchor to position where unit died
 	if( waygateDialog > 0 ) {
-		rgnName = DataTableGetString(true, LibapxWAYGATEDIALOGREGDATATABLEIDENTIFIER + " " + IntToString(waygateDialog));
+		rgnName = DataTableGetString(true, gv_LibapxWaygateDialogRegDataTableIdentifier + " " + IntToString(waygateDialog));
 		// anchor dialog to position where unit died with a new unit
-		UnitCreate(1, LibapxWaygateDialogAnchorUnit, c_unitCreateIgnorePlacement, 0, UnitGetPosition(EventUnit()), 270.0);
-		DataTableSetUnit(true, LibapxWAYGATEANCHORDATATABLEIDENTIFIER + " " + rgnName, UnitLastCreated());
+		UnitCreate(1, LibapxWaygateDialogAnchorUnit, c_unitCreateIgnorePlacement, 0, UnitGetPosition(u), 270.0);
+		DataTableSetUnit(true, gv_LibapxWaygateAnchorDataTableIdentifier + " " + rgnName, UnitLastCreated());
 
 		//ActorSend(libNtve_gf_MainActorofUnit(UnitLastCreated()), "SetOpacity {0.1}"); // set opacity to hide
 		// hide the beacons for all players

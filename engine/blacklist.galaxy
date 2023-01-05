@@ -1,104 +1,10 @@
-//=========================================================
-//		Apex Roleplaying Engine
-//		Copyright (c) 2022, Apex Group
-//=========================================================
-// This software is distributed under the MIT License:
-// <http://opensource.org/licenses/MIT>
-//=========================================================
 
-// BLACKLIST
-
-// Blacklists save a player's handle and their text name
-// in a player's bank. When blacklist is run, if any player
-// ingame matches a handle in the admin's list, that player
-// will be disabled.
-
-// Bank architecture as follows:
-// Key: (string) "[HANDLE]" | Value: (text) PlayerName
-// e.g. "1-S2-1-841872" : "SomeGuy"
 
 const string gv_LibapxBankSectionBlacklist = "blacklist";
 
-// LibapxBlacklistAdd
-// =================
-// handles adding a blacklisted player to player bank
-// stored value is the text of the player's name
-void LibapxBlacklistAdd(int player, string blacklistedHandle, text blacklistedName) {
-	BankValueSetFromText( gv_LibapxPlayer[player].bankStorage, gv_LibapxBankSectionBlacklist, blacklistedHandle, blacklistedName);
-	BankSave( gv_LibapxPlayer[player].bankStorage );
-}
-
-// LibapxBlacklistRemove
-// ==================
-// bank functions, removes a blacklisted handle
-// from the player's bank.
-void LibapxBlacklistRemove(int player, string blacklistedHandle) {
-	BankKeyRemove( gv_LibapxPlayer[player].bankStorage, gv_LibapxBankSectionBlacklist, blacklistedHandle );
-	BankSave( gv_LibapxPlayer[player].bankStorage );
-}
-
-// LibapxBlacklistList
-// ===============
-// displays list of a player's blacklist in format
-// [ID] [handle] [player-name (text)]
-// where the ID is simply the bank section index of the entry
-void LibapxBlacklistList (int player) {
-	int index = 0;
-	string blistHandle;
-	text list = StringToText("Blacklisted Players:");
-
-	while( index < BankKeyCount(gv_LibapxPlayer[player].bankStorage, gv_LibapxBankSectionBlacklist) ) {
-		blistHandle = BankKeyName(gv_LibapxPlayer[player].bankStorage, gv_LibapxBankSectionBlacklist, index);
-		list = list + StringToText( "\n[ID: " + IntToString(index + 1) + "] " + blistHandle + " : " )
-					+ BankValueGetAsText(gv_LibapxPlayer[player].bankStorage, gv_LibapxBankSectionBlacklist, blistHandle);
-
-		index += 1;
-	}
-
-	LibapxPrintText(PlayerGroupSingle(player), list);
-}
-
-// LibapxBlacklistUpdate
-// ==================
-// updates the blacklist of a specific player by checking a lobby
-// for players with matching handles. if a handle in the lobby
-// is on the player's blacklist, re-adds this handle with the
-// name of the handle's player (to deal with possible player name changes)
-void LibapxBlacklistUpdate(int player) {
-	int p; 	// other players ingame
-	int count;
-	int updates = 0;
-
-	while( p < gv_LibapxMaxPlayers ) {
-		if( PlayerStatus(p) == c_playerStatusActive && BankKeyExists(gv_LibapxPlayer[player].bankStorage, gv_LibapxBankSectionBlacklist, PlayerHandle(p)) ) {
-			LibapxBlacklistRemove(player, PlayerHandle(p));
-			LibapxBlacklistAdd(player, PlayerHandle(p), StringToText("<d Player=\"" + IntToString(player) + "\" GameValue=\"PlayerClanTag\"/> ") + PlayerName(p));
-			updates += 1;
-		}
-		p += 1;
-	}
-
-	if (updates != 0) {
-		LibapxPrintOutput(player, "Updated " + IntToString(updates) + " blacklist entries");
-	}
-}
-
-// LibapxBlacklistRun
-// =================
-// runs the admin's blacklist (assumed running at initialization)
-// -> any players in game with handles on admins blacklist are disabled
-void LibapxBlacklistRun(int admin) {
-	int player = 1;
-
-	if( BankKeyCount(gv_LibapxPlayer[admin].bankStorage, gv_LibapxBankSectionBlacklist) == 0 ) {
-		return;
-	}
-
-	while( player < gv_LibapxMaxPlayers ) {
-		if( PlayerStatus(player) == c_playerStatusActive && BankKeyExists(gv_LibapxPlayer[admin].bankStorage, gv_LibapxBankSectionBlacklist, PlayerHandle(player)) ) {
-			gv_LibapxPlayer[player].disabled = true;
-			LibapxPrintText(PlayerGroupAll(), gv_LibapxPlayerNameColored(player) + StringToText(" has been blacklisted and disabled by host ") + gv_LibapxPlayerNameColored(admin));
-		}
-		player += 1;
+void LibapxBlacklistDeprecatedRemoveBank(int p) {
+	if(BankSectionExists(gv_LibapxPlayer[p].bankStorage, gv_LibapxBankSectionBlacklist)) {
+		LibapxLogInfo(p, "Removed Blacklist Bank Section! _blacklist was removed.");
+		BankSectionRemove(gv_LibapxPlayer[p].bankStorage, gv_LibapxBankSectionBlacklist); 
 	}
 }

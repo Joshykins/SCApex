@@ -6,6 +6,40 @@
 // <http://opensource.org/licenses/MIT>
 //=========================================================
 
+//Clean Wireframes
+void LibapxCleanUpWireframes(int p) {
+    int i;
+    string wireframeName;
+    string wireframeList;
+    int j;
+	i = BankSectionCount(gv_LibapxPlayer[p].bankStorage) - 1;
+
+
+    while(i >= 0) {
+        if( StringContains(BankSectionName(gv_LibapxPlayer[p].bankStorage, i), "WF_", c_stringBegin, c_stringNoCase) ) {
+            wireframeName = BankSectionName(gv_LibapxPlayer[p].bankStorage, i);
+            wireframeList = wireframeList + " " + wireframeName;
+        }
+        i -= 1;
+    }
+
+    if(wireframeList == "") {
+        return;
+    }
+    else {
+		j = 1;
+		while(StringWord(wireframeList, j) != "") {
+			BankSectionRemove(gv_LibapxPlayer[p].bankStorage, StringWord(wireframeList, j));
+			j+=1;
+		}
+		LibapxLogInfo(p, "All Wireframes Removed! Checkout <c val=\"00ffff\">@unitcard</c> for making custom unit images! (its much cooler and text based)");
+		BankSave(gv_LibapxPlayer[p].bankStorage);
+    }
+}
+
+
+
+
 // creates, removes key/values from a section in player bank
 // !!! BankSave required to ensure the changes persist
 void LibapxBankCreate(string section, string key, string content, int player) {
@@ -28,11 +62,11 @@ void LibapxBankSectionRemoveAll(string section, int player) {
 // prints out content of bank value
 void LibapxBankKeyContentDump(string section, string key, int player) {
 	if( BankKeyExists(gv_LibapxPlayer[player].bankStorage, section, key) ) {
-		LibapxPrintOutput(player, StringCase(section, true) + ": " + key);
-		LibapxPrintOutput(player, "CONTENT: " + BankValueGetAsString(gv_LibapxPlayer[player].bankStorage, section, key));
+		LibapxLogInfo(player, StringCase(section, true) + ": " + key);
+		LibapxLogInfo(player, "CONTENT: " + BankValueGetAsString(gv_LibapxPlayer[player].bankStorage, section, key));
 	}
 	else {
-		LibapxPrintError(player, StringCase(section, true) + " " + key + " DOES NOT EXIST");
+		LibapxLogError(player, StringCase(section, true) + " " + key + " DOES NOT EXIST");
 	}
 }
 
@@ -50,15 +84,14 @@ void LibapxBankSectionDump(string section, int player) {
 		}
 		// remove extra ','
 		keys = StringSub(keys, 1, StringLength(keys) - 1) + "]";
-		LibapxPrintOutput(player, StringCase(section, true) + ":\n" + keys);
+		LibapxLogInfo(player, StringCase(section, true) + ":\n" + keys);
 	}
 	else {
-		LibapxPrintOutput(player, "You have no " + section);
+		LibapxLogInfo(player, "You have no " + section);
 	}
 }
 
 
-void LibapxPopulateWireframesUi(int p);
 
 void LibapxBankLoad() {
 	int i;
@@ -66,16 +99,22 @@ void LibapxBankLoad() {
 
 	for (i = 1; i <= PlayerGroupCount(PlayerGroupActive()); i += 1) {
 		player = PlayerGroupPlayer(PlayerGroupActive(), i);
-		LibapxPrintText(PlayerGroupActive(), StringToText("<c val=\"77aaff\">Bank loading for ")+ TextWithColor(PlayerName(player), ColorFromIndex( PlayerGetColorIndex(player, false), c_teamColorDiffuse)));
+		// LibapxLogPlayerGroupText(PlayerGroupActive(), StringToText("<c val=\"77aaff\">Bank loading for ")+ TextWithColor(PlayerName(player), ColorFromIndex( PlayerGetColorIndex(player, false), c_teamColorDiffuse)));
 	
-		gv_LibapxPlayer[player].bankStorage = BankLoad( gv_gv_LibapxPlayerBankName,  player);
+		gv_LibapxPlayer[player].bankStorage = BankLoad( gv_LibapxPlayerBankName,  player);
 		BankWait(gv_LibapxPlayer[player].bankStorage);
 		gv_LibapxPlayer[player].aliases = LibapxSortAliases(player);
-		gv_LibapxPlayer[player].wireframes = LibapxWireframesGetAll(player);
 		gv_LibapxPlayer[player].banksloaded = true;
-		LibapxPopulateWireframesUi(player);
+
+
+		
+		if(gv_LibapxPlayer[player].permissionLevel > 0) {
+			LibapxPopulateSettingsFromPlayer(player);
+		}
+
+		LibapxCleanUpWireframes(player);
 		LibapxChkAllAliases(player);
 	}
 	
-	LibapxPrintText(PlayerGroupActive(), StringToText("<c val=\"00ff00\">All banks loaded :)</c>"));
+	// LibapxLogPlayerGroupText(PlayerGroupActive(), StringToText("<c val=\"00ff00\">All banks loaded :)</c>"));
 }

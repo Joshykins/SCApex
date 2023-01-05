@@ -24,18 +24,18 @@ bool LibapxMacroCommandRedirect(string command, int player) {
 	// -> bank value stored is: "%a %b = @cmd1 %a; @cmd2 %b"
 	if( StringEqual(subcommand, "create", c_stringNoCase) ) {
 		if( !StringContains(gv_LibapxPlayer[player].chatMsg, "=", c_stringAnywhere, c_stringNoCase) ) {
-			LibapxPrintError(player, "IMPROPER MACRO: NO ASSIGNMENT");
+			LibapxLogError(player, "IMPROPER MACRO: NO ASSIGNMENT");
 			return true;
 		}
 
 		macro = StringWord(gv_LibapxPlayer[player].chatMsg, 3);
 		// verify macro name is proper:
 		// if(StringSub(macro, 1, 1) == LibapxMACROTOKENIDENTIFIER) {
-			// LibapxPrintError("MACRO NAME CANNOT BE A TOKEN", player);
+			// LibapxLogError("MACRO NAME CANNOT BE A TOKEN", player);
 			// return true;
 		// }
 		if( StringContains(macro, "=", c_stringAnywhere, c_stringNoCase) ) {
-			LibapxPrintError(player, "MACRO NAME CANNOT HAVE AN \'=\' SYMBOL");
+			LibapxLogError(player, "MACRO NAME CANNOT HAVE AN \'=\' SYMBOL");
 			return true;
 		}
 
@@ -46,11 +46,11 @@ bool LibapxMacroCommandRedirect(string command, int player) {
 
 		if( content != "" ) {
 			LibapxBankCreate(LibapxBANKSECTIONMACRO, StringWord(macro, 1), content, player);
-			LibapxPrintSuccess(player, "MACRO CREATED: " + macro + " " + StringSub(content, 1, StringFind(content, "=", c_stringNoCase) - 1) + "\n"
+			LibapxLogSuccess(player, "MACRO CREATED: " + macro + " " + StringSub(content, 1, StringFind(content, "=", c_stringNoCase) - 1) + "\n"
 								  + "[\'" + LibapxStringTrim( StringSub(content, StringFind(content, "=", c_stringNoCase) + 1, StringLength(content)) ) + "\']");
 		}
 		else {
-			LibapxPrintError(player, "MACRO CANNOT BE EMPTY");
+			LibapxLogError(player, "MACRO CANNOT BE EMPTY");
 		}
 
 		return true;
@@ -59,15 +59,15 @@ bool LibapxMacroCommandRedirect(string command, int player) {
 		macro = StringWord(command, 3);
 		if( BankKeyExists(gv_LibapxPlayer[player].bankStorage, LibapxBANKSECTIONMACRO, macro) ) {
 			LibapxBankRemove(LibapxBANKSECTIONMACRO, macro, player);
-			LibapxPrintSuccess(player, "MACRO REMOVED: " + macro);
+			LibapxLogSuccess(player, "MACRO REMOVED: " + macro);
 		}
 		else {
-			LibapxPrintError(player, "MACRO " + macro + " DOES NOT EXIST");
+			LibapxLogError(player, "MACRO " + macro + " DOES NOT EXIST");
 		}
 	}
 	else if( StringEqual(subcommand, "removeall", c_stringNoCase) ) {
 		LibapxBankSectionRemoveAll(LibapxBANKSECTIONMACRO, player);
-		LibapxPrintSuccess(player, "ALL MACROS REMOVED");
+		LibapxLogSuccess(player, "ALL MACROS REMOVED");
 	}
 	else if( StringEqual(subcommand, "list", c_stringNoCase) ) {
 		LibapxBankSectionDump(LibapxBANKSECTIONMACRO, player);
@@ -79,7 +79,7 @@ bool LibapxMacroCommandRedirect(string command, int player) {
 		LibapxBankKeyContentDump(LibapxBANKSECTIONMACRO, subcommand, player);
 	}
 	else {
-		LibapxPrintError(player, "INVALID MACRO COMMAND");
+		LibapxLogError(player, "INVALID MACRO COMMAND");
 	}
 
 	return false;

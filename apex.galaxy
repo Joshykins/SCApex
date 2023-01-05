@@ -5,33 +5,135 @@
 // This software is distributed under the MIT License:
 // <http://opensource.org/licenses/MIT>
 //=========================================================
-include "apex/engine/globals.galaxy"
+
+//Include prototypes
+include "apex/engine/globals/prototypes.galaxy"
+
+//Remainder
 include "apex/engine/engine.galaxy"
 include "apex/commands/commands.galaxy"
-include "apex/variables/variables.galaxy"
-include "apex/ui/ui.galaxy"
-// include "apex/uiLib/uiLibrary.galaxy"
+include "apex/variables/variables_functions.galaxy"
+// include "apex/ui/ui.galaxy"
+include "apex/ui_lib/ui.lib.galaxy"
 include "apex/toolkit/toolkit.galaxy"
 
 // welcome message
 static string[7] InspirationalQuotes;
 
-//TODO: Add a function to make units not save with gamesetup
-//TODO: 3
+// DONE: Chat Issue
+// DONE: Loan Not working
+// DONE: Permissionig when sending message on another player, broked
+// FIXME: Unit tabs switch everyone
+// FIXME: Chat tab cycle recipents text still there
+// TODO: Previous message cycle commands
+// FIXME: MainUI closing for all
+// FIXME: Adjuster not saving deathmodel
+// FIXME: Copy visual printing
+// FIXME: Main ui blue?
+// FIXME: Worldheight
+//TODO: Worldheight->Terrainheight
+// DONE: Variables funcs with string crash
+
+
+// DONE: Renamed SetVar to _var
+// DONE: Added _unitvar
+// DONE: Increase default set delay to .33
+// DONE: ui: Color picker
+// DONE: $Wolrdheight
+// DONE: $UnitProperty
+// DONE: $Wolrdheight
+// DONE: Copy +visual one unit
+// DONE: ui: Chat Revamped
+// DONE: ui: Commands guide
+// DONE: ui: data search
+// DONE: ui: admin settings
+// DONE: ui: permission level
+// DONE: Admin Permission RepeatNoDelay
+// DONE: Admin Permission Replace
+// DONE: Admin Permission ReloadBank
+// DONE: Admin Permission Data Edit
+// DONE: Admin Permission Gamesetup
+// DONE: no case sens on commands
+// DONE: @rotation -a actor passthrough 
+// DONE: @attack
+// DONE: ui: attach adjuster
+// DONE: Face x,y
+// DONE: -rel @height
+// DONE: ui: scaler
+// DONE: @loan / @loan -lock
+// DONE: Admin Permission @loan
+// DONE: Unit variables
+// DONE: Change functions to no prefix
+// DONE: Variables can't be same as functions
+// DONE: Updated discord linker 
+// DONE: Fixed Random 
+// DONE: ui: global variables 
+// DONE: ui: local unit variables
+// TODO: break; with gamesetups
+// TODO: ui: _alias / _alias revamp with _macro->deletion 
+// TODO: Change splitter to " X "
+// TODO: Optional parameter error if you put at begining
+// TODO: TEST with big BANK
+// TODO: UI integration, 3 edit boxes, key, options, value
+// TOOD: 
+// TODO: @context with individual unit selectors
+// TODO: $UnitCount
+// TODO: >foreach 
+// DONE: @unitvar to @unitgroup
+// TODO: @Unitgroup -g
+// DONE: Assigning keypress prints help msg
+// FIXME: Keypress nums broken
+// TODO: ui: unit properties (unitgroups(vars), keypresses, position(with copy), face (with copy), list of behaviors)
+// TODO: ui: unitcard
+// TODO: ui: turn off
+// TODO: Add a function to make units not save with gamesetup
+// DONE: Remove Blacklist
+// FIXME: Proper Unit Cleanup
+// FIXME: Proper Variable Cleanup
+// FIXME: Change versioning to 3.minor.hotfix
+// TODO: ui: Patch Notes
+// TODO: BAnk reload once
+// TODO: FIX API
+// DONE: Mod demote mod
+// DONE: Remove Rotate
+// TODO: WIP on attach checker
+
+// == APEX 3.0 DONE ==
+
+// TODO: Post-release confirmed -----------------------------
+// TODO: API revisit
+// TODO: Keypress overhaul
+// TODO: Help Message Revamp
+// TODO: ui: attach checker
+// TODO: Custom print messages
+// TODO: Keypress raw
+// TODO: Keypress cooldown
+// TODO: Event Attack
+// TODO: And/OR conditions
+// TODO: Inverse Context/Inverse select
+// TODO: Event Death
+// TODO: Event Walk
+// TODO: Event Stop Walk
+// TODO: Event Damaged
+// TODO: Event Energy Drained
+// TODO: Event Shields Damaged
+// TODO: Event Proximity
+// TODO: @UnitFilter (filter via things) Unit Type, stats, weapons, behaviors, unitvars, localunitvariables
+// TODO: @effect point breaking when chained with spawn
+
+
+// == APEX 3.1 DONE ==
+
+// TODO: Post-release unconfirmed -----------------------------
+// TODO: Team Color Picker
 
 //THIS HAS TO BE SNAKE, TRIGGER TIES INTO THIS
 //DO NOT CHANGE, EVER
 void libapx_initialize() {
+	//Entry
 	int i = RandomInt(0,6);
-	LibapxToolkitInitialize();
-	LibapxEngineInitialize();
-	LibapxCommandsInitialize();
-	LibapxVariableFunctionInitialize();
-	LibapxUiInitialize();
-	LibapxGlobalsInit();
-	LibapxStatbarsInit();
-	// Josh Testing Some new UI Lib, doesn't work yet :).
-	// LibapxInitilizeUiLib();
+
+
 	InspirationalQuotes[0] = " Be inspired. This engine can do almost anything you could want! ";
 	InspirationalQuotes[1] = " Don't always be a passive roleplayer. Have your character be proactive and go to people instead of waiting about for someone to come to you. ";
 	InspirationalQuotes[2] = " Cooperate and be considerate of what others want while roleplaying. Try your best to make everyone in the roleplay satisfied with their experience. ";
@@ -41,15 +143,35 @@ void libapx_initialize() {
 	InspirationalQuotes[6] = " Help the new players. A good and welcoming community is only possible if most will it. Don't drag everyone down. ";
 
 
+
+	
+	LibapxToolkitInitialize();
+	LibapxEngineInitialize();
+	LibapxCommandsInitialize();
+	LibapxVariableFunctionInitialize();
+	// LibapxUiInitialize();
+	LibapxGlobalsInit();
+	LibapxBankLoad();
+
+	// Josh Testing Some new UI Lib, doesn't work yet :).
+	LibapxInitilizeUiLib();
+
+
+	DebugLog("Local Player Detected | Debug log Enabled");
+	
+	Wait(2, c_timeReal);
 	if(RandomInt(0,1000) != 666) {
-		LibapxPrint(PlayerGroupAll(), "Welcome to the <c val=\"ff0000\"> Apex Roleplaying Engine</c> created by Serobliss. " + InspirationalQuotes[i]);
+		LibapxLogPlayerGroup(PlayerGroupAll(), "Welcome to the <c val=\"ff0000\">Apex Roleplaying Engine</c> created by <c val=\"00fcb9\"><ApexRP> Serobliss<c val=\"ffffff\">. " + InspirationalQuotes[i]);
 	}
 	else {
-		LibapxPrint(PlayerGroupAll(), "Welcome to the <c val=\"ff0000\"> Apex Roleplaying Engine</c> created by Serobliss. hE'S kInDa a bIg dEaL. SeRoBliSs Is GaY ");
+		LibapxLogPlayerGroup(PlayerGroupAll(), "Welcome to the <c val=\"ff0000\">Apex Roleplaying Engine</c> created by <c val=\"00fcb9\"><ApexRP> Serobliss<c val=\"ffffff\">. hE'S kInDa a bIg dEaL. SeRoBliSs Is GaY ");
 	}
-	
-	LibapxBankLoad();
+
+	// DebugLog("Query String Run");
+    // LibapxQueryImages(".tga", 2, 4);
+
 	LibapxApiStart();
-	//LibapxPrint(PlayerGroupAll(), "apex Engine: v" + IntToString(gv_LibapxBuildVersion) + "." + IntToString(gv_LibapxBuildSubVersion) + gv_LibapxBuildVersionModifier);
-	//LibapxPrint(PlayerGroupAll(), LibapxSPLASHMESSAGE);
+	//LibapxLogPlayerGroup(PlayerGroupAll(), "apex Engine: v" + IntToString(gv_LibapxBuildVersion) + "." + IntToString(gv_LibapxBuildSubVersion) + gv_LibapxBuildVersionModifier);
+	//LibapxLogPlayerGroup(PlayerGroupAll(), LibapxSPLASHMESSAGE);
+
 }

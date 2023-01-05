@@ -1,0 +1,250 @@
+// contains functions assisting with data tables, including creation, cleanup, deletion, count, and exists
+static const string gv_CountTableName = "count"; 
+static const string gv_ListTableName = "list";
+static void InitializeIfNotExistingTable(string baseTableString) {
+    //count table
+    if(!DataTableValueExists(true, baseTableString + gv_CountTableName)) {
+        DataTableSetInt(true, baseTableString + gv_CountTableName, 0);
+    }
+    //list table
+    if(!DataTableValueExists(true, baseTableString + gv_ListTableName)) {
+        DataTableSetString(true, baseTableString + gv_ListTableName, "");
+    }
+} 
+
+
+
+
+//List Functions
+// ==========================
+//List contains a space-seperated list of all datatable entry key names
+string LibapxTManagerGetList(string baseTableString) {
+    return StringReplaceWord(
+        DataTableGetString(true,  baseTableString + gv_ListTableName), 
+        baseTableString, 
+        "", 
+        c_noMaxCount,
+        true
+    );
+}
+
+static bool DoesListTableContain(string baseTableString, string keyName) {
+    int i = 1;
+    string current;
+    string list = DataTableGetString(true, baseTableString + gv_ListTableName);
+    while(StringWord(list, i) != "") {
+        current = StringWord(list, i);
+        i+= 1;
+
+        if(current == keyName) {
+            return true;
+        };
+    }
+    return false;
+}
+
+static void AddToList(string baseTableString, string keyName) {
+    string currentList = DataTableGetString(true, baseTableString + gv_ListTableName);
+    if(currentList == "") {
+        DataTableSetString(true, baseTableString + gv_ListTableName, keyName);
+    }
+    else {
+        DataTableSetString(true, baseTableString + gv_ListTableName, currentList + " " + keyName);
+    }
+}
+
+static void RemoveFromList(string baseTableString, string keyName) {
+    string currentList = DataTableGetString(true, baseTableString + gv_ListTableName);
+    string newList = "";
+    int i = 1;
+    string current;
+    if(currentList != "") {
+        //lets rebuild current List
+        while(StringWord(currentList, i) != "") {
+            current = StringWord(currentList, i);
+            i += 1;
+
+            if(current != keyName) {
+                if(newList == "") {
+                    newList = current;
+                }
+                else {
+                    newList += " " + current;
+                }
+            }
+        }
+
+        DataTableSetString(true, baseTableString + gv_ListTableName, newList);
+    }
+}
+
+//Count Functions
+int LibapxTManagerGetCount(string baseTableString) {
+    return DataTableGetInt(true,  baseTableString + gv_CountTableName);
+}
+
+static void DataTableCountAdd(string baseTableString, int add) {
+    int count = DataTableGetInt(true, baseTableString + gv_CountTableName);
+    count += add;
+
+    if(count < 0) {
+        count = 0;
+    }
+
+    DataTableSetInt(true, baseTableString + gv_CountTableName, count);
+}
+
+
+// Data Functions
+//=============================================
+
+//Cleanup
+void LibapxTManagerCleanup(string baseTableString) {
+    string list = DataTableGetString(true,  baseTableString + gv_ListTableName);
+    int i = 1;
+    string current;
+    //Count
+    DataTableValueRemove(true, baseTableString + gv_CountTableName);
+    
+    //List
+    while(StringWord(list, i) != "") {
+        current = StringWord(list, i);
+        i+= 1;
+        DataTableValueRemove(true, current);
+    }
+
+    DataTableValueRemove(true, baseTableString + gv_ListTableName);
+}
+
+
+//Remove
+bool LibapxTManagerRemoveValue(string baseTableString, string specifiedTableString) {
+    string keyName = baseTableString + specifiedTableString;
+    
+    //Value exists?
+    if(DoesListTableContain(baseTableString, keyName)) {
+        
+        //Decrement Count
+        DataTableCountAdd(baseTableString, -1);
+        
+        //Remove From List
+        RemoveFromList(baseTableString, keyName);
+        
+        //Rmove Data
+        DataTableValueRemove(true, keyName);
+        return true;
+    }
+    else {
+        return false;
+    }
+}
+
+//Setters (One for each type)
+void LibapxTManagerSetInt(string baseTableString, string specifiedTableString, int value ) {
+    string keyName = baseTableString + specifiedTableString;
+
+    InitializeIfNotExistingTable(baseTableString);
+
+    if(!DoesListTableContain(baseTableString, keyName)) {
+        //Add
+
+        //Increment count
+        DataTableCountAdd(baseTableString, 1);
+        //Add to List
+        AddToList(baseTableString, keyName);
+        //Add data
+        DataTableSetInt(true, keyName, value);
+    }
+    else {
+        //Set
+        DataTableSetInt(true, keyName, value);
+    }
+}
+
+
+void LibapxTManagerSetString(string baseTableString, string specifiedTableString, string value ) {
+    string keyName = baseTableString + specifiedTableString;
+
+    InitializeIfNotExistingTable(baseTableString);
+
+    if(!DoesListTableContain(baseTableString, keyName)) {
+        //Add
+
+        //Increment count
+        DataTableCountAdd(baseTableString, 1);
+        //Add to List
+        AddToList(baseTableString, keyName);
+        //Add data
+        DataTableSetString(true, keyName, value);
+    }
+    else {
+        //Set
+        DataTableSetString(true, keyName, value);
+    }
+}
+
+void LibapxTManagerSetFixed(string baseTableString, string specifiedTableString, fixed value ) {
+    string keyName = baseTableString + specifiedTableString;
+
+    InitializeIfNotExistingTable(baseTableString);
+
+    if(!DoesListTableContain(baseTableString, keyName)) {
+        //Add
+
+        //Increment count
+        DataTableCountAdd(baseTableString, 1);
+        //Add to List
+        AddToList(baseTableString, keyName);
+        //Add data
+        DataTableSetFixed(true, keyName, value);
+    }
+    else {
+        //Set
+        DataTableSetFixed(true, keyName, value);
+    }
+}
+
+
+
+void LibapxTManagerSetUnitgroup(string baseTableString, string specifiedTableString, unitgroup value ) {
+    string keyName = baseTableString + specifiedTableString;
+
+    InitializeIfNotExistingTable(baseTableString);
+
+    if(!DoesListTableContain(baseTableString, keyName)) {
+        //Add
+
+        //Increment count
+        DataTableCountAdd(baseTableString, 1);
+        //Add to List
+        AddToList(baseTableString, keyName);
+        //Add data
+        DataTableSetUnitGroup(true, keyName, value);
+    }
+    else {
+        //Set
+        DataTableSetUnitGroup(true, keyName, value);
+    }
+}
+
+
+//Getters
+int LibapxTManagerGetInt(string baseTableString, string specifiedTableString ) {
+    return DataTableGetInt(true, baseTableString + specifiedTableString);
+}
+
+string LibapxTManagerGetString(string baseTableString, string specifiedTableString ) {
+    return DataTableGetString(true, baseTableString + specifiedTableString);
+}
+
+fixed LibapxTManagerGetFixed(string baseTableString, string specifiedTableString ) {
+    return DataTableGetFixed(true, baseTableString + specifiedTableString);
+}
+
+unitgroup LibapxTManagerGetUnitGroup(string baseTableString, string specifiedTableString ) {
+    return DataTableGetUnitGroup(true, baseTableString + specifiedTableString);
+}
+//Exists
+bool LibapxTManagerExists(string baseTableString, string specifiedTableString) {
+    return DataTableValueExists(true, baseTableString + specifiedTableString);
+}

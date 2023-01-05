@@ -1,0 +1,520 @@
+//Static Prototypes
+static void TriggerAdjustment(int p, fixed delay);
+static void AssignTriggers(int p);
+
+//Dialogs
+static int gv_InactiveText;
+static int gv_Target;
+static int gv_Actor;
+static int gv_AttachPoint;
+static int gv_XSlider;
+static int gv_XSliderLabel;
+static int gv_YSlider;
+static int gv_YSliderLabel;
+static int gv_ZSlider;
+static int gv_ZSliderLabel;
+static int gv_Scaler;
+static int gv_YawSlider;
+static int gv_YawSliderLabel;
+static int gv_PitchSlider;
+static int gv_PitchSliderLabel;
+static int gv_RollSlider;
+static int gv_RollSliderLabel;
+static int gv_DegreeStep;
+static int gv_Output;
+
+//Ui Erorrs  // Last tick for running code on activation/deactivation
+static bool[gv_LibapxMaxPlayers] gv_ShouldActivate;
+static bool[gv_LibapxMaxPlayers] gv_ShoudlActivateLastTick;
+static unitgroup[gv_LibapxMaxPlayers] gv_PreviouslySelected;
+
+//
+static int[gv_LibapxMaxPlayers] gv_CurrentTimeElapsed;
+static bool [gv_LibapxMaxPlayers] gv_ActivationSkipAdjustment;
+
+
+
+void LibapxUiInitAttachAdjuster() {
+    int base = DialogControlHookupStandard(
+        c_triggerControlTypePanel,
+        "UIContainer/ConsoleUIContainer/PanelAdjuster/Content"
+    );
+
+    gv_InactiveText = DialogControlHookup(base, c_triggerControlTypeLabel, "InactiveText");
+    DialogControlSetPropertyAsBool(gv_InactiveText, c_triggerControlPropertyVisible, PlayerGroupAll(), true);
+
+    gv_Target = DialogControlHookup(base, c_triggerControlTypeEditBox, "Target/EditBoxPadding/Editbox");
+    gv_Actor = DialogControlHookup(base, c_triggerControlTypeEditBox, "Actor/EditBoxPadding/Editbox");
+    gv_AttachPoint = DialogControlHookup(base, c_triggerControlTypeEditBox, "Attachpoint/EditBoxPadding/Editbox");
+    gv_XSlider = DialogControlHookup(base, c_triggerControlTypeSlider, "XSlider/Slider");
+    gv_XSliderLabel = DialogControlHookup(gv_XSlider, c_triggerControlTypeLabel, "Tooltip");
+    gv_YSlider = DialogControlHookup(base, c_triggerControlTypeSlider, "YSlider/Slider");
+    gv_YSliderLabel = DialogControlHookup(gv_YSlider, c_triggerControlTypeLabel, "Tooltip");
+    gv_ZSlider = DialogControlHookup(base, c_triggerControlTypeSlider, "ZSlider/Slider");
+    gv_ZSliderLabel = DialogControlHookup(gv_ZSlider, c_triggerControlTypeLabel, "Tooltip");
+    gv_Scaler = DialogControlHookup(base, c_triggerControlTypeEditBox, "Scaler/EditBoxPadding/Editbox");
+    gv_YawSlider = DialogControlHookup(base, c_triggerControlTypeSlider, "YawSlider/Slider");
+    gv_YawSliderLabel = DialogControlHookup(gv_YawSlider, c_triggerControlTypeLabel, "Tooltip");
+    gv_PitchSlider = DialogControlHookup(base, c_triggerControlTypeSlider, "PitchSlider/Slider");
+    gv_PitchSliderLabel = DialogControlHookup(gv_PitchSlider, c_triggerControlTypeLabel,"Tooltip");
+    gv_RollSlider = DialogControlHookup(base, c_triggerControlTypeSlider, "RollSlider/Slider");
+    gv_RollSliderLabel = DialogControlHookup(gv_RollSlider, c_triggerControlTypeLabel, "Tooltip");
+    gv_DegreeStep = DialogControlHookup(base, c_triggerControlTypeEditBox, "DegreeStep/EditBoxPadding/Editbox");
+    gv_Output = DialogControlHookup(base, c_triggerControlTypeEditBox, "Output/EditBoxPadding/Editbox");
+}
+
+
+static void CanAdjustValidator(int p) {
+    unitgroup selected = UnitGroupSelected(p);
+    unit current = UnitGroupUnit(selected, 1); 
+    string errorMessage;
+    while (true) {
+        if(UnitGroupCount(selected, c_unitCountAlive) < 1) {
+            errorMessage = "No unit Selected.";
+             break;
+        }
+
+        if(UnitGroupCount(selected, c_unitCountAlive) > 1) {
+            errorMessage = "Too many units selected.";
+            break;
+        }
+
+        //Check if can
+        if (FixedToInt(UnitGetCustomValue(current, gv_LibapxUnitIndexFlagAttach)) != 1) {
+            errorMessage = "Attach to the unit to begin adjusting! Don't know attach? Look up @attach in the command lookup button!";
+            break;
+        }
+
+        break;
+    }
+
+    DialogControlSetPropertyAsText(gv_InactiveText, c_triggerControlPropertyText, PlayerGroupSingle(p), StringToText(errorMessage));
+
+    if(errorMessage == "") {
+        gv_ShouldActivate[p] = true;
+        DialogControlSetPropertyAsBool(gv_InactiveText, c_triggerControlPropertyVisible, PlayerGroupSingle(p), false);
+    }
+    else {
+        gv_ShouldActivate[p] = false;
+        DialogControlSetPropertyAsBool(gv_InactiveText, c_triggerControlPropertyVisible, PlayerGroupSingle(p), true);
+    }
+
+
+
+    if(current != UnitGroupUnit(gv_PreviouslySelected[p], 1) && errorMessage == "") {
+        gv_ShoudlActivateLastTick[p] = false; //This'll trigger re-activation
+    } 
+    gv_PreviouslySelected[p] = selected;
+}
+
+
+void LibapxUiInitAttachAdjusterPlayer(int p) {
+    AssignTriggers(p);
+    gv_ShoudlActivateLastTick[p] = true;
+    CanAdjustValidator(p);
+}
+
+
+
+
+static string[gv_LibapxMaxPlayers] gv_cmdsTarget;
+static string[gv_LibapxMaxPlayers] gv_cmdsActor;
+static string[gv_LibapxMaxPlayers] gv_cmdsAttachPoint;
+static fixed[gv_LibapxMaxPlayers] gv_cmdsTransX;
+static fixed[gv_LibapxMaxPlayers] gv_cmdsTransY;
+static fixed[gv_LibapxMaxPlayers] gv_cmdsTransZ;
+static fixed[gv_LibapxMaxPlayers] gv_cmdsScaler;
+static fixed[gv_LibapxMaxPlayers] gv_cmdsRoll;
+static fixed[gv_LibapxMaxPlayers] gv_cmdsPitch;
+static fixed[gv_LibapxMaxPlayers] gv_cmdsYaw;
+static int[gv_LibapxMaxPlayers] gv_cmdsDegStep;
+
+static void UpdateUnitAndCache(unit u, int p) {
+    string commandsToRebuildActor = "";
+    string currentCmd;
+    string parserInput = "";
+    int actorCount = 0;
+    string semicolenString = "";
+    string attachActor;
+    bool rotation;
+    int i;
+    string target;
+    string output = "";
+    while(true) {
+        currentCmd = LibapxUnitCachePop(u, true);
+        actorCount += LibapxGetCommandActorCount(currentCmd);
+        if(StringWord(currentCmd, 1) == "@attach") {
+            break;
+        }
+        if(StringWord(currentCmd, 1) == "@rotation") {
+            continue;
+        }
+        if(StringWord(currentCmd, 1) == "") {
+            LibapxLogError(p, "INTERNAL ERROR | Deleted cache too far.");
+            return;
+        }
+        commandsToRebuildActor = currentCmd+semicolenString + commandsToRebuildActor;
+        semicolenString = ";";
+        //Semi colen string will get set after first iteration
+    }
+
+    for (i = 0; i < actorCount; i += 1) {
+        parserInput = "@actrmsg Destroy -nocache;" + parserInput;
+    }
+
+    if(gv_cmdsYaw[p] == 0 && gv_cmdsPitch[p] == 0 && gv_cmdsRoll[p] == 0) {
+        attachActor = gv_cmdsActor[p];
+    }
+    else {
+        rotation = true;
+        attachActor = "Beacon_Nova";
+    }
+    if(gv_cmdsTarget[p] == "") {
+        target = "";
+    }
+    else {
+        target = " ->"+gv_cmdsTarget[p];
+    }
+
+
+
+    //Build attach statement
+    output = "@attach -nodelay -nouireset" 
+    + target
+    + " " 
+    + attachActor
+    + " " 
+    + gv_cmdsAttachPoint[p]
+    + " " 
+    + LibapxUtilsTrimExcessZeros(FixedToString(gv_cmdsTransX[p], 3))
+    + " " 
+    + LibapxUtilsTrimExcessZeros(FixedToString(gv_cmdsTransY[p], 3))
+    + " " 
+    + LibapxUtilsTrimExcessZeros(FixedToString(gv_cmdsTransZ[p], 3));
+
+    if(rotation) {
+        output = output+";" 
+        + "@rotation -ypr -a "
+        + gv_cmdsActor[p]
+        + " ";
+        if(gv_cmdsYaw[p] != 0) {
+            output = output + FixedToString(gv_cmdsYaw[p], 0)+"y ";
+        }
+        if(gv_cmdsPitch[p] != 0) {
+            output = output + FixedToString(gv_cmdsPitch[p], 0)+"p ";
+        }
+        if(gv_cmdsRoll[p] != 0) {
+            output = output + FixedToString(gv_cmdsRoll[p], 0)+"r ";
+        }
+    }
+
+    parserInput = parserInput + output;
+    output = StringReplaceWord(output, "-nodelay", "", 1, c_stringNoCase);
+    output = StringReplaceWord(output, "-nouireset", "", 1, c_stringNoCase);
+
+    output = StringReplaceWord(output, "   ", " ", -1, c_stringNoCase);
+    output = LibapxStringTrim(StringReplaceWord(output, "  ", " ", -1, c_stringNoCase));
+
+    if(commandsToRebuildActor != "") {
+        parserInput = parserInput + ";";    
+    }
+    parserInput = parserInput + commandsToRebuildActor;
+
+
+    libNtve_gf_SetDialogItemEditorValue(gv_Output, output, PlayerGroupSingle(p));
+    LibapxChatParse(parserInput, p, UnitGroupSelected(p), gv_LibapxPlayer[p].spawningCount);
+}
+
+
+static string[gv_LibapxMaxPlayers] gv_cmdsTargetLast;
+static string[gv_LibapxMaxPlayers] gv_cmdsActorLast;
+static string[gv_LibapxMaxPlayers] gv_cmdsAttachPointLast;
+static fixed[gv_LibapxMaxPlayers] gv_cmdsTransXLast;
+static fixed[gv_LibapxMaxPlayers] gv_cmdsTransYLast;
+static fixed[gv_LibapxMaxPlayers] gv_cmdsTransZLast;
+static fixed[gv_LibapxMaxPlayers] gv_cmdsRollLast;
+static fixed[gv_LibapxMaxPlayers] gv_cmdsPitchLast;
+static fixed[gv_LibapxMaxPlayers] gv_cmdsYawLast;
+
+
+//Updates UI with current values
+static void UpdateUiWithCurrentValues(int p) {
+    //Do this to prevent issues
+    libNtve_gf_SetDialogItemEditorValue(gv_Target, gv_cmdsTarget[p], PlayerGroupSingle(p));
+    libNtve_gf_SetDialogItemEditorValue(gv_Actor, gv_cmdsActor[p], PlayerGroupSingle(p));
+    libNtve_gf_SetDialogItemEditorValue(gv_AttachPoint, gv_cmdsAttachPoint[p], PlayerGroupSingle(p));
+    LibapxUiSetSlider(gv_cmdsTransX[p], -gv_cmdsScaler[p], gv_cmdsScaler[p], gv_XSlider, gv_XSliderLabel, p, 3);
+    LibapxUiSetSlider(gv_cmdsTransY[p], -gv_cmdsScaler[p], gv_cmdsScaler[p], gv_YSlider, gv_YSliderLabel, p, 3);
+    LibapxUiSetSlider(gv_cmdsTransZ[p], -gv_cmdsScaler[p], gv_cmdsScaler[p], gv_ZSlider, gv_ZSliderLabel, p, 3);
+    libNtve_gf_SetDialogItemEditorValue(gv_Scaler, FixedToString(gv_cmdsScaler[p], 3), PlayerGroupSingle(p));
+    LibapxUiSetSlider(gv_cmdsRoll[p], -180, 180, gv_RollSlider, gv_RollSliderLabel, p, 0);
+    LibapxUiSetSlider(gv_cmdsPitch[p], -180, 180, gv_PitchSlider, gv_PitchSliderLabel, p, 0);
+    LibapxUiSetSlider(gv_cmdsYaw[p], -180, 180, gv_YawSlider, gv_YawSliderLabel, p, 0);
+    libNtve_gf_SetDialogItemEditorValue(gv_DegreeStep, "1", PlayerGroupSingle(p));
+    gv_ActivationSkipAdjustment[p] = true;  
+}
+
+
+
+//Reset function(used when @attach is triggered, and on activation)
+void LibapxAttachAdjusterReset(int p, unit u) {
+    string target = LibapxGetPreviousAttachCache(u, c_LibapxAttachCacheTarget);
+	string attachActor = LibapxGetPreviousAttachCache(u, c_LibapxAttachCacheActor);
+	string attachPoint = LibapxGetPreviousAttachCache(u, c_LibapxAttachCacheAttachpoint);
+	fixed transX = StringToFixed(LibapxGetPreviousAttachCache(u, c_LibapxAttachCacheTransX));
+	fixed transY = StringToFixed(LibapxGetPreviousAttachCache(u, c_LibapxAttachCacheTransY));
+	fixed transZ = StringToFixed(LibapxGetPreviousAttachCache(u, c_LibapxAttachCacheTransZ));
+    string rotActor = LibapxGetPreviousRotationCache(u, c_LibpaxRotationCacheActor);
+	fixed rotX = StringToFixed(LibapxGetPreviousRotationCache(u, c_LibpaxRotationCacheRotX)); // Roll
+	fixed rotY = StringToFixed(LibapxGetPreviousRotationCache(u, c_LibpaxRotationCacheRotY)); // Pitch
+	fixed rotZ = StringToFixed(LibapxGetPreviousRotationCache(u, c_LibpaxRotationCacheRotZ)); // Yaw
+    string endActor = attachActor;
+    fixed scaler;
+    
+
+    if(u != UnitGroupUnit(UnitGroupSelected(p), 1)) {
+        //context mismatch, selected vs input not right
+        return;
+    }
+    
+
+    //Handle scaler calc
+    if(AbsF(transX) >= AbsF(transY) && AbsF(transX) >= AbsF(transZ)) {
+        scaler = AbsF(transX*1.5);
+    }
+    if(AbsF(transY) >= AbsF(transX) && AbsF(transY) >= AbsF(transZ)) {
+        scaler = AbsF(transY*1.5);
+    }
+    if(AbsF(transZ) >= AbsF(transX) && AbsF(transZ) >= AbsF(transY)) {
+        scaler = AbsF(transZ*1.5);
+    }
+
+    if(scaler == 0) {
+        scaler = 2;
+    }
+
+    //s marine;@attach marine origin 0 3 -5
+    //End actor
+    if(rotActor != "") {
+        endActor = rotActor;
+    }
+
+    gv_cmdsTarget[p] = target;
+    gv_cmdsActor[p] = endActor;
+    gv_cmdsAttachPoint[p] = attachPoint;
+    gv_cmdsTransX[p] = transX;
+    gv_cmdsTransY[p] = transY;
+    gv_cmdsTransZ[p] = transZ;
+    gv_cmdsScaler[p] = scaler;
+    gv_cmdsRoll[p] = rotX;
+    gv_cmdsPitch[p] = rotY;
+    gv_cmdsYaw[p] = rotZ;
+    gv_cmdsDegStep[p] = 1;
+    UpdateUiWithCurrentValues(p);
+}
+
+
+
+static void TriggerAdjustment(int p, fixed delay) {
+    gv_CurrentTimeElapsed[p] += 1;
+
+    Wait(delay, c_timeGame);
+    if(gv_CurrentTimeElapsed[p] == 1) {
+        if(gv_ActivationSkipAdjustment[p]) {
+            gv_ActivationSkipAdjustment[p] = false;
+        }
+        else {
+
+            if(
+                gv_cmdsTargetLast[p] == gv_cmdsTarget[p] &&
+                gv_cmdsActorLast[p] == gv_cmdsActor[p] &&
+                gv_cmdsAttachPointLast[p] == gv_cmdsAttachPoint[p] &&
+                gv_cmdsTransXLast[p] == gv_cmdsTransX[p] &&
+                gv_cmdsTransYLast[p] == gv_cmdsTransY[p] &&
+                gv_cmdsTransZLast[p] == gv_cmdsTransZ[p] &&
+                gv_cmdsRollLast[p] == gv_cmdsRoll[p] &&
+                gv_cmdsPitchLast[p] == gv_cmdsPitch[p] &&
+                gv_cmdsYawLast[p] == gv_cmdsYaw[p]
+            ) {
+                //Skipping as samel values as last run
+            }
+            else {
+                gv_cmdsTargetLast[p] = gv_cmdsTarget[p];
+                gv_cmdsActorLast[p] = gv_cmdsActor[p];
+                gv_cmdsAttachPointLast[p] = gv_cmdsAttachPoint[p];
+                gv_cmdsTransXLast[p] = gv_cmdsTransX[p];
+                gv_cmdsTransYLast[p] = gv_cmdsTransY[p];
+                gv_cmdsTransZLast[p] = gv_cmdsTransZ[p];
+                gv_cmdsRollLast[p] = gv_cmdsRoll[p];
+                gv_cmdsPitchLast[p] = gv_cmdsPitch[p];
+                gv_cmdsYawLast[p] = gv_cmdsYaw[p];
+
+                UpdateUnitAndCache(UnitGroupUnit(UnitGroupSelected(p), 1), p);
+            }
+
+        }
+    }
+    gv_CurrentTimeElapsed[p] -= 1;
+}
+
+
+//Activate Function 
+static void AttachAdjusterActivate(int p) {
+    //do this to stop it from adjusting on EVERY new unit
+    LibapxAttachAdjusterReset(p, UnitGroupUnit(UnitGroupSelected(p), 1));
+} 
+
+
+static void AttachAdjusterDeactivate(int p) {
+
+} 
+
+void LibapxUiUpdateAttachAdjuster(int p) {
+    //Modifys error message
+    CanAdjustValidator(p);
+
+    if(gv_ShouldActivate[p] && !gv_ShoudlActivateLastTick[p]) {
+        //Runs once on activation
+        // DebugLog("activated");
+        AttachAdjusterActivate(p);
+        gv_ShoudlActivateLastTick[p] = true;
+    }
+    if(!gv_ShouldActivate[p] && gv_ShoudlActivateLastTick[p]) {
+        //Runs once on deactivation (cleanup)
+        // DebugLog("deactivated");
+        AttachAdjusterDeactivate(p);
+        gv_ShoudlActivateLastTick[p] = false;
+    }
+}
+//Triggers
+static void AssignTriggers(int p)  {
+    
+    TriggerAddEventDialogControl(TriggerCreate("TrigTarget"), p, gv_Target, c_triggerControlEventTypeTextChanged);
+    TriggerAddEventDialogControl(TriggerCreate("TrigActor"), p, gv_Actor, c_triggerControlEventTypeTextChanged);
+    TriggerAddEventDialogControl(TriggerCreate("TrigAttachPoint"), p, gv_AttachPoint, c_triggerControlEventTypeTextChanged);
+    TriggerAddEventDialogControl(TriggerCreate("TrigXTransSlider"), p, gv_XSlider, c_triggerControlEventTypeValueChanged);
+    TriggerAddEventDialogControl(TriggerCreate("TrigYTransSlider"), p, gv_YSlider, c_triggerControlEventTypeValueChanged);
+    TriggerAddEventDialogControl(TriggerCreate("TrigZTransSlider"), p, gv_ZSlider, c_triggerControlEventTypeValueChanged);
+    TriggerAddEventDialogControl(TriggerCreate("TrigScaler"), p, gv_Scaler, c_triggerControlEventTypeTextChanged);
+    TriggerAddEventDialogControl(TriggerCreate("TrigYawSlider"), p, gv_YawSlider, c_triggerControlEventTypeValueChanged);
+    TriggerAddEventDialogControl(TriggerCreate("TrigPitchSlider"), p, gv_PitchSlider, c_triggerControlEventTypeValueChanged);
+    TriggerAddEventDialogControl(TriggerCreate("TrigRollSlider"), p, gv_RollSlider, c_triggerControlEventTypeValueChanged);
+    TriggerAddEventDialogControl(TriggerCreate("TrigDegStep"), p, gv_DegreeStep, c_triggerControlEventTypeTextChanged);
+}
+
+
+
+bool TrigTarget(bool testConds, bool runActions) {
+    int p = EventPlayer();
+    string target = LibapxGetEditBoxValueAsString(gv_Target, p, "");
+
+    gv_cmdsTarget[p] = target;
+    TriggerAdjustment(p, 1);
+    return true;
+}
+bool TrigActor(bool testConds, bool runActions) {
+    int p = EventPlayer();
+    string actr = LibapxGetEditBoxValueAsString(gv_Actor, p, "Beacon_Apex");
+    string scope;
+
+	actr = LibapxCatalogGet(c_gameCatalogActor, actr);
+	if(actr == null) {
+		actr = "Beacon_Nova";
+	}
+
+    gv_cmdsActor[p] = actr;
+    TriggerAdjustment(p, .3);
+    return true;
+}
+
+bool TrigAttachPoint(bool testConds, bool runActions) {
+    int p = EventPlayer();
+    string attachPoint = LibapxGetEditBoxValueAsString(gv_AttachPoint, p, "origin");
+    gv_cmdsAttachPoint[p] = attachPoint;
+
+
+    TriggerAdjustment(p, .3);
+    return true;
+}
+
+bool TrigXTransSlider(bool testConds, bool runActions) {
+    int p = EventPlayer();
+    fixed value = DialogControlGetPropertyAsFixed(gv_XSlider, c_triggerControlPropertyValue, p);
+    value = LibapxSliderGetInput(value, -gv_cmdsScaler[p], gv_cmdsScaler[p], gv_XSlider, p, 2);
+    gv_cmdsTransX[p] = value;
+    LibapxUiSetSliderLabel(gv_XSliderLabel, p, value, 2);
+    
+    TriggerAdjustment(p, .3);
+    return true;
+}
+bool TrigYTransSlider(bool testConds, bool runActions) {
+    int p = EventPlayer();
+    fixed value = DialogControlGetPropertyAsFixed(gv_YSlider, c_triggerControlPropertyValue, p);
+    value = LibapxSliderGetInput(value, -gv_cmdsScaler[p], gv_cmdsScaler[p], gv_YSlider, p, 2);
+    gv_cmdsTransY[p] = value;
+    LibapxUiSetSliderLabel(gv_YSliderLabel, p, value, 2);
+
+    TriggerAdjustment(p, .3);
+    return true;
+}
+bool TrigZTransSlider(bool testConds, bool runActions) {
+    int p = EventPlayer();
+    fixed value = DialogControlGetPropertyAsFixed(gv_ZSlider, c_triggerControlPropertyValue, p);
+    value = LibapxSliderGetInput(value, -gv_cmdsScaler[p], gv_cmdsScaler[p], gv_ZSlider, p, 2);
+    gv_cmdsTransZ[p] = value;
+    LibapxUiSetSliderLabel(gv_ZSliderLabel, p, value, 2);
+
+    TriggerAdjustment(p, .3);
+    return true;
+}
+
+bool TrigScaler(bool testConds, bool runActions) {
+    int p = EventPlayer();
+    fixed typed = LibapxGetEditBoxValueAsFixed(gv_Scaler, p, 1);
+    gv_cmdsScaler[p] = typed;
+
+    LibapxUiSetSlider(gv_cmdsTransX[p], -gv_cmdsScaler[p], gv_cmdsScaler[p], gv_XSlider, gv_XSliderLabel, p, 2);
+    LibapxUiSetSlider(gv_cmdsTransY[p], -gv_cmdsScaler[p], gv_cmdsScaler[p], gv_YSlider, gv_YSliderLabel, p, 2);
+    LibapxUiSetSlider(gv_cmdsTransZ[p], -gv_cmdsScaler[p], gv_cmdsScaler[p], gv_ZSlider, gv_ZSliderLabel, p, 2);
+    return true;
+}
+bool TrigYawSlider(bool testConds, bool runActions) {
+    int p = EventPlayer();
+    fixed value = DialogControlGetPropertyAsFixed(gv_YawSlider, c_triggerControlPropertyValue, p);
+    value = LibapxSliderGetInput(value, -180, 180, gv_YawSliderLabel, p, 0);
+    value = Round(value/gv_cmdsDegStep[p])*gv_cmdsDegStep[p];
+
+    gv_cmdsYaw[p] = value;
+    LibapxUiSetSliderLabel(gv_YawSliderLabel, p, value, 0);
+    TriggerAdjustment(p, .3);
+    return true;
+}
+bool TrigPitchSlider(bool testConds, bool runActions) {
+    int p = EventPlayer();
+    fixed value = DialogControlGetPropertyAsFixed(gv_PitchSlider, c_triggerControlPropertyValue, p);
+    value = LibapxSliderGetInput(value, -180, 180, gv_PitchSliderLabel, p, 0);
+    value = Round(value/gv_cmdsDegStep[p])*gv_cmdsDegStep[p];
+
+    gv_cmdsPitch[p] = value;
+    LibapxUiSetSliderLabel(gv_PitchSliderLabel, p, value, 0);
+    TriggerAdjustment(p, .3);
+    return true;
+}
+bool TrigRollSlider(bool testConds, bool runActions) {
+    int p = EventPlayer();
+    fixed value = DialogControlGetPropertyAsFixed(gv_RollSlider, c_triggerControlPropertyValue, p);
+    value = LibapxSliderGetInput(value, -180, 180, gv_RollSliderLabel, p, 0);
+    value = Round(value/gv_cmdsDegStep[p])*gv_cmdsDegStep[p];
+
+    gv_cmdsRoll[p] = value;
+    LibapxUiSetSliderLabel(gv_RollSliderLabel, p, value, 0);
+    TriggerAdjustment(p, .3);
+    return true;
+}
+bool TrigDegStep(bool testConds, bool runActions) {
+    int p = EventPlayer();
+    int typed = FixedToInt(LibapxGetEditBoxValueAsFixed(gv_DegreeStep, p, 1));
+    gv_cmdsDegStep[p] = typed;
+
+    return true;
+}

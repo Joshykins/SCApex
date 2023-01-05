@@ -23,16 +23,17 @@ static const string gv_ApexButtonBackground = "Apex\\Assets\\Textures\\Button.dd
 static const string gv_ApexButtonBackgroundHov = "Apex\\Assets\\Textures\\ButtonHover.dds";
 
 // text header styles
-const string gv_LibapxUiHeader1 = "GlueButton";
-const string gv_LibapxUiHeader2 = "DirectiveDisplay";
-const string gv_LibapxUiHeader3 = "DebugTechPanelLabel";
-const string gv_LibapxUiHeader4 = "Header18";
-const string gv_LibapxUiHeader5 = "Header16";
+const string gv_LibapxUiHeader1 = "apx_heading_center";
+const string gv_LibapxUiHeader2 = "apx_heading_left";
+const string gv_LibapxUiHeader3 = "apx_bold_left";
+const string gv_LibapxUiHeaderNewCenter = "apx_bold_center";
+const string gv_LibapxUiHeader4 = "apx_light_left";
+const string gv_LibapxUiHeader5 = "apx_light_left";
 const string gv_LibapxUiShining = "CreditsLabel";
 
 // generic icons
 const string gv_LibapxUiIconSearch = "Assets\\Textures\\ui-editoricon-toolbar_find.dds";
-const string gv_LibapxUiIconGo = "Assets\\Textures\\ui-editoricon-dataTypes_movers.dds";
+const string gv_LibapxUiIconGo = "Assets\\Textures\\ui-editoricon-data_types_movers.dds";
 const string gv_LibapxUiIconReset = "Assets\\Textures\\ui-editoricon-general_undo.dds";
 const string gv_LibapxUiIconX = "Assets\\Textures\\ui-editoricon-previewer_delete.dds";
 const string gv_LibapxUiIconPlus = "EditorData\\Images\\DataAdd.tga";
@@ -190,6 +191,7 @@ int LibapxCreateDialogBtn(int dialog, int width, int height, int anchor, int off
 	libNtve_gf_SetDialogItemImage2(btn, gv_ApexButtonBackground, PlayerGroupAll());
 
 	libNtve_gf_SetDialogItemImageType(btn, c_triggerImageTypeBorder, PlayerGroupAll());
+	libNtve_gf_SetDialogItemStyle(btn, "apx_bold_button", PlayerGroupAll());
 
 	return btn;
 }

@@ -1,0 +1,109 @@
+include "apex/ui_lib/main/tabs/ui.main_sub_tabs.galaxy"
+
+
+static int gv_button1;
+static bool[gv_LibapxMaxPlayers] gv_button1toggled;
+static int gv_button2;
+static bool[gv_LibapxMaxPlayers] gv_button2toggled;
+static int gv_button3;
+static bool[gv_LibapxMaxPlayers] gv_button3toggled;
+static int gv_button4;
+static bool[gv_LibapxMaxPlayers] gv_button4toggled;
+
+void LibapxUiInitMainPanel() {
+
+
+    LibapxUiInitSubTabs();
+
+
+    gv_button1 = DialogControlHookupStandard(
+        c_triggerControlTypeButton, "UIContainer/ConsoleUIContainer/MainPanelContainer/MainButton1"
+    );
+    gv_button2 = DialogControlHookupStandard(
+        c_triggerControlTypeButton, "UIContainer/ConsoleUIContainer/MainPanelContainer/MainButton2"
+    );
+    gv_button3 = DialogControlHookupStandard(
+        c_triggerControlTypeButton, "UIContainer/ConsoleUIContainer/MainPanelContainer/MainButton3"
+    );
+    gv_button4 = DialogControlHookupStandard(
+        c_triggerControlTypeButton, "UIContainer/ConsoleUIContainer/MainPanelContainer/MainButton4"
+    );
+}
+
+void LibapxUiInitMainPanelPlayer(int p) {
+    LibapxUiInitSubTabsPlayer(p);
+    
+    TriggerAddEventDialogControl(TriggerCreate("LibapxTrigMainPanelButtonClick1"), p, gv_button1, c_triggerControlEventTypeClick);
+
+    TriggerAddEventDialogControl(TriggerCreate("LibapxTrigMainPanelButtonClick2"), p, gv_button2, c_triggerControlEventTypeClick);
+
+    TriggerAddEventDialogControl(TriggerCreate("LibapxTrigMainPanelButtonClick3"), p, gv_button3, c_triggerControlEventTypeClick);
+
+    TriggerAddEventDialogControl(TriggerCreate("LibapxTrigMainPanelButtonClick4"), p, gv_button4, c_triggerControlEventTypeClick);       
+}
+
+
+void LibapxUiUpdateMainPanelPlayer(int p) {
+    gv_LibapxMainPanelOpen[p] = false;
+
+    if(gv_button1toggled[p] || gv_button2toggled[p] || gv_button3toggled[p] || gv_button4toggled[p]) {
+        gv_LibapxMainPanelOpen[p] = true;
+    }
+
+}
+static void ManageMainPanelTabs(int clickedPanel, int p) {
+    //Panel1
+    if(clickedPanel != gv_button1) {
+        gv_button1toggled[p] = false;
+        DialogControlSetPropertyAsBool(gv_button1, c_triggerControlPropertyToggled, PlayerGroupSingle(p), false);
+    }
+    //Panel2
+    if(clickedPanel != gv_button2) {
+        gv_button2toggled[p] = false;
+        DialogControlSetPropertyAsBool(gv_button2, c_triggerControlPropertyToggled, PlayerGroupSingle(p), false);
+    }
+    //Panel3
+    if(clickedPanel != gv_button3) {
+        gv_button3toggled[p] = false;
+        DialogControlSetPropertyAsBool(gv_button3, c_triggerControlPropertyToggled, PlayerGroupSingle(p), false);
+    }
+
+    //Panel4
+    if(clickedPanel != gv_button4) {
+        gv_button4toggled[p] = false;
+        DialogControlSetPropertyAsBool(gv_button4, c_triggerControlPropertyToggled, PlayerGroupSingle(p), false);
+    }
+} 
+
+void LibapxMainUiSelectGuide(int p) {
+    gv_button3toggled[p] = true;
+    DialogControlSetPropertyAsBool(gv_button3, c_triggerControlPropertyToggled, PlayerGroupSingle(p), true);
+    ManageMainPanelTabs(gv_button3, p);
+}
+
+bool LibapxTrigMainPanelButtonClick1(bool testConds, bool runActions) {
+    int p = EventPlayer();
+    ManageMainPanelTabs(gv_button1, p);
+    gv_button1toggled[p] = !gv_button1toggled[p];
+    return true;
+}
+
+bool LibapxTrigMainPanelButtonClick2(bool testConds, bool runActions) {
+    int p = EventPlayer();
+    ManageMainPanelTabs(gv_button2, p);
+    gv_button2toggled[p] = !gv_button2toggled[p];
+    return true;
+}
+
+bool LibapxTrigMainPanelButtonClick3(bool testConds, bool runActions) {
+    int p = EventPlayer();
+    ManageMainPanelTabs(gv_button3, p);
+    gv_button3toggled[p] = !gv_button3toggled[p];
+    return true;
+}
+bool LibapxTrigMainPanelButtonClick4(bool testConds, bool runActions) {
+    int p = EventPlayer();
+    ManageMainPanelTabs(gv_button4, p);
+    gv_button4toggled[p] = !gv_button4toggled[p];
+    return true;
+}

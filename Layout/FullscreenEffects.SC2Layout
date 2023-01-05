@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<Desc>
+    <!-- Fullscreen effects -->
+    <Frame type="Frame" name="GameUI/UIContainer" file="GameUI">
+        
+        <Frame type="Frame" name="ApexFullscreenEffects">
+            <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
+            <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+            <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+            <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
+            <Visible val="true"/>
+    
+            <Frame type="Image" name="Shade">
+                <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
+                <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+                <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+                <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
+                <Texture val="Apex/Assets/Textures/shade.png"/>
+                <RenderPriority val="25"/>
+                <RenderType val="HDR"/>
+                <Visible val="true"/>
+            </Frame>
+    
+            <Frame type="Image" name="InitBackgroundImage">
+                <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
+                <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+                <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+                <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
+                <Texture val="Assets/Textures/white32.dds"/>
+                <Color val="35,35,35"/>
+                <TextureType val="Normal"/>
+                <Visible val="true"/>
+            </Frame>
+            <Animation name="Show">
+                <Event event="OnShown" action="DirectionForward,Play" frame="$this"/>
+                <Controller type="Fade" end="Pause" frame="$this/InitBackgroundImage">
+                    <Key type="Curve" time="0" value="255" out="Slow"/>
+                    <Key type="Curve" time="3" value="0" in="Slow"/>
+                </Controller>
+            </Animation>
+        </Frame>
+
+    </Frame>
+
+</Desc>

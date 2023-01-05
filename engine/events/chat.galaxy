@@ -30,7 +30,6 @@ void LibapxProcessChat(string msg,int user, unitgroup target) {
 		}
 		else {
 			target = UnitGroupSelected(user);
-			target = LibapxEnforceUnitPermissions(target, user);
 		}
 
 		LibapxChatParse(msg, user, target, gv_LibapxPlayer[user].spawningCount);

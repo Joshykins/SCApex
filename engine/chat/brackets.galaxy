@@ -136,5 +136,50 @@ string LibapxBracketTextGrab(string bracketText, int arg) {
 		i += 1;
 	}
 
-	return outputText;
+	return LibapxStringTrim(outputText);
+}
+
+string LibapxParseOutBracketText(string input) {
+	int pairEnd;
+	string bracketText;
+	int pairStart;
+	int i = 1;
+	while( StringFind(input, "[", c_stringNoCase) != -1) {
+		pairStart = LibapxBracketGetStartPair(input, 0);
+
+
+		if(LibapxBracketWithinBracketCheck( input, pairStart+1)) {
+			pairEnd = LibapxBracketGetEndPair(input, 0);
+			bracketText += gv_BracketSeperator + StringSub(input, pairStart + 1, pairEnd - 1);
+			input = StringReplace(input, "", pairStart, pairEnd);
+		}
+		else {
+			break;
+		}
+		i+=1;
+		if (i > 10) {
+			break;
+		} 
+	}
+
+	return bracketText;
+}
+
+string LibapxRemoveBracketTextFromString(string input, string bracketText, int limit) {
+	int i = 1;
+	string currentBracketText;
+	while(LibapxBracketTextGrab(bracketText, i) != "") {
+		currentBracketText = "["+LibapxBracketTextGrab(bracketText, i) + "]";
+		input = StringReplace(input, "", 
+		StringFind(input, currentBracketText, c_stringNoCase), 
+		StringFind(input, currentBracketText, c_stringNoCase)+StringLength(currentBracketText)
+		);
+		if(limit != -1 && i > limit) {
+			return input;
+		}
+		i+=1;
+	}
+	
+
+	return input;
 }

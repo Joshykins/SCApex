@@ -8,11 +8,11 @@
 
 include "apex/engine/chat/brackets.galaxy"
 include "apex/engine/chat/parser.variables.galaxy"
-include "apex/engine/chat/alias.galaxy"
+include "apex/engine/chat/chat.alias.galaxy"
 include "apex/engine/chat/macro.galaxy"
 
 const string gv_LibapxChatcommandPrefix = "LibapxCommand_";
-static const string BracketCommands = "@cache Delay Api >condition >repeat >chance >random >keypress >moveto";
+static const string BracketCommands = "_alias _var _unitvar @cache _delay _api >condition >repeat >chance >random >keypress >moveto";
 
 
 // LibapxArg
@@ -23,6 +23,8 @@ string LibapxArg(string argv, int index) {
 	return StringWord(argv, index);
 }
 
+
+//Prototype
 
 // function signature for Apex chat commands
 void LibapxCommandSignature(int user, unitgroup u, string argv, int spawningCount, string bracketText);
@@ -60,7 +62,7 @@ int gv_gv_LibapxCommandTableCounter = 0;
 // Adds a command function to the global array of commands.
 // Use data table to map command name (string) to the array index.
 void LibapxChatCommandCreate(string command, LibapxCommandType func,LibapxCommandGuide guideFunc) {
-	DataTableSetInt(true, gv_LibapxChatcommandPrefix + command, gv_gv_LibapxCommandTableCounter);
+	DataTableSetInt(true, gv_LibapxChatcommandPrefix +  StringCase(command, false), gv_gv_LibapxCommandTableCounter);
 	gv_LibapxCommandTable[gv_gv_LibapxCommandTableCounter] = func;
 	gv_gv_LibapxCommandTableCounter += 1;
 
@@ -81,6 +83,17 @@ const int gv_LibapxParseLimit = 40000;
 //
 
 
+//LibapxChatParseSimplified
+void LibapxChatParseSimplified(string msg, int p) {
+	int spawningCount = gv_LibapxPlayer[p].spawningCount;
+	LibapxChatParse(
+		msg, 
+		p, 
+		gv_LibapxPlayerParser[p][spawningCount].context, 
+		spawningCount
+	);
+}
+
 // LibapxChatParse
 // =================
 // parses a chat message string for commands (each command separated by ";" )
@@ -100,8 +113,13 @@ void LibapxChatParse(string msg, int player, unitgroup target, int spawningCount
 	int i;
 	string currentTemp;
 	bool matchedBracketCmd = false;
-	
 	LibapxCommandType func; // command ref test
+	
+	//Enforce target and player
+	target = LibapxEnforceUnitPermissions(target, player);
+	player = LibapxEnforceLoanPlayer(target, player);
+
+
 	LibapxChatParseIncrement(player);
 	gv_LibapxPlayerParser[player][spawningCount].context = target; //Sets Target of cmd
 
@@ -203,26 +221,10 @@ void LibapxChatParse(string msg, int player, unitgroup target, int spawningCount
 		}
 		
 
-		i = 1;
 		currentTemp = StringReplaceWord(currentTemp, "\\;", "", c_stringReplaceAll, false);
-			while( StringFind(currentTemp, "[", c_stringNoCase) != -1 && matchedBracketCmd) {
-				pairStart = LibapxBracketGetStartPair(currentTemp, 0);
-
-
-				if(LibapxBracketWithinBracketCheck( currentTemp, pairStart+1)) {
-					pairEnd = LibapxBracketGetEndPair(currentTemp, 0);
-					bracketText += gv_BracketSeperator + StringSub(currentTemp, pairStart + 1, pairEnd - 1);
-					currentTemp = StringReplace(currentTemp, "", pairStart, pairEnd);
-				}
-				else {
-					break;
-				}
-				i+=1;
-				if (i > 10) {
-					break;
-					LibapxPrintOutput(player,"Looped bracket parsing, report error to <ApexRP> Serobliss.");
-				} 
-			}
+		if(matchedBracketCmd) {
+			bracketText = LibapxParseOutBracketText(currentTemp);
+		}
 		//}
 
 
@@ -249,28 +251,11 @@ void LibapxChatParse(string msg, int player, unitgroup target, int spawningCount
 				break;
 			}
 
-			// returns true if using "alias create":
-			// in this case, the rest of msg is used up AS IS, so parsing considered finished
-			if( LibapxAliasCommandRedirect(current, player) ) {
+			// returns true if using LEGACY "alias create":
+			if( LibapxAliasCreateLegacy(current, player) ) {
 				break;
 			}
 			continue; // skip OOC printing
-		}
-		else if ( StringEqual( StringWord(current, 1), "macro", c_stringNoCase) ) {
-			//Bank validation
-			if(!gv_LibapxPlayerbankHasloaded(player)) {
-				break;
-			}
-			
-			// returns true if using "macro create":
-			// in this case, the rest of msg is used up AS IS, so parsing considered finished
-			if( LibapxMacroCommandRedirect(current, player) ) {
-				break;
-			}
-			continue; // skip OOC printing
-		}
-		else if ( StringEqual( StringWord(current, 1), "var", c_stringNoCase) ) {
-			// TODO: ADD VARIABLE SYSTEM
 		}
 
 		// replace aliases (returns true if aliases):
@@ -279,9 +264,10 @@ void LibapxChatParse(string msg, int player, unitgroup target, int spawningCount
 		if(!gv_LibapxPlayerbankHasloaded(player)) {
 			continue;
 		}
-		currentAliasSubbed = LibapxAliasSub(current, player, 0);
-		if( (currentAliasSubbed != current) ) {
 
+		currentAliasSubbed = LibapxAliasParse(current, player, 0);
+
+		if( (currentAliasSubbed != current) && !LibapxAliasRecursiveValidation(player) ) {
 			msg = currentAliasSubbed + " ;" + msg;
 			count += 1;
 			continue;
@@ -305,23 +291,21 @@ void LibapxChatParse(string msg, int player, unitgroup target, int spawningCount
 
 
 			//Delete the bracket from current
-			i = 1;
-			while(LibapxBracketTextGrab(bracketText, i) != "") {
-				current = StringReplace(current, "", StringFind(current, "["+LibapxBracketTextGrab(bracketText, i)+"]", c_stringNoCase), StringFind(current, "["+LibapxBracketTextGrab(bracketText, i)+"]", c_stringNoCase)+StringLength("["+LibapxBracketTextGrab(bracketText, i)+"]"));
-				i+=1;
-			}
+			current = LibapxRemoveBracketTextFromString(current, bracketText, -1);
 
 			target = gv_LibapxPlayerParser[player][spawningCount].context;
 			func( player, target, current, spawningCount, bracketText);
 		}
 		else if ( !gv_LibapxPlayer[player].muted ) {
-			LibapxChatPrintOOC(player, current);
+			if(current != "") {
+				LibapxChatPrintOOC(player, current);
+			}
 		}
 	}
 
 	// reached parse limit
 	if( count == gv_LibapxParseLimit ) {
-		LibapxPrintError(player, "Reached parse limit (recursive alias or recursive macro?)");
+		LibapxLogError(player, "Reached parse limit (recursive alias or recursive macro?)");
 	}
 
 }

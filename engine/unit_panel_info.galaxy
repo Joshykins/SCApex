@@ -1,0 +1,152 @@
+//=========================================================
+//		Apex Roleplaying Engine
+//		Copyright (c) 2022, Apex Group
+//=========================================================
+// This software is distributed under the MIT License:
+// <http://opensource.org/licenses/MIT>
+//=========================================================
+static const string gv_NameIdentifier =  "LibapxRename_";
+static const string gv_SubtitleIdentifier = "LibapxSubtitle_";
+static const string gv_SubtitleColorIdentifier = "LibapxSubtitleColor_";
+static const string gv_SubtitleBorderColorIdentifier = "LibapxSubtitleBorderColor_";
+static const string gv_DescIdentifier = "LibapxDesc_";
+static const string gv_DescallIdenfitier = "LibapxDescall_";
+static const string gv_LogIdentifier = "LibapxLog_";
+
+//Setters
+void LibapxUnitnameSetEntry(unit u, string name) {
+    string id = LibapxUnitId(u);
+    DataTableSetString(true, gv_NameIdentifier + id, name);
+}
+void LibapxUnitsubtitleSetEntry(unit u, string subtitle) {
+    string id = LibapxUnitId(u);
+    DataTableSetString(true, gv_SubtitleIdentifier + id, subtitle);
+}
+void LibapxUnitSubtitleColorSetEntry(unit u, color subtitleColor) {
+    string id = LibapxUnitId(u);
+    DataTableSetColor(true, gv_SubtitleColorIdentifier + id, subtitleColor);
+}
+void LibapxUnitSubtitleBorderColorSetEntry(unit u, color subtitleBorderColor) {
+    string id = LibapxUnitId(u);
+    DataTableSetColor(true, gv_SubtitleBorderColorIdentifier + id, subtitleBorderColor);
+}
+void LibapxUnitdescSetEntry(unit u, string desc) {
+    string id = LibapxUnitId(u);
+    DataTableSetString(true, gv_DescIdentifier + id, desc);
+}
+void LibapxUnitdescallSetEntry(unit u, string descall) {
+    string type = UnitGetType(u);
+    string p = IntToString(UnitGetOwner(u));
+    DataTableSetString(true, gv_DescallIdenfitier + p + "_" + type, descall);
+}
+void LibapxUnitLogSetEntry(unit u, text name, text log) {
+    string id = LibapxUnitId(u);
+    string p = IntToString(UnitGetOwner(u));
+    text current;
+    text cleanerTextName = StringToText("<s val=\"apx_regular_left_top\"><c val=\"255,255,255\">");
+    text cleanerTextLog = StringToText("<s val=\"apx_regular_left_top\"><c val=\"175,175,175\">");
+    current = DataTableGetText(true, gv_LogIdentifier + id);
+    if(DataTableValueExists(true, gv_LogIdentifier + id)) {
+        DataTableSetText(true, gv_LogIdentifier + id, current+StringToText("</n></n>")+cleanerTextName+name+cleanerTextLog+log);   
+    }
+    else {
+        DataTableSetText(true, gv_LogIdentifier + id, cleanerTextName+name+cleanerTextLog+log);   
+    }
+}
+
+
+//getters
+string LibapxUnitnameGetEntry(unit u) {
+    string id = LibapxUnitId(u);
+    return DataTableGetString(true, gv_NameIdentifier + id);
+}
+string LibapxUnitsubtitleGetEntry(unit u) {
+    string id = LibapxUnitId(u);
+    return DataTableGetString(true, gv_SubtitleIdentifier + id);
+}
+color LibapxUnitSubtitleColorGetEntry(unit u) {
+    string id = LibapxUnitId(u);
+    return DataTableGetColor(true, gv_SubtitleColorIdentifier + id);
+}
+color LibapxUnitSubtitleBorderColorGetEntry(unit u) {
+    string id = LibapxUnitId(u);
+    return DataTableGetColor(true, gv_SubtitleBorderColorIdentifier + id);
+}
+string LibapxUnitdescGetEntry(unit u) {
+    string id = LibapxUnitId(u);
+    return DataTableGetString(true, gv_DescIdentifier + id);
+}
+string LibapxUnitdescallGetEntry(unit u) {
+    string type = UnitGetType(u);
+    string p = IntToString(UnitGetOwner(u));
+
+    return DataTableGetString(true, gv_DescallIdenfitier + p + "_" + type);
+}
+text LibapxUnitLogGetEntry(unit u) {
+    string id = LibapxUnitId(u);
+    return DataTableGetText(true, gv_LogIdentifier + id);
+}
+
+//Is Set
+bool LibapxUnitHasSubtitleColor(unit u) {
+    string id = LibapxUnitId(u);
+    return DataTableValueExists(true,  gv_SubtitleColorIdentifier + id);
+}
+
+bool LibapxUnitHasSubtitleBorderColor(unit u) {
+    string id = LibapxUnitId(u);
+    return DataTableValueExists(true,  gv_SubtitleBorderColorIdentifier + id);
+}
+
+//Formal getters
+string LibapxUnitnameGet(unit u) {
+    string id = LibapxUnitId(u);
+    string catalogName;
+    //check for name
+    if(DataTableValueExists(true, gv_NameIdentifier + id)) {
+        return LibapxUnitnameGetEntry(u);
+    }
+    //REturn renameall
+    catalogName = CatalogFieldValueGet(c_gameCatalogUnit, UnitGetType(u), "Name", UnitGetOwner(u));
+    //Will sometimes return Unit/Name/{Units Name}
+    //Thus we check if it does and then substring if needed.
+    if(StringContains(catalogName, "Unit/Name/", c_stringAnywhere, false)) {
+        catalogName = StringSub(catalogName, 11, StringLength(catalogName));
+    }
+    return catalogName;
+}
+
+string LibapxUnitsubtitleGet(unit u) {
+    string id = LibapxUnitId(u);
+    string catalogName;
+    //check for name
+    if(DataTableValueExists(true, gv_SubtitleIdentifier + id)) {
+        return LibapxUnitsubtitleGetEntry(u);
+    }
+    //REturn renameall
+    catalogName = CatalogFieldValueGet(c_gameCatalogUnit, UnitGetType(u), "Subtitle", UnitGetOwner(u));
+    //Will sometimes return Unit/Name/{Units Name}
+    //Thus we check if it does and then substring if needed.
+    if(StringContains(catalogName, "UnitSubtitle/", c_stringAnywhere, false)) {
+        catalogName = StringSub(catalogName, 14, StringLength(catalogName));
+    }
+    return catalogName;
+}
+
+string LibapxUnitdescGet(unit u) {
+    string id = LibapxUnitId(u);
+    string type = UnitGetType(u);
+    string p = IntToString(UnitGetOwner(u));
+    string description;
+    if(DataTableValueExists(true, gv_DescIdentifier + id)) {
+        description = LibapxUnitdescGetEntry(u);
+    }
+    else if(DataTableValueExists(true, gv_DescallIdenfitier + p + "_" + type)) {
+        description = LibapxUnitdescallGetEntry(u);
+    }
+    else {
+        description = "";
+    }
+    return description;
+}
+

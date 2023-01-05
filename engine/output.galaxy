@@ -13,71 +13,260 @@ const string LibapxOUTPUTSOUNDERROR = "UIGenericError";
 
 
 
-// LibapxPrint
-// ===========================
-// prints a (string) message to all for the custom overrided chat
-void LibapxPrint(playergroup players, string msg) {
-	UIDisplayMessage(players, c_messageAreaDebug, StringToText(msg));
+
+struct gv_LibapxSayLogForToastsStructure {
+	fixed createdTime;
+	text message;
+	bool used; //Used use for initial rendering
+	bool hasBackground;
+	//Background Color
+	int backgroundAlpha;
+	color backgroundColor;
+	//Border Color
+	int borderAlpha;
+	color borderColor;
+};
+
+const int gv_LibapxSayToastCount = 25;
+gv_LibapxSayLogForToastsStructure[gv_LibapxMaxPlayers][gv_LibapxSayToastCount] gv_LibapxSayLogForToasts;
+
+static void PushSayLogsUp(int p) {
+	int i;
+	for (i = gv_LibapxSayToastCount-1; i > 0; i -= 1) {
+		if(i == 0) {
+			break;
+		}
+		gv_LibapxSayLogForToasts[p][i].createdTime = gv_LibapxSayLogForToasts[p][i-1].createdTime;
+		gv_LibapxSayLogForToasts[p][i].message = gv_LibapxSayLogForToasts[p][i-1].message; 
+		gv_LibapxSayLogForToasts[p][i].used = gv_LibapxSayLogForToasts[p][i-1].used;
+		gv_LibapxSayLogForToasts[p][i].hasBackground = gv_LibapxSayLogForToasts[p][i-1].hasBackground;
+		gv_LibapxSayLogForToasts[p][i].backgroundColor = gv_LibapxSayLogForToasts[p][i-1].backgroundColor;
+		gv_LibapxSayLogForToasts[p][i].backgroundAlpha = gv_LibapxSayLogForToasts[p][i-1].backgroundAlpha;
+		gv_LibapxSayLogForToasts[p][i].borderColor = gv_LibapxSayLogForToasts[p][i-1].borderColor;
+		gv_LibapxSayLogForToasts[p][i].borderAlpha = gv_LibapxSayLogForToasts[p][i-1].borderAlpha;
+	}
+	//Defaults
+	gv_LibapxSayLogForToasts[p][0].hasBackground = false;
+	gv_LibapxSayLogForToasts[p][0].backgroundColor = Color(0,0,0);
+	gv_LibapxSayLogForToasts[p][0].borderColor = Color(255,255,255);
+	gv_LibapxSayLogForToasts[p][0].backgroundAlpha = 50;
+	gv_LibapxSayLogForToasts[p][0].borderAlpha = 155;
+	gv_LibapxSayLogForToasts[p][0].used = true;
+} 
+
+
+void LibapxLogSay( text message) {
+	int i;
+	int p;
+	//This is an all one, so all need to be set
+	for (i = 1; i <= PlayerGroupCount(PlayerGroupActive()); i += 1) {
+		p = PlayerGroupPlayer(PlayerGroupActive(), i);
+		PushSayLogsUp(p);
+
+		gv_LibapxSayLogForToasts[p][0].createdTime = GameGetMissionTime();
+		gv_LibapxSayLogForToasts[p][0].message = StringToText("<s val=\"apx_chat\">")+message;
+	
+		gv_LibapxSayLogForToasts[p][0].hasBackground = true;
+	}
+
 }
 
-// LibapxPrintText
-// ===========================
-// prints a (text) message to the chat
-void LibapxPrintText(playergroup players, text msg) {
-	UIDisplayMessage(players, c_messageAreaDebug, msg);
+
+void LibapxLogText(int p, text message) {
+	//Migrate all down one
+	PushSayLogsUp(p);
+	gv_LibapxSayLogForToasts[p][0].createdTime = GameGetMissionTime();
+	gv_LibapxSayLogForToasts[p][0].message = StringToText("<s val=\"apx_chat\">")+message;
 }
 
-// LibapxPrintOutput
-// ===========================
-// prints a message proceeded by "> " to single player
-// (used for various function output)
-void LibapxPrintOutput(int player, string msg) {
-	UIDisplayMessage(PlayerGroupSingle(player), c_messageAreaDebug, StringToText("> " + msg));
+void LibapxLog(int p, string message) {
+	PushSayLogsUp(p);
+	gv_LibapxSayLogForToasts[p][0].createdTime = GameGetMissionTime();
+	gv_LibapxSayLogForToasts[p][0].message = StringToText("<s val=\"apx_chat\">"+message);
 }
 
-// LibapxPrintSuccess
-// ===========================
-// prints an success message to the chat
-// (green tinted message)
-void LibapxPrintSuccess(int player, string msg) {
-	UIDisplayMessage(PlayerGroupSingle(player), c_messageAreaDebug, TextWithColor(StringToText("> " + msg), Color(0,250,0)));
-	SoundPlay(SoundLink(LibapxOUTPUTSOUNDSUCCESS, -1), PlayerGroupSingle(player), 100.0, 0.0);
+// Debug Log
+void DebugLog(string s) {
+	int i;
+	int p;
+	if(gv_LibapxDebugMode) {
+		for (i = 1; i <= PlayerGroupCount(PlayerGroupActive()); i += 1) {
+			p = PlayerGroupPlayer(PlayerGroupActive(), i);
+			PushSayLogsUp(p);
+	
+			gv_LibapxSayLogForToasts[p][0].createdTime = GameGetMissionTime();
+			gv_LibapxSayLogForToasts[p][0].message = StringToText("<s val=\"apx_chat\"><c val=\"55,55,55\">"+"debug-log"+"</n><c val=\"255,255,255\">"+s);
+		
+			gv_LibapxSayLogForToasts[p][0].hasBackground = true;
+			
+			gv_LibapxSayLogForToasts[p][0].backgroundColor = Color(LibapxUtil255To100(52),LibapxUtil255To100(235),LibapxUtil255To100(185));
+			gv_LibapxSayLogForToasts[p][0].borderColor = Color(LibapxUtil255To100(52),LibapxUtil255To100(235),LibapxUtil255To100(185));
+			gv_LibapxSayLogForToasts[p][0].backgroundAlpha = 115;
+		}
+	}
 }
 
-// LibapxPrintError
-// ===========================
-// prints an error message to the chat
-// (red tinted message)
-void LibapxPrintError(int player, string msg) {
-	UIDisplayMessage(PlayerGroupSingle(player), c_messageAreaDebug, TextWithColor(StringToText("> [ERR] " + msg), Color(250,0,0)));
-	SoundPlay(SoundLink(LibapxOUTPUTSOUNDERROR, -1), PlayerGroupSingle(player), 100.0, 0.0);
-}
-
-// LibapxPrintWarning
-// ===========================
-// prints a warning message to the chat
-// (yellow tinted message)
-void LibapxPrintWarning(int player, string msg) {
-	UIDisplayMessage(PlayerGroupSingle(player), c_messageAreaDebug, TextWithColor(StringToText("> [WARN] " + msg), Color(250,250,0)));
-	//SoundPlay(SoundLink(LibapxOUTPUTSOUNDERROR, -1), PlayerGroupSingle(player), 100.0, 0.0);
-}
 
 // LibapxChatPrintOOC
 // ===========================
 // prints an "out-of-character" message for all players in format
 // "[OOC] [Clan-tag] [Player-Name]: [msg]"
-void LibapxChatPrintOOC(int player, string msg) {
+void LibapxChatPrintOOC(int inputP, string msg) {
+	int i;
+	int p;
 	text output;
 
-	if( gv_LibapxPlayer[player].muted ) {
+	if( gv_LibapxPlayer[inputP].muted ) {
 		return;
 	}
-	output = StringToText("[OOC] ") + gv_LibapxPlayerNameColored(player) + StringToText(": ") + StringToText(msg);
-	UIDisplayMessage(PlayerGroupAll(), c_messageAreaDebug, output);
+	output = StringToText("<s val=\"apx_chat\">") + gv_LibapxPlayerNameColored(inputP) + StringToText(": ") + StringToText(msg);
+
+	//This is an all one, so all need to be set
+	for (i = 1; i <= PlayerGroupCount(PlayerGroupActive()); i += 1) {
+		p = PlayerGroupPlayer(PlayerGroupActive(), i);
+		PushSayLogsUp(p);
+		gv_LibapxSayLogForToasts[p][0].createdTime = GameGetMissionTime();
+		gv_LibapxSayLogForToasts[p][0].message = output;
+	}
 }
 
 
-// Debug Log
-void DebugLog(string s) {
-	LibapxPrintOutput(EventPlayer(),"debug-log : "+ s);
+
+
+// LibapxLogPlayerGroupText
+// ===========================
+// prints a (text) message to the chat
+void LibapxLogPlayerGroupText(playergroup players, text msg) {
+	int i;
+	int p;
+
+	//This is an all one, so all need to be set
+	for (i = 1; i <= PlayerGroupCount(players); i += 1) {
+		p = PlayerGroupPlayer(players, i);
+		PushSayLogsUp(p);
+		gv_LibapxSayLogForToasts[p][0].createdTime = GameGetMissionTime();
+		gv_LibapxSayLogForToasts[p][0].message = StringToText("<s val=\"apx_chat\">")+msg;
+	}
+}
+// LibapxLogPlayerGroup
+// ===========================
+// prints a (string) message to all for the custom overrided chat
+void LibapxLogPlayerGroup(playergroup players, string msg) {
+	LibapxLogPlayerGroupText(players, StringToText(msg));
+}
+
+
+// LibapxLogInfoText
+// ===========================
+// prints a info message proceeded by  to single player
+// (used for various function output)
+void LibapxLogInfoText(int p, text msg) {
+	PushSayLogsUp(p);
+
+	gv_LibapxSayLogForToasts[p][0].createdTime = GameGetMissionTime();
+	gv_LibapxSayLogForToasts[p][0].message = StringToText("<s val=\"apx_chat\"><c val=\"255,255,255\">")+msg;
+
+	gv_LibapxSayLogForToasts[p][0].hasBackground = true;
+	
+	gv_LibapxSayLogForToasts[p][0].backgroundColor = Color(LibapxUtil255To100(255),LibapxUtil255To100(255),LibapxUtil255To100(255));
+	gv_LibapxSayLogForToasts[p][0].borderColor = Color(LibapxUtil255To100(255),LibapxUtil255To100(255),LibapxUtil255To100(255));
+	gv_LibapxSayLogForToasts[p][0].backgroundAlpha = 55;
+	gv_LibapxSayLogForToasts[p][0].borderAlpha = 25;
+	
+}
+
+// LibapxLogInfo
+// ===========================
+// prints a info message proceeded by  to single player
+// (used for various function output)
+void LibapxLogInfo(int p, string msg) {
+	
+	LibapxLogInfoText(p, StringToText(msg));
+}
+
+// LibapxLogInfoPlayerGroup
+// ===========================
+// prints a info message proceeded by  to single player
+// (used for various function output)
+void LibapxLogInfoPlayerGroup(playergroup ug, text msg) {
+	int i;
+	int p;
+	for (i = 1; i <= PlayerGroupCount(PlayerGroupActive()); i += 1) {
+		p = PlayerGroupPlayer(PlayerGroupActive(), i);
+		LibapxLogInfoText(p, msg);
+	}
+}
+
+
+// LibapxLogError
+// ===========================
+// prints an error message to the chat
+// (red tinted message)
+void LibapxLogError(int p, string msg) {
+	PushSayLogsUp(p);
+
+	gv_LibapxSayLogForToasts[p][0].createdTime = GameGetMissionTime();
+	gv_LibapxSayLogForToasts[p][0].message = StringToText("<s val=\"apx_chat\"><c val=\"255,255,255\"> "+msg);
+
+	gv_LibapxSayLogForToasts[p][0].hasBackground = true;
+	
+	gv_LibapxSayLogForToasts[p][0].backgroundColor = Color(LibapxUtil255To100(255),LibapxUtil255To100(0),LibapxUtil255To100(0));
+	gv_LibapxSayLogForToasts[p][0].borderColor = Color(LibapxUtil255To100(0),LibapxUtil255To100(0),LibapxUtil255To100(0));
+	gv_LibapxSayLogForToasts[p][0].backgroundAlpha = 50;
+}
+
+// LibapxLogWarning
+// ===========================
+// prints an error message to the chat
+// (red tinted message)
+void LibapxLogWarning(int p, string msg) {
+	PushSayLogsUp(p);
+
+	gv_LibapxSayLogForToasts[p][0].createdTime = GameGetMissionTime();
+	gv_LibapxSayLogForToasts[p][0].message = StringToText("<s val=\"apx_chat\"><c val=\"255,255,255\"> "+msg);
+
+	gv_LibapxSayLogForToasts[p][0].hasBackground = true;
+	
+	gv_LibapxSayLogForToasts[p][0].backgroundColor = Color(LibapxUtil255To100(255),LibapxUtil255To100(125),LibapxUtil255To100(0));
+	gv_LibapxSayLogForToasts[p][0].borderColor = Color(LibapxUtil255To100(0),LibapxUtil255To100(0),LibapxUtil255To100(0));
+	gv_LibapxSayLogForToasts[p][0].backgroundAlpha = 60;
+}
+
+
+
+// LibapxLogSuccess
+// ===========================
+// prints an success message to the chat
+// (green tinted message)
+void LibapxLogSuccess(int p, string msg) {
+	PushSayLogsUp(p);
+
+	gv_LibapxSayLogForToasts[p][0].createdTime = GameGetMissionTime();
+	gv_LibapxSayLogForToasts[p][0].message = StringToText("<s val=\"apx_chat\"><c val=\"255,255,255\"> "+msg);
+
+	gv_LibapxSayLogForToasts[p][0].hasBackground = true;
+	
+	gv_LibapxSayLogForToasts[p][0].backgroundColor = Color(LibapxUtil255To100(0),LibapxUtil255To100(255),LibapxUtil255To100(125));
+	gv_LibapxSayLogForToasts[p][0].borderColor = Color(LibapxUtil255To100(0),LibapxUtil255To100(0),LibapxUtil255To100(0));
+	gv_LibapxSayLogForToasts[p][0].backgroundAlpha = 50;
+}
+
+//allows custom log
+void LibapxLogCustom(playergroup pg, string msg, bool hasBg, color bgColor, color borderColor, int alpha) {
+	int i;
+	int p;
+
+	for (i = 1; i <= PlayerGroupCount(pg); i += 1) {
+		p = PlayerGroupPlayer(pg, i);
+		PushSayLogsUp(p);
+		gv_LibapxSayLogForToasts[p][0].createdTime = GameGetMissionTime();
+		gv_LibapxSayLogForToasts[p][0].message = StringToText("<s val=\"apx_chat\">"+msg);
+	
+		gv_LibapxSayLogForToasts[p][0].hasBackground = hasBg;
+		
+		gv_LibapxSayLogForToasts[p][0].backgroundColor = bgColor;
+		gv_LibapxSayLogForToasts[p][0].borderColor = borderColor;
+		gv_LibapxSayLogForToasts[p][0].backgroundAlpha = alpha;
+	}
+
 }

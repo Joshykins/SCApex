@@ -7,35 +7,10 @@
 //=========================================================
 
 
-
+//Prototypes
 void LibapxUpdateCamera();
+void LibapxUiLibUpdate(int p);
 
-void LibapxManagePermissionUi(int p) { 
-    int permissionLevel = gv_LibapxPlayer[p].permissionLevel;
-    string permissionLevelText;
-    color permissionLevelColor;
-    if(permissionLevel == 0) {
-        permissionLevelText = "User";
-        permissionLevelColor = ColorWithAlpha(100,100,100,80);
-    }
-    
-    if(permissionLevel == 1) {
-        permissionLevelText = "Moderator";
-        permissionLevelColor = ColorWithAlpha(100,70,70,80);
-    }
-    
-    if(permissionLevel == 2) {
-        permissionLevelText = "Administrator";
-        permissionLevelColor = ColorWithAlpha(100,00,00,80);
-    }
-    if(permissionLevel == 3) {
-        permissionLevelText = "SadAdmin :'(";
-        permissionLevelColor = ColorWithAlpha(0,100,100,90);
-    }
-
-    libNtve_gf_SetDialogItemColor(gv_LibapxPlayer[p].permissionLevelUi, permissionLevelColor, PlayerGroupSingle(p));
-    libNtve_gf_SetDialogItemText(gv_LibapxPlayer[p].permissionLevelUi, StringToText(permissionLevelText), PlayerGroupSingle(p));
-}
 
 bool LibapxTrigTicker(bool testConds, bool runActions) {
     int p;
@@ -48,7 +23,7 @@ bool LibapxTrigTicker(bool testConds, bool runActions) {
         p = PlayerGroupPlayer(PlayerGroupActive(), i);
         selected = UnitGroupSelected(p);
 
-        LibapxManagePermissionUi(p);
+
 
         if(UnitGroupCount(selected, c_unitCountAll) > 1 || UnitGroupCount(selected, c_unitCountAll) < 1) {
             gv_LibapxPlayer[p].nameDisplay = false;
@@ -57,8 +32,9 @@ bool LibapxTrigTicker(bool testConds, bool runActions) {
             gv_LibapxPlayer[p].nameDisplay = true;
             u = UnitGroupUnit(selected, 1);
         }
-        LibapxUpdateAlllabels(p);
-        LibapxUpdateStatdisplay(p);
+        LibapxUiLibUpdate(p);
+        // LibapxUpdateAlllabels(p);
+        // LibapxUpdateStatdisplay(p);
     }
 	return true;
 }

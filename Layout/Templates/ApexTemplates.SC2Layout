@@ -1,0 +1,1259 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<Desc>
+
+
+    <!-- Settings Button -->
+    <Frame type="Frame" name="SettingsButton">
+        <Anchor side="Top" relative="$parent" pos="Mid" offset="0"/>
+        <Anchor side="Left" relative="$parent" pos="Mid" offset="0"/>
+        <Anchor side="Right" relative="$parent" pos="Mid" offset="0"/>
+        <Anchor side="Bottom" relative="$parent" pos="Mid" offset="-200"/>
+        <Height val="100"/>
+        <Width val="100"/>
+        <Visible val="true"/>
+
+        <Frame type="Image" name="SettingsGearFlare">
+            <Anchor side="Left" relative="$parent/SettingsGearButton" pos="Max" offset="-5"/>
+            <Anchor side="Bottom" relative="$parent/SettingsGearButton" pos="Mid" offset="0"/>
+            <Anchor side="Top" relative="$parent/SettingsGearButton" pos="Mid" offset="0"/>
+            <Height val="80"/>
+            <Width val="80"/>
+            <Texture val="Apex\Assets\Textures\settings_gear_flare.dds"/>
+            <TextureType val="Normal"/>
+            <Color val="255,255,255"/>
+            <Visible val="true"/>
+            <Alpha val="255"/>
+            <Unclipped val="True"/>
+        </Frame>
+
+
+        <Frame type="Button" name="SettingsGearButton">
+            <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+            <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
+            <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+            <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
+            <Visible val="true"/>
+            <AcceptsMouse val="true"/>
+            <Tooltip val="Settings"/>
+
+            <Frame type="Image" name="NormalImage">
+                <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+                <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+                <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
+                <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
+                <Texture val="Apex\Assets\Textures\settings_gear.dds"/>
+                <TextureType val="Normal"/>
+                <Color val="255,255,255"/>
+                <Visible val="true"/>
+                <Alpha val="165"/>>
+                
+            </Frame>
+
+            <Animation name="Show">
+                <Event event="OnShown" action="DirectionForward,Play" frame="$this"/>
+                <Controller type="Fade" end="Pause" frame="$this/NormalImage">
+                    <Key type="Curve" time="0" value="0" out="Slow"/>
+                    <Key type="Curve" time="3" value="165" in="Slow"/>
+                </Controller>
+            </Animation>
+           
+            <Animation name="HoverOver">
+                <Event event="OnMouseEnter" action="DirectionForward,Play" frame="$this"/>
+                <Event event="OnMouseExit" action="DirectionReverse,Play" frame="$this"/>
+                <Controller type="Fade" end="Pause" frame="$this/NormalImage">
+                    <Key type="Curve" time="0" value="165" out="Slow"/>
+                    <Key type="Curve" time=".35" value="255" in="Slow"/>
+                </Controller>
+                <Controller type="Rotation" end="Pause" frame="$this/NormalImage">
+                    <Key type="Curve" time="0" value="0" out="Slow"/>
+                    <Key type="Curve" time=".35" value="36" in="Slow"/>
+                </Controller>
+            </Animation>
+        </Frame>
+
+    </Frame>
+
+    <!-- ScrollableFrame -->
+    <!-- Add ContainerFrame, with height being actual height of content -->
+    <!-- Reference Unit Panel - Description Panel -->
+    <Frame type="ScrollableFrame" name="ScrollableFrame">
+        <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+        <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
+        <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+        <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
+        <AcceptsMouse val="True"/>
+        <Visible val="True"/>
+        <Frame type="Frame" name="ContainerFrame">
+            <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+            <!-- BOTTOM ANCHOR MUST BE SAID TO CONTAINER FRAME -->
+            <Anchor side="Bottom" relative="$this/heklop" pos="Max" offset="0"/>
+            <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+            <Anchor side="Right" relative="$parent" pos="Max" offset="-30"/>
+            <!-- Here Is there Container Frame Would go, it's height goes to bottom anchor-->
+        </Frame>
+    
+        <Frame type="ScrollBar" name="ScrollBar">
+            <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+            <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
+            <Anchor side="Left" relative="$parent" pos="Max" offset="-15"/>
+            <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
+            <StepValue val="30"/>
+            <RenderPriority val="600"/>
+            <Orientation val="Vertical"/>
+            <Visible val="True"/>
+    
+            <Frame type="Image" name="ImageBg">
+                <Anchor side="Top" relative="$parent" pos="Min" offset="-10"/>
+                <Anchor side="Bottom" relative="$parent" pos="Max" offset="10"/>
+                <Anchor side="Left" relative="$parent" pos="Mid" offset="0"/>
+                <Anchor side="Right" relative="$parent" pos="Mid" offset="0"/>
+                <TextureType val="Border"/>
+                <Texture val="Apex/Assets/Textures/GenericFrame/simple_outline_border.dds"/>
+                <Alpha val="50"/>
+                <Width val="12"/>
+            </Frame>
+    
+    
+            <Frame type="Button" name="Button">
+                <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+                <Anchor side="Bottom" relative="$parent" pos="Min" offset="200"/>
+                <Anchor side="Left" relative="$parent" pos="Min" offset="5"/>
+                <Anchor side="Right" relative="$parent" pos="Max" offset="-5"/>
+    
+                <Frame type="Image" name="NormalImage">
+                    <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+                    <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
+                    <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+                    <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
+                    <Texture val="Assets\Textures\white32.dds"/>
+                    <Color val="255,255,255"/>
+                    <Alpha val="0"/>
+                    
+                    <Frame type="Image" name="ScrollBarActualBar">
+                        <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+                        <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
+                        <Anchor side="Left" relative="$parent" pos="Mid" offset="0"/>
+                        <Anchor side="Right" relative="$parent" pos="Mid" offset="0"/>
+                        <Width val="4"/>
+                        <Texture val="Assets\Textures\white32.dds"/>
+                        <Color val="255,255,255"/>
+                        <IgnoreParentAlpha val="True"/>
+                        <Unclipped val="True"/>
+                        <Visible val="True"/>
+                        <Alpha val="125"/>
+                    </Frame>
+                    <Frame type="Image" name="ScrollBarSquare">
+                        <Anchor side="Top" relative="$parent" pos="Mid" offset="0"/>
+                        <Anchor side="Bottom" relative="$parent" pos="Mid" offset="0"/>
+                        <Anchor side="Left" relative="$parent" pos="Mid" offset="0"/>
+                        <Anchor side="Right" relative="$parent" pos="Mid" offset="0"/>
+                        <Height val="12"/>
+                        <Width val="12"/>
+                        <Texture val="Assets\Textures\white32.dds"/>
+                        <Color val="255,255,255"/>
+                        <IgnoreParentAlpha val="True"/>
+                        <Unclipped val="True"/>
+                        <Visible val="True"/>
+                        <RotationPosition val="MiddleCenter"/>
+                        <Rotation val="45"/>
+                        <Alpha val="165"/>
+                        <Frame type="Image" name="ScrollBarSquareMid">
+                            <Anchor side="Top" relative="$parent" pos="Mid" offset="0"/>
+                            <Anchor side="Bottom" relative="$parent" pos="Mid" offset="0"/>
+                            <Anchor side="Left" relative="$parent" pos="Mid" offset="0"/>
+                            <Anchor side="Right" relative="$parent" pos="Mid" offset="0"/>
+                            <Height val="10"/>
+                            <Width val="10"/>
+                            <Texture val="Assets\Textures\white32.dds"/>
+                            <Color val="50,50,50"/>
+                            <IgnoreParentAlpha val="True"/>
+                            <Unclipped val="True"/>
+                            <Visible val="True"/>
+                            <RotationPosition val="MiddleCenter"/>
+                            <Rotation val="45"/>
+                        </Frame>
+                    </Frame>
+                </Frame>
+
+            </Frame>
+        </Frame>
+    </Frame>
+
+    <!-- Outlines Text in cool label -->
+    <Frame type="Frame" name="ApexOutlineTemplate">
+        <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+        <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+        <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
+        <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
+
+
+        <Visible val="True"/>
+        <RenderPriority val="8"/>
+        <!-- Background -->
+        <Frame type="Image" name="OutlineFrameBackground">
+            <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+            <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+            <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
+            <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
+            <Texture val="Apex\Assets\Textures\GenericFrame\outline_frame_background.dds"/>
+            <TextureType val="Border"/>
+            <Alpha val="135"/>
+            <RenderPriority val="9"/>
+        </Frame>
+        <!-- BIG Lines -->
+        <Frame type="Image" name="OutlineFrameBackgroundLines">
+            <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+            <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+            <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
+            <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
+            <Alpha val="255"/>
+            <Texture val="Apex\Assets\Textures\GenericFrame\outline_frame_lines.dds" layer="0"/>
+            <TextureType val="Border" layer="0"/>
+        </Frame>
+        <!-- SMALL Lines -->
+        <Frame type="Image" name="OutlineFrameBackgroundLinesSmall">
+            <Anchor side="Left" relative="$parent" pos="Min" offset="6"/>
+            <Anchor side="Top" relative="$parent" pos="Min" offset="6"/>
+            <Anchor side="Bottom" relative="$parent" pos="Max" offset="-6"/>
+            <Anchor side="Right" relative="$parent" pos="Max" offset="-6"/>
+            <Alpha val="100"/>
+            <Texture val="Apex\Assets\Textures\GenericFrame\outline_frame_lines.dds" layer="0"/>
+            <TextureType val="Border" layer="0"/>
+        </Frame>
+    </Frame>
+
+    <!--Secondary Frame Background-->
+    <Frame type="Frame" name="ApexSecondaryFrameTemplate">
+        
+			<Frame type="Image" name="Border">
+				<TextureType val="Border"/>
+				<Texture val="Apex/Assets/Textures/GenericFrame/simple_outline_border.dds"/>
+				<Anchor side="Top" relative="$parent/Background" pos="Min" offset="0"/>
+				<Anchor side="Left" relative="$parent/Background" pos="Min" offset="0"/>
+				<Anchor side="Bottom" relative="$parent/Background" pos="Max" offset="0"/>
+				<Anchor side="Right" relative="$parent/Background" pos="Max" offset="0"/>
+				<Alpha val="255"/>
+				<RenderPriority val="5"/>
+			</Frame>
+
+			<Frame type="Image" name="Background">
+					<Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
+					<Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+					<Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+					<Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
+					<Texture val="Assets/Textures/white32.dds"/>
+					<Color val="0,0,0"/>
+					<Alpha val="135"/>
+					<TextureType val="Normal"/>
+					<RenderPriority val="4"/>
+                    <Frame type="Frame" name="BlurContainer">
+                        <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
+                        <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+                        <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+                        <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
+                        <IgnoreParentAlpha val="True"/>
+                        <Alpha val="255"/>
+                        <Frame type="BlurFrame" name="Blur">
+                            <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
+                            <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+                            <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+                            <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
+                            <Blur val="true"/>
+                            <BlurAmount val="0.64"/>
+                            <Alpha val="165"/>
+                            <IgnoreParentAlpha val="True"/>
+                            <Unclipped val="true"/>
+                            <RenderType val="HDR"/>
+                        </Frame>
+                    </Frame>
+			</Frame>
+    </Frame>
+    
+    <!-- Must use Content Frame to hide content properly -->
+    <!-- Main Frame Background -->
+    <Frame type="Button" name="ApexFrameTemplate">
+        <Visible val="True"/>
+        <RenderPriority val="5"/>
+        <AcceptsMouse val="False"/>
+        <Frame type="Image" name="ApexFrameBackground">
+            <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+            <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+            <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
+            <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
+            <Texture val="Apex\Assets\Textures\GenericFrame\frame_background.dds" layer="1"/>
+            <TextureType val="Border" layer="1"/>
+            <Texture val="Apex\Assets\Textures\GenericFrame\frame_background.dds" layer="0"/>
+            <TextureType val="Border" layer="0"/>
+            <AlphaLayer val="True" layer="0"/>
+            <LayerCount val="1"/>
+            <Alpha val="135"/>
+            <RenderPriority val="6"/>
+        </Frame>
+        <!-- Lines -->
+        <Frame type="Image" name="ApexFrameBackgroundLines">
+            <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+            <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+            <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
+            <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
+            <Alpha val="200"/>
+            <Texture val="Apex\Assets\Textures\GenericFrame\frame_lines.dds" layer="0"/>
+            <TextureType val="Border" layer="0"/>
+        </Frame>
+        <!-- Fade Animation -->
+        <Animation name="Show">
+            <Event event="Toggled" action="Restart,Play" frame="$this"/>
+            <Controller type="Fade" end="Pause" frame="$this">
+                <Key type="Curve" time="0.0" value="0"/>
+                <Key type="Curve" time=".15" value="255"/>
+            </Controller>
+        </Animation>
+
+        <Animation name="Hide">
+            <Event event="Normal" action="Restart,Play" frame="$this"/>
+            <Controller type="Fade" end="Pause" frame="$this">
+                <Key type="Curve" time="0.0" value="255"/>
+                <Key type="Curve" time=".15" value="0"/>
+            </Controller>
+        </Animation>
+
+        <!-- Show/Hide Content -->
+        <Animation name="ShowContent">
+            <Event event="Toggled" action="Restart,Play" frame="$this"/>
+            <Controller type="Anchor" side="Right" relative="True" end="Pause" frame="$this/Content" property="Visible">
+                <Key type="Curve" time="0.0" value="-4000"/>
+                <Key type="Curve" time="0.0" value="0"/>
+            </Controller>
+        </Animation>
+        <Animation name="HideHideContent">
+            <Event event="Normal" action="Restart,Play" frame="$this"/>
+            <Controller type="Anchor" side="Right" relative="True" end="Pause" frame="$this/Content" property="Visible">
+                <Key type="Curve" time="0.0" value="0"/>
+                <Key type="Curve" time="0.15" value="0"/>
+                <Key type="Curve" time="0.0" value="-4000"/>
+            </Controller>
+        </Animation>
+
+        <Frame type="Frame" name="Content">
+            <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
+            <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+            <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+            <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
+            
+        </Frame>
+
+
+        <!-- Blur Top Left -->
+        <Frame type="BlurFrame" name="BlurTopLeft">
+            <Anchor side="Left" relative="$parent" pos="Min" offset="16"/>
+            <Anchor side="Top" relative="$parent" pos="Min" offset="16"/>
+            <Width val="64"/>
+            <Height val="64"/>
+            <Blur val="true"/>
+            <BlurAmount val=".64"/>
+            <RenderType val="HDR"/>
+            <AlphaMaskTexture val="Apex\Assets\Textures\GenericFrame\frame_top_left.dds"/>
+            <Alpha val="155"/>
+        </Frame>
+        <!-- Blur Top Right -->
+        <Frame type="BlurFrame" name="BlurTopRight">
+            <Anchor side="Right" relative="$parent" pos="Max" offset="-16"/>
+            <Anchor side="Top" relative="$parent" pos="Min" offset="16"/>
+            <Width val="64"/>
+            <Height val="64"/>
+            <Blur val="true"/>
+            <BlurAmount val=".64"/>
+            <RenderType val="HDR"/>
+            <AlphaMaskTexture val="Apex\Assets\Textures\GenericFrame\frame_top_right.dds"/>
+            <Alpha val="155"/>
+        </Frame>
+        <!-- Blur Bot Left -->
+        <Frame type="BlurFrame" name="BlurBotLeft">
+            <Anchor side="Left" relative="$parent" pos="Min" offset="16"/>
+            <Anchor side="Bottom" relative="$parent" pos="Max" offset="-16"/>
+            <Width val="64"/>
+            <Height val="64"/>
+            <Blur val="true"/>
+            <BlurAmount val=".64"/>
+            <RenderType val="HDR"/>
+            <AlphaMaskTexture val="Apex\Assets\Textures\GenericFrame\frame_bot_left.dds"/>
+            <Alpha val="155"/>
+        </Frame>
+        <!-- Blur Bot Right -->
+        <Frame type="BlurFrame" name="BlurBotRight">
+            <Anchor side="Right" relative="$parent" pos="Max" offset="-16"/>
+            <Anchor side="Bottom" relative="$parent" pos="Max" offset="-16"/>
+            <Width val="64"/>
+            <Height val="64"/>
+            <Blur val="true"/>
+            <BlurAmount val=".64"/>
+            <RenderType val="HDR"/>
+            <AlphaMaskTexture val="Apex\Assets\Textures\GenericFrame\frame_bot_right.dds"/>
+            <Alpha val="255"/>
+        </Frame>
+        <!-- Blur Mid -->
+        <Frame type="BlurFrame" name="BlurMid">
+            <Anchor side="Left" relative="$parent" pos="Min" offset="75"/>
+            <Anchor side="Right" relative="$parent" pos="Max" offset="-75"/>
+            <Anchor side="Top" relative="$parent" pos="Min" offset="16"/>
+            <Anchor side="Bottom" relative="$parent" pos="Max" offset="-16"/>
+            <Blur val="true"/>
+            <BlurAmount val=".64"/>
+            <RenderType val="HDR"/>
+            <Alpha val="155"/>
+        </Frame>
+        <!-- Blur Left -->
+        <Frame type="BlurFrame" name="BlurLeft">
+            <Anchor side="Left" relative="$parent" pos="Min" offset="16"/>
+            <Anchor side="Top" relative="$parent" pos="Min" offset="75"/>
+            <Anchor side="Bottom" relative="$parent" pos="Max" offset="-75"/>
+            <Width val="64"/>
+            <Blur val="true"/>
+            <BlurAmount val=".64"/>
+            <RenderType val="HDR"/>
+            <Alpha val="155"/>
+        </Frame>
+        <!-- Blur Right -->
+        <Frame type="BlurFrame" name="BlurRight">
+            <Anchor side="Right" relative="$parent" pos="Max" offset="-16"/>
+            <Anchor side="Top" relative="$parent" pos="Min" offset="75"/>
+            <Anchor side="Bottom" relative="$parent" pos="Max" offset="-75"/>
+            <Width val="64"/>
+            <Blur val="true"/>
+            <BlurAmount val=".64"/>
+            <RenderType val="HDR"/>
+            <Alpha val="155"/>
+        </Frame>
+    </Frame>
+
+
+    <Frame type="Frame" name="ApexStandardBackdrop">
+        <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+        <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
+        <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+        <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
+        <Frame type="Image" name="BG">
+            <Texture val="Assets/Textures/white32.dds"/>
+            <Color val="25,25,25"/>
+            <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+            <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+            <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
+            <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
+            <Alpha val="255"/>
+        </Frame>
+    </Frame>
+    
+    <!-- Apex Checkbox -->
+    <Frame type="Frame" name="ApexCheckbox">
+        <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+        <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
+        <Height val="70"/>
+
+        <Frame type="Label" name="Name">
+            <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
+            <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+            <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+            <Anchor side="Right" relative="$parent" pos="Min" offset="130"/>
+            <Style val="apx_regular_right_mid"/>
+            <Text val="Input Text"/>
+            <Text val="undefined text"/>
+        </Frame>
+
+        <Frame type="Button" name="Checkbox">
+            <Anchor side="Top" relative="$parent" pos="Min" offset="20"/>
+            <Anchor side="Bottom" relative="$parent" pos="Max" offset="-20"/>
+            <Anchor side="Left" relative="$parent" pos="Min" offset="160"/>
+            <AcceptsMouse val="True"/>
+            <RenderPriority val="25"/>
+            <Width val="30"/>
+
+            <Animation name="Hover">
+                <Event event="OnMouseEnter" action="Reset,Play" frame="$this"/>
+                <Controller type="Fade" end="Pause" frame="$this/Border">
+                    <Key type="Curve" time="0.0" value="100"/>
+                    <Key type="Curve" time="0.15" value="180"/>
+                </Controller>
+            </Animation>
+            
+            <Animation name="OffHover">
+                <Event event="OnMouseExit" action="Reset,Play" frame="$this"/>
+                <Controller type="Fade" end="Pause" frame="$this/Border">
+                    <Key type="Curve" time="0.0" value="180"/>
+                    <Key type="Curve" time="0.15" value="100"/>
+                </Controller>
+            </Animation>
+            
+            
+            <Animation name="ToggleOn">
+                <Event event="Toggled" action="Reset,Play" frame="$this"/>
+                <Controller type="Fade" end="Pause" frame="$this/ToggleBackground">
+                    <Key type="Curve" time="0.0" value="0"/>
+                    <Key type="Curve" time="0.15" value="165"/>
+                </Controller>
+            </Animation>
+            
+            <Animation name="ToggleOff">
+                <Event event="Normal" action="Reset,Play" frame="$this"/>
+                <Controller type="Fade" end="Pause" frame="$this/ToggleBackground">
+                    <Key type="Curve" time="0.0" value="165"/>
+                    <Key type="Curve" time="0.15" value="0"/>
+                </Controller>
+            </Animation>
+
+            <Frame type="Image" name="ToggleBackground">
+                <Texture val="Assets/Textures/white32.dds"/>
+                <Anchor side="Top" relative="$parent" pos="Mid" offset="0"/>
+                <Anchor side="Left" relative="$parent" pos="Mid" offset="0"/>
+                <Anchor side="Bottom" relative="$parent" pos="Mid" offset="0"/>
+                <Anchor side="Right" relative="$parent" pos="Mid" offset="0"/>
+                <Alpha val="50"/>
+                <RenderPriority val="9"/>
+                <Unclipped val="True"/>
+                <Width val="12"/>
+                <Height val="12"/>
+                <Rotation val="45"/>
+                <RotationPosition val="MiddleCenter"/>
+                
+            </Frame>
+
+            <Frame type="Image" name="Border">
+                <TextureType val="Border"/>
+                <Texture val="Apex/Assets/Textures/GenericFrame/simple_outline_border.dds"/>
+                <Anchor side="Top" relative="$parent" pos="Min" offset="3"/>
+                <Anchor side="Left" relative="$parent" pos="Min" offset="3"/>
+                <Anchor side="Bottom" relative="$parent" pos="Max" offset="-3"/>
+                <Anchor side="Right" relative="$parent" pos="Max" offset="-3"/>
+                <Alpha val="100"/>
+                <RenderPriority val="12"/>
+                <Unclipped val="True"/>
+                <Rotation val="45"/>
+                <RotationPosition val="MiddleCenter"/>
+            </Frame>
+        </Frame>
+    
+
+
+    </Frame>
+
+
+    <!-- Apex Input -->
+    <Frame type="Frame" name="ApexInput">
+        <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+        <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
+        <Height val="70"/>
+
+        <Frame type="Label" name="Name">
+            <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
+            <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+            <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+            <Anchor side="Right" relative="$parent" pos="Min" offset="130"/>
+            <Style val="apx_regular_right_mid"/>
+            <Text val="Input Text"/>
+            <Text val="undefined text"/>
+        </Frame>
+
+        <!-- Edit box padding -->
+        <Frame type="Frame" name="EditBoxPadding">
+            <Anchor side="Top" relative="$parent" pos="Min" offset="15"/>
+            <Anchor side="Bottom" relative="$parent" pos="Max" offset="-15"/>
+            <Anchor side="Left" relative="$parent" pos="Min" offset="160"/>
+            <Anchor side="Right" relative="$parent" pos="Max" offset="-5"/>
+
+            <!-- Border -->
+            <Frame type="Image" name="Border">
+                <TextureType val="Border"/>
+                <Texture val="Apex/Assets/Textures/GenericFrame/simple_outline_border.dds"/>
+                <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+                <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+                <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
+                <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
+                <Alpha val="50"/>
+                <RenderPriority val="9"/>
+            </Frame>
+            
+
+            <!-- Focused Background -->
+            <Frame type="Image" name="Focused">
+                <Anchor side="Top" relative="$parent" pos="Min" offset="3"/>
+                <Anchor side="Left" relative="$parent" pos="Min" offset="3"/>
+                <Anchor side="Bottom" relative="$parent" pos="Max" offset="-3"/>
+                <Anchor side="Right" relative="$parent" pos="Max" offset="-3"/>
+                <Texture val="Assets/Textures/white32.dds"/>
+                <Color val="0,0,0"/>
+                <Alpha val="0"/>
+                <RenderPriority val="7"/>
+            </Frame>
+    
+            <!-- Background -->
+            <Frame type="Image" name="Background">
+                <Anchor side="Top" relative="$parent" pos="Min" offset="3"/>
+                <Anchor side="Left" relative="$parent" pos="Min" offset="3"/>
+                <Anchor side="Bottom" relative="$parent" pos="Max" offset="-3"/>
+                <Anchor side="Right" relative="$parent" pos="Max" offset="-3"/>
+                <Texture val="Assets/Textures/white32.dds"/>
+                <Color val="0,0,0"/>
+                <Alpha val="55"/>
+                <RenderPriority val="6"/>
+            </Frame>
+
+            <!-- Edit box -->
+            <Frame type="EditBox" name="Editbox">
+                <Anchor side="Top" relative="$parent" pos="Min" offset="7"/>
+                <Anchor side="Bottom" relative="$parent" pos="Max" offset="-7"/>
+                <Anchor side="Left" relative="$parent" pos="Min" offset="7"/>
+                <Anchor side="Right" relative="$parent" pos="Max" offset="-7"/>
+                <RenderPriority val="25"/>
+                <HighlightColor val="53,161,252"/>
+                <HighlightAlpha val="60"/>
+                <HighlightOnFocus val="True"/>
+                <Text val=""/>
+    
+                <Animation name="Focus">
+                    <Event event="OnFocusGained" action="Reset,Play" frame="$this"/>
+                    <Controller type="Fade" end="Pause" frame="$parent/Focused">
+                        <Key type="Curve" time="0.0" value="0"/>
+                        <Key type="Curve" time="0.15" value="45"/>
+                    </Controller>
+                    <Controller type="Fade" end="Pause" frame="$parent/Border">
+                        <Key type="Curve" time="0.0" value="50"/>
+                        <Key type="Curve" time="0.15" value="85"/>
+                    </Controller>
+                </Animation>
+                
+                <Animation name="Unfocus">
+                    <Event event="OnFocusLost" action="Reset,Play" frame="$this"/>
+                    <Controller type="Fade" end="Pause" frame="$parent/Focused">
+                        <Key type="Curve" time="0.0" value="45"/>
+                        <Key type="Curve" time="0.15" value="0"/>
+                    </Controller>
+                    <Controller type="Fade" end="Pause" frame="$parent/Border">
+                        <Key type="Curve" time="0.0" value="85"/>
+                        <Key type="Curve" time="0.15" value="50"/>
+                    </Controller>
+                </Animation>
+        
+                <Frame type="Frame" name="LabelContainerFrame">
+                    <RenderPriority val="9"/>
+                    <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+                    <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+                    <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
+                    <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
+                    
+                    <Frame type="Label" name="Label">
+                        <Anchor relative="$parent"/>
+                        <Text val=""/>
+                        <Style val="apx_regular_left_mid"/>
+                    </Frame>
+                </Frame>
+            </Frame>
+            <!-- END of Edit box -->
+
+        </Frame>
+        <!-- END of Edit box padding -->
+    
+
+
+    </Frame>
+
+
+    <!-- Apex Textarea -->
+    <Frame type="Frame" name="ApexTextarea">
+        <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+        <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
+        <Height val="200"/>
+
+        <Frame type="Label" name="Name">
+            <Anchor side="Top" relative="$parent" pos="Min" offset="20"/>
+            <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+            <Anchor side="Right" relative="$parent" pos="Min" offset="130"/>
+            <Style val="apx_regular_right_mid"/>
+            <Text val="undefined text"/>
+        </Frame>
+        <!-- Edit box padding -->
+        <Frame type="Frame" name="EditBoxPadding">
+            <Anchor side="Top" relative="$parent" pos="Min" offset="15"/>
+            <Anchor side="Bottom" relative="$parent" pos="Max" offset="-15"/>
+            <Anchor side="Left" relative="$parent" pos="Min" offset="160"/>
+            <Anchor side="Right" relative="$parent" pos="Max" offset="-5"/>
+
+            <!-- Border -->
+            <Frame type="Image" name="Border">
+                <TextureType val="Border"/>
+                <Texture val="Apex/Assets/Textures/GenericFrame/simple_outline_border.dds"/>
+                <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+                <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+                <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
+                <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
+                <Alpha val="50"/>
+                <RenderPriority val="9"/>
+            </Frame>
+            
+
+            <!-- Focused Background -->
+            <Frame type="Image" name="Focused">
+                <Anchor side="Top" relative="$parent" pos="Min" offset="3"/>
+                <Anchor side="Left" relative="$parent" pos="Min" offset="3"/>
+                <Anchor side="Bottom" relative="$parent" pos="Max" offset="-3"/>
+                <Anchor side="Right" relative="$parent" pos="Max" offset="-3"/>
+                <Texture val="Assets/Textures/white32.dds"/>
+                <Color val="0,0,0"/>
+                <Alpha val="0"/>
+                <RenderPriority val="7"/>
+            </Frame>
+    
+            <!-- Background -->
+            <Frame type="Image" name="Background">
+                <Anchor side="Top" relative="$parent" pos="Min" offset="3"/>
+                <Anchor side="Left" relative="$parent" pos="Min" offset="3"/>
+                <Anchor side="Bottom" relative="$parent" pos="Max" offset="-3"/>
+                <Anchor side="Right" relative="$parent" pos="Max" offset="-3"/>
+                <Texture val="Assets/Textures/white32.dds"/>
+                <Color val="0,0,0"/>
+                <Alpha val="55"/>
+                <RenderPriority val="6"/>
+            </Frame>
+
+
+            <Frame type="EditBox" name="Editbox">
+                <Anchor side="Top" relative="$parent" pos="Min" offset="7"/>
+                <Anchor side="Bottom" relative="$parent" pos="Max" offset="-7"/>
+                <Anchor side="Left" relative="$parent" pos="Min" offset="7"/>
+                <Anchor side="Right" relative="$parent" pos="Max" offset="-7"/>
+
+
+                
+                <MultiLine val="True"/>
+                <RenderPriority val="25"/>
+                <HighlightColor val="53,161,252"/>
+                <HighlightAlpha val="60"/>
+                <HighlightOnFocus val="True"/>
+                <Text val=""/>
+
+                <Animation name="Focus">
+                    <Event event="OnFocusGained" action="Reset,Play" frame="$this"/>
+                    <Controller type="Fade" end="Pause" frame="$parent/Focused">
+                        <Key type="Curve" time="0.0" value="0"/>
+                        <Key type="Curve" time="0.15" value="45"/>
+                    </Controller>
+                    <Controller type="Fade" end="Pause" frame="$parent/Border">
+                        <Key type="Curve" time="0.0" value="50"/>
+                        <Key type="Curve" time="0.15" value="85"/>
+                    </Controller>
+                </Animation>
+                
+                <Animation name="Unfocus">
+                    <Event event="OnFocusLost" action="Reset,Play" frame="$this"/>
+                    <Controller type="Fade" end="Pause" frame="$parent/Focused">
+                        <Key type="Curve" time="0.0" value="45"/>
+                        <Key type="Curve" time="0.15" value="0"/>
+                    </Controller>
+                    <Controller type="Fade" end="Pause" frame="$parent/Border">
+                        <Key type="Curve" time="0.0" value="85"/>
+                        <Key type="Curve" time="0.15" value="50"/>
+                    </Controller>
+                </Animation>
+        
+                <Frame type="Frame" name="LabelContainerFrame">
+                    <RenderPriority val="9"/>
+                    <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+                    <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+                    <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
+                    <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
+                    <Frame type="Label" name="Label">
+                        <Anchor relative="$parent"/>
+                        <BaseHeight val="40"/>
+                        <Style val="apx_regular_left_mid"/>
+                    </Frame>
+                </Frame>
+            </Frame>
+        </Frame>
+    <!-- END of Edit box padding -->
+    </Frame>
+
+
+
+    <!-- Apex Slider -->
+    <Frame type="Frame" name="ApexSlider">
+        <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+        <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
+        <Height val="70"/>
+
+        <Frame type="Label" name="Name">
+            <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
+            <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+            <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+            <Anchor side="Right" relative="$parent" pos="Min" offset="130"/>
+            <Style val="apx_regular_right_mid"/>
+            <Text val="Adjustment X"/>
+            <Text val="undefined text"/>
+        </Frame>
+
+        <Frame type="Slider" name="Slider">
+            <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+            <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
+            <Anchor side="Left" relative="$parent" pos="Min" offset="160"/>
+            <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
+            <Height val="48"/>
+
+            <Image val="Background"/>
+            <FillContainer val="FillContainer"/>
+            <FillBarImage val="FillImage"/>
+            <Button val="Button"/>
+            <AutoSizeFillBar val="true"/>
+            <Orientation val="Horizontal"/>
+            <MaxValue val="360"/>
+            <MinValue val="0"/>
+            <Value val="127"/>
+            <StepValue val="1"/>
+            <AcceptsMouse val="True"/>
+    
+            <!-- Clickable region btw -->
+            <Animation name="HoverOn">
+                <Event event="OnMouseEnter" action="Reset,Play" frame="$this"/>
+                <Controller type="Fade" end="Pause" frame="$this/Tooltip">
+                    <Key type="Curve" time="0.0" value="55"/>
+                    <Key type="Curve" time="0.15" value="165"/>
+                </Controller>
+                <Controller type="Color" end="Pause" frame="$this/Button/NormalImage">
+                    <Key type="Curve" time="0.0" value="175,175,175"/>   
+                    <Key type="Curve" time="0.15" value="255,255,255"/>
+                </Controller>
+            </Animation>
+            
+            <Animation name="HoverOut">
+                <Event event="OnMouseExit" action="Reset,Play" frame="$this"/>
+                <Controller type="Fade" end="Pause" frame="$this/Tooltip">
+                    <Key type="Curve" time="0.0" value="165"/>
+                    <Key type="Curve" time="0.15" value="55"/>
+                </Controller>
+                <Controller type="Color" end="Pause" frame="$this/Button/NormalImage">
+                    <Key type="Curve" time="0.0" value="255,255,255"/>   
+                    <Key type="Curve" time="0.15" value="175,175,175"/>
+                </Controller>
+            </Animation>
+    
+    
+            <Frame type="Image" name="Background">
+                <Anchor side="Top" relative="$parent" pos="Mid" offset="0"/>
+                <Anchor side="Bottom" relative="$parent" pos="Mid" offset="0"/>
+                <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+                <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
+                <Height val="1"/>
+                <Texture val="Assets/Textures/white32.dds"/>
+                <Color val="255,255,255"/>
+                <Alpha val="165"/>
+                <DisabledAlpha val="64"/>
+            </Frame>
+    
+            <Frame type="Frame" name="FillContainer">
+                <Anchor side="Top" relative="$parent" pos="Mid" offset="0"/>
+                <Anchor side="Bottom" relative="$parent" pos="Mid" offset="0"/>
+                <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+                <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
+                <Height val="24"/>
+            </Frame>
+    
+            <Frame type="Image" name="FillImage">
+                <Texture val="Assets/Textures/white32.dds"/>
+                <Color val="0,0,0"/>
+                <Alpha val="0"/>
+            </Frame>
+    
+            <Frame type="Label" name="Tooltip">
+                <Anchor side="Bottom" relative="$parent/Button" pos="Min" offset="13"/>
+                <Anchor side="Left" relative="$parent/Button" pos="Mid" offset="0"/>
+                <Anchor side="Right" relative="$parent/Button" pos="Max" offset="0"/>
+                <Width val="60"/>
+                <Height val="20"/>
+                <Style val="apx_regular_center_mid"/>
+                <Text val="127"/>
+                <Unclipped val="True"/>
+                <Alpha val="55"/>
+            </Frame>
+    
+            <Frame type="Button" name="Button">
+                <Width val="12"/>
+                <Height val="12"/>
+                <AcceptsMouse val="False"/>
+                <Frame type="Image" name="NormalImage">
+                    <Anchor side="Top" relative="$parent" pos="Mid" offset="0"/>
+                    <Anchor side="Left" relative="$parent" pos="Mid" offset="0"/>
+                    <Anchor side="Bottom" relative="$parent" pos="Mid" offset="0"/>
+                    <Anchor side="Right" relative="$parent" pos="Mid" offset="0"/>
+                    <Texture val="Assets/Textures/white32.dds"/>
+                    <Color val="175,175,175"/>
+                    <Width val="12"/>
+                    <Height val="12"/>
+                    <Rotation val="45"/>
+                    <RotationPosition val="MiddleCenter"/>
+                </Frame>
+            </Frame>
+        </Frame>
+    </Frame>
+
+    
+    <!-- Icon Button -->
+    <Frame type="Button" name="ApexIconButtonNoOutline">
+        <Visible val="True"/>
+        <RenderPriority val="8"/>
+        <AcceptsMouse val="True"/>
+        <Toggled val="False"/>
+
+        <Animation name="Hover">
+            <Event event="OnMouseEnter" action="Reset,Play" frame="$this"/>
+            <Controller type="Fade" end="Pause" frame="$this/Text">
+                <Key type="Curve" time="0.0" value="150"/>
+                <Key type="Curve" time="0.15" value="255"/>
+            </Controller>
+            <Controller type="Fade" end="Pause" frame="$this/Icon">
+                <Key type="Curve" time="0.0" value="150"/>
+                <Key type="Curve" time="0.15" value="255"/>
+            </Controller>
+            <Controller type="Fade" end="Pause" frame="$this/TooltipFrame">
+                <Key type="Curve" time="0.0" value="0"/>
+                <Key type="Curve" time="0.15" value="245"/>
+            </Controller>
+            <Controller type="Fade" end="Pause" frame="$this/Tooltip">
+                <Key type="Curve" time="0.0" value="0"/>
+                <Key type="Curve" time="0.15" value="165"/>
+            </Controller>
+        </Animation>
+        
+        <Animation name="HoverOff">
+            <Event event="OnMouseExit" action="Reset,Play" frame="$this"/>
+            <Controller type="Fade" end="Pause" frame="$this/Text">
+                <Key type="Curve" time="0.0" value="255"/>
+                <Key type="Curve" time="0.15" value="150"/>
+            </Controller>
+            <Controller type="Fade" end="Pause" frame="$this/Icon">
+                <Key type="Curve" time="0.0" value="255"/>
+                <Key type="Curve" time="0.15" value="150"/>
+            </Controller>
+            <Controller type="Fade" end="Pause" frame="$this/TooltipFrame">
+                <Key type="Curve" time="0.0" value="245"/>
+                <Key type="Curve" time="0.15" value="0"/>
+            </Controller>
+            <Controller type="Fade" end="Pause" frame="$this/Tooltip">
+                <Key type="Curve" time="0.0" value="165"/>
+                <Key type="Curve" time="0.15" value="0"/>
+            </Controller>
+        </Animation>
+
+        <Animation name="Disable">
+            <Event event="OnDisabled" action="Reset,Play" frame="$this"/>
+            <Controller type="Fade" end="Pause" frame="$this/TooltipFrame">
+                <Key type="Curve" time="0.0" value="245"/>
+                <Key type="Curve" time="0.15" value="0"/>
+            </Controller>
+            <Controller type="Fade" end="Pause" frame="$this/Tooltip">
+                <Key type="Curve" time="0.0" value="165"/>
+                <Key type="Curve" time="0.15" value="0"/>
+            </Controller>
+        </Animation>
+
+        <Animation name="Enabled">
+            <Event event="OnEnabled" action="Reset,Play" frame="$this"/>
+            <Controller type="Fade" end="Pause" frame="$this/TooltipFrame">
+                <Key type="Curve" time="0.0" value="0"/>
+            </Controller>
+            <Controller type="Fade" end="Pause" frame="$this/Tooltip">
+                <Key type="Curve" time="0.0" value="0"/>
+            </Controller>
+        </Animation>
+
+
+        <Frame type="Label" name="Text">
+            <Anchor relative="$parent"/>
+            <Style val="apx_regular_center_mid"/>
+            <Text val=""/>
+            <Alpha val="150"/>
+        </Frame>
+
+        <Frame type="Image" name="Icon">
+            <Texture val="Assets/Textures/blank.dds"/>
+            <Anchor side="Top" relative="$parent" pos="Min" offset="7"/>
+            <Anchor side="Left" relative="$parent" pos="Min" offset="7"/>
+            <Anchor side="Bottom" relative="$parent" pos="Max" offset="-7"/>
+            <Anchor side="Right" relative="$parent" pos="Max" offset="-7"/>
+            <Alpha val="150"/>
+            <RenderPriority val="9"/>
+        </Frame>
+        <!-- Tooltip -->
+        <Frame type="Frame" name="TooltipFrame" template="ApexTemplates/ApexSecondaryFrameTemplate">
+			<Unclipped val="True"/>
+            <IgnoreParentAlpha val="True"/>
+			<Alpha val="0"/>
+            <Anchor side="Left" relative="$parent/Tooltip" pos="Min" offset="-5"/>
+            <Anchor side="Right" relative="$parent/Tooltip" pos="Max" offset="5"/>
+			<Anchor side="Bottom" relative="$parent/Tooltip" pos="Max" offset="5"/>
+			<Anchor side="Top" relative="$parent/Tooltip" pos="Min" offset="-5"/>
+
+            
+			<Frame type="Image" name="Background">
+                <Alpha val="255"/>
+            </Frame>
+		</Frame>
+
+        <Frame type="Label" name="Tooltip">
+            <IgnoreParentAlpha val="True"/>
+            <Unclipped val="True"/>
+            <Alpha val="0"/>
+            <Style val="apx_regular_center_mid"/>
+            <Text val=""/>
+            <Anchor side="Left" relative="$parent" pos="Mid" offset="0"/>
+            <Anchor side="Right" relative="$parent" pos="Mid" offset="0"/>
+			<Anchor side="Bottom" relative="$parent" pos="Min" offset="-5"/>
+        </Frame>
+
+
+
+    </Frame>
+
+    <!-- Rectangular Button -->
+    <Frame type="Button" name="ApexRectangularButton">
+        <Visible val="True"/>
+        <RenderPriority val="8"/>
+        <AcceptsMouse val="True"/>
+        <Toggleable val="True"/>
+        <Toggled val="False"/>
+        <Frame type="Image" name="Border">
+            <TextureType val="Border"/>
+            <Texture val="Apex/Assets/Textures/GenericFrame/simple_outline_border.dds"/>
+            <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+            <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+            <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
+            <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
+            <Alpha val="50"/>
+            <RenderPriority val="9"/>
+        </Frame>
+        <Frame type="Image" name="BackgroundColor">
+            <TextureType val="Border"/>
+            <Texture val="Apex/Assets/Textures/GenericFrame/simple_outline_background.dds"/>
+            <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+            <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+            <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
+            <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
+            <Alpha val="25"/>
+            <Color val="0,0,0"/>
+            <RenderPriority val="7"/>
+        </Frame>
+        <Frame type="Image" name="BackgroundColorHover">
+            <TextureType val="Border"/>
+            <Texture val="Apex/Assets/Textures/GenericFrame/simple_outline_background.dds"/>
+            <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+            <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+            <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
+            <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
+            <Alpha val="0"/>
+            <Color val="255,255,255"/>
+            <RenderPriority val="8"/>
+        </Frame>
+        <Frame type="Image" name="BackgroundLineHover">
+            <TextureType val="Border"/>
+            <Texture val="Apex/Assets/Textures/GenericFrame/simple_outline_border.dds"/>
+            <Anchor side="Top" relative="$parent" pos="Min" offset="6"/>
+            <Anchor side="Left" relative="$parent" pos="Min" offset="6"/>
+            <Anchor side="Bottom" relative="$parent" pos="Max" offset="-6"/>
+            <Anchor side="Right" relative="$parent" pos="Max" offset="-6"/>
+            <Alpha val="0"/>
+            <Color val="255,255,255"/>
+            <RenderPriority val="8"/>
+        </Frame>
+        
+        <Frame type="Image" name="BackgroundColorToggle">
+            <TextureType val="Border"/>
+            <Texture val="Apex/Assets/Textures/GenericFrame/simple_outline_background.dds"/>
+            <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+            <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+            <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
+            <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
+            <Alpha val="0"/>
+            <Color val="255,255,255"/>
+            <RenderPriority val="8"/>
+        </Frame>
+        <Frame type="Image" name="BackgroundLineToggle">
+            <TextureType val="Border"/>
+            <Texture val="Apex/Assets/Textures/GenericFrame/simple_outline_border.dds"/>
+            <Anchor side="Top" relative="$parent" pos="Min" offset="6"/>
+            <Anchor side="Left" relative="$parent" pos="Min" offset="6"/>
+            <Anchor side="Bottom" relative="$parent" pos="Max" offset="-6"/>
+            <Anchor side="Right" relative="$parent" pos="Max" offset="-6"/>
+            <Alpha val="0"/>
+            <Color val="255,255,255"/>
+            <RenderPriority val="8"/>
+        </Frame>
+
+        <Animation name="Toggle">
+            <Event event="Normal" action="Reset" frame="$this"/>
+            <Event event="Toggled"  action="Reset,Play" frame="$this"/>
+            <Controller type="Fade" end="Pause" frame="$this/BackgroundColorToggle">
+                <Key type="Curve" time="0.0" value="0"/>
+                <Key type="Curve" time="0.0" value="35"/>
+            </Controller>
+            <Controller type="Fade" end="Pause" frame="$this/BackgroundLineToggle">
+                <Key type="Curve" time="0.0" value="0"/>
+                <Key type="Curve" time="0.0" value="165"/>
+            </Controller>
+            <Controller type="Anchor" side="Top" relative="False" end="Pause" frame="$this/BackgroundLineToggle">
+                <Key type="Curve" time="0.0" value="6"/>
+                <Key type="Curve" time="0.0" value="0"/>
+            </Controller>
+            <Controller type="Anchor" side="Left" relative="False" end="Pause" frame="$this/BackgroundLineToggle">
+                <Key type="Curve" time="0.0" value="6"/>
+                <Key type="Curve" time="0.0" value="0"/>
+            </Controller>
+            <Controller type="Anchor" side="Right" relative="False" end="Pause" frame="$this/BackgroundLineToggle">
+                <Key type="Curve" time="0.0" value="-6"/>
+                <Key type="Curve" time="0.0" value="0"/>
+            </Controller>
+            <Controller type="Anchor" side="Bottom" relative="False" end="Pause" frame="$this/BackgroundLineToggle">
+                <Key type="Curve" time="0.0" value="-6"/>
+                <Key type="Curve" time="0.0" value="0"/>
+            </Controller>
+        </Animation>
+
+        <Animation name="Hover">
+            <Event event="Toggled" action="Reset,Play,DirectionReverse" frame="$this"/>
+            <Event event="OnMouseEnter" action="DirectionForward,Play" frame="$this"/>
+            <Event event="OnMouseExit" action="DirectionReverse,Play" frame="$this"/>
+            <Controller type="Fade" end="Pause" frame="$this/BackgroundColorHover">
+                <Key type="Curve" time="0.0" value="0"/>
+                <Key type="Curve" time="0.2" value="35"/>
+            </Controller>
+            <Controller type="Fade" end="Pause" frame="$this/BackgroundLineHover">
+                <Key type="Curve" time="0.0" value="0"/>
+                <Key type="Curve" time="0.2" value="165"/>
+            </Controller>
+            <Controller type="Anchor" side="Top" relative="False" end="Pause" frame="$this/BackgroundLineHover">
+                <Key type="Curve" time="0.0" value="6"/>
+                <Key type="Curve" time="0.2" value="0"/>
+            </Controller>
+            <Controller type="Anchor" side="Left" relative="False" end="Pause" frame="$this/BackgroundLineHover">
+                <Key type="Curve" time="0.0" value="6"/>
+                <Key type="Curve" time="0.2" value="0"/>
+            </Controller>
+            <Controller type="Anchor" side="Right" relative="False" end="Pause" frame="$this/BackgroundLineHover">
+                <Key type="Curve" time="0.0" value="-6"/>
+                <Key type="Curve" time="0.2" value="0"/>
+            </Controller>
+            <Controller type="Anchor" side="Bottom" relative="False" end="Pause" frame="$this/BackgroundLineHover">
+                <Key type="Curve" time="0.0" value="-6"/>
+                <Key type="Curve" time="0.2" value="0"/>
+            </Controller>
+        </Animation>
+
+    </Frame>
+
+    <!-- Listbox -->
+    <Frame type="Frame" name="ApexListBox" template="ApexTemplates">
+
+
+        <!-- Next Page Button -->
+        <Frame type="Button" name="NextPage" template="ApexTemplates/ApexIconButtonNoOutline">
+            <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
+            <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
+            <Height val="30"/>
+            <Width val="30"/>
+            <RenderPriority val="999"/>
+            <Frame type="Image" name="Icon">
+                <Texture val="Apex/Assets/textures/btn_next.png"/>
+            </Frame>
+            <Frame type="Label" name="Tooltip">
+                <Text val="Next Page"/>
+            </Frame>
+        </Frame>
+        <!-- Previous Page Button -->
+        <Frame type="Button" name="PreviousPage" template="ApexTemplates/ApexIconButtonNoOutline">
+            <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
+            <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+            <Height val="30"/>
+            <Width val="30"/>
+            <RenderPriority val="999"/>
+            <Enabled val="False"/>
+            <Frame type="Image" name="Icon">
+                <Rotation val="180"/>
+                <RotationPosition val="MiddleCenter"/>
+                <Texture val="Apex/Assets/textures/btn_next.png"/>
+            </Frame>
+            <Frame type="Label" name="Tooltip">
+                <Text val="Previous Page"/>
+            </Frame>
+        </Frame>
+
+
+    </Frame>
+
+    <!-- Item -->
+    <Frame type="Button" name="ApexListItem">
+        <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
+        <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+        <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+        <Height val="37"/>
+        <Toggled val="False"/>
+        <Animation name="Show">
+            <Event event="Toggled" action="Reset,Play" frame="$this"/>
+            <Controller type="Fade" end="Pause" frame="$this">
+                <Key type="Curve" time="0.0" value="0"/>
+                <Key type="Curve" time="0.0" value="255"/>
+            </Controller>
+        </Animation>
+        <Animation name="Hide">
+            <Event event="Normal" action="Reset,Play" frame="$this"/>
+            <Controller type="Fade" end="Pause" frame="$this">
+                <Key type="Curve" time="0.0" value="255"/>
+                <Key type="Curve" time="0.0" value="0"/>
+            </Controller>
+        </Animation>
+
+        <Frame type="Label" name="ListItemContent">
+            <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
+            <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+            <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+            <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
+            <Style val="apx_regular_left_mid"/>
+            <Text val="ContentNotSet"/>
+            <Alpha val="175"/>
+        </Frame>
+
+    </Frame>
+    <!-- End of listbox -->
+    <!-- Start of URL -->
+
+    <Frame type="Frame" name="ApexURL" template="ScreenCustomFeatured/CTABannerTemplate">
+        <Anchor side="Top" relative="$this" pos="Min" offset="0"/>
+        <Anchor side="Left" relative="$this" pos="Min" offset="0"/>
+
+        <Frame type="LaunchURLButton" name="WebsiteButton" template="ApexTemplates/ApexIconButtonNoOutline">
+            <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+            <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+            <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
+            <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
+            <Width val="0"/>
+            <Height val="0"/>
+        </Frame>
+
+        <Frame type="Frame" name="BannerImage">
+            <DescFlags val="CreationDeferred"/>
+        </Frame>
+        <Frame type="Frame" name="BorderInner">
+            <DescFlags val="CreationDeferred"/>
+        </Frame>
+        <Frame type="Frame" name="BorderOuter">
+            <DescFlags val="CreationDeferred"/>
+        </Frame>
+        <Frame type="Frame" name="BannerVignette">
+            <DescFlags val="CreationDeferred"/>
+        </Frame>
+        <Frame type="Frame" name="DescriptionLabel">
+            <DescFlags val="CreationDeferred"/>
+        </Frame>
+        <Frame type="Frame" name="HeaderLabel">
+            <DescFlags val="CreationDeferred"/>
+        </Frame>
+        <Frame type="Frame" name="MoreInfoLabel">
+            <DescFlags val="CreationDeferred"/>
+        </Frame>
+    </Frame>
+
+
+    <!-- End of URL -->
+</Desc>

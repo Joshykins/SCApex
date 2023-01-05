@@ -1,0 +1,342 @@
+
+//
+struct dataSearchResult {
+    int panel;
+    int label;
+    int apply;
+    string[gv_LibapxMaxPlayers] result;
+};
+//panels
+//No results
+static int gv_NoResultsPanel;
+static int gv_NextPage;
+static int gv_PreviousPage;
+
+static int gv_SearchQuery;
+static int gv_SearchLabel;
+
+//Checks
+struct checkInfo {
+    int button;
+    string searchQuery;
+};
+
+static const int gv_TotalCheckCount = 16;
+
+static checkInfo[gv_TotalCheckCount] gv_AllCheckboxes;
+
+static string[gv_LibapxMaxPlayers] gv_InputSearchQuery;
+
+//Result Items
+static dataSearchResult[gv_LibapxTotalSearchItemsInPage] gv_SearchResults;
+  
+
+
+static void PopulateCheckBoxes(int i, string template, string searchQuery) {
+    int j;
+    int p;
+    gv_AllCheckboxes[i].searchQuery = searchQuery;
+    gv_AllCheckboxes[i].button = DialogControlHookupStandard( c_triggerControlTypeButton, "UIContainer/ConsoleUIContainer/PanelCatalogs/Content/ScrollableContent/ContainerFrame/" + template + "/Checkbox"); 
+    for (j = 1; j <= PlayerGroupCount(PlayerGroupActive()); j += 1) {
+        p = PlayerGroupPlayer(PlayerGroupActive(), j);
+        TriggerAddEventDialogControl(TriggerCreate("TrigCheckDataSearch"), p, gv_AllCheckboxes[i].button, c_triggerControlEventTypeClick);
+    }
+}
+
+static void PopulateDataSearch(int i) {
+    int p;
+    int j;
+    int base = DialogControlHookupStandard(
+        c_triggerControlTypeButton,
+        "UIContainer/ConsoleUIContainer/PanelCatalogs/Content/ScrollableContent/ContainerFrame/SearchResults/Item"+IntToString(i+1)
+    );
+    gv_SearchResults[i].panel = base;
+    gv_SearchResults[i].apply = DialogControlHookup( base, c_triggerControlTypeButton, "ApplyButton" );
+    gv_SearchResults[i].label = DialogControlHookup( base, c_triggerControlTypeLabel, "ListItemContent" );
+    DialogControlSetPropertyAsBool(base, c_triggerControlPropertyToggled, PlayerGroupAll(), false);
+    
+    for (j = 1; j <= PlayerGroupCount(PlayerGroupActive()); j += 1) {
+        p = PlayerGroupPlayer(PlayerGroupActive(), j);
+        gv_SearchResults[i].result[p] = "";
+    }
+}
+
+
+
+void LibapxUiInitDataSearch() {
+    int i;
+    string baseTemplate = "UIContainer/ConsoleUIContainer/PanelCatalogs/Content/";
+
+
+
+    gv_SearchQuery = DialogControlHookupStandard(c_triggerControlTypeEditBox, baseTemplate+"SearchQuery/EditBoxPadding/Editbox");
+    
+    gv_SearchLabel = DialogControlHookupStandard(c_triggerControlTypeLabel, baseTemplate+"SearchQuery/Name");
+
+    //Init Result Items
+    for (i = 0; i < gv_LibapxTotalSearchItemsInPage; i += 1) {
+        PopulateDataSearch(i);
+    }
+
+    //Set no results as true to init
+    gv_NoResultsPanel = DialogControlHookupStandard(c_triggerControlTypeLabel, baseTemplate+"ScrollableContent/ContainerFrame/SearchResults/NoResultsText");
+    DialogControlSetPropertyAsBool(gv_NoResultsPanel, c_triggerControlPropertyVisible, PlayerGroupAll(), true);
+
+    //Disable previous and next buttons
+    gv_NextPage = DialogControlHookupStandard(c_triggerControlTypeButton, baseTemplate+"ScrollableContent/ContainerFrame/SearchResults/NextPage");
+
+
+    DialogControlSetPropertyAsBool(gv_NextPage, c_triggerControlPropertyEnabled, PlayerGroupAll(), false);
+    gv_PreviousPage = DialogControlHookupStandard(c_triggerControlTypeButton, baseTemplate+"ScrollableContent/ContainerFrame/SearchResults/PreviousPage");
+    DialogControlSetPropertyAsBool(gv_PreviousPage, c_triggerControlPropertyEnabled, PlayerGroupAll(), false);
+
+    PopulateCheckBoxes(0, "ModelCheck", "model");
+    PopulateCheckBoxes(1, "ActorCheck", "actor");
+    PopulateCheckBoxes(2, "BehaviorCheck", "behavior");
+    PopulateCheckBoxes(3, "EffectCheck", "effect");
+    PopulateCheckBoxes(4, "UnitCheck", "unit");
+    PopulateCheckBoxes(5, "DecalCheck", "decal");
+    PopulateCheckBoxes(6, "WeaponCheck", "weapon");
+    PopulateCheckBoxes(7, "FootprintCheck", "footprint");
+
+    PopulateCheckBoxes(8, "SoundCheck", "sound");
+    PopulateCheckBoxes(9, "LightCheck", "light");
+    PopulateCheckBoxes(10, "UpgradeCheck", "upgrade");
+    PopulateCheckBoxes(11, "ValidatorCheck", "validator");
+    PopulateCheckBoxes(12, "AbilityCheck", "ability");
+    PopulateCheckBoxes(13, "TurretCheck", "turret");
+    PopulateCheckBoxes(14, "SoundtrackCheck", "soundtrack");
+    PopulateCheckBoxes(15, "ImageCheck", "image"); 
+}
+
+static int[gv_LibapxMaxPlayers] gv_CurrentQueryTimeElapsed;
+
+void LibapxUiInitDataSearchPlayer(int p) {
+    int i;
+    //Init QueryTime
+    gv_CurrentQueryTimeElapsed[p] = 0;
+
+    //Set Model to default field, but do not actually search yet
+    gv_LibapxPlayer[p].searchType = "model";
+    gv_LibapxPlayer[p].searchPage = 1;
+    gv_LibapxPlayer[p].searchQuery = "";
+    gv_LibapxPlayer[p].searchNextPage = false;
+    LibapxSelectSearchQuery(gv_AllCheckboxes[0].button, p, "");
+    
+    TriggerAddEventDialogControl(TriggerCreate("TrigSearchQueryType"), p, gv_SearchQuery, c_triggerControlEventTypeTextChanged);
+
+    TriggerAddEventDialogControl(TriggerCreate("TrigSearchNextPage"), p, gv_NextPage, c_triggerControlEventTypeClick);
+    TriggerAddEventDialogControl(TriggerCreate("TrigSearchPreviousPage"), p, gv_PreviousPage, c_triggerControlEventTypeClick);
+    
+    //Trigger Each apply
+    for (i = 0; i < gv_LibapxTotalSearchItemsInPage; i += 1) {
+        TriggerAddEventDialogControl(TriggerCreate("TrigSearchApply"), p, gv_SearchResults[i].apply, c_triggerControlEventTypeClick);
+    }
+}
+
+
+bool TrigSearchApply(bool testConds, bool runActions) {
+    int p = EventPlayer();
+    unitgroup ug = UnitGroupSelected(p);
+    int panel = EventDialogControl();
+    int i;
+    int j;
+    string value;
+
+    for (i = 0; i < gv_LibapxTotalSearchItemsInPage; i += 1) {
+        if(panel == gv_SearchResults[i].apply) {
+            value = gv_SearchResults[i].result[p];
+            if(gv_LibapxPlayer[p].searchType == "model") {
+                LibapxChatParse("@modelswap "+value, p, ug, gv_LibapxPlayer[p].spawningCount);
+            }
+            if(gv_LibapxPlayer[p].searchType == "actor") {
+                LibapxChatParse("@attach- "+value, p, ug, gv_LibapxPlayer[p].spawningCount);
+            }
+            if(gv_LibapxPlayer[p].searchType == "behavior") {
+                LibapxChatParse("@addbehavior "+value, p, ug, gv_LibapxPlayer[p].spawningCount);
+            }
+            if(gv_LibapxPlayer[p].searchType == "effect") {
+                LibapxChatParse("@effect "+value, p, ug, gv_LibapxPlayer[p].spawningCount);
+            }
+            if(gv_LibapxPlayer[p].searchType == "unit") {
+                if(UnitGroupCount(gv_LibapxPlayer[p].lastUnitApplied, c_unitCountAlive) > 0) {
+                    LibapxChatParse("@unitswap "+value, p, gv_LibapxPlayer[p].lastUnitApplied, gv_LibapxPlayer[p].spawningCount);
+                    gv_LibapxPlayer[p].lastUnitApplied = gv_LibapxPlayerParser[p][gv_LibapxPlayer[p].spawningCount-1].context;
+                }
+                else {
+                    LibapxChatParse("@spawn "+value+";@position "+FixedToString(PointGetX(CameraGetTarget(p)), 2) + " " +FixedToString(PointGetY(CameraGetTarget(p)), 2), p, ug, gv_LibapxPlayer[p].spawningCount);
+                    gv_LibapxPlayer[p].lastUnitApplied = gv_LibapxPlayerParser[p][gv_LibapxPlayer[p].spawningCount-1].context;
+                }
+            }
+            if(gv_LibapxPlayer[p].searchType == "decal") {
+                LibapxChatParse("@decal "+value, p, ug, gv_LibapxPlayer[p].spawningCount);
+            }
+            if(gv_LibapxPlayer[p].searchType == "weapon") {
+                LibapxChatParse("@removeweapon "+gv_LibapxPlayer[p].lastWeaponApplied+";@addweapon "+value, p, ug, gv_LibapxPlayer[p].spawningCount);
+                gv_LibapxPlayer[p].lastWeaponApplied = value;
+            }
+            if(gv_LibapxPlayer[p].searchType == "footprint") {
+                LibapxChatParse("_print Footprint has no command", p, ug, gv_LibapxPlayer[p].spawningCount);
+            }
+            if(gv_LibapxPlayer[p].searchType == "sound") {
+                LibapxChatParse("_print Sound has no command", p, ug, gv_LibapxPlayer[p].spawningCount);
+            }
+            if(gv_LibapxPlayer[p].searchType == "light") {
+                LibapxChatParse("!light "+value, p, ug, gv_LibapxPlayer[p].spawningCount);
+            }
+            if(gv_LibapxPlayer[p].searchType == "upgrade") {
+                LibapxChatParse("_upgrade "+value, p, ug, gv_LibapxPlayer[p].spawningCount);
+            }
+            if(gv_LibapxPlayer[p].searchType == "validator") {
+                LibapxChatParse("_print Validator has no command", p, ug, gv_LibapxPlayer[p].spawningCount);
+            }
+            if(gv_LibapxPlayer[p].searchType == "ability") {
+                LibapxChatParse("_print Ability has no command", p, ug, gv_LibapxPlayer[p].spawningCount);
+            }
+            if(gv_LibapxPlayer[p].searchType == "turret") {
+                LibapxChatParse("_print Turret has no command", p, ug, gv_LibapxPlayer[p].spawningCount);
+            }
+            if(gv_LibapxPlayer[p].searchType == "soundtrack") {
+                LibapxChatParse("_print Soundtrack has no command", p, ug, gv_LibapxPlayer[p].spawningCount);
+            }
+            if(gv_LibapxPlayer[p].searchType == "image") {
+                LibapxChatParse("_print <img path=\""+value+"\"/>", p, ug, gv_LibapxPlayer[p].spawningCount);
+            }
+
+        }
+    }
+
+    return true;
+}
+
+
+bool TrigSearchNextPage(bool testConds, bool runActions) {
+    int p = EventPlayer();
+
+    gv_LibapxPlayer[p].searchPage += 1;
+    LibapxSearch(p, gv_LibapxPlayer[p].searchType, gv_LibapxPlayer[p].searchQuery, gv_LibapxPlayer[p].searchPage, false);
+    
+    return true;
+}
+
+bool TrigSearchPreviousPage(bool testConds, bool runActions) {
+    int p = EventPlayer();
+
+    gv_LibapxPlayer[p].searchPage -= 1;
+    LibapxSearch(p, gv_LibapxPlayer[p].searchType, gv_LibapxPlayer[p].searchQuery, gv_LibapxPlayer[p].searchPage, false);
+    
+    return true;
+}
+
+
+void LibapxSelectSearchQuery(int panel, int p, string query) {
+    int i;
+    //Previous button
+    if(gv_LibapxPlayer[p].searchPage != 1) {
+        DialogControlSetPropertyAsBool(gv_PreviousPage, c_triggerControlPropertyEnabled, PlayerGroupAll(), true);
+    }
+    else {
+        DialogControlSetPropertyAsBool(gv_PreviousPage, c_triggerControlPropertyEnabled, PlayerGroupAll(), false);
+    }
+    //Next
+    if(gv_LibapxPlayer[p].searchNextPage) {
+        DialogControlSetPropertyAsBool(gv_NextPage, c_triggerControlPropertyEnabled, PlayerGroupAll(), true);
+    }
+    else {
+        DialogControlSetPropertyAsBool(gv_NextPage, c_triggerControlPropertyEnabled, PlayerGroupAll(), false);
+    }
+
+    //Checkboxes and query setting
+    for (i = 0; i < gv_TotalCheckCount; i += 1) {
+        if(gv_AllCheckboxes[i].button == panel) {
+            gv_InputSearchQuery[p] = gv_AllCheckboxes[i].searchQuery;
+            DialogControlSetPropertyAsText(gv_SearchLabel, c_triggerControlPropertyText, PlayerGroupSingle(p), StringToText("_search "+gv_AllCheckboxes[i].searchQuery));
+            libNtve_gf_SetDialogItemEditorValue(gv_SearchQuery, query, PlayerGroupSingle(p));
+            DialogControlSetPropertyAsBool(gv_AllCheckboxes[i].button, c_triggerControlPropertyToggled, PlayerGroupSingle(p), true);
+        }
+        else {
+            DialogControlSetPropertyAsBool(gv_AllCheckboxes[i].button, c_triggerControlPropertyToggled, PlayerGroupSingle(p), false);
+        }
+    }
+}
+
+
+
+bool TrigSearchQueryType(bool testConds, bool runActions) {
+    int p = EventPlayer();
+    string value = libNtve_gf_DialogItemEditValue(gv_SearchQuery, p);
+    gv_LibapxPlayer[p].searchQuery = value;
+    gv_LibapxPlayer[p].searchPage = 1;
+    gv_CurrentQueryTimeElapsed[p] += 1;
+    
+    Wait(.6, c_timeGame);
+        
+    if(gv_CurrentQueryTimeElapsed[p] == 1) {
+        LibapxSearch(p, gv_LibapxPlayer[p].searchType, gv_LibapxPlayer[p].searchQuery, gv_LibapxPlayer[p].searchPage, false );
+    }
+
+    gv_CurrentQueryTimeElapsed[p] -= 1;
+
+    return true;
+}
+
+
+bool TrigCheckDataSearch(bool testConds, bool runActions) {
+    int p = EventPlayer();
+    int panel = EventDialogControl();
+    int i;
+    //Handling type
+    for (i = 0; i < gv_TotalCheckCount; i += 1) {
+        // TODO:
+        if(gv_AllCheckboxes[i].button == panel) {
+            LibapxSearch(p, gv_AllCheckboxes[i].searchQuery, "", 1, false);
+            gv_LibapxPlayer[p].searchQuery = "";
+            gv_LibapxPlayer[p].searchPage = 1;
+            gv_LibapxPlayer[p].searchType = gv_AllCheckboxes[i].searchQuery;
+
+            break;
+        }
+    }
+
+
+    return true;
+}
+
+
+void LibapxDataSearchUiSetSearchQuery(string results, int p, string type, string query) {
+    int i;
+    //Handling type
+    for (i = 0; i < gv_TotalCheckCount; i += 1) {
+        // TODO:
+        if(gv_AllCheckboxes[i].searchQuery == type) {
+            LibapxSelectSearchQuery(gv_AllCheckboxes[i].button, p, query);
+            break;
+        }
+    }
+
+
+    //Setting queries
+    if(results == "") {
+        DialogControlSetPropertyAsBool(gv_NoResultsPanel, c_triggerControlPropertyVisible, PlayerGroupAll(), true);
+        
+        for (i = 0; i < gv_LibapxTotalSearchItemsInPage; i += 1) {
+            gv_SearchResults[i].result[p] = "";
+            DialogControlSetPropertyAsBool(gv_SearchResults[i].panel, c_triggerControlPropertyToggled, PlayerGroupSingle(p), false);
+        }
+    }
+    else {
+        DialogControlSetPropertyAsBool(gv_NoResultsPanel, c_triggerControlPropertyVisible, PlayerGroupAll(), false);
+        
+        for (i = 0; i < gv_LibapxTotalSearchItemsInPage; i += 1) {
+            if(StringWord(results, i+1) != "") {
+                gv_SearchResults[i].result[p] = StringWord(results, i+1);
+                DialogControlSetPropertyAsText(gv_SearchResults[i].label, c_triggerControlPropertyText, PlayerGroupSingle(p), StringToText(StringWord(results, i+1)));
+                DialogControlSetPropertyAsBool(gv_SearchResults[i].panel, c_triggerControlPropertyToggled, PlayerGroupSingle(p), true);
+            }
+            else {    
+                gv_SearchResults[i].result[p] = "";
+                DialogControlSetPropertyAsBool(gv_SearchResults[i].panel, c_triggerControlPropertyToggled, PlayerGroupSingle(p), false);
+            }
+        }
+    }
+}

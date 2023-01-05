@@ -1,0 +1,141 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<Desc>
+    <Frame type="Button" name="Tabs" template="MainUiTemplates/SubTab">
+      
+        <StateGroup name="tab1">
+            <DefaultState val="Default"/>
+            <State name="TabAdmminSettings">
+                <When type="Property" Toggled="True" frame="$parent/$parent/MainPanelBackground/Settings/Tab1" operator="Equal"/>
+                <Action type="SetProperty" Toggled="True" frame="$parent/$parent/PanelAdministration" />
+            </State>
+
+            <State name="Default">
+                <Action type="SetProperty" Toggled="False" frame="$parent/$parent/PanelAdministration" />
+            </State>
+        </StateGroup>
+
+
+        <!-- SubButtons -->
+        <Frame type="Button" name="Tab1" template="MainUiTemplates/SubTabButton">
+            <Frame type="Image" name="Icon">
+                <Texture val="Apex/Assets/Textures/BottomUi/btn_setting.png"/>
+                <Color val="185,0,0"/>
+            </Frame>
+
+            <Frame type="Label" name="ButtonText">
+                <Text val="Administration"/>
+            </Frame>
+        </Frame>
+
+    </Frame>
+
+
+
+    <Frame type="Frame" name="GameUI/UIContainer/ConsoleUIContainer" file="GameUI">
+            <!-- Administration -->
+		<Frame type="Button" name="PanelAdministration" template="MainUiTemplates/SubPanelTemplate">
+			<Frame type="Frame" name="Content">
+
+                <!-- Tab Label -->
+				<Frame type="Label" name="PanelTitle">
+					<Text val="Admin Configuration"/>
+				</Frame>
+
+                <Frame type="Frame" name="RepeatNoDelay" template="ApexTemplates/ApexCheckbox">
+                    <Anchor side="Left" relative="$parent" pos="Mid" offset="0"/>
+                    <Anchor side="Right" relative="$parent" pos="Mid" offset="0"/>
+                    <Anchor side="Top" relative="$parent" pos="Min" offset="40"/>
+                    <Width val="450"/>
+                    <Frame type="Button" name="Checkbox">
+                        <Anchor side="Left" relative="$parent" pos="Min" offset="360"/>
+                    </Frame>
+                    <Frame type="Label" name="Name">
+                        <Anchor side="Right" relative="$parent" pos="Min" offset="350"/>
+                        <Text val="Allow >repeat with no delay"/>
+                    </Frame>
+                </Frame>
+
+                <Frame type="Frame" name="Replace" template="ApexTemplates/ApexCheckbox">
+                    <Anchor side="Left" relative="$parent" pos="Mid" offset="0"/>
+                    <Anchor side="Right" relative="$parent" pos="Mid" offset="0"/>
+                    <Anchor side="Top" relative="$parent/RepeatNoDelay" pos="Max" offset="-25"/>
+                    <Width val="450"/>
+                    <Frame type="Button" name="Checkbox">
+                        <Anchor side="Left" relative="$parent" pos="Min" offset="360"/>
+                    </Frame>
+                    <Frame type="Label" name="Name">
+                        <Anchor side="Right" relative="$parent" pos="Min" offset="350"/>
+                        <Text val="Allow _replace"/>
+                    </Frame>
+                </Frame>
+
+                <Frame type="Frame" name="ReloadBank" template="ApexTemplates/ApexCheckbox">
+                    <Anchor side="Left" relative="$parent" pos="Mid" offset="0"/>
+                    <Anchor side="Right" relative="$parent" pos="Mid" offset="0"/>
+                    <Anchor side="Top" relative="$parent/Replace" pos="Max" offset="-25"/>
+                    <Width val="450"/>
+                    <Frame type="Button" name="Checkbox">
+                        <Anchor side="Left" relative="$parent" pos="Min" offset="360"/>
+                    </Frame>
+                    <Frame type="Label" name="Name">
+                        <Anchor side="Right" relative="$parent" pos="Min" offset="350"/>
+                        <Text val="Allow _reloadbank"/>
+                    </Frame>
+                </Frame>
+
+                <Frame type="Frame" name="DataEdit" template="ApexTemplates/ApexCheckbox">
+                    <Anchor side="Left" relative="$parent" pos="Mid" offset="0"/>
+                    <Anchor side="Right" relative="$parent" pos="Mid" offset="0"/>
+                    <Anchor side="Top" relative="$parent/ReloadBank" pos="Max" offset="-25"/>
+                    <Width val="450"/>
+                    <Frame type="Button" name="Checkbox">
+                        <Anchor side="Left" relative="$parent" pos="Min" offset="360"/>
+                    </Frame>
+                    <Frame type="Label" name="Name">
+                        <Anchor side="Right" relative="$parent" pos="Min" offset="350"/>
+                        <Text val="Allow _dataedit"/>
+                    </Frame>
+                </Frame>
+
+                <Frame type="Frame" name="Gamesetups" template="ApexTemplates/ApexCheckbox">
+                    <Anchor side="Left" relative="$parent" pos="Mid" offset="0"/>
+                    <Anchor side="Right" relative="$parent" pos="Mid" offset="0"/>
+                    <Anchor side="Top" relative="$parent/DataEdit" pos="Max" offset="-25"/>
+                    <Width val="450"/>
+                    <Frame type="Button" name="Checkbox">
+                        <Anchor side="Left" relative="$parent" pos="Min" offset="360"/>
+                    </Frame>
+                    <Frame type="Label" name="Name">
+                        <Anchor side="Right" relative="$parent" pos="Min" offset="350"/>
+                        <Text val="Allow _gamesetup"/>
+                    </Frame>
+                </Frame>
+
+                <Frame type="Frame" name="Loan" template="ApexTemplates/ApexCheckbox">
+                    <Anchor side="Left" relative="$parent" pos="Mid" offset="0"/>
+                    <Anchor side="Right" relative="$parent" pos="Mid" offset="0"/>
+                    <Anchor side="Top" relative="$parent/Gamesetups" pos="Max" offset="-25"/>
+                    <Width val="450"/>
+                    <Frame type="Button" name="Checkbox">
+                        <Anchor side="Left" relative="$parent" pos="Min" offset="360"/>
+                    </Frame>
+                    <Frame type="Label" name="Name">
+                        <Anchor side="Right" relative="$parent" pos="Min" offset="350"/>
+                        <Text val="Allow @loan"/>
+                    </Frame>
+                </Frame>
+
+                <Frame type="Label" name="Disclaimer">
+                    <Height val="50"/>
+                    <Width val="450"/>
+                    <Anchor side="Bottom" relative="$parent" pos="Max" offset="-120"/>
+                    <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
+                    <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+                    <Style val="apx_regular_left_mid"/>
+                    <Text val="These configurations only apply when you are admin, and your moderators are immune to them."/>
+                </Frame>
+			</Frame>
+        </Frame>
+    </Frame>
+
+</Desc>

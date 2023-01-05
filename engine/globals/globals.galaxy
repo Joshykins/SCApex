@@ -1,0 +1,220 @@
+//=========================================================
+//		Apex Roleplaying Engine
+//		Copyright (c) 2022, Apex Group
+//=========================================================
+// This software is distributed under the MIT License:
+// <http://opensource.org/licenses/MIT>
+//=========================================================
+
+
+//Aliases
+string gv_AliasParameterPrefix = "%"; 
+
+
+//Gamesetups loading
+int gGamesetupsLoading = 0;
+
+//Camera
+trigger gv_CameraUpdater;
+trigger gv_CameraMouseWheel;
+
+//Commands guide
+//======
+//Commands guide entries
+int gv_CommandsGuideEntryAdmin = 0; //!admin
+int gv_CommandsGuideEntryGeneral = 1;  //generalshit
+int gv_CommandsGuideEntryUnit = 2; //@spawn
+int gv_CommandsGuideEntryActor = 3; //@attach
+int gv_CommandsGuideEntryRegion = 4; //#create
+int gv_CommandsGuideEntryStats = 5; //@maxlife
+int gv_CommandsGuideEntryVariableFunctions = 6; //$RandInt
+
+bool gv_LibapxDebugMode = false;
+
+//Wireframe
+//Definition of each layer
+struct wireframeLayerSig {
+    string path;
+    int r;
+    int g;
+	int b;
+	bool saturation;
+	int renderPriority;
+	int OffsetX;
+	int OffsetY;
+	int width;
+	int height;
+	int rotation;
+	int alpha;
+};
+wireframeLayerSig gv_DefaultWireframe;
+string gv_DefaultWireframeString = "defaultWireframeX1235asdAZSw";
+
+//Who is admin?
+int gv_LibapxCurrentAdmin;
+
+
+//gets a units set name
+string LibapxUnitnameGetEntry(unit u);
+
+//Delay trig
+trigger delayTrigger;
+
+void LibapxGlobalsInit() {
+	string playerHandle = PlayerHandle(1);
+    if(playerHandle == "") {
+        gv_LibapxDebugMode = true;
+    }
+
+    delayTrigger = TriggerCreate("LibapxDelayTrigger");
+    
+    LibapxInitImageStrings();
+}
+
+string gv_LibapxCommandsGuideColorAdmin = "<c val=\"c0392b\">";
+string gv_LibapxCommandsGuideColorGeneral = "<c val=\"95a5a6\">";
+string gv_LibapxCommandsGuideColorUnit = "<c val=\"f1c40f\">";
+string gv_LibapxCommandsGuideColorActor = "<c val=\"d35400\">";
+string gv_LibapxCommandsGuideColorRegion = "<c val=\"9b59b6\">";
+string gv_LibapxCommandsGuideColorStats = "<c val=\"3498db\">";
+string gv_LibapxCommandsGuideColorVarFuncs = "<c val=\"1abc9c\">";
+
+
+string LibapxCommandsGuideGetEntryTypeColor(int entryType) {
+    if(entryType == gv_CommandsGuideEntryAdmin) {
+        return gv_LibapxCommandsGuideColorAdmin;
+    } 
+    if(entryType == gv_CommandsGuideEntryGeneral) {
+        return gv_LibapxCommandsGuideColorGeneral;
+    } 
+    if(entryType == gv_CommandsGuideEntryUnit) {
+        return gv_LibapxCommandsGuideColorUnit;
+    } 
+    if(entryType == gv_CommandsGuideEntryActor) {
+        return gv_LibapxCommandsGuideColorActor;
+    } 
+    if(entryType == gv_CommandsGuideEntryRegion) {
+        return gv_LibapxCommandsGuideColorRegion;
+    } 
+    if(entryType == gv_CommandsGuideEntryStats) {
+        return gv_LibapxCommandsGuideColorStats;
+    } 
+    if(entryType == gv_CommandsGuideEntryVariableFunctions) {
+        return gv_LibapxCommandsGuideColorVarFuncs;
+    } 
+    return "";
+}
+
+struct commandsGuideEntry {
+    int type;               //Type of command
+    string name;            //Name of the command
+    string description;     //Description of command
+    int uiPosition;
+};
+struct commandGuideTypeCount {
+    int Admin;
+    int General;
+    int Unit;
+    int Actor;
+    int Region;
+    int Stats;
+    int VarFuncs;
+};
+
+void commandGuideFormatDescription(int dialog, playergroup pg, string description) {
+    int maxDialogCharacters = 60;
+    string currentVal;
+    string preText;
+    string postText;
+    int i;
+
+
+    //Form dialog
+    i = 1;
+    currentVal = "";
+    while(StringWord(description, i) != "") {
+        
+
+
+        if (currentVal == "") {
+            currentVal+= StringWord(description, i)+" "; 
+        }
+        else if (StringLength(currentVal + StringWord(description, i)) > maxDialogCharacters) {
+            //currentVal = LibapxStringTrim(currentVal);
+            DialogControlAddItem(dialog, pg,StringToText(currentVal));
+            currentVal = "";
+            continue;
+        }
+        else {
+            currentVal += StringWord(description, i)+" ";
+        }
+
+        if(StringWord(description, i) == "</n>") {
+            currentVal = StringReplaceWord(currentVal, "</n>","",1,c_stringNoCase);
+            DialogControlAddItem(dialog, pg,StringToText(currentVal));
+            currentVal = "";
+        }
+        i+=1;
+    }
+
+    if(currentVal != "") {
+        DialogControlAddItem(dialog, pg,StringToText(currentVal));
+    }
+
+
+}
+
+
+commandsGuideEntry[500] gv_CommandsGuideEntries;
+
+int gv_CommandsGuideEntryCount = 0;
+
+
+
+void LibapxCommandsGuideEntrySet(int type, string name, string description) {
+    gv_CommandsGuideEntries[gv_CommandsGuideEntryCount].type = type;
+    gv_CommandsGuideEntries[gv_CommandsGuideEntryCount].name = name;
+    gv_CommandsGuideEntries[gv_CommandsGuideEntryCount].description = description;
+    gv_CommandsGuideEntryCount += 1;
+}
+
+void LibapxGuidePresetDescriptions() {
+    // LibapxCommandsGuideEntrySet(
+	// 	gv_CommandsGuideEntryActor, 
+	// 	"What are actors?", 
+    //     " Actors are essentially everything you attach to a unit. Anytime you spawn a unit the unit creates the respective units actor. Usually these things are named the same (@spawn marine = @attach marine). </n> </n> That means any command under the actor cateogry doesn't apply to the entire unit. It only applies to the \"main\" actor of the unit. Aka the last actor that was attached or created. Or the actor you target with @target. This is a critical piece of understanding to becoming a good modeler. </n> </n> Extra info: </n> The first actor of a unit carries some of it's commands onto the later actors of the unit. For instance if you do </n> @spawn marine;@tint 255;@attach marine head </n> The first marine will be tinted red aswell as the second marine. That is because the second marine copied the first marine's commands. "
+    // );
+    // LibapxCommandsGuideEntrySet(
+	// 	gv_CommandsGuideEntryGeneral, 
+	// 	"Alias", 
+    //     " This command creates, removes an alias. It can also list all your aliases. </n> alias [aliasname] [commands.. </n></n><c val=\"255,229,201\">Examples</c>: </n> alias create s @spawn </n> alias create orc1 @spawn marine;@renameall orc;@tint 0 255 </n> alias remove s </n> alias list </n> alias removeall   "
+    // ); 
+    // LibapxCommandsGuideEntrySet(
+	// 	gv_CommandsGuideEntryGeneral, 
+	// 	"<<", 
+    //     " If you start typing with everything you type afterwards will be display. Regardless of if it's a command or an alias/macro/variable. </n></n><c val=\"255,229,201\">Examples</c>: </n> << @spawn goat doesn't work man!; what do you mean son?;Idk!  "
+    // ); 
+    // LibapxCommandsGuideEntrySet(
+	// 	gv_CommandsGuideEntryGeneral, 
+	// 	"\\;", 
+    //     " If you preceed a semicolen with a slash the colen will display reguarly and not break apart statements like it usually does.  "
+    // );
+    // LibapxCommandsGuideEntrySet(
+	// 	gv_CommandsGuideEntryGeneral, 
+	// 	";", 
+    //     " Semicolens break apart statements and commands. It's is vital to entering more than one command at a time or creating complicated aliases.  "
+    // );
+}
+
+//Variable Functions
+//-----------------------------
+const int gv_LibapxVariableFunctionPrecision = 4;
+
+void LibapxCommandsGuideSetVariableFunctionEntry(string title, string body) {
+    LibapxCommandsGuideEntrySet(
+        gv_CommandsGuideEntryVariableFunctions, 
+        title, 
+        body
+    );
+}
+

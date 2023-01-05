@@ -1,0 +1,81 @@
+//Globals needed everywhere
+bool[gv_LibapxMaxPlayers] gv_LibapxMainPanelOpen;
+
+include "apex/ui_lib/ui.utils.galaxy";
+include "apex/ui_lib/ui.chat.galaxy";
+include "apex/ui_lib/unit/ui.unit.galaxy";
+include "apex/ui_lib/main/ui.main_panel.galaxy";
+
+static int gv_permissionLevelUi;
+
+//Handle permission level here for now
+void LibapxMangePermissionLevel(int p) {
+    int permissionLevel = gv_LibapxPlayer[p].permissionLevel;
+    string permissionLevelText;
+    color permissionLevelColor;
+    if(permissionLevel == 0) {
+        permissionLevelText = "User";
+        permissionLevelColor = ColorWithAlpha(100,100,100,80);
+    }
+    
+    if(permissionLevel == 1) {
+        permissionLevelText = "Moderator";
+        permissionLevelColor = ColorWithAlpha(100,70,70,80);
+    }
+    
+    if(permissionLevel == 2) {
+        permissionLevelText = "Administrator";
+        permissionLevelColor = ColorWithAlpha(100,00,00,80);
+    }
+    if(permissionLevel == 3) {
+        permissionLevelText = "SadAdmin :'(";
+        permissionLevelColor = ColorWithAlpha(0,100,100,90);
+    }
+
+    libNtve_gf_SetDialogItemColor(gv_permissionLevelUi, permissionLevelColor, PlayerGroupSingle(p));
+    libNtve_gf_SetDialogItemText(gv_permissionLevelUi, StringToText(permissionLevelText), PlayerGroupSingle(p));
+}
+
+
+void LibapxInitilizeUiLib() {
+    int tmp_player;
+    int i;
+
+    gv_permissionLevelUi = DialogControlHookupStandard(c_triggerControlTypeLabel, "UIContainer/ConsoleUIContainer/PermissionLevel");
+
+    //Inits of other uis
+    LibapxUIInitChat();
+    LibapxUIInitUnit();
+    LibapxUiInitMainPanel();
+
+    //Per player init
+    for (i = 1; i <= PlayerGroupCount(PlayerGroupActive()); i += 1) {
+        tmp_player = PlayerGroupPlayer(PlayerGroupActive(), i);
+        LibapxUIInitChatPlayer(tmp_player);
+        LibapxUIInitUnitPlayer(tmp_player);
+        LibapxUiInitMainPanelPlayer(tmp_player);
+    }
+
+
+    //Hide Things
+	UISetFrameVisible(PlayerGroupAll(), c_syncFrameTypeIdleWorkerButton, false);
+	UISetFrameVisible(PlayerGroupAll(), c_syncFrameTypeSupply, false);
+	UISetFrameVisible(PlayerGroupAll(), c_syncFrameTypeConsolePanel, false);
+	UISetFrameVisible(PlayerGroupAll(), c_syncFrameTypeArmyButton, false);
+	UISetFrameVisible(PlayerGroupAll(), c_syncFrameTypeResourcePanel, false);
+	UISetFrameVisible(PlayerGroupAll(), c_syncFrameTypeTeamResourceButton, false);
+	UISetFrameVisible(PlayerGroupAll(), c_syncFrameTypeAllianceButton, false);
+	UISetFrameVisible(PlayerGroupAll(), c_syncFrameTypeSupply, false);
+	UISetFrameVisible(PlayerGroupAll(), c_syncFrameTypeHelpMenuButton, false);
+
+
+
+}
+
+void LibapxUiLibUpdate(int p) {
+    LibapxUIUpdateUnitPlayer(p);
+    LibapxUiUpdateChatPlayer(p);
+    LibapxUiUpdateMainPanelPlayer(p);
+    LibapxUiUpdateSubTabsPlayer(p);
+    LibapxMangePermissionLevel(p);
+}

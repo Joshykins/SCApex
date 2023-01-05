@@ -6,9 +6,278 @@
 		<Visible val="false"/>
 	</Frame>
 
-	<!-- Hide replay chat area so that viewers don't have to see all the commands there -->
-	<Frame type="MessageDisplay" name="GameUI/UIContainer/FullscreenUpperContainer/ReplayChatDisplay" file="GameUI">
-		<Visible val="false"/>
+
+	<!-- Say Toast Template -->
+	<Frame type="Frame" name="Toast">
+		<!-- Bottom gets overriden -->
+		<Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
+		<Anchor side="Right" relative="$parent" pos="Max" offset="-25"/>
+		<Anchor side="Left" relative="$parent" pos="Min" offset="25"/>
+		<Anchor side="Top" relative="$this/ToastInner/ToastContainer" pos="Min" offset="0"/>
+		<StateGroup name="Padding">
+			<DefaultState val="1"/>
+			<State name="1">
+				<When type="Property" Visible="False" frame="$this/ToastInner/Background" operator="Equal" />	
+				<Action type="SetAnchor" frame="$this/ToastInner/ToastContainer/ToastMessage" side="Right" relative="$parent" pos="Max" offset="0"/>
+				<Action type="SetAnchor" frame="$this/ToastInner/ToastContainer/ToastMessage" side="Left" relative="$parent" pos="Min" offset="0"/>
+				<Action type="SetAnchor" frame="$this/ToastInner/ToastContainer/ToastMessage" side="Bottom" relative="$parent" pos="Max" offset="0"/>
+				<Action type="SetAnchor" frame="$this/ToastInner/ToastContainer" side="Top" relative="$this/ToastMessage" pos="Min" offset="0"/>
+			</State>
+		
+			<State name="2">
+				<When type="Property" Visible="True" frame="$this/ToastInner/Background" operator="Equal" />	
+				<!-- Margin -->
+				<Action type="SetAnchor" frame="$this" side="Top" relative="$this/ToastInner/ToastContainer" pos="Min" offset="-15"/>
+				<Action type="SetAnchor" frame="$this/ToastInner" side="Top" relative="$parent" pos="Min" offset="15"/>
+
+				<!-- Inner Padding -->
+				<Action type="SetAnchor" frame="$this/ToastInner/ToastContainer/ToastMessage" side="Right" relative="$parent" pos="Max" offset="-10"/>
+				<Action type="SetAnchor" frame="$this/ToastInner/ToastContainer/ToastMessage" side="Left" relative="$parent" pos="Min" offset="10"/>
+				<Action type="SetAnchor" frame="$this/ToastInner/ToastContainer/ToastMessage" side="Bottom" relative="$parent" pos="Max" offset="-10"/>
+				<Action type="SetAnchor" frame="$this/ToastInner/ToastContainer" side="Top" relative="$this/ToastMessage" pos="Min" offset="-10"/>
+			</State>
+		</StateGroup>
+
+		<Frame type="Frame" name="ToastInner" template="ApexTemplates/ApexSecondaryFrameTemplate">
+			<AcceptsMouse val="False"/>
+			<Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+			<Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+			<Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
+			<Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
+			<Alpha val="0"/>
+			
+			<Frame type="Frame" name="ToastContainer">
+				<IgnoreParentAlpha val="True"/>
+				<AcceptsMouse val="False"/>
+				<Alpha val="0"/>
+				<Anchor side="Top" relative="$this/ToastMessage" pos="Min" offset="0"/>
+				<Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+				<Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
+				<Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
+	
+				<Frame type="Label" name="ToastMessage">
+					<Text val="We should think of everyone's needs, not just the faithful. For what is the purpose if all we are to have is faith, we must survive, after all are to have is faith, we must survive, after all. Hello how are you doing today this will be 255 characters yess"/>
+					<Anchor side="Right" relative="$parent" pos="Max" offset="-5"/>
+					<Anchor side="Left" relative="$parent" pos="Min" offset="5"/>
+					<Anchor side="Bottom" relative="$parent" pos="Max" offset="-5"/>
+				</Frame>
+			</Frame>
+		</Frame>
+	</Frame>
+
+	<Frame type="Frame" name="GameUI/UIContainer/FullscreenUpperContainer" file="GameUI">
+
+		<!-- Say Display -->
+		<Frame type="Frame" name="ToastDisplay">
+			<Height val="2000"/>
+			<Width val="720"/>
+
+			<Anchor side="Left" relative="$parent" pos="Mid" offset="0"/>
+			<Anchor side="Right" relative="$parent" pos="Mid" offset="0"/>
+			<Anchor side="Bottom" relative="$parent/ChatBar" pos="Min" offset="-10"/>
+			<Frame type="Frame" name="Toast25" template="Chat/Toast">
+				<Anchor side="Bottom" relative="$parent/Toast24" pos="Min" offset="0"/>
+			</Frame>
+			<Frame type="Frame" name="Toast24" template="Chat/Toast">
+				<Anchor side="Bottom" relative="$parent/Toast23" pos="Min" offset="0"/>
+			</Frame>
+			<Frame type="Frame" name="Toast23" template="Chat/Toast">
+				<Anchor side="Bottom" relative="$parent/Toast22" pos="Min" offset="0"/>
+			</Frame>
+			<Frame type="Frame" name="Toast22" template="Chat/Toast">
+				<Anchor side="Bottom" relative="$parent/Toast21" pos="Min" offset="0"/>
+			</Frame>
+			<Frame type="Frame" name="Toast21" template="Chat/Toast">
+				<Anchor side="Bottom" relative="$parent/Toast20" pos="Min" offset="0"/>
+			</Frame>
+			<Frame type="Frame" name="Toast20" template="Chat/Toast">
+				<Anchor side="Bottom" relative="$parent/Toast19" pos="Min" offset="0"/>
+			</Frame>
+			<Frame type="Frame" name="Toast19" template="Chat/Toast">
+				<Anchor side="Bottom" relative="$parent/Toast18" pos="Min" offset="0"/>
+			</Frame>
+			<Frame type="Frame" name="Toast18" template="Chat/Toast">
+				<Anchor side="Bottom" relative="$parent/Toast17" pos="Min" offset="0"/>
+			</Frame>
+			<Frame type="Frame" name="Toast17" template="Chat/Toast">
+				<Anchor side="Bottom" relative="$parent/Toast16" pos="Min" offset="0"/>
+			</Frame>
+			<Frame type="Frame" name="Toast16" template="Chat/Toast">
+				<Anchor side="Bottom" relative="$parent/Toast15" pos="Min" offset="0"/>
+			</Frame>
+			<Frame type="Frame" name="Toast15" template="Chat/Toast">
+				<Anchor side="Bottom" relative="$parent/Toast14" pos="Min" offset="0"/>
+			</Frame>
+			<Frame type="Frame" name="Toast14" template="Chat/Toast">
+				<Anchor side="Bottom" relative="$parent/Toast13" pos="Min" offset="0"/>
+			</Frame>
+			<Frame type="Frame" name="Toast13" template="Chat/Toast">
+				<Anchor side="Bottom" relative="$parent/Toast12" pos="Min" offset="0"/>
+			</Frame>
+			<Frame type="Frame" name="Toast12" template="Chat/Toast">
+				<Anchor side="Bottom" relative="$parent/Toast11" pos="Min" offset="0"/>
+			</Frame>
+			<Frame type="Frame" name="Toast11" template="Chat/Toast">
+				<Anchor side="Bottom" relative="$parent/Toast10" pos="Min" offset="0"/>
+			</Frame>
+			<Frame type="Frame" name="Toast10" template="Chat/Toast">
+				<Anchor side="Bottom" relative="$parent/Toast9" pos="Min" offset="0"/>
+			</Frame>
+			<Frame type="Frame" name="Toast9" template="Chat/Toast">
+				<Anchor side="Bottom" relative="$parent/Toast8" pos="Min" offset="0"/>
+			</Frame>
+			<Frame type="Frame" name="Toast8" template="Chat/Toast">
+				<Anchor side="Bottom" relative="$parent/Toast7" pos="Min" offset="0"/>
+			</Frame>
+			<Frame type="Frame" name="Toast7" template="Chat/Toast">
+				<Anchor side="Bottom" relative="$parent/Toast6" pos="Min" offset="0"/>
+			</Frame>
+			<Frame type="Frame" name="Toast6" template="Chat/Toast">
+				<Anchor side="Bottom" relative="$parent/Toast5" pos="Min" offset="0"/>
+			</Frame>
+			<Frame type="Frame" name="Toast5" template="Chat/Toast">
+				<Anchor side="Bottom" relative="$parent/Toast4" pos="Min" offset="0"/>
+			</Frame>
+			<Frame type="Frame" name="Toast4" template="Chat/Toast">
+				<Anchor side="Bottom" relative="$parent/Toast3" pos="Min" offset="0"/>
+			</Frame>
+			<Frame type="Frame" name="Toast3" template="Chat/Toast">
+				<Anchor side="Bottom" relative="$parent/Toast2" pos="Min" offset="0"/>
+			</Frame>
+			<Frame type="Frame" name="Toast2" template="Chat/Toast">
+				<Anchor side="Bottom" relative="$parent/Toast1" pos="Min" offset="0"/>
+			</Frame>
+			<Frame type="Frame" name="Toast1" template="Chat/Toast">
+			</Frame>
+		</Frame>
+		
+
+		<!-- Chat Bar -->
+		<Frame type="ChatBar" name="ChatBar">
+			<Width val="700"/>
+			<Alpha val="255"/>
+			<Frame type="Image" name="BackgroundImage">
+				<Texture val="Assets/Textures/blank.dds"/>
+			</Frame>
+			<Frame type="Image" name="EmoticonButton">
+				<Visible val="False"/>
+			</Frame>
+			<Frame type="Image" name="EmojiBorderLine">
+				<Texture val="Assets/Textures/blank.dds"/>
+				<Visible val="False"/>
+			</Frame>
+			<Frame type="Image" name="RecipientImage">
+				<Visible val="False"/>
+				<Anchor side="Left" relative="$parent" pos="Min" offset="20000"/>
+			</Frame>
+			<Frame type="Label" name="RecipientLabel">
+				<Visible val="False"/>
+				<Anchor side="Left" relative="$parent" pos="Min" offset="20000"/>
+			</Frame>
+			<Frame type="EditBox" name="ChatEditBox">
+				<Anchor side="Bottom" relative="$parent" pos="Max" offset="-18"/>
+				<Anchor side="Left" relative="$parent" pos="Min" offset="38"/>
+				<Anchor side="Top" relative="$parent" pos="Min" offset="18"/>
+				<Anchor side="Right" relative="$parent" pos="Max" offset="-18"/>
+				<MultiLine val="True"/>
+				<Style val="apx_chat"/>
+				<RenderPriority val="25"/>
+				<Frame type="Frame" name="LabelContainerFrame">
+					<Anchor side="Bottom" relative="$parent" pos="Max" offset="-18"/>
+					<Anchor side="Left" relative="$parent" pos="Min" offset="18"/>
+					<Anchor side="Top" relative="$parent" pos="Min" offset="18"/>
+					<Anchor side="Right" relative="$parent" pos="Max" offset="-18"/>
+					<Frame type="Label" name="Label">
+						<BaseHeight val="18"/>
+						<Style val="apx_chat"/>
+						<IgnoreParentAlpha val="True"/>
+					</Frame>
+				</Frame>
+			</Frame>
+
+
+			<Frame type="Frame" name="ApexChatBackground" template="ApexTemplates/ApexSecondaryFrameTemplate">
+					<Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
+					<Anchor side="Left" relative="$parent" pos="Min" offset="20"/>
+					<Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+					<Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
+					<RenderPriority val="9"/>
+			</Frame>
+			
+			<Frame type="Image" name="ApexChatLineT">
+				<Anchor side="Top" relative="$parent" pos="Min" offset="5"/>
+				<Anchor side="Bottom" relative="$parent" pos="Mid" offset="-9"/>
+				<Anchor side="Left" relative="$parent" pos="Min" offset="10"/>
+				<Width  val="1"/>
+				<Texture val="Assets/Textures/white32.dds"/>
+				<Color val="255,255,255"/>
+				<Alpha val="0"/>
+				<TextureType val="Normal"/>
+				<RenderPriority val="12"/>
+			</Frame>
+			<Frame type="Image" name="ApexChatLineB">
+				<Anchor side="Bottom" relative="$parent" pos="Max" offset="-5"/>
+				<Anchor side="Top" relative="$parent" pos="Mid" offset="9"/>
+				<Anchor side="Left" relative="$parent" pos="Min" offset="10"/>
+				<Width  val="1"/>
+				<Texture val="Assets/Textures/white32.dds"/>
+				<Color val="255,255,255"/>
+				<Alpha val="0"/>
+				<TextureType val="Normal"/>
+				<RenderPriority val="12"/>
+			</Frame>
+			
+			<Frame type="Image" name="ApexFlareLeft">
+				<Anchor side="Top" relative="$parent" pos="Mid" offset="0"/>
+				<Anchor side="Bottom" relative="$parent" pos="Mid" offset="0"/>
+				<Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+				<Texture val="Apex/Assets/Textures/flare.png"/>
+				<Alpha val="255"/>
+				<TextureType val="Normal"/>
+				<RenderPriority val="25"/>
+				<Unclipped val="True"/>
+			</Frame>
+			<Frame type="Label" name="HelpLabel">
+				<Visible val="False"/>
+				<Anchor side="Left" relative="$parent" pos="Max" offset="2000"/>
+			</Frame>
+			<Frame type="Label" name="CharCount">
+				<Anchor side="Bottom" relative="$parent" pos="Max" offset="-5"/>
+				<Anchor side="Right" relative="$parent" pos="Max" offset="-5"/>
+				<Color val="125,125,125"/>
+				<Style val="apx_regular_right_bot"/>
+				<Text val="230"/>
+			</Frame>
+			
+			<Animation name="Show">
+				<Event event="OnShown" action="Restart,Play" frame="$this/ApexChatBackground"/>
+				<Controller type="Fade" end="Pause" frame="$this">
+					<Key type="Curve" time="0" value="255" out="Slow"/>
+					<Key type="Curve" time=".15" value="255" in="Slow"/>
+				</Controller>
+				<Controller type="Anchor" side="Bottom" relative="False" pos="Max" end="Pause" frame="$this/ApexChatBackground">
+					<Key type="Curve" time="0" value="-35" />
+					<Key type="Curve" time=".15" value="0" />
+				</Controller>
+				<Controller type="Anchor" side="Top" relative="False" pos="Max" end="Pause" frame="$this/ApexChatBackground">
+					<Key type="Curve" time="0" value="35" />
+					<Key type="Curve" time=".15" value="0" />
+				</Controller>
+				<Controller type="Fade" end="Pause" frame="$this/ApexChatBackground">
+					<Key type="Curve" time="0" value="0" />
+					<Key type="Curve" time="0.25" value="255" />
+				</Controller>
+				<Controller type="Fade" end="Pause" frame="$this/ApexChatLineT">
+					<Key type="Curve" time="0" value="0" />
+					<Key type="Curve" time="0.15" value="255" />
+				</Controller>
+				<Controller type="Fade" end="Pause" frame="$this/ApexChatLineB">
+					<Key type="Curve" time="0" value="0" />
+					<Key type="Curve" time="0.15" value="255" />
+				</Controller>
+			</Animation>
+		</Frame>
+
 	</Frame>
 
 
@@ -17,13 +286,11 @@
 		<MaxMessages val="64"/>
 		<MessageDuration val="20000"/>
 		<FadeDuration val="5000"/>
-		<Style val="ChatDisplayApex"/>
+		<Style val="apx_chat"/>
 		<AcceptsMouse val="false"/>
 		<BatchText val="true"/>
-		<Anchor side="Bottom" relative="$parent" pos="Max" offset="-335"/>
-		<Anchor side="Left" relative="$parent" pos="Mid" offset="0"/>
-		<Anchor side="Right" relative="$parent" pos="Mid" offset="0"/>
-		<Width val="720"/>
+		<Visible val="False"/>
+		<Width val="500"/>
 		<Height val="700"/>
 		<!--Frame name="background" type="Image">
 			<IgnoreParentAlpha val="true"/>

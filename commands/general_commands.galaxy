@@ -6,6 +6,159 @@
 // <http://opensource.org/licenses/MIT>
 //=========================================================
 
+
+
+//Log colors
+static string aColor = "<c val=\"a1ffd6\">";
+static string resetColor = "<c val=\"aaaaaa\">";
+
+// LibapxCommandAlias
+// =========================
+// Parses aliases into chat.alias.galaxy
+// Splits based on params, chat.alias.galaxy handles bank logic and reading aliases when used in chat
+void LibapxCommandAlias(int user, unitgroup u, string argv, int spawningCount, string bracketText) {
+	string subCommand;
+	string aliasName;
+	string aliasValue;
+	
+	string current;
+	int i;
+
+	int bracketIndex = 1;
+
+	string aliasParameters;
+	string aliasParametersWithoutDefaults;
+
+	//If true, alias does NOT store to bank
+	bool localAlias = false;
+
+	bool hasOptionalAppeared = false;
+
+	if( StringFind(argv, "-local" ,c_stringNoCase) != -1 ) {
+		argv =  StringReplaceWord(argv, "-local", "", 1, c_stringNoCase);
+		localAlias = true;
+	}
+
+	subCommand = StringWord(argv, 2);
+
+	//    _alias create asd %test  = [asd2] %boobies [valuehere;hello!]
+	//List
+	if(subCommand == "list") {
+		LibapxLogCustom(
+			PlayerGroupSingle(user), 
+			"Alias List", 
+			true,
+			Color(0,30,100),
+			Color(100,100,100),
+			40
+		);
+		LibapxLog(user, aColor+StringReplaceWord(LibapxStringTrim(gv_LibapxPlayer[user].aliases), " ", resetColor+", "+aColor, c_noMaxCount, true)); 
+		return;
+	}
+
+	//Create
+	if(subCommand == "create") {
+		aliasName = StringWord(argv, 3);
+		if(!aliasName) {
+			LibapxLogError(user, "Alias needs a name to be created!");
+			return;
+		}
+
+		//_alias create myMarine %count %type = [marine]  %life = [35] [@spawn %count %type;@maxlife %life]
+
+		//Recursively parse
+		i = 4;
+		while(StringWord(argv, i) != "") {
+			current = StringWord(argv, i);
+			if(StringSub(current, 1, 1) == gv_AliasParameterPrefix) {
+				//Is a parameter!
+				aliasParameters += current + " ";
+				aliasParametersWithoutDefaults += current + " ";
+
+				//Does it have a default value?
+				if(StringWord(argv, i+1) == "=") {
+					//Clean argv
+					argv = StringReplaceWord(argv, StringWord(argv, i)+" "+StringWord(argv, i+1), StringWord(argv, i), 1, true);
+					if(LibapxBracketTextGrab(bracketText, bracketIndex) != "") {
+						if(LibapxBracketTextGrab(bracketText, bracketIndex) == aliasName) {
+							LibapxLogError(user, "Default Parameter can't be the same as the alias name! That'd be bad!");
+							return;
+						}
+						hasOptionalAppeared = true;
+						aliasParameters += "= ["+LibapxBracketTextGrab(bracketText, bracketIndex)+"] ";
+						bracketIndex += 1;
+					}
+					else {
+						LibapxLogError(user, "Insufficent brackets given! Did you have one too many default values?");
+						return;
+					}
+				}
+				else {
+					if(hasOptionalAppeared) {
+						LibapxLogError(user, "Default values must go at the end of _alias create!");
+						return;
+					}
+				}
+			}
+			else {
+				LibapxLogError(user, "'"+current+"' Unexpceted Character, ensure everything is within brackets!");
+				return;
+			}
+			i += 1;
+		}
+		aliasValue = LibapxBracketTextGrab(bracketText, bracketIndex);
+
+		if(aliasValue == "") {
+			LibapxLogError(user, "No alias value given, did you forget to add a bracket around it?");
+			return;
+		}
+
+
+		//Warn for unused parameters
+		i = 1;
+		while(StringWord(aliasParametersWithoutDefaults, i) != "") {
+			current = StringWord(aliasParametersWithoutDefaults, i);
+			i += 1;
+			if(
+				StringFind(
+					aliasValue,
+					current,
+					true
+				) == -1
+			) {
+				LibapxLogWarning(user, "'"+current+"'<c val=\"dddddd\"> Is unused in the alias!");
+			}
+		}
+
+		//Good to insert
+		LibapxAliasCreate(user, localAlias, aliasName, aliasParameters, aliasValue);
+	
+	}
+	else if(subCommand == "remove") {
+		aliasName = StringWord(argv, 3);
+
+		
+		LibapxAliasRemove(user, localAlias, aliasName);
+
+		if(!aliasName) {
+			LibapxLogError(user, "Alias needs a name to be removed!");
+			return;
+		}
+
+		
+	}
+	else {
+		LibapxLogError(user, "Unknown sub command! Use 'list, 'create', or 'remove'! ");
+		return;
+	}
+}
+void LibapxDefineAlias(string commandName) {
+	LibapxCommandsGuideEntrySet(
+		gv_CommandsGuideEntryGeneral, 
+		commandName, 
+		"");
+}
+
 // LibapxCommandCamera
 // ====================
 // camera manipulation
@@ -301,21 +454,21 @@ void LibapxCommandCamera(int user, unitgroup u, string argv, int spawningCount, 
 	if(StringEqual(s, "editor", false)) {
 		if(paremVal == "on") {
 			LibapxEnableEditorCamera(user, true);
-			LibapxPrintOutput(user, "<c val=\"00ff00\">Enabling Editor Camera</c><n/>");
-			LibapxPrintOutput(user, "Use the [Tab]+[Mouse] to pan the camera. Use [Ctrl]+[Mouse] to orbit the camera. Use [Alt]+[MouseWheel] to change the height of the camera. Use [MouseWheel] to zoom the camera.");
+			LibapxLogInfo(user, "<c val=\"00ff00\">Enabling Editor Camera</c><n/>");
+			LibapxLogInfo(user, "Use the [Tab]+[Mouse] to pan the camera. Use [Ctrl]+[Mouse] to orbit the camera. Use [Alt]+[MouseWheel] to change the height of the camera. Use [MouseWheel] to zoom the camera.");
 		}
 		else {
 			LibapxEnableEditorCamera(user, false);
-			LibapxPrintOutput(user, "<c val=\"00ff00\">Disabling Editor Camera</c><n/>");
+			LibapxLogInfo(user, "<c val=\"00ff00\">Disabling Editor Camera</c><n/>");
 		}
 		return;
 	}
 	if(StringEqual(s, "properties", false)) {
-		LibapxPrintOutput(user, "<c val=\"00ff00\">Camera properties:</c><n/>" + cameraProperties);
+		LibapxLogInfo(user, "<c val=\"00ff00\">Camera properties:</c><n/>" + cameraProperties);
 		return;
 	}
 	if(StringEqual(s, "reset", false)) {
-		LibapxPrintOutput(user, "Camera resetting to default parameters.");
+		LibapxLogInfo(user, "Camera resetting to default parameters.");
 
 			val = StringToFixed(CatalogFieldValueGet(c_gameCatalogCamera, CatalogFieldValueGet(c_gameCatalogTerrain, GameTerrainSet(), "Camera", user), "ParamInitial[5]", user));
 		CameraSetValue(user, c_cameraValuePitch, val, 1.0, -1, 10);
@@ -352,10 +505,10 @@ void LibapxCommandCamera(int user, unitgroup u, string argv, int spawningCount, 
 	if(StringEqual(s, "Match", false) ) {
 		targetp = LibapxColorToPlayer( StringCase( paremVal, false ), user);
 		if( targetp == -1 ) {
-			LibapxPrintError(user, "Invalid player");
+			LibapxLogError(user, "Invalid player");
 			return;
 		}
-		LibapxPrintText(PlayerGroupSingle(user), StringToText("Camera matching ") + gv_LibapxPlayerNameColored(targetp) + StringToText("'s properties now."));
+		LibapxLogPlayerGroupText(PlayerGroupSingle(user), StringToText("Camera matching ") + gv_LibapxPlayerNameColored(targetp) + StringToText("'s properties now."));
 
 
 	}
@@ -503,7 +656,7 @@ void LibapxCommandCamera(int user, unitgroup u, string argv, int spawningCount, 
 		return ;
 	}
 	else {
-		LibapxPrintOutput(user, "<c val=\"ff0000\">Error</c>: Invalid camera property.<n/>You can obtain a list of camera properties by typing <c val=\"00ff00\">camera properties</c>.");
+		LibapxLogInfo(user, "<c val=\"ff0000\">Error</c>: Invalid camera property.<n/>You can obtain a list of camera properties by typing <c val=\"00ff00\">camera properties</c>.");
 		return;
 	}
 }
@@ -511,7 +664,7 @@ void LibapxDefineCamera(string commandName) {
 	LibapxCommandsGuideEntrySet(
 		gv_CommandsGuideEntryGeneral, 
 		commandName, 
-		" This command changes the players camera. <br> The properties it can use are AngleOfAttack, DepthOfField, Distance, FalloffEnd, FalloffStart, FarClip, FieldOfView, FocalDepth, HeightOffset, NearClip, Roll, Rotation, ShadowClip, and editor <br> Camera [property/reset] <br> Examples: Camera roll 90 <br> Camera reset <br> Camera editor on (This enables an entirely new camera)");
+		" This command changes the players camera. </n> The properties it can use are AngleOfAttack, DepthOfField, Distance, FalloffEnd, FalloffStart, FarClip, FieldOfView, FocalDepth, HeightOffset, NearClip, Roll, Rotation, ShadowClip, and editor </n> _camera [property/reset] </n></n><c val=\"255,229,201\">Examples</c>: _camera roll 90 </n> _camera reset </n> _camera editor on (This enables an entirely new camera)");
 }
 
 
@@ -527,7 +680,7 @@ void LibapxCommandUpgrade(int user, unitgroup u, string argv, int spawningCount,
     upgrade = LibapxParamCatalog(c_gameCatalogUpgrade, upgrade);
     if(upgrade == null)
     {
-        LibapxPrintOutput(user, "<c val=\"ff0000\">Unable to modify upgrade</c>: That upgrade does not exists.");
+        LibapxLogInfo(user, "<c val=\"ff0000\">Unable to modify upgrade</c>: That upgrade does not exists.");
         return;
     }
 
@@ -555,19 +708,19 @@ void LibapxCommandUpgrade(int user, unitgroup u, string argv, int spawningCount,
         }
         else if(nextParam == "query")
         {
-            LibapxPrintOutput(user, "Upgrade level is at: " +
+            LibapxLogInfo(user, "Upgrade level is at: " +
                 IntToString(curLevel));
             return;
         }
         else if(nextParam != "0" && newLevel == 0)
         {
-            LibapxPrintOutput(user,"Usage: upgrade upgradename [on/off/query/number]");
+            LibapxLogInfo(user,"Usage: _upgrade upgradename [on/off/query/number]");
             return;
         }
     }
 		else if(nextParam == "")
     {
-        LibapxPrintOutput(user, "Upgrade level is at: " + IntToString(curLevel));
+        LibapxLogInfo(user, "Upgrade level is at: " + IntToString(curLevel));
         return;
     }
     TechTreeUpgradeAddLevel(player, upgrade, newLevel - curLevel);
@@ -578,24 +731,24 @@ void LibapxDefineUpgrade(string commandName) {
 	LibapxCommandsGuideEntrySet(
 		gv_CommandsGuideEntryGeneral, 
 		commandName, 
-		" This command modifies or changes the upgrades you have. <br> Upgrade upgradename [on/off/query/number] <br> Examples: <br> Upgrade TerranInfantryArmorslevel3 on <br> Upgrade TerranInfantryArmorslevel3 off ");
+		" This command modifies or changes the upgrades you have. </n> _upgrade upgradename [on/off/query/number] </n></n><c val=\"255,229,201\">Examples</c>: </n> _upgrade TerranInfantryArmorslevel3 on </n> _upgrade TerranInfantryArmorslevel3 off ");
 }
 
 // LibapxCommandInfo
 // ====================
 // just prints out a line of text to everyone
 void LibapxCommandInfo(int user, unitgroup u, string argv, int spawningCount, string bracketText) {
-	LibapxPrintOutput(user, "Apex Engine v" + IntToString(gv_LibapxBuildVersion) + "." + IntToString(gv_LibapxBuildSubVersion) + gv_LibapxBuildVersionModifier);
-	LibapxPrintOutput(user, "Developer: Melvin");
-	LibapxPrintOutput(user, "Asset Developers: Capnbombad, Comfromal, Dalgar, Lunar, Serobliss, Ngokerz");
-	LibapxPrintOutput(user, "Special Thanks to: Xethyr, Dalgar, and Motive");
-	LibapxPrintOutput(user, "Report bugs at serobliss2@gmail.com");
+	LibapxLogInfo(user, "Apex Engine v" + IntToString(gv_LibapxBuildVersion) + "." + IntToString(gv_LibapxBuildSubVersion) + gv_LibapxBuildVersionModifier);
+	LibapxLogInfo(user, "Developer: Serobliss");
+	LibapxLogInfo(user, "Asset Developers: Capnbombad, Comfromal, Dalgar, Lunar, Serobliss, Ngokerz");
+	LibapxLogInfo(user, "Special Thanks to: Xethyr, Dalgar, and Motive");
+	LibapxLogInfo(user, "Report bugs at serobliss2@gmail.com");
 }
 void LibapxDefineInfo(string commandName) {
 	LibapxCommandsGuideEntrySet(
 		gv_CommandsGuideEntryGeneral, 
 		commandName, 
-		" This command gives information about the engine and it's version. <br> Info <br> Examples: <br> Info ");
+		" This command gives information about the engine and it's version. </n> _info </n></n><c val=\"255,229,201\">Examples</c>: </n> _info ");
 }
 
 
@@ -628,13 +781,13 @@ void LibapxDefineApi(string commandName) {
 // ===============
 // prints out a list of all the commands registered
 void LibapxCommandListCommands(int user, unitgroup u, string argv, int spawningCount, string bracketText) {
-	LibapxPrintOutput(user, "LISTING GAME COMMANDS:\n" + gv_LibapxSettings.commands);
+	LibapxLogInfo(user, "LISTING GAME COMMANDS:\n" + gv_LibapxSettings.commands);
 }
 void LibapxDefineListCommands(string commandName) {
 	LibapxCommandsGuideEntrySet(
 		gv_CommandsGuideEntryGeneral, 
 		commandName, 
-		" This command lists all the available commands possible. <br> Commands <br> Examples: <br> Commands ");
+		" This command lists all the available commands possible. </n> _commands </n></n><c val=\"255,229,201\">Examples</c>: </n> _commands ");
 }
 // LibapxCommandWait
 // ===============
@@ -667,7 +820,7 @@ void LibapxCommandDelay(int user, unitgroup u, string argv, int spawningCount, s
 		DelayCommandArray[LeadingIndex].spawningCount = spawningCount;
 
 		LeadingIndex +=1 ;
-		TriggerAddEventTimeElapsed(TriggerCreate("LibapxDelayTrigger"), time, c_timeGame);
+		TriggerAddEventTimeElapsed(delayTrigger, time, c_timeGame);
 	}
 }
 bool LibapxDelayTrigger(bool testConds,bool runActions) {
@@ -675,7 +828,6 @@ bool LibapxDelayTrigger(bool testConds,bool runActions) {
 		TrailingIndex = 0;
 	}
 	LibapxChatParse(DelayCommandArray[TrailingIndex].msg, DelayCommandArray[TrailingIndex].p, DelayCommandArray[TrailingIndex].u, gv_LibapxPlayer[DelayCommandArray[TrailingIndex].p].spawningCount);
-
 	TrailingIndex +=1;
 	return true;
 }
@@ -683,7 +835,7 @@ void LibapxDefineDelay(string commandName) {
 	LibapxCommandsGuideEntrySet(
 		gv_CommandsGuideEntryGeneral, 
 		commandName, 
-		" This command waits a given amount of time before allowing more commands to be ran. <br> Delay [time] <br> Examples: <br> @spawn marine; Delay 5 ; @attach marine head ");
+		" This command waits a given amount of time before allowing more commands to be ran. It can also \"thread\" commands, putting them in a seperate delay using brackets. </n> _delay time </n></n><c val=\"255,229,201\">Examples</c>: </n> @spawn marine; _delay 5 ; @attach marine head </n> _delay 2 [This will run after two seconds]; This will run immediately!");
 }
 
 // LibapxCommandPlayers
@@ -718,13 +870,13 @@ void LibapxCommandPlayers(int user, unitgroup u, string argv, int spawningCount,
 		player += 1;
 	}
 
-	LibapxPrintText(PlayerGroupSingle(user), output);
+	LibapxLogPlayerGroupText(PlayerGroupSingle(user), output);
 }
 void LibapxDefinePlayers(string commandName) {
 	LibapxCommandsGuideEntrySet(
 		gv_CommandsGuideEntryGeneral, 
 		commandName, 
-		" This command prints out the permission level, color, and status of all the players in the game. <br> Players <br> Examples: <br> Players ");
+		" This command prints out the permission level, color, and status of all the players in the game. </n> _players </n></n><c val=\"255,229,201\">Examples</c>: </n> _players ");
 }
 
 // LibapxCommandGamesetup
@@ -737,6 +889,15 @@ void LibapxCommandGamesetup(int user, unitgroup u, string argv, int spawningCoun
 	region rgn = RegionEntireMap();
 	int i;
 	string gamesetupList = "";
+
+
+	if(LibapxAdminSettingIsPlayerEnforceable(user)) {
+		if(!gv_LibapxSettings.allowGamesetup) {
+			LibapxLogError(user, "_gamesetup disabled due to admin settings.");
+			return;
+		}
+	}
+
 
 	//Bank validation
 	if(!gv_LibapxPlayerbankHasloaded(user)) {
@@ -752,7 +913,7 @@ void LibapxCommandGamesetup(int user, unitgroup u, string argv, int spawningCoun
 	if(StringEqual(param, "save", c_stringNoCase)) {
 		gamesetupName = StringWord(gv_LibapxPlayer[user].chatMsg, 3);
 		if(gamesetupName == "") {
-			LibapxPrintError(user, "Invalid game setup name");
+			LibapxLogError(user, "Invalid game setup name");
 			return;
 		}
 		// TODO: PROPER REGIONS
@@ -764,13 +925,13 @@ void LibapxCommandGamesetup(int user, unitgroup u, string argv, int spawningCoun
 				// TODO: Get region from rgnName
 
 				if(rgn == null) {
-					LibapxPrintError(user, "No region with that name exists!");
+					LibapxLogError(user, "No region with that name exists!");
 					return;
 				}
-				LibapxPrintSuccess(user, "Saving region " + rgnName);
+				LibapxLogSuccess(user, "Saving region " + rgnName);
 			}
 			else {
-				LibapxPrintError(user, "Region name must be prefixed with '#' (e.g. a region named \"rgn\" must be entered as #rgn");
+				LibapxLogError(user, "Region name must be prefixed with '#' (e.g. a region named \"rgn\" must be entered as #rgn");
 				return;
 			}
 		}
@@ -783,12 +944,12 @@ void LibapxCommandGamesetup(int user, unitgroup u, string argv, int spawningCoun
 		gamesetupName = StringWord(gv_LibapxPlayer[user].chatMsg, 3);
 
 		if(BankSectionExists(gv_LibapxPlayer[user].bankStorage, LibapxBANKGAMESETUPPREFIX + gamesetupName)) {
-			LibapxPrintText(PlayerGroupAll(), gv_LibapxPlayerNameColored(user) + StringToText(" is loading a gamesetup..."));
+			LibapxLogPlayerGroupText(PlayerGroupAll(), gv_LibapxPlayerNameColored(user) + StringToText(" is loading a gamesetup..."));
 			LibapxGamesetupLoad(user, gamesetupName);
 			return;
 		}
 		else {
-			LibapxPrintError(user, "Game setup " + gamesetupName + " does not exist");
+			LibapxLogError(user, "Game setup " + gamesetupName + " does not exist");
 			return;
 		}
 	}
@@ -797,11 +958,11 @@ void LibapxCommandGamesetup(int user, unitgroup u, string argv, int spawningCoun
 		gamesetupName = StringWord(gv_LibapxPlayer[user].chatMsg, 3);
 
 		if( LibapxGamesetupRemove(user, gamesetupName) ) {
-			LibapxPrintSuccess(user, "Game setup \"" + gamesetupName + "\" has been deleted");
+			LibapxLogSuccess(user, "Game setup \"" + gamesetupName + "\" has been deleted");
 			return;
 		}
 		else {
-			LibapxPrintError(user, "Game setup \"" + gamesetupName + "\" does not exist");
+			LibapxLogError(user, "Game setup \"" + gamesetupName + "\" does not exist");
 			return;
 		}
 	}
@@ -816,7 +977,7 @@ void LibapxCommandGamesetup(int user, unitgroup u, string argv, int spawningCoun
 			i -= 1;
 		}
 		BankSave(gv_LibapxPlayer[user].bankStorage);
-		LibapxPrintSuccess(user, "All game setups have been deleted");
+		LibapxLogSuccess(user, "All game setups have been deleted");
 
 		return;
 	}
@@ -833,14 +994,14 @@ void LibapxCommandGamesetup(int user, unitgroup u, string argv, int spawningCoun
 		}
 
 		if(gamesetupList == "") {
-			LibapxPrintOutput(user, "You have no saved game setups");
+			LibapxLogInfo(user, "You have no saved game setups");
 			return;
 		}
 
 		//remove the first comma
 		gamesetupList = StringSub(gamesetupList, 3, StringLength(gamesetupList));
 
-		LibapxPrintOutput(user, "Listing gamesetups:\n" + gamesetupList);
+		LibapxLogInfo(user, "Listing gamesetups:\n" + gamesetupList);
 
 		return;
 	}
@@ -849,7 +1010,7 @@ void LibapxDefineGamesetup(string commandName) {
 	LibapxCommandsGuideEntrySet(
 		gv_CommandsGuideEntryGeneral, 
 		commandName, 
-		" This command allows you to save all of your units on the map and reload them at a later point. <br> Gamesetup [save/load/list/remove/removeall] [gamesetupName] <br> Examples: <br> Gamesetup save bob <br> Gamesetup list <br> Gamesetup remove bob <br> Gamesetup removeall ");
+		" This command allows you to save all of your units on the map and reload them at a later point. </n> _gamesetup [save/load/list/remove/removeall] [gamesetupName] </n></n><c val=\"255,229,201\">Examples</c>: </n> _gamesetup save bob </n> _gamesetup list </n> _gamesetup remove bob </n> _gamesetup removeall ");
 }
 
 // LibapxCommandControl
@@ -922,7 +1083,7 @@ void LibapxDefineControl(string commandName) {
 	LibapxCommandsGuideEntrySet(
 		gv_CommandsGuideEntryGeneral, 
 		commandName, 
-		" This command allows your units to be controled by the target player. <br> Control [targetplayer] <br> Examples: <br> Control brown ");
+		" This command allows your units to be controled by the target player. </n> _control [targetplayer] </n></n><c val=\"255,229,201\">Examples</c>: </n> _control brown ");
 }
 
 // LibapxCommandUncontrol
@@ -995,7 +1156,7 @@ void LibapxDefineUncontrol(string commandName) {
 	LibapxCommandsGuideEntrySet(
 		gv_CommandsGuideEntryGeneral, 
 		commandName, 
-		" This command disallows your units to be controled by the target player. <br> Uncontrol [targetplayer] <br> Examples: <br> Uncontrol brown ");
+		" This command disallows your units to be controled by the target player. </n> _uncontrol [targetplayer] </n></n><c val=\"255,229,201\">Examples</c>: </n> _uncontrol brown ");
 }
 
 // LibapxCommandAlly
@@ -1029,7 +1190,7 @@ void LibapxCommandAlly(int user, unitgroup u, string argv, int spawningCount, st
 	if( original == "all" ) {
 		while( i != gv_LibapxMaxPlayers ) {
 			// Issue this command over the next color.
-			LibapxChatParse("Ally " + LibapxColorFromPlayer(i) + " " + targetPlayer, user, gv_LibapxPlayerParser[user][spawningCount].context, spawningCount);
+			LibapxChatParse("_ally " + LibapxColorFromPlayer(i) + " " + targetPlayer, user, gv_LibapxPlayerParser[user][spawningCount].context, spawningCount);
 			i += 1;
 		}
 		return;
@@ -1064,7 +1225,7 @@ void LibapxDefineAlly(string commandName) {
 	LibapxCommandsGuideEntrySet(
 		gv_CommandsGuideEntryGeneral, 
 		commandName, 
-		" This command allies the player you target. This also means they ally you. <br> Ally [targetplayer] <br> Examples: <br> Ally brown ");
+		" This command allies the player you target. This also means they ally you. </n> _ally [targetplayer] </n></n><c val=\"255,229,201\">Examples</c>: </n> _ally brown ");
 }
 
 // LibapxCommandUnally
@@ -1124,7 +1285,7 @@ void LibapxDefineUnally(string commandName) {
 	LibapxCommandsGuideEntrySet(
 		gv_CommandsGuideEntryGeneral, 
 		commandName, 
-		" This command unallies the player you target. This also means they unally you. <br> Unally [targetplayer] <br> Examples: <br> Unally brown ");
+		" This command unallies the player you target. This also means they unally you. </n> _unally [targetplayer] </n></n><c val=\"255,229,201\">Examples</c>: </n> _unally brown ");
 }
 
 // LibapxCommandRoll
@@ -1150,18 +1311,18 @@ void LibapxCommandRoll(int user, unitgroup u, string argv, int spawningCount, st
 			//We did not have a dice count, so our command actually looked more like Dy than xDy... let's just run one die then. -F
 			winnings = RandomInt(1,StringToInt( StringSub( snum, StringFind(snum,"d",false) + 1, StringLength(snum) ) ) );
 		}
-		LibapxPrintText(PlayerGroupAll(), gv_LibapxPlayerNameColored(user) + StringToText(" rolled ") + StringToText(snum) + StringToText(" and got: ") + IntToText(winnings));
+		LibapxLogPlayerGroupText(PlayerGroupAll(), gv_LibapxPlayerNameColored(user) + StringToText(" rolled ") + StringToText(snum) + StringToText(" and got: ") + IntToText(winnings));
 		return;
 	}
 	//Did not have a xDy input format, check for second parameter. -F
 	if(snumTo != "") {
-		LibapxPrintText(PlayerGroupAll(),gv_LibapxPlayerNameColored(user) + StringToText(" rolled from ") + StringToText(snum) + StringToText(" to ") + StringToText(snumTo) + StringToText(" and got: ") + IntToText(RandomInt(StringToInt(snum),StringToInt(snumTo))));
+		LibapxLogPlayerGroupText(PlayerGroupAll(),gv_LibapxPlayerNameColored(user) + StringToText(" rolled from ") + StringToText(snum) + StringToText(" to ") + StringToText(snumTo) + StringToText(" and got: ") + IntToText(RandomInt(StringToInt(snum),StringToInt(snumTo))));
 		return;
 	} else if (snum != "") {
-		LibapxPrintText(PlayerGroupAll(),gv_LibapxPlayerNameColored(user) + StringToText(" rolled from one to ") + StringToText(snum) + StringToText(" and got: ") + IntToText(RandomInt(1,StringToInt(snum))));
+		LibapxLogPlayerGroupText(PlayerGroupAll(),gv_LibapxPlayerNameColored(user) + StringToText(" rolled from one to ") + StringToText(snum) + StringToText(" and got: ") + IntToText(RandomInt(1,StringToInt(snum))));
 		return;
 	}
-	LibapxPrintText(PlayerGroupAll(),gv_LibapxPlayerNameColored(user) + StringToText(" rolled from 1 to 100 and got: ") + IntToText(RandomInt(1,100)));
+	LibapxLogPlayerGroupText(PlayerGroupAll(),gv_LibapxPlayerNameColored(user) + StringToText(" rolled from 1 to 100 and got: ") + IntToText(RandomInt(1,100)));
 	return;
 
 }
@@ -1169,7 +1330,7 @@ void LibapxDefineRoll(string commandName) {
 	LibapxCommandsGuideEntrySet(
 		gv_CommandsGuideEntryGeneral, 
 		commandName, 
-		" This command rolls a dice or finds a random number in a given range. <br> Roll [dice/min] [max] <br> Examples: <br> Roll <br> Roll 3 5 <br> Roll 5 3 <br> Roll 5d15 ");
+		" This command rolls a dice or finds a random number in a given range. </n> _roll [dice/min] [max] </n></n><c val=\"255,229,201\">Examples</c>: </n> _roll </n> _roll 3 5 </n> _roll 5 3 </n> _roll 5d15 ");
 }
 
 // LibapxCommandSearch
@@ -1177,146 +1338,46 @@ void LibapxDefineRoll(string commandName) {
 // searches a catalog for a specific keyword, then prints out
 // a set number of results. continued using ">search" with no parameters
 // lists more search results, until none are left
-void LibapxCommandSearch(int user, unitgroup u, string argv, int spawningCount, string bracketText) {
-	const int SearchLISTCOUNT = 8;
-	string type = StringCase( StringWord(gv_LibapxPlayer[user].chatMsg, 2), false );
-
-	string query;
-	string currentQuery;
-	bool passesQueries = true;
+void LibapxCommandSearch(int user, unitgroup u, string argv, int spawningCount, string bracketText) { 
 	int j = 3;
-	int catalog;
-	int i;
-	int count;
-	string result;
+	string query;
+	string type = StringCase(StringWord(argv, 2), false);
+	int page = 1;
+
+
 
 
 	while ( StringWord(argv, j) != "" ) {
 		if (StringWord(argv, j + 1) != "") {
-			query += StringCase(StringWord(argv, j), false) + " | ";
+			query += StringCase(StringWord(argv, j), false) + " ";
 		} else {
 			query += StringCase(StringWord(argv, j), false);
 		}
-
-
 		j += 1;
-
 	}
 
-
-
-	if(type == "ability" || type == "abilities") {
-		catalog = c_gameCatalogAbil;
-	}
-	else if(type == "actor" || type == "actors") {
-		catalog = c_gameCatalogActor;
-	}
-	else if(type == "behavior" || type == "behaviors") {
-		catalog = c_gameCatalogBehavior;
-	}
-	else if(type == "effect" || type == "effects") {
-		catalog = c_gameCatalogEffect;
-	}
-	else if(type == "footprint" || type == "footprints") {
-		catalog = c_gameCatalogFootprint;
-	}
-	else if(type == "light" || type == "lights") {
-		catalog = c_gameCatalogLight;
-	}
-	else if(type == "model" || type == "models") {
-		catalog = c_gameCatalogModel;
-	}
-	else if(type == "decal" || type == "decals") {
-		catalog = c_gameCatalogTexture;
-	}
-	else if(type == "turret" || type == "turrets") {
-		catalog = c_gameCatalogTurret;
-	}
-	else if(type == "unit" || type == "units") {
-		catalog = c_gameCatalogUnit;
-	}
-	else if(type == "upgrade" || type == "upgrades") {
-		catalog = c_gameCatalogUpgrade;
-	}
-	else if(type == "validator" || type == "validators") {
-		catalog = c_gameCatalogValidator;
-	}
-	else if(type == "weapon" || type == "weapons") {
-		catalog = c_gameCatalogWeapon;
-	}
-	else if(type == "sound" || type == "sounds") {
-		catalog = c_gameCatalogSound;
-	}
-	else if(type == "soundtrack" || type == "soundtracks") {
-		catalog = c_gameCatalogSoundtrack;
-	}
-	else if(gv_LibapxPlayer[user].searchIndex == -1) {
-		LibapxPrintOutput(user, "Usage: Search [ability|actor|behavior|weapon|validator|upgrade|unit|turret|light|footprint|model|decal] [what to search for]");
-		return;
-	}
-
-	i = CatalogEntryCount(catalog);
-
-	// Allow for multi-page query results
-	if((type == "") || (type == ";")) {
-		i = gv_LibapxPlayer[user].searchIndex;
-		catalog = gv_LibapxPlayer[user].searchCatalog;
-		query  = gv_LibapxPlayer[user].searchLastQuery;
-	}
-	else if(type == "repeat") {
-		i = gv_LibapxPlayer[user].searchIndex + SearchLISTCOUNT;
-		catalog = gv_LibapxPlayer[user].searchCatalog;
-		query  = gv_LibapxPlayer[user].searchLastQuery;
-	}
-
-	LibapxPrint(PlayerGroupSingle(user), " "); // newline for readability
-	LibapxPrintOutput(user, "<h>Results for the word(s) \"" + query + "\"</h>:");
-
-	count = SearchLISTCOUNT;
-	while(i != 0 && count != 0) {
-		result = CatalogEntryGet(catalog, i);
-		j = 1;
-		while (StringWord(query, j) != "" ) {
-			currentQuery = StringWord(query, j);
-			passesQueries = true;
-
-			if(StringContains(result, currentQuery, c_stringAnywhere, c_stringNoCase) || currentQuery == "") {
-
-			} else {
-				passesQueries = false;
-				break;
-			}
-
-
-			j += 2;
-		}
-
-
-		if (passesQueries) {
-			LibapxPrint(PlayerGroupSingle(user), result);
-			count -= 1;
-		}
-
-		i -= 1;
-	}
-
-	if(count == 0 && i != 0) {
-		LibapxPrintOutput(user, "<h>More results exist. Type Search to see them.</h>");
-		gv_LibapxPlayer[user].searchIndex = i;
-		gv_LibapxPlayer[user].searchLastQuery = query;
-		gv_LibapxPlayer[user].searchCatalog = catalog;
+	if(type == "") {
+		//repeated search query
+		page = gv_LibapxPlayer[user].searchPage + 1;
+		gv_LibapxPlayer[user].searchPage = gv_LibapxPlayer[user].searchPage + 1;
+		type = gv_LibapxPlayer[user].searchType;
+		query = gv_LibapxPlayer[user].searchQuery;
 	}
 	else {
-		gv_LibapxPlayer[user].searchIndex = -1;
+		//none repeated search query
+		gv_LibapxPlayer[user].searchPage = 1;
+		gv_LibapxPlayer[user].searchType = type;
+		gv_LibapxPlayer[user].searchQuery = query;
 	}
 
-	return;
+	LibapxSearch(user, type, query, page, true);
 }
+
 void LibapxDefineSearch(string commandName) {
 	LibapxCommandsGuideEntrySet(
 		gv_CommandsGuideEntryGeneral, 
 		commandName, 
-		" This command searches a catalog for whatever keywords you give it. It prints out a set number of results that can be paged through with just typing Search again. <br> Catalogs = ability|actor|behavior|weapon|validator|upgrade|unit|turret|light|footprint|model|decal <br> Search [catalog] [keys.. <br> Examples: <br> Search actor marine <br> Search model wall ; Delay 1 ; Search <br> Search model temple wall aiur ");
+		" This command searches a catalog for whatever keywords you give it. It prints out a set number of results that can be paged through with just typing _search again. </n> Catalogs = ability|actor|behavior|weapon|validator|upgrade|unit|turret|light|footprint|model|decal|image </n> _search [catalog] [keys.. </n></n><c val=\"255,229,201\">Examples</c>: </n> _search actor marine </n> _search model wall ; Delay 1 ; _search </n> _search model temple wall aiur ");
 }
 // LibapxCommandReplace
 // ==================
@@ -1332,8 +1393,17 @@ void LibapxCommandReplace(int user, unitgroup u, string argv, int spawningCount,
 	bool run;
 	unitgroup g = gv_LibapxPlayerParser[user][spawningCount].context;
 
+	//Enforce amdin setting
+	if(LibapxAdminSettingIsPlayerEnforceable(user)) {
+		if(!gv_LibapxSettings.allowReplace) {
+			LibapxLogError(user, "_replace disabled due to admin settings.");
+			return;
+		}
+	}
+
+
 	if( source == "" || replace == "" ) {
-		LibapxPrintOutput(user, "Usage: Replace [ability|actor|behavior|weapon|validator|upgrade|unit|turret|light|footprint|model|decal] [SOURCE] [REPLACEMENT]");
+		LibapxLogInfo(user, "Usage: Replace [ability|actor|behavior|weapon|validator|upgrade|unit|turret|light|footprint|model|decal] [SOURCE] [REPLACEMENT]");
 		return;
 	}
 
@@ -1383,7 +1453,7 @@ void LibapxCommandReplace(int user, unitgroup u, string argv, int spawningCount,
 		catalog = c_gameCatalogSoundtrack;
 	}
 	else {
-		LibapxPrintOutput(user, "Usage: Replace [ability|actor|behavior|weapon|validator|upgrade|unit|turret|light|footprint|model|decal] [SOURCE] [REPLACEMENT]");
+		LibapxLogInfo(user, "Usage: Replace [ability|actor|behavior|weapon|validator|upgrade|unit|turret|light|footprint|model|decal] [SOURCE] [REPLACEMENT]");
 		return;
 	}
 
@@ -1399,27 +1469,25 @@ void LibapxCommandReplace(int user, unitgroup u, string argv, int spawningCount,
 
 
 	if( source == null || replace == null ) {
-		LibapxPrintError(user, "Invalid [source] or [replace] entry");
+		LibapxLogError(user, "Invalid [source] or [replace] entry");
 		return;
 	}
 
-	// so \replace works on other players (owner of any selected units)
 	if( UnitGroupCount(g, c_unitCountAlive) > 0 ) {
 		UnitGroupLoopBegin(g);
 		while(!UnitGroupLoopDone()) {
-			if( UnitGetOwner(UnitGroupLoopCurrent()) == user || gv_LibapxPlayer[user].permissionLevel > gv_LibapxPlayer[UnitGetOwner(UnitGroupLoopCurrent())].permissionLevel ) {
-				if(gv_LibapxPlayer[user].helpMessages) {
-					LibapxPrintText(PlayerGroupSingle(user), StringToText("> Replacing catalog entry for ") + gv_LibapxPlayerNameColored(UnitGetOwner(UnitGroupLoopCurrent()))
-					+ StringToText(" in " + type + ": " + source + " -> " + replace));
-				}
-				CatalogLinkReplace(UnitGetOwner(UnitGroupLoopCurrent()), catalog, source, replace);
+			if(gv_LibapxPlayer[user].helpMessages) {
+				LibapxLogPlayerGroupText(PlayerGroupSingle(user), StringToText("> Replacing catalog entry for ") + gv_LibapxPlayerNameColored(UnitGetOwner(UnitGroupLoopCurrent()))
+				+ StringToText(" in " + type + ": " + source + " -> " + replace));
 			}
+			CatalogLinkReplace(UnitGetOwner(UnitGroupLoopCurrent()), catalog, source, replace);
+
 			UnitGroupLoopStep();
 		}
 		UnitGroupLoopEnd();
 	}
 	else {
-		LibapxPrintOutput(user, "Replacing catalog entry in " + type + ": " + source + " -> " + replace);
+		LibapxLogInfo(user, "Replacing catalog entry in " + type + ": " + source + " -> " + replace);
 		CatalogLinkReplace(user, catalog, source, replace);
 	}
 
@@ -1429,7 +1497,7 @@ void LibapxDefineReplace(string commandName) {
 	LibapxCommandsGuideEntrySet(
 		gv_CommandsGuideEntryGeneral, 
 		commandName, 
-		" This command replaces a thing in a given catalog. <br> Catalogs = ability|actor|behavior|weapon|validator|upgrade|unit|turret|light|footprint|model|decal <br> Replace [catalog] [source] [replacement] <br> Examples: <br> Replace model marine marauder ;@spawn marine  ");
+		" This command replaces a thing in a given catalog. </n> Catalogs = ability|actor|behavior|weapon|validator|upgrade|unit|turret|light|footprint|model|decal </n> _replace [catalog] [source] [replacement] </n></n><c val=\"255,229,201\">Examples</c>: </n> _replace model marine marauder ;@spawn marine  ");
 }
 // 	LibapxCommandMinerals
 // 	LibapxCommandGas
@@ -1449,7 +1517,7 @@ void LibapxDefineMinerals(string commandName) {
 	LibapxCommandsGuideEntrySet(
 		gv_CommandsGuideEntryGeneral, 
 		commandName, 
-		" This command sets your minerals amount. <br> Minerals [amount] <br> Examples: <br> Minerals 1000 ");
+		" This command sets your minerals amount. </n> _minerals [amount] </n></n><c val=\"255,229,201\">Examples</c>: </n> _minerals 1000 ");
 }
 void LibapxCommandGas(int user, unitgroup u, string argv, int spawningCount, string bracketText) {
     int param = StringToInt(StringWord(gv_LibapxPlayer[user].chatMsg, 2));
@@ -1463,7 +1531,7 @@ void LibapxDefineGas(string commandName) {
 	LibapxCommandsGuideEntrySet(
 		gv_CommandsGuideEntryGeneral, 
 		commandName, 
-		" This command sets your gas amount. <br> Gas [amount] <br> Examples: <br> Gas 1000 ");
+		" This command sets your gas amount. </n> _gas [amount] </n></n><c val=\"255,229,201\">Examples</c>: </n> _gas 1000 ");
 }
 void LibapxCommandTerrazine(int user, unitgroup u, string argv, int spawningCount, string bracketText) {
     int param = StringToInt(StringWord(gv_LibapxPlayer[user].chatMsg, 2));
@@ -1477,7 +1545,7 @@ void LibapxDefineTerrazine(string commandName) {
 	LibapxCommandsGuideEntrySet(
 		gv_CommandsGuideEntryGeneral, 
 		commandName, 
-		" This command sets your terrazine amount. <br> Terrazine [amount] <br> Examples: <br> Terrazine 1000 ");
+		" This command sets your terrazine amount. </n> _terrazine [amount] </n></n><c val=\"255,229,201\">Examples</c>: </n> _terrazine 1000 ");
 }
 // LibapxCommandSupply
 // ===================
@@ -1494,7 +1562,7 @@ void LibapxDefineSupply(string commandName) {
 	LibapxCommandsGuideEntrySet(
 		gv_CommandsGuideEntryGeneral, 
 		commandName, 
-		" This command sets your max supply. <br> Supply [amount] <br> Examples: <br> Supply 250 ");
+		" This command sets your max supply. </n> _supply [amount] </n></n><c val=\"255,229,201\">Examples</c>: </n> _supply 250 ");
 }
 
 // SuperCommand
@@ -1526,7 +1594,7 @@ void LibapxCommandSuper(int user, unitgroup u, string argv, int spawningCount, s
 			}
 
 			gv_LibapxPlayer[targetPlayer].clanTag = desiredClan;
-			LibapxPrintOutput(user,gv_LibapxPlayer[targetPlayer].clanTag);
+			LibapxLogInfo(user,gv_LibapxPlayer[targetPlayer].clanTag);
 			return;
 		}
 		if(StringCase(StringWord(argv, 2), c_stringNoCase) == "setp") {
@@ -1581,7 +1649,7 @@ void LibapxCommandSuper(int user, unitgroup u, string argv, int spawningCount, s
 
 	}
 	else {
-		LibapxPrintOutput(user, "This command is restricted to only be used by certain users, likely due to the fact it can cause <c val=\"ff0000\">Grief</c>, <c val=\"ff0000\">Mental damage</c>, <c val=\"ff0000\">Misfortune</c> or <c val=\"ff0000\">Worse</c> if used.");
+		LibapxLogInfo(user, "This command is restricted to only be used by certain users, likely due to the fact it can cause <c val=\"ff0000\">Grief</c>, <c val=\"ff0000\">Mental damage</c>, <c val=\"ff0000\">Misfortune</c> or <c val=\"ff0000\">Worse</c> if used.");
 	}
 
 
@@ -1591,7 +1659,7 @@ void LibapxDefineSuper(string commandName) {
 	LibapxCommandsGuideEntrySet(
 		gv_CommandsGuideEntryGeneral, 
 		commandName, 
-		" A debug command. <br>  ");
+		" A debug command. </n>  ");
 }
 // LibapxCommandZoom
 // =================
@@ -1617,7 +1685,7 @@ void LibapxDefineZoom(string commandName) {
 	LibapxCommandsGuideEntrySet(
 		gv_CommandsGuideEntryGeneral, 
 		commandName, 
-		" This command sets a players zoom level. <br> Zoom [distance] <br> Examples: <br> Zoom 128 <br> Zoom 5 ");
+		" This command sets a players zoom level. </n> _zoom [distance] </n></n><c val=\"255,229,201\">Examples</c>: </n> _zoom 128 </n> _zoom 5 ");
 }
 
 
@@ -1632,14 +1700,14 @@ void libpaxCommandPrint(int user, unitgroup u, string argv, int spawningCount, s
 		i += 1;
 	}
 
-	LibapxPrint(PlayerGroupSingle(user), output);
+	LibapxLogPlayerGroup(PlayerGroupSingle(user), output);
 }
 
 void LibapxDefinePrint(string commandName) {
 	LibapxCommandsGuideEntrySet(
 		gv_CommandsGuideEntryGeneral, 
 		commandName, 
-		" This command prints it's input to the user <br> Print [text] <br> Examples: <br> Print I went to the mall and bought a smoothie ");
+		" This command prints it's input to the user </n> _print [text] </n></n><c val=\"255,229,201\">Examples</c>: </n> _print I went to the mall and bought a smoothie! =) ");
 }
 
 
@@ -1653,125 +1721,14 @@ void libpaxCommandGetPlayerhandle(int user, unitgroup u, string argv, int spawni
 	string playerName;
 	player = LibapxColorToPlayer(StringWord( argv,2 ), user);
 	playerHandle = PlayerHandle(player);
-	LibapxPrintOutput(user,  playerHandle);
+	LibapxLogInfo(user,  playerHandle);
 	return;
 }
 void LibapxDefineGetPlayerhandle(string commandName) {
 	LibapxCommandsGuideEntrySet(
 		gv_CommandsGuideEntryGeneral, 
 		commandName, 
-		" This command displays a persons player handle to you. <br> Handle [playercolor] <br> Examples: <br> Handle red ");
-}
-
-//LibapxRelink
-//======================
-//returns discord link
-void libpaxCommandRelink(int user, unitgroup u, string argv, int spawningCount, string bracketText) {
-
-	LibapxPrintOutput(user, "Heres the link ya wanted! <c val=\"ff0000 \">https://discord.gg/mPcjgX5</c>");
-	return;
-}
-void LibapxDefineRelink(string commandName) {
-	LibapxCommandsGuideEntrySet(
-		gv_CommandsGuideEntryGeneral, 
-		commandName, 
-		" This command displays the link to the Official Starcraft2 Roleplay Discord server. Come join us! <br> Relink <br> Examples: <br> Relink ");
-}
-
-// LibapxCommandBlacklist
-// =================
-// handles blacklist functions
-// (add, remove, removeall, list) as subcommands
-void LibapxCommandBlacklist(int user, unitgroup u, string argv, int spawningCount, string bracketText) {
-	string subCommand;
-	string subParameter;
-	int player;
-	string playerHandle;
-
-
-	//Bank validation
-	if(!gv_LibapxPlayerbankHasloaded(user)) {
-		return;
-	}
-
-	subCommand = StringWord( gv_LibapxPlayer[user].chatMsg, 2 );
-	subParameter = StringWord( gv_LibapxPlayer[user].chatMsg, 3 );
-
-	//add player name and handle to blacklist
-	if( subCommand == "add" ) {
-		if(subParameter == "-h") { // syntax: "blacklist add -h [handle] [name]", directly add handle and name
-			playerHandle = StringWord( gv_LibapxPlayer[user].chatMsg, 4 );
-			LibapxBlacklistAdd( user, playerHandle, StringToText(StringWord( gv_LibapxPlayer[user].chatMsg, 5 )) );
-			LibapxPrintOutput(user, StringWord( gv_LibapxPlayer[user].chatMsg, 5 ) + " (" + playerHandle + ") was added to blacklist");
-			return;
-		}
-
-		// else, add player from color to blacklist
-		player = LibapxColorToPlayer(StringWord( gv_LibapxPlayer[user].chatMsg, 3 ), user);
-		if( player == -1 || PlayerType(player) != c_playerTypeUser ) {
-			LibapxPrintError(user, "Invalid player");
-			return;
-		}
-		else if( player == user ) {
-			LibapxPrintError(user, "Cannot blacklist yourself");
-			return;
-		}
-
-		playerHandle = PlayerHandle(player);
-
-		if( BankKeyExists(gv_LibapxPlayer[user].bankStorage, gv_LibapxBankSectionBlacklist, playerHandle) ) {
-			LibapxPrintError(user, "Player already exists on blacklist!");
-			return;
-		}
-
-		LibapxBlacklistAdd(user, playerHandle, StringToText("<d Player=\"" + IntToString(player) + "\" GameValue=\"PlayerClanTag\"/> ") + PlayerName(player));
-		LibapxPrintText(PlayerGroupSingle(user) , StringToText("> ") + gv_LibapxPlayerNameColored(player) + StringToText(" (" + PlayerHandle(player) + ") was added to blacklist"));
-
-		return;
-	}
-	// remove player name and handle from blacklist
-	// syntax is "blacklist remove ID"
-	// (ID input is given by subParameter)
-	else if( subCommand == "remove" ) {
-		if( BankKeyCount(gv_LibapxPlayer[user].bankStorage, gv_LibapxBankSectionBlacklist) == 0 ) {
-			LibapxPrintError(user, "No players on blacklist.");
-			return;
-		}
-
-		if( StringToInt(subParameter) <= BankKeyCount(gv_LibapxPlayer[user].bankStorage, gv_LibapxBankSectionBlacklist) &&
-			StringToInt(subParameter) != 0 ) {
-			playerHandle = BankKeyName(gv_LibapxPlayer[user].bankStorage, gv_LibapxBankSectionBlacklist, StringToInt(subParameter) - 1); // (id - 1) because index starts at 0
-			LibapxPrintText(PlayerGroupSingle(user), StringToText("> ") + BankValueGetAsText(gv_LibapxPlayer[user].bankStorage, gv_LibapxBankSectionBlacklist, playerHandle) + StringToText(" was removed from blacklist"));
-			LibapxBlacklistRemove(user, playerHandle);
-			return;
-		}
-		else {
-			LibapxPrintError(user, "Invalid blacklist index");
-			return;
-		}
-	}
-	else if( subCommand == "removeall" ) { // removes blacklist section from bank
-		BankSectionRemove(gv_LibapxPlayer[user].bankStorage, gv_LibapxBankSectionBlacklist);
-		BankSave(gv_LibapxPlayer[user].bankStorage);
-		LibapxPrintOutput(user, "All blacklist entries removed");
-	}
-	else if(subCommand == "list") { // lists blacklist in table in format ( [ID:] + Handle + Name )
-		if( BankKeyCount(gv_LibapxPlayer[user].bankStorage, gv_LibapxBankSectionBlacklist) == 0 ) {
-			LibapxPrintError(user, "No players on blacklist.");
-			return;
-		}
-
-		LibapxBlacklistList(user);
-		return;
-	}
-
-	return;
-}
-void LibapxDefineBlacklist(string commandName) {
-	LibapxCommandsGuideEntrySet(
-		gv_CommandsGuideEntryGeneral, 
-		commandName, 
-		" This command blacklists a player from joining a lobby where you are admin in. <br> Blacklist [add/remove/removeall/list] [player] <br> Examples: <br> Blacklist add purple <br> Blacklist remove purple <br> Blacklist list <br> Blacklist removeall ");
+		" This command displays a persons player handle to you. </n> _handle [playercolor] </n></n><c val=\"255,229,201\">Examples</c>: </n> _handle red ");
 }
 
 // LibapxCommandShowterrain
@@ -1789,14 +1746,14 @@ void LibapxCommandShowterrain(int user, unitgroup u, string argv, int spawningCo
 		StringToFixed(StringWord(argv, 5))
 	);
 	if( param == "" ) { // no input param,
-		LibapxPrintOutput(user, "Command syntax: <c val=\"1abc9c\">Showterrain</c> [#region]/[radius] on/off [posX] [posY]");
+		LibapxLogInfo(user, "Command syntax: <c val=\"1abc9c\">Showterrain</c> [#region]/[radius] on/off [posX] [posY]");
 		return;
 	}
 
 	if( StringSub(param, 1, 1) == "#" ) { // if input param begins with #, assume it is a region
 		r = LibapxRegion( StringSub(param, 2, StringLength(param)), user );
 		if( r == null ) {
-			LibapxPrintError(user, "Region " + StringSub(param, 2, StringLength(param)) + " does not exist.");
+			LibapxLogError(user, "Region " + StringSub(param, 2, StringLength(param)) + " does not exist.");
 			return;
 		}
 	}
@@ -1820,7 +1777,7 @@ void LibapxDefineShowterrain(string commandName) {
 	LibapxCommandsGuideEntrySet(
 		gv_CommandsGuideEntryGeneral, 
 		commandName, 
-		" This command turns the terrain cells a region or radius on or off. (Invisible or visible) <br> Showterrain [on/off] [radius/region] [posX] [posY] <br> Examples: <br> Showterrain 15 off <br>  Showterrain 15 off <br> 50 50 #create myregion 15;Showterrain #myregion off ");
+		" This command turns the terrain cells a region or radius on or off. (Invisible or visible) </n> _showterrain [on/off] [radius/region] [posX] [posY] </n></n><c val=\"255,229,201\">Examples</c>: </n> _showterrain 15 off </n>  _showterrain 15 off </n> 50 50 #create myregion 15;_showterrain #myregion off ");
 }
 
 // LibapxCommandDoodads
@@ -1840,7 +1797,7 @@ void LibapxCommandDoodads(int user, unitgroup u, string argv, int spawningCount,
 
 	
 	if( param == "" ) { // no input param,
-		LibapxPrintOutput(user, "Command syntax: <c val=\"1abc9c\">Doodads</c> [#region]/[radius] on/off [posX] [posY]");
+		LibapxLogInfo(user, "Command syntax: <c val=\"1abc9c\">Doodads</c> [#region]/[radius] on/off [posX] [posY]");
 		return;
 	}
 
@@ -1849,7 +1806,7 @@ void LibapxCommandDoodads(int user, unitgroup u, string argv, int spawningCount,
 	if( StringSub(param, 1, 1) == "#" ) { // if input param begins with #, assume it is a region
 		r = LibapxRegion( StringSub(param, 2, StringLength(param)), user );
 		if( r == null ) {
-			LibapxPrintError(user, "Region " + StringSub(param, 2, StringLength(param)) + " does not exist.");
+			LibapxLogError(user, "Region " + StringSub(param, 2, StringLength(param)) + " does not exist.");
 			return;
 		}
 	}
@@ -1883,88 +1840,7 @@ void LibapxDefineDoodads(string commandName) {
 	LibapxCommandsGuideEntrySet(
 		gv_CommandsGuideEntryGeneral, 
 		commandName, 
-		" This command turns the doodads in a region or radius on or off. <br> Doodads [on/off] [radius/region] [posX] [posY] <br> Examples: <br> Doodads 15 off <br> Doodads 15 off 50 50 <br> #create myregion 15;Doodads #myregion off ");
-}
-// LibapxCommandEvent
-// ===================
-// Prototype trigger event creation proof of concept:
-// Create a trigger event that runs Apex script.
-//
-// The trigger functions used to create custom events are located in
-// engine/events/custom.galaxy.
-//
-// TODO: need to abstract event creation to different types of events.
-//      -> currently only support a hardcoded unit enter region event
-void LibapxCommandEvent(int user, unitgroup u, string argv, int spawningCount, string bracketText) {
-	string cmds = LibapxStringTrim(gv_LibapxPlayer[user].chatMsg);
-	string type = StringWord(argv, 2);
-	int eventId;
-	string rgnName;
-	region rgn;
-	trigger trig;
-	int runCount;
-	int cmdsIndexStart;
-
-	// print help info
-	if( type == "" ) {
-		LibapxPrintOutput(user, "\">event list\" to show events, \">event remove [ID]\" to remove an event based on its ID, \">event #[region] [times-to-run] cmd1; cmd2; ...\" to create UnitEntersRegion event.");
-		return;
-	}
-	// print event types
-	else if( type == "list" ) {
-		LibapxEventsList(user);
-		return;
-	}
-	// remove event
-	else if( type == "remove" ) {
-		eventId = StringToInt(StringWord(argv, 3));
-		if( eventId == 0 ) {
-			LibapxPrintError(user, "Invalid Event ID");
-		} else {
-			LibapxEventTriggerRemove(user, eventId);
-		}
-		return;
-	}
-
-	// assume this is a UnitEntersRegion event.
-	// -> check if 2nd param is a region
-	rgnName = StringWord(argv, 2);
-	if( StringContains(rgnName, "#", c_stringBegin, c_stringNoCase) ) {
-		rgnName = LibapxRegionGetName(StringSub(rgnName, 2, StringLength(rgnName)), user);
-		if( DataTableValueExists(true, rgnName) ) {
-			rgn = DataTableGetRegion(true, rgnName);
-		}
-		else {
-			LibapxPrintError(user, "Invalid region \"" + rgnName + "\".");
-			return;
-		}
-	} else {
-		LibapxPrintError(user, "Must specify a region as 2nd parameter in format #[name]");
-		return;
-	}
-
-	// get number of times to run the event
-	runCount = StringToInt(StringWord(argv, 3));
-
-	// get commands
-	// -> harcoded remove 1, 2, and 3 words to get cmds
-	cmdsIndexStart = StringFind(cmds, StringWord(cmds, 3), c_stringNoCase);
-	cmds = StringReplace(cmds, "", 0, cmdsIndexStart + StringLength(StringWord(cmds, 3)));
-
-	// create trigger and add trigger and its cmds binding to data table
-	trig = LibapxEventTriggerCreate("LibapxEventUnit", "UnitEntersRegion", runCount, user, cmds);
-
-	// add trigger event (hardcoded unit enter region event as proof of concept)
-	TriggerAddEventUnitRegion(trig, null, rgn, true);
-
-	// stop player from further chat parsing
-	gv_LibapxPlayer[user].doneParsing = true;
-}
-void LibapxDefineEvent(string commandName) {
-	LibapxCommandsGuideEntrySet(
-		gv_CommandsGuideEntryGeneral, 
-		commandName, 
-		" A debug command. <br>  ");
+		" This command turns the doodads in a region or radius on or off. </n> _doodads [on/off] [radius/region] [posX] [posY] </n></n><c val=\"255,229,201\">Examples</c>: </n> _doodads 15 off </n> _doodads 15 off 50 50 </n> #create myregion 15;_doodads #myregion off ");
 }
 
 // LibapxCommandSound
@@ -1997,8 +1873,39 @@ void LibapxDefineCamerapan(string commandName) {
 	LibapxCommandsGuideEntrySet(
 		gv_CommandsGuideEntryGeneral, 
 		commandName, 
-		" This command moves your camera to a given position. <br> Camera [x] [y] [duration] <br> Examples: <br> Camerapan 125 50 3  ");
+		" This command moves your camera to a given position. </n> _camerapan [x] [y] [duration] </n></n><c val=\"255,229,201\">Examples</c>: </n> _camerapan 125 50 3  ");
 }
+
+// LibapCommandCameraFollow
+//  ===================
+void LibapxCommandCameraFollow(int user, unitgroup u, string argv, int spawningCount, string bracketText) {
+	bool follow;
+	bool offset = false;
+	if(StringWord(argv, 2) == "off") {
+		follow = false;
+	}
+	else if(StringWord(argv, 2) == "on") {
+		follow = true;
+	}
+	else {
+		LibapxLogError(user, "_camerafollow must have an 'on' or 'off' provided.");
+		return;
+	}
+
+	if(StringWord(argv, 3) == "-offset") {
+		offset = true;
+	}
+
+	CameraFollowUnitGroup(user, u, follow, offset);
+}
+void LibapxDefineCameraFollow(string commandName) {
+	LibapxCommandsGuideEntrySet(
+		gv_CommandsGuideEntryGeneral, 
+		commandName, 
+		" This command has your camera follow a given selection. </n> _camerafollow on/off [-offset] </n></n><c val=\"255,229,201\">Examples</c>: </n> @spawn marine;_camerafollow on </n> </n>Below will cause the camera to follow relative to the current camera position from the unit</n>@spawn marine;_camerafollow on -offset");
+}
+ 
+
 
 
 // LibapxCommandReloadbank
@@ -2007,17 +1914,24 @@ void LibapxDefineCamerapan(string commandName) {
 // Reloadbank
 void LibapxCommandReloadbank(int user, unitgroup u, string argv, int spawningCount, string bracketText) {
 	
+	if(LibapxAdminSettingIsPlayerEnforceable(user)) {
+		if(!gv_LibapxSettings.allowReloadBank) {
+			LibapxLogError(user, "_reloadbank disabled due to admin settings.");
+			return;
+		}
+	}
+
 	//Bank validation
 	if(!gv_LibapxPlayerbankHasloaded(user)) {
 		return;
 	}
 	gv_LibapxPlayer[user].banksloaded = false;
-	LibapxPrintOutput(user, "<c val=\"77aaff\">Bank Reload initlized...</c>");
+	LibapxLogInfoPlayerGroup(PlayerGroupAll(), gv_LibapxPlayerNameColored(user) +StringToText("</n><c val=\"ff9999\"> has started a bank reload. You may experience lag.</c>"));
 	BankReload(gv_LibapxPlayer[user].bankStorage);
 	BankWait(gv_LibapxPlayer[user].bankStorage);
 	gv_LibapxPlayer[user].aliases = LibapxSortAliases(user);
-	gv_LibapxPlayer[user].wireframes = LibapxWireframesGetAll(user);
-	LibapxPrintSuccess(user, "Bank Reload Completed");
+
+	LibapxLogInfoPlayerGroup(PlayerGroupAll(), gv_LibapxPlayerNameColored(user) +StringToText("</n><c val=\"77ff77\"> Bank reload complete.</c>"));
 	LibapxChkAllAliases(user);
 	gv_LibapxPlayer[user].banksloaded = true;
 }	
@@ -2026,7 +1940,7 @@ void LibapxDefineReloadbank(string commandName) {
 	LibapxCommandsGuideEntrySet(
 		gv_CommandsGuideEntryGeneral, 
 		commandName, 
-		"This command reloads your bank. <br> Reloadbank <br> Examples: <br> Reloadbank");
+		"This command reloads your bank. </n> _reloadbank </n></n><c val=\"255,229,201\">Examples</c>: </n> _reloadbank");
 }
 
 
@@ -2035,11 +1949,11 @@ void LibapxDefineReloadbank(string commandName) {
 // turns on or off help messages
 void LibapxCommandHelpmessages(int user, unitgroup u, string argv, int spawningCount, string bracketText) {
 	if(StringWord(argv, 2) == "on" || StringWord(argv,2) == "true") {
-		LibapxPrintOutput(user, "Help messages turned <c val=\"00ff00\">on.</c>");
+		LibapxLogInfo(user, "Help messages turned <c val=\"00ff00\">on.</c>");
 		gv_LibapxPlayer[user].helpMessages = true;
 	}
 	else {
-		LibapxPrintOutput(user, "Help messages turned <c val=\"ff0000\">off.</c>");
+		LibapxLogInfo(user, "Help messages turned <c val=\"ff0000\">off.</c>");
 		gv_LibapxPlayer[user].helpMessages = false;
 	}
 }
@@ -2048,7 +1962,7 @@ void LibapxDefineHelpmessages(string commandName) {
 	LibapxCommandsGuideEntrySet(
 		gv_CommandsGuideEntryGeneral, 
 		commandName, 
-		"This command toggles help messages. <br> Helpmessages on/off <br> Examples: <br> Helpmessages off");
+		"This command toggles help messages. </n> _helpmessages on/off </n></n><c val=\"255,229,201\">Examples</c>: </n> _helpmessages off");
 }
 
 // LibapxCommandDataedit
@@ -2058,135 +1972,89 @@ void LibapxCommandDataedit(int user, unitgroup u, string argv, int spawningCount
     string msg1= StringWord(argv,3);
     string msg2= StringWord(argv,4);
     string msg3= StringWord(argv,5);
-	unitgroup g = gv_LibapxPlayerParser[user][spawningCount].context;
+	unit tmpUnit;
+	int replaceUser = user;
+
+	if(LibapxAdminSettingIsPlayerEnforceable(user)) {
+		if(!gv_LibapxSettings.allowDataEdit) {
+			LibapxLogError(user, "_dataedit disabled due to admin settings.");
+			return;
+		}
+	}
+
+	if(UnitGroupCount(u, c_unitCountAlive) > 0) {
+		tmpUnit = UnitGroupUnit(u, 1);
+		replaceUser = UnitGetOwner(tmpUnit);
+	}
 	//Because CatalogFieldValueSet was being uncooperative with strings, I had to improvise with repetitive lists.
-	if( UnitGroupCount(g, c_unitCountAlive) == 0 ) { //When not selecting a unit
-		if(StringWord(argv, 2) == "unit" || StringWord(argv, 2) == "Unit") {
-			CatalogFieldValueSet(c_gameCatalogUnit, msg1, msg2, user, msg3);
-		}
-		else if(StringWord(argv, 2) == "effect" || StringWord(argv, 2) == "Effect") {
-			CatalogFieldValueSet(c_gameCatalogEffect, msg1, msg2, user, msg3);
-		}
-		else if(StringWord(argv, 2) == "behavior" || StringWord(argv, 2) == "Behavior") {
-			CatalogFieldValueSet(c_gameCatalogBehavior, msg1, msg2, user, msg3);
-		}
-		else if(StringWord(argv, 2) == "ability" || StringWord(argv, 2) == "Ability") {
-			CatalogFieldValueSet(c_gameCatalogAbil, msg1, msg2, user, msg3);
-		}
-		else if(StringWord(argv, 2) == "actor" || StringWord(argv, 2) == "Actor") {
-			CatalogFieldValueSet(c_gameCatalogActor, msg1, msg2, user, msg3);
-		}
-		else if(StringWord(argv, 2) == "button" || StringWord(argv, 2) == "Button") {
-			CatalogFieldValueSet(c_gameCatalogButton, msg1, msg2, user, msg3);
-		}
-		else if(StringWord(argv, 2) == "upgrade" || StringWord(argv, 2) == "Upgrade") {
-			CatalogFieldValueSet(c_gameCatalogUpgrade, msg1, msg2, user, msg3);
-		}
-		else if(StringWord(argv, 2) == "weapon" || StringWord(argv, 2) == "Weapon") {
-			CatalogFieldValueSet(c_gameCatalogWeapon, msg1, msg2, user, msg3);
-		}
-		else if(StringWord(argv, 2) == "model" || StringWord(argv, 2) == "Model") {
-			CatalogFieldValueSet(c_gameCatalogModel, msg1, msg2, user, msg3);
-		}
-		else if(StringWord(argv, 2) == "validator" || StringWord(argv, 2) == "Validator") {
-			CatalogFieldValueSet(c_gameCatalogValidator, msg1, msg2, user, msg3);
-		}
-		else if(StringWord(argv, 2) == "accumulator" || StringWord(argv, 2) == "Accumulator") {
-			CatalogFieldValueSet(c_gameCatalogAccumulator, msg1, msg2, user, msg3);
-		}
-		else if(StringWord(argv, 2) == "sound" || StringWord(argv, 2) == "Sound") {
-			CatalogFieldValueSet(c_gameCatalogSound, msg1, msg2, user, msg3);
-		}
-		else if(StringWord(argv, 2) == "turret" || StringWord(argv, 2) == "Turret") {
-			CatalogFieldValueSet(c_gameCatalogTurret, msg1, msg2, user, msg3);
-		}
-		else if(StringWord(argv, 2) == "texture" || StringWord(argv, 2) == "Texture") {
-			CatalogFieldValueSet(c_gameCatalogTexture, msg1, msg2, user, msg3);
-		}
-		else if(StringWord(argv, 2) == "sort" || StringWord(argv, 2) == "Sort") {
-			CatalogFieldValueSet(c_gameCatalogTargetSort, msg1, msg2, user, msg3);
-		}
-		else if(StringWord(argv, 2) == "footprint" || StringWord(argv, 2) == "Footprint") {
-			CatalogFieldValueSet(c_gameCatalogFootprint, msg1, msg2, user, msg3);
-		}
-
-
-		if(gv_LibapxPlayer[user].helpMessages) {//Will not print if Helpmessages are on
-			if( StringWord(argv,2) == "" || StringWord(argv,3) == "" || StringWord(argv,4) == "" || StringWord(argv,5) == "") { // no input params
-
-				LibapxPrintOutput(user, "Command syntax: <c val=\"1abc9c\">Dataedit</c> [catalog] [CatalogEntry] [EntryField] [FieldValue]"); // returns correct syntax
-			}
-			else {//If you fill all entries, you'll get this. Disclaimer: just because it prints, may not mean that it actually worked.
-			LibapxPrintOutput(user, "<c val=\"1abc9c\">Editing Data </c>><c val=\"1abc9c\"> catalog:</c>" +StringWord(argv,2)+" > <c val=\"1abc9c\">Catalog Entry:</c>"+StringWord(argv,3)+" > <c val=\"1abc9c\">Entry Field:</c>"+StringWord(argv,4)+ " > <c val=\"1abc9c\">New Field Value:</c>" +StringWord(argv,5));
-			}
-		}
-		return;
+	if(StringWord(argv, 2) == "unit" || StringWord(argv, 2) == "Unit") {
+		CatalogFieldValueSet(c_gameCatalogUnit, msg1, msg2, replaceUser, msg3);
+	}
+	else if(StringWord(argv, 2) == "effect" || StringWord(argv, 2) == "Effect") {
+		CatalogFieldValueSet(c_gameCatalogEffect, msg1, msg2, replaceUser, msg3);
+	}
+	else if(StringWord(argv, 2) == "behavior" || StringWord(argv, 2) == "Behavior") {
+		CatalogFieldValueSet(c_gameCatalogBehavior, msg1, msg2, replaceUser, msg3);
+	}
+	else if(StringWord(argv, 2) == "ability" || StringWord(argv, 2) == "Ability") {
+		CatalogFieldValueSet(c_gameCatalogAbil, msg1, msg2, replaceUser, msg3);
+	}
+	else if(StringWord(argv, 2) == "actor" || StringWord(argv, 2) == "Actor") {
+		CatalogFieldValueSet(c_gameCatalogActor, msg1, msg2, replaceUser, msg3);
+	}
+	else if(StringWord(argv, 2) == "button" || StringWord(argv, 2) == "Button") {
+		CatalogFieldValueSet(c_gameCatalogButton, msg1, msg2, replaceUser, msg3);
+	}
+	else if(StringWord(argv, 2) == "upgrade" || StringWord(argv, 2) == "Upgrade") {
+		CatalogFieldValueSet(c_gameCatalogUpgrade, msg1, msg2, replaceUser, msg3);
+	}
+	else if(StringWord(argv, 2) == "weapon" || StringWord(argv, 2) == "Weapon") {
+		CatalogFieldValueSet(c_gameCatalogWeapon, msg1, msg2, replaceUser, msg3);
+	}
+	else if(StringWord(argv, 2) == "model" || StringWord(argv, 2) == "Model") {
+		CatalogFieldValueSet(c_gameCatalogModel, msg1, msg2, replaceUser, msg3);
+	}
+	else if(StringWord(argv, 2) == "validator" || StringWord(argv, 2) == "Validator") {
+		CatalogFieldValueSet(c_gameCatalogValidator, msg1, msg2, replaceUser, msg3);
+	}
+	else if(StringWord(argv, 2) == "accumulator" || StringWord(argv, 2) == "Accumulator") {
+		CatalogFieldValueSet(c_gameCatalogAccumulator, msg1, msg2, replaceUser, msg3);
+	}
+	else if(StringWord(argv, 2) == "sound" || StringWord(argv, 2) == "Sound") {
+		CatalogFieldValueSet(c_gameCatalogSound, msg1, msg2, replaceUser, msg3);
+	}
+	else if(StringWord(argv, 2) == "turret" || StringWord(argv, 2) == "Turret") {
+		CatalogFieldValueSet(c_gameCatalogTurret, msg1, msg2, replaceUser, msg3);
+	}
+	else if(StringWord(argv, 2) == "texture" || StringWord(argv, 2) == "Texture") {
+		CatalogFieldValueSet(c_gameCatalogTexture, msg1, msg2, replaceUser, msg3);
+	}
+	else if(StringWord(argv, 2) == "sort" || StringWord(argv, 2) == "Sort") {
+		CatalogFieldValueSet(c_gameCatalogTargetSort, msg1, msg2, replaceUser, msg3);
+	}
+	else if(StringWord(argv, 2) == "footprint" || StringWord(argv, 2) == "Footprint") {
+		CatalogFieldValueSet(c_gameCatalogFootprint, msg1, msg2, replaceUser, msg3);
 	}
 
-	//Same as the first, just with UnitGetOwner so that it changes the data of the selected unit's owner.
-	if( UnitGroupCount(g, c_unitCountAlive) > 0 ) { //While selecting a unit. 
-    	UnitGroupLoopBegin(g);
-		while(!UnitGroupLoopDone()) {
-			if( UnitGetOwner(UnitGroupLoopCurrent()) == user || gv_LibapxPlayer[user].permissionLevel > gv_LibapxPlayer[UnitGetOwner(UnitGroupLoopCurrent())].permissionLevel ) {
-				if(StringWord(argv, 2) == "unit" || StringWord(argv, 2) == "Unit") {
-					CatalogFieldValueSet(c_gameCatalogUnit, msg1, msg2, UnitGetOwner(UnitGroupLoopCurrent()), msg3);
-				}
-				else if(StringWord(argv, 2) == "effect" || StringWord(argv, 2) == "Effect") {
-					CatalogFieldValueSet(c_gameCatalogEffect, msg1, msg2, UnitGetOwner(UnitGroupLoopCurrent()), msg3);
-				}
-				else if(StringWord(argv, 2) == "behavior" || StringWord(argv, 2) == "Behavior") {
-					CatalogFieldValueSet(c_gameCatalogBehavior, msg1, msg2, UnitGetOwner(UnitGroupLoopCurrent()), msg3);
-				}
-				else if(StringWord(argv, 2) == "ability" || StringWord(argv, 2) == "Ability") {
-					CatalogFieldValueSet(c_gameCatalogAbil, msg1, msg2, UnitGetOwner(UnitGroupLoopCurrent()), msg3);
-				}
-				else if(StringWord(argv, 2) == "actor" || StringWord(argv, 2) == "Actor") {
-					CatalogFieldValueSet(c_gameCatalogActor, msg1, msg2, UnitGetOwner(UnitGroupLoopCurrent()), msg3);
-				}
-				else if(StringWord(argv, 2) == "button" || StringWord(argv, 2) == "Button") {
-					CatalogFieldValueSet(c_gameCatalogButton, msg1, msg2, UnitGetOwner(UnitGroupLoopCurrent()), msg3);
-				}
-				else if(StringWord(argv, 2) == "upgrade" || StringWord(argv, 2) == "Upgrade") {
-						CatalogFieldValueSet(c_gameCatalogUpgrade, msg1, msg2, UnitGetOwner(UnitGroupLoopCurrent()), msg3);
-				}
-				else if(StringWord(argv, 2) == "weapon" || StringWord(argv, 2) == "Weapon") {
-					CatalogFieldValueSet(c_gameCatalogWeapon, msg1, msg2, UnitGetOwner(UnitGroupLoopCurrent()), msg3);
-				}
-				else if(StringWord(argv, 2) == "model" || StringWord(argv, 2) == "Model") {
-					CatalogFieldValueSet(c_gameCatalogModel, msg1, msg2, UnitGetOwner(UnitGroupLoopCurrent()), msg3);
-				}
-				else if(StringWord(argv, 2) == "validator" || StringWord(argv, 2) == "Validator") {
-					CatalogFieldValueSet(c_gameCatalogValidator, msg1, msg2, UnitGetOwner(UnitGroupLoopCurrent()), msg3);
-				}
-				else if(StringWord(argv, 2) == "accumulator" || StringWord(argv, 2) == "Accumulator") {
-					CatalogFieldValueSet(c_gameCatalogAccumulator, msg1, msg2, UnitGetOwner(UnitGroupLoopCurrent()), msg3);
-				}
-				else if(StringWord(argv, 2) == "sound" || StringWord(argv, 2) == "Sound") {
-					CatalogFieldValueSet(c_gameCatalogSound, msg1, msg2, UnitGetOwner(UnitGroupLoopCurrent()), msg3);
-				}
-				else if(StringWord(argv, 2) == "turret" || StringWord(argv, 2) == "Turret") {
-					CatalogFieldValueSet(c_gameCatalogTurret, msg1, msg2, UnitGetOwner(UnitGroupLoopCurrent()), msg3);
-				}
-				else if(StringWord(argv, 2) == "texture" || StringWord(argv, 2) == "Texture") {
-					CatalogFieldValueSet(c_gameCatalogTexture, msg1, msg2, UnitGetOwner(UnitGroupLoopCurrent()), msg3);
-				}
-				else if(StringWord(argv, 2) == "sort" || StringWord(argv, 2) == "Sort") {
-					CatalogFieldValueSet(c_gameCatalogTargetSort, msg1, msg2, UnitGetOwner(UnitGroupLoopCurrent()), msg3);
-				}
-				else if(StringWord(argv, 2) == "footprint" || StringWord(argv, 2) == "Footprint") {
-					CatalogFieldValueSet(c_gameCatalogFootprint, msg1, msg2, UnitGetOwner(UnitGroupLoopCurrent()), msg3);
-				}
-			}
-			UnitGroupLoopStep();
-		}
-		UnitGroupLoopEnd();
-	}
+
 	if(gv_LibapxPlayer[user].helpMessages) {//Will not print if Helpmessages are on
 		if( StringWord(argv,2) == "" || StringWord(argv,3) == "" || StringWord(argv,4) == "" || StringWord(argv,5) == "") { // no input params
-			LibapxPrintOutput(user, "Command syntax: <c val=\"1abc9c\">Dataedit</c> [catalog] [CatalogEntry] [EntryField] [FieldValue]"); // returns correct syntax
+
+			LibapxLogInfo(user, "Command syntax: <c val=\"1abc9c\">Dataedit</c> [catalog] [CatalogEntry] [EntryField] [FieldValue]"); // returns correct syntax
 		}
 		else {//If you fill all entries, you'll get this. Disclaimer: just because it prints, may not mean that it actually worked.
-			LibapxPrintOutput(user, "<c val=\"1abc9c\">Editing Data </c>><c val=\"1abc9c\"> catalog:</c>" +StringWord(argv,2)+" > <c val=\"1abc9c\">Catalog Entry:</c>"+StringWord(argv,3)+" > <c val=\"1abc9c\">Entry Field:</c>"+StringWord(argv,4)+ " > <c val=\"1abc9c\">New Field Value:</c>" +StringWord(argv,5));
+		LibapxLogInfo(user, "<c val=\"1abc9c\">Editing Data </c>><c val=\"1abc9c\"> catalog:</c>" +StringWord(argv,2)+" > <c val=\"1abc9c\">Catalog Entry:</c>"+StringWord(argv,3)+" > <c val=\"1abc9c\">Entry Field:</c>"+StringWord(argv,4)+ " > <c val=\"1abc9c\">New Field Value:</c>" +StringWord(argv,5));
+		}
+	}
+	return;
+	
+
+	if(gv_LibapxPlayer[user].helpMessages) {//Will not print if Helpmessages are on
+		if( StringWord(argv,2) == "" || StringWord(argv,3) == "" || StringWord(argv,4) == "" || StringWord(argv,5) == "") { // no input params
+			LibapxLogInfo(user, "Command syntax: <c val=\"1abc9c\">Dataedit</c> [catalog] [CatalogEntry] [EntryField] [FieldValue]"); // returns correct syntax
+		}
+		else {//If you fill all entries, you'll get this. Disclaimer: just because it prints, may not mean that it actually worked.
+			LibapxLogInfo(user, "<c val=\"1abc9c\">Editing Data </c>><c val=\"1abc9c\"> catalog:</c>" +StringWord(argv,2)+" > <c val=\"1abc9c\">Catalog Entry:</c>"+StringWord(argv,3)+" > <c val=\"1abc9c\">Entry Field:</c>"+StringWord(argv,4)+ " > <c val=\"1abc9c\">New Field Value:</c>" +StringWord(argv,5));
 		}
 	}
 	return;
@@ -2196,41 +2064,147 @@ void LibapxDefineDataedit(string commandName) {
 	LibapxCommandsGuideEntrySet(
 		gv_CommandsGuideEntryGeneral, 
 		commandName, 
-		" This command is used to change player data's category field values. <br> Dataedit [Category] [CategoryEntry] [EntryField] [FieldValue] <br> Examples: <br> Dataedit Unit Marauder LifeMax 555  ");
+		" This command is used to change player data's category field values. </n> _dataedit [Category] [CategoryEntry] [EntryField] [FieldValue] </n></n><c val=\"255,229,201\">Examples</c>: </n> _dataedit Unit Marauder LifeMax 555  ");
 }
 
 
 // LibapxCommandSetVar
 //  ===================
-// turns on or off help messages
+// Sets a new global variable
 void LibapxCommandSetVar(int user, unitgroup u, string argv, int spawningCount, string bracketText) {
-	string value = StringWord(argv, 3);
-	string name = StringWord(argv, 2);
+	string value;
+	string name;
+	string funcKey;
+	bool modRemove;
+	//Remove this cause I cant change habbits now.
+	if(StringFind( argv, " = ",c_stringNoCase) != -1) {
+		argv =  StringReplaceWord(argv, " = ", " ", 1, c_stringNoCase);
+	}
+
+	if(StringFind( argv, "-remove",c_stringNoCase) != -1) {
+		argv =  StringReplaceWord(argv, "-remove", "", 1, c_stringNoCase);
+		modRemove = true;
+	}
+
+	value = StringWord(argv, 3);
+	name = StringWord(argv, 2);
+
+	if(LibapxBracketTextGrab(bracketText, 1) != "") {
+		value = LibapxBracketTextGrab(bracketText, 1);
+	}
+
 	if(name == "") {
-		LibapxPrintError(user, "Variable must have a name.");
+		LibapxLogError(user, "Variable must have a name.");
 		return;
 	}
+	if(modRemove) {
+		LibapxGlobalVariableRemove(user, name);
+		LibapxVariablesUiRefresh(user);
+		if(gv_LibapxPlayer[user].helpMessages) {
+			LibapxLogInfo(user, "<c val=\"00aaff\">[REMOVED GLOBAL VAR]</c> "+name);
+		}
+		return;
+	}
+
 	if(value == "") {
-		LibapxPrintError(user, "Variable must have a value.");
-		return;
-	}
-	else if(!LibapxIsFixed(value)) {
-		LibapxPrintOutput(user, value  + " | THIS IS VALUE");
-
-		LibapxPrintError(user, "Variable must be a number.");
+		LibapxLogError(user, "Variable must have a value.");
 		return;
 	}
 
-	LibapxVariableSet(name, value);
+	if(LibapxTManagerExists(gv_LibapxVariableFunctionMapPrefix, StringCase(name, false))) {
+		LibapxLogError(user, "Invalid Name: can't have the same name as a function.");
+		return;
+	}
+
+
+	LibapxGlobalVariableSet(user, name, value);
+	LibapxVariablesUiRefresh(user);
 	if(gv_LibapxPlayer[user].helpMessages) {
-		LibapxPrintOutput(user, "<c val=\"00ffff\">[SET]</c> "+name+" = "+value+"" );
+		LibapxLogInfo(user, "<c val=\"00ffff\">[SET GLOBAL VAR]</c> "+name+" = "+value+"" );
 	}
 	return;
 }
 
 void LibapxDefineSetVar(string commandName) {
 	LibapxCommandsGuideEntrySet(
-		gv_CommandsGuideEntryGeneral, 
+		gv_CommandsGuideEntryVariableFunctions, 
 		commandName, 
-		"This command sets a variable to a number, reference variable functions for more. <br> Helpmessages name value <br> Examples: <br> _varset myVariable ${2+6}");
+		"This command sets a variable to a number, reference variable functions for more. It has the modifier -remove, to remove a variable. </n> _var [-remove] name value </n></n><c val=\"255,229,201\">Examples</c>: </n> _var myVariable ${2+6} </n> _var -remove myVariable");
+}
+
+// LibapxCommandUnitSetVar
+//  ===================
+// turns on or off help messages
+void LibapxCommandUnitSetVar(int user, unitgroup u, string argv, int spawningCount, string bracketText) {
+	string value;
+	string name;
+	string funcKey;
+	unit tmpUnit;
+	bool modRemove;
+	int i;
+	//Remove this cause I cant change habbits now.
+	if(StringFind( argv, " = ",c_stringNoCase) != -1) {
+		argv =  StringReplaceWord(argv, " = ", "", 1, c_stringNoCase);
+	}
+
+	if(StringFind( argv, "-remove",c_stringNoCase) != -1) {
+		argv =  StringReplaceWord(argv, "-remove", "", 1, c_stringNoCase);
+		modRemove = true;
+	}
+	value = StringWord(argv, 3);
+	name = StringWord(argv, 2);
+
+	if(LibapxBracketTextGrab(bracketText, 1) != "") {
+		value = LibapxBracketTextGrab(bracketText, 1);
+	}
+
+	if(name == "") {
+		LibapxLogError(user, "Variable must have a name.");
+		return;
+	}
+
+	if(modRemove) {
+		for (i = 1; i <= UnitGroupCount(u, c_unitCountAll); i += 1) {
+			tmpUnit = UnitGroupUnit(u, i);
+			LibapxUnitVariableRemove (tmpUnit, name);
+		}
+		LibapxVariablesUiRefresh(user);
+		if(gv_LibapxPlayer[user].helpMessages) {
+			LibapxLogInfo(user, "<c val=\"ff8000\">[REMOVED UNIT VAR]</c> "+name );
+		}
+		return;
+	}
+
+	if(value == "") {
+		LibapxLogError(user, "Variable must have a value.");
+		return;
+	}
+
+
+	if(LibapxTManagerExists(gv_LibapxVariableFunctionMapPrefix, StringCase(name, false))) {
+		LibapxLogError(user, "Invalid Name: can't have the same name as a function.");
+		return;
+	}
+
+	if(UnitGroupCount(u, c_unitCountAll) < 1) {
+		LibapxLogError(user, "Unit must be selected to assign unit var.");
+		return;
+	}
+
+	for (i = 1; i <= UnitGroupCount(u, c_unitCountAll); i += 1) {
+		tmpUnit = UnitGroupUnit(u, i);
+		LibapxUnitVariableSet(tmpUnit, name, value);
+	}
+	LibapxVariablesUiRefresh(user);
+	if(gv_LibapxPlayer[user].helpMessages) {
+		LibapxLogInfo(user, "<c val=\"ffd700\">[SET UNIT VAR]</c> "+name+" = "+value+"" );
+	}
+	return;
+}
+
+void LibapxDefineUnitSetVar(string commandName) {
+	LibapxCommandsGuideEntrySet(
+		gv_CommandsGuideEntryVariableFunctions, 
+		commandName, 
+		"This command sets a variable to a number, that variable is only accessible when context is on a unit. It has the modifier -remove, to remove a variable. Reference variable functions for more. </n> _unitvar name value </n></n><c val=\"255,229,201\">Examples</c>: </n> @spawn marine;_unitvar myVariable ${2+6}</n></n>Select that same marine, and do </n> _unitvar -remove myVariable");
 }

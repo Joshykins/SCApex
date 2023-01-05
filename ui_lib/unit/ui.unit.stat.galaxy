@@ -1,0 +1,72 @@
+
+static int gv_StatPanel;
+static int gv_StatText;
+static string lifeColor = "<c val=\"66,226,122\">";
+static string shieldcolor = "<c val=\"59,133,203\">";
+static string energyColor = "<c val=\"147,59,203\">";
+void LibapxUIInitStat() {
+    gv_StatPanel = DialogControlHookupStandard(c_triggerControlTypePanel, "UIContainer/ConsoleUIContainer/ApexUnitStatPanel");
+    gv_StatText = DialogControlHookupStandard(c_triggerControlTypeLabel, "UIContainer/ConsoleUIContainer/ApexUnitStatPanel/ApexStatLabel");
+}
+
+
+void LibapxUIStatUpdate(int p) {
+    unitgroup selected = UnitGroupSelected(p);
+    bool displayStats = true; 
+    unit u;
+    fixed statMax;
+    fixed stat;
+    string output = "";
+    if(UnitGroupCount(selected, c_unitCountAll) > 1 || UnitGroupCount(selected, c_unitCountAll) < 1) {
+        displayStats = false;
+    }
+
+    if(displayStats) {
+        u = UnitGroupUnit(selected, 1);
+        
+        //Life
+        statMax = UnitGetPropertyFixed(u, c_unitPropLifeMax, true);
+        stat = UnitGetPropertyFixed(u, c_unitPropLife, true);
+        if(statMax > 0) {
+            output += lifeColor + FixedToString(stat, 0) + "/" + ""+ FixedToString(statMax, 0) + "</n>";
+        }
+        //Shields
+        statMax = UnitGetPropertyFixed(u, c_unitPropShieldsMax, true);
+        stat = UnitGetPropertyFixed(u, c_unitPropShields, true);
+        if(statMax > 0) {
+            output += shieldcolor + FixedToString(stat, 0) + "/" + ""+ FixedToString(statMax, 0) + "</n>";
+        }
+
+        //Energy
+        statMax = UnitGetPropertyFixed(u, c_unitPropEnergyMax, true);
+        stat = UnitGetPropertyFixed(u, c_unitPropEnergy, true);
+        if(statMax > 0) {
+            output += energyColor + FixedToString(stat, 0) + "/" + ""+ FixedToString(statMax, 0) + "</n>";
+        }
+
+        DialogControlSetPropertyAsBool(
+            gv_StatPanel,
+            c_triggerControlPropertyVisible,
+            PlayerGroupSingle(p),
+            true
+        );
+        DialogControlSetPropertyAsText(
+            gv_StatText,
+            c_triggerControlPropertyText, 
+            PlayerGroupSingle(p),
+            StringToText(output)
+        );
+
+        
+    }
+    else {
+        DialogControlSetPropertyAsBool(
+            gv_StatPanel,
+            c_triggerControlPropertyVisible,
+            PlayerGroupSingle(p),
+            false
+        );
+
+    }
+
+}

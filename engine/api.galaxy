@@ -10,14 +10,14 @@
 
 void LibapxApiStartReading(int p) {
     gv_LibapxPlayer[p].apiReading = true;
-    LibapxPrintOutput(p, "<c val=\"00eeff\">API</c> | Listening");
+    LibapxLogInfo(p, "<c val=\"00eeff\">API</c> | Listening");
 }
 
 void LibapxApiStopReading(int p) {
     string apiString = gv_LibapxPlayer[p].apiStringInput;
     gv_LibapxPlayer[p].apiReading = false;
     gv_LibapxPlayer[p].apiStringInput = "";
-    LibapxPrintOutput(p, "<c val=\"00eeff\">API</c> | Running And Stopping Listening");
+    LibapxLogInfo(p, "<c val=\"00eeff\">API</c> | Running And Stopping Listening");
     LibapxProcessChat( apiString, p, UnitGroupSelected(p));
 }
 
@@ -41,10 +41,10 @@ void libpaxApiUpdate(int p) {
 
         desiredKey = "stream";
         if(!BankKeyExists(gv_LibapxPlayer[p].bankStorage, "Api", desiredKey)) {
-            LibapxPrintOutput(p, "<c val=\"00eeff\">API</c> | Stream Not Found");
+            LibapxLogInfo(p, "<c val=\"00eeff\">API</c> | Stream Not Found");
             BankValueSetFromString(gv_LibapxPlayer[p].bankStorage, "Api", desiredKey, "");
             BankSave(gv_LibapxPlayer[p].bankStorage);
-            LibapxPrintOutput(p, "<c val=\"00eeff\">API</c> | Creating Stream Key");
+            LibapxLogInfo(p, "<c val=\"00eeff\">API</c> | Creating Stream Key");
             return;
         }
         
@@ -58,7 +58,7 @@ void libpaxApiUpdate(int p) {
         }
 
         if(stream == "apiRun") {
-            LibapxPrintOutput(p, "<c val=\"ffee00\">API CMD</c> | Running Buffer");
+            LibapxLogInfo(p, "<c val=\"ffee00\">API CMD</c> | Running Buffer");
             apiString = gv_LibapxPlayer[p].apiStringInput;
             gv_LibapxPlayer[p].apiStringInput = "";
             
@@ -66,12 +66,12 @@ void libpaxApiUpdate(int p) {
             BankSave(gv_LibapxPlayer[p].bankStorage);
             return;
         } else if(stream == "apiStop") {
-            LibapxPrintOutput(p, "<c val=\"ffee00\">API CMD</c> | Running Buffer and Stopping");
+            LibapxLogInfo(p, "<c val=\"ffee00\">API CMD</c> | Running Buffer and Stopping");
             LibapxApiStopReading(p);
             BankSave(gv_LibapxPlayer[p].bankStorage);
             return;
         } else if(stream == "apiLength") {
-            LibapxPrintText(PlayerGroupSingle(p), StringToText("> <c val=\"ffee00\">API CMD</c> | Buffer length ") + FormatNumber(StringLength(gv_LibapxPlayer[p].apiStringInput)));
+            LibapxLogPlayerGroupText(PlayerGroupSingle(p), StringToText("> <c val=\"ffee00\">API CMD</c> | Buffer length ") + FormatNumber(StringLength(gv_LibapxPlayer[p].apiStringInput)));
             
             BankSave(gv_LibapxPlayer[p].bankStorage);
             return;
@@ -82,8 +82,8 @@ void libpaxApiUpdate(int p) {
         gv_LibapxPlayer[p].apiStringInput += stream;
     }
     else {
-        LibapxPrintOutput(p, "<c val=\"00eeff\">API</c> | API Section Not Found");
-        LibapxPrintOutput(p, "<c val=\"00eeff\">API</c> | Creating API Section in <c val=\"ff0000\">ApexBank</c>");
+        LibapxLogInfo(p, "<c val=\"00eeff\">API</c> | API Section Not Found");
+        LibapxLogInfo(p, "<c val=\"00eeff\">API</c> | Creating API Section in <c val=\"ff0000\">ApexBank</c>");
         BankSectionCreate(gv_LibapxPlayer[p].bankStorage, "Api");
     }
     BankSave(gv_LibapxPlayer[p].bankStorage);

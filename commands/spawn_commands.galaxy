@@ -14,7 +14,7 @@
 
 void LibapxCommandSpawn(int user, unitgroup u, string argv, int spawningCount, string bracketText) {
   point spawnPoint = gv_LibapxPlayer[user].mousePosition;
-	int count = StringToInt( StringWord(argv, 2) );
+	int count = StringToInt( "0"+StringWord(argv, 2) );
 	string type = StringWord(argv, 3);
 	region location = null;
 	int player = user;
@@ -45,7 +45,7 @@ void LibapxCommandSpawn(int user, unitgroup u, string argv, int spawningCount, s
 			return;
 		}
 		else {
-			LibapxPrintError(user, "Invalid unit type, or no previous spawn instance");
+			LibapxLogError(user, "Invalid unit type, or no previous spawn instance");
 			return;
 		}
 	}
@@ -59,7 +59,7 @@ void LibapxCommandSpawn(int user, unitgroup u, string argv, int spawningCount, s
 
 	// get unit type
 	if( type == "" ) {
-		LibapxPrintError(user, "INVALID UNIT TYPE");
+		LibapxLogError(user, "INVALID UNIT TYPE");
 		return;
 	}
 
@@ -67,7 +67,7 @@ void LibapxCommandSpawn(int user, unitgroup u, string argv, int spawningCount, s
 		type = UnitTypeFromString(type);
 		//type = librtprCatalogGet( c_gameCatalogUnit, type );
 		if (type == "" || !CatalogEntryIsValid(c_gameCatalogUnit, type) || UnitTypeTestFlag(type, c_unitFlagMissile) ) {
-			LibapxPrintError(user, "INVALID UNIT TYPE");
+			LibapxLogError(user, "INVALID UNIT TYPE");
 			return;
 		}
 	}
@@ -91,7 +91,7 @@ void LibapxCommandSpawn(int user, unitgroup u, string argv, int spawningCount, s
 				spawnPoint = RegionGetCenter(location);
 			}
 			else {
-				LibapxPrintError(user, "No region by name \"" + parameter + "\" exists, defaulting to cursor");
+				LibapxLogError(user, "No region by name \"" + parameter + "\" exists, defaulting to cursor");
 			}
 		}
 		else if( StringContains( StringWord(argv, 4), "@", c_stringBegin, c_stringNoCase) ) {
@@ -99,7 +99,7 @@ void LibapxCommandSpawn(int user, unitgroup u, string argv, int spawningCount, s
 			player = LibapxColorToPlayer( StringSub(parameter, 2, StringLength(parameter)), user );
 			if( player == -1 ) {
 				player = user;
-				LibapxPrintError(user, "Invalid player color, defaulting to self");
+				LibapxLogError(user, "Invalid player color, defaulting to self");
 			}
 		}
 	}
@@ -112,7 +112,7 @@ void LibapxCommandSpawn(int user, unitgroup u, string argv, int spawningCount, s
 				spawnPoint = RegionGetCenter(location);
 			}
 			else {
-				LibapxPrintError(user, "No region by name \"" + parameter + "\" exists, defaulting to cursor");
+				LibapxLogError(user, "No region by name \"" + parameter + "\" exists, defaulting to cursor");
 			}
 		}
 		else if( StringContains( StringWord(argv, 5), "@", c_stringBegin, c_stringNoCase) ) {
@@ -120,7 +120,7 @@ void LibapxCommandSpawn(int user, unitgroup u, string argv, int spawningCount, s
 			player = LibapxColorToPlayer( StringSub(parameter, 2, StringLength(parameter)), user );
 			if( player == -1 ) {
 				player = user;
-				LibapxPrintError(user, "Invalid player color, defaulting to self");
+				LibapxLogError(user, "Invalid player color, defaulting to self");
 			}
 		}
 	}
@@ -150,7 +150,7 @@ void LibapxDefineRegionSpawn(string commandName) {
 	LibapxCommandsGuideEntrySet(
 		gv_CommandsGuideEntryUnit, 
 		commandName, 
-		" This command spawns a unit or units. <br> @spawn [unitname] [amount] <br> Examples: <br> @spawn marauder 3  "
+		" This command spawns a unit or units. </n> @spawn [unitname] [amount] </n></n><c val=\"255,229,201\">Examples</c>: </n> @spawn marauder 3  "
 	);
 }
 //LibapxCommandSpawnPlus
@@ -185,7 +185,7 @@ void LibapxCommandSpawnPlus(int user, unitgroup u, string argv, int spawningCoun
 			return;
 		}
 		else {
-			LibapxPrintError(user, "Invalid unit type, or no previous spawn instance");
+			LibapxLogError(user, "Invalid unit type, or no previous spawn instance");
 			return;
 		}
 	}
@@ -199,7 +199,7 @@ void LibapxCommandSpawnPlus(int user, unitgroup u, string argv, int spawningCoun
 
 	// get unit type
 	if( type == "" ) {
-		LibapxPrintError(user, "INVALID UNIT TYPE");
+		LibapxLogError(user, "INVALID UNIT TYPE");
 		return;
 	}
 
@@ -207,7 +207,7 @@ void LibapxCommandSpawnPlus(int user, unitgroup u, string argv, int spawningCoun
 		type = UnitTypeFromString(type);
 		//type = librtprCatalogGet( c_gameCatalogUnit, type );
 		if (type == "" || !CatalogEntryIsValid(c_gameCatalogUnit, type) || UnitTypeTestFlag(type, c_unitFlagMissile) ) {
-			LibapxPrintError(user, "INVALID UNIT TYPE");
+			LibapxLogError(user, "INVALID UNIT TYPE");
 			return;
 		}
 	}
@@ -215,10 +215,10 @@ void LibapxCommandSpawnPlus(int user, unitgroup u, string argv, int spawningCoun
 	// if count is <= 0, then turn on mouse-click spawning
 	if( count <= 0 ) {
     if(StringFind(type, "colossus", c_stringNoCase) != -1 ) {
-  		LibapxPrintOutput(user, "Spawn+ can't be used with colossus");
+  		LibapxLogInfo(user, "Spawn+ can't be used with colossus");
       return;
   	} else {
-      LibapxPrintOutput(user, "SPAWNING: " + type + "\n(Press [Left Mouse] to place, [ESC] key to cancel.\n" +
+      LibapxLogInfo(user, "SPAWNING: " + type + "\n(Press [Left Mouse] to place, [ESC] key to cancel.\n" +
   							"Hold: [Ctrl] to rotate, [Shift] to scale, [Alt] to change height,\n" +
   							"Hold: [Right Mouse] to lock position)");
   		LibapxSpawnCreateSplat(type, user,  spawningCount);
@@ -244,7 +244,7 @@ void LibapxCommandSpawnPlus(int user, unitgroup u, string argv, int spawningCoun
 				spawnPoint = RegionGetCenter(location);
 			}
 			else {
-				LibapxPrintError(user, "No region by name \"" + parameter + "\" exists, defaulting to cursor");
+				LibapxLogError(user, "No region by name \"" + parameter + "\" exists, defaulting to cursor");
 			}
 		}
 		else if( StringContains( StringWord(argv, 4), "@", c_stringBegin, c_stringNoCase) ) {
@@ -252,7 +252,7 @@ void LibapxCommandSpawnPlus(int user, unitgroup u, string argv, int spawningCoun
 			player = LibapxColorToPlayer( StringSub(parameter, 2, StringLength(parameter)), user );
 			if( player == -1 ) {
 				player = user;
-				LibapxPrintError(user, "Invalid player color, defaulting to self");
+				LibapxLogError(user, "Invalid player color, defaulting to self");
 			}
 		}
 	}
@@ -265,7 +265,7 @@ void LibapxCommandSpawnPlus(int user, unitgroup u, string argv, int spawningCoun
 				spawnPoint = RegionGetCenter(location);
 			}
 			else {
-				LibapxPrintError(user, "No region by name \"" + parameter + "\" exists, defaulting to cursor");
+				LibapxLogError(user, "No region by name \"" + parameter + "\" exists, defaulting to cursor");
 			}
 		}
 		else if( StringContains( StringWord(argv, 5), "@", c_stringBegin, c_stringNoCase) ) {
@@ -273,7 +273,7 @@ void LibapxCommandSpawnPlus(int user, unitgroup u, string argv, int spawningCoun
 			player = LibapxColorToPlayer( StringSub(parameter, 2, StringLength(parameter)), user );
 			if( player == -1 ) {
 				player = user;
-				LibapxPrintError(user, "Invalid player color, defaulting to self");
+				LibapxLogError(user, "Invalid player color, defaulting to self");
 			}
 		}
 	}
@@ -303,6 +303,6 @@ void LibapxDefineRegionSpawnPlus(string commandName) {
 	LibapxCommandsGuideEntrySet(
 		gv_CommandsGuideEntryUnit, 
 		commandName, 
-		" This command spawns a unit or units on click. <br> @spawn+ [unitname] [amount] <br> Examples: <br> @spawn+ marauder <br> @spawn+ marine;@scale 3 "
+		" This command spawns a unit or units on click. </n> @clickspawn [unitname] [amount] </n></n><c val=\"255,229,201\">Examples</c>: </n> @clickspawn marauder </n> @clickspawn marine;@scale 3 "
 	);
 }

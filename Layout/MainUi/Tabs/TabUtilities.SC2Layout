@@ -1,0 +1,533 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<Desc>
+    <Frame type="Button" name="Tabs" template="MainUiTemplates/SubTab">
+    
+
+        <StateGroup name="tab1">
+            <DefaultState val="Default"/>
+            <State name="1">
+                <When type="Property" Toggled="True" frame="$parent/$parent/MainPanelBackground/Utilities/Tab1" operator="Equal"/>
+                <Action type="SetProperty" Toggled="True" frame="$parent/$parent/PanelPicker" />
+            </State>
+            <State name="Default">
+                <Action type="SetProperty" Toggled="False" frame="$parent/$parent/PanelPicker" />
+            </State>
+        </StateGroup>
+
+        <StateGroup name="tab2">
+            <DefaultState val="Default"/>
+            <State name="1">
+                <When type="Property" Toggled="True" frame="$parent/$parent/MainPanelBackground/Utilities/Tab2" operator="Equal"/>
+                <Action type="SetProperty" Toggled="True" frame="$parent/$parent/PanelAdjuster" />
+            </State>
+            <State name="Default">
+                <Action type="SetProperty" Toggled="False" frame="$parent/$parent/PanelAdjuster" />
+            </State>
+        </StateGroup>
+
+        <StateGroup name="tab3">
+            <DefaultState val="Default"/>
+            <State name="1">
+                <When type="Property" Toggled="True" frame="$parent/$parent/MainPanelBackground/Utilities/Tab3" operator="Equal"/>
+                <Action type="SetProperty" Toggled="True" frame="$parent/$parent/PanelScaler" />
+            </State>
+            <State name="Default">
+                <Action type="SetProperty" Toggled="False" frame="$parent/$parent/PanelScaler" />
+            </State>
+        </StateGroup>
+
+        <StateGroup name="tab4">
+            <DefaultState val="Default"/>
+            <State name="1">
+                <When type="Property" Toggled="True" frame="$parent/$parent/MainPanelBackground/Utilities/Tab4" operator="Equal"/>
+                <Action type="SetProperty" Toggled="True" frame="$parent/$parent/PanelChecker" />
+            </State>
+            <State name="Default">
+                <Action type="SetProperty" Toggled="False" frame="$parent/$parent/PanelChecker" />
+            </State>
+        </StateGroup>
+
+
+
+        <!-- SubButtons -->
+        <Frame type="Button" name="Tab1" template="MainUiTemplates/SubTabButton">
+            <Frame type="Image" name="Icon">
+                <Color val="179,0,255"/>
+                <Texture val="Apex/Assets/Textures/BottomUi/btn_utils_color.png"/>
+            </Frame>
+
+            <Frame type="Label" name="ButtonText">
+                <Text val="Color Picker"/>
+            </Frame>
+        </Frame>
+
+        <Frame type="Button" name="Tab2" template="MainUiTemplates/SubTabButton">
+            <Anchor side="Right" relative="$parent/Tab1" pos="Min" offset="-20"/>
+            <Frame type="Image" name="Icon">
+                <Color val="101,255,222"/>
+                <RotationPosition val="MiddleCenter"/>
+                <Texture val="Apex/Assets/Textures/BottomUi/btn_utils_adjuster.png"/>
+            </Frame>
+
+            <Frame type="Label" name="ButtonText">
+                <Text val="Attach Adjuster"/>
+            </Frame>
+        </Frame>
+
+        <Frame type="Button" name="Tab3" template="MainUiTemplates/SubTabButton">
+            <Anchor side="Right" relative="$parent/Tab2" pos="Min" offset="-20"/>
+            <Frame type="Image" name="Icon">
+                <Color val="0,132,255"/>
+                <Texture val="Apex/Assets/Textures/BottomUi/btn_utils_scaler.png"/>
+            </Frame>
+
+            <Frame type="Label" name="ButtonText">
+                <Text val="Scaler"/>
+            </Frame>
+        </Frame>
+
+        <Frame type="Button" name="Tab4" template="MainUiTemplates/SubTabButton">
+            <Anchor side="Right" relative="$parent/Tab3" pos="Min" offset="-20"/>
+            <Frame type="Image" name="Icon">
+                <Color val="255,109,109"/>
+                <Texture val="Apex/Assets/Textures/BottomUi/btn_utils_checker.png"/>
+            </Frame>
+
+            <Frame type="Label" name="ButtonText">
+                <Text val="Attach Checker"/>
+            </Frame>
+        </Frame>
+    </Frame>
+
+
+    <Frame type="Frame" name="GameUI/UIContainer/ConsoleUIContainer" file="GameUI">
+
+        
+
+        <!-- Picker -->
+		<Frame type="Button" name="PanelPicker" template="MainUiTemplates/SubPanelTemplate">
+
+
+			<Frame type="Frame" name="Content">
+                <!-- Tab Label -->
+				<Frame type="Label" name="PanelTitle">
+					<Text val="Color Picker"/>
+				</Frame>
+
+
+                <!-- Slider -->
+                <Frame type="Frame" name="RedSlider" template="ApexTemplates/ApexSlider">
+                    <Anchor side="Left" relative="$parent" pos="Mid" offset="0"/>
+                    <Anchor side="Right" relative="$parent" pos="Mid" offset="00"/>
+                    <Anchor side="Top" relative="$parent" pos="Min" offset="50"/>
+                    <Width val="450"/>
+                    
+                    <Frame type="Label" name="Name">
+                        <Text val="Red"/>
+                    </Frame>
+                </Frame>
+
+                <Frame type="Frame" name="GreenSlider" template="ApexTemplates/ApexSlider">
+                    <Anchor side="Left" relative="$parent" pos="Mid" offset="0"/>
+                    <Anchor side="Right" relative="$parent" pos="Mid" offset="00"/>
+                    <Anchor side="Top" relative="$parent/RedSlider" pos="Max" offset="-20"/>
+                    <Width val="450"/>
+
+                    <Frame type="Label" name="Name">
+                        <Text val="Green"/>
+                    </Frame>
+                </Frame>
+
+                <Frame type="Frame" name="BlueSlider" template="ApexTemplates/ApexSlider">
+                    <Anchor side="Left" relative="$parent" pos="Mid" offset="0"/>
+                    <Anchor side="Right" relative="$parent" pos="Mid" offset="00"/>
+                    <Anchor side="Top" relative="$parent/GreenSlider" pos="Max" offset="-20"/>
+                    <Width val="450"/>
+
+                    <Frame type="Label" name="Name">
+                        <Text val="Blue"/>
+                    </Frame>
+                </Frame>
+
+                <Frame type="Frame" name="AlphaSlider" template="ApexTemplates/ApexSlider">
+                    <Anchor side="Left" relative="$parent" pos="Mid" offset="0"/>
+                    <Anchor side="Right" relative="$parent" pos="Mid" offset="00"/>
+                    <Anchor side="Top" relative="$parent/BlueSlider" pos="Max" offset="-20"/>
+                    <Width val="450"/>
+
+                    <Frame type="Label" name="Name">
+                        <Text val="Alpha"/>
+                    </Frame>
+                </Frame>
+
+                <Frame type="Frame" name="HDRSlider" template="ApexTemplates/ApexSlider">
+                    <Anchor side="Left" relative="$parent" pos="Mid" offset="0"/>
+                    <Anchor side="Right" relative="$parent" pos="Mid" offset="00"/>
+                    <Anchor side="Top" relative="$parent/AlphaSlider" pos="Max" offset="-20"/>
+                    <Width val="450"/>
+
+                    <Frame type="Label" name="Name">
+                        <Text val="HDR"/>
+                    </Frame>
+                </Frame>
+
+                <Frame type="Frame" name="HDRMultiplier" template="ApexTemplates/ApexInput">
+                    <Anchor side="Left" relative="$parent" pos="Mid" offset="0"/>
+                    <Anchor side="Right" relative="$parent" pos="Mid" offset="00"/>
+                    <Anchor side="Top" relative="$parent/HDRSlider" pos="Max" offset="-20"/>
+                    <Width val="450"/>
+
+                    <Frame type="Label" name="Name">
+                        <Text val="HDR Multiplier"/>
+                    </Frame>
+                </Frame>
+
+                <Frame type="Frame" name="Timescale" template="ApexTemplates/ApexInput">
+                    <Anchor side="Left" relative="$parent" pos="Mid" offset="0"/>
+                    <Anchor side="Right" relative="$parent" pos="Mid" offset="00"/>
+                    <Anchor side="Top" relative="$parent/HDRMultiplier" pos="Max" offset="-20"/>
+                    <Width val="450"/>
+
+                    <Frame type="Label" name="Name">
+                        <Text val="Timescale"/>
+                    </Frame>
+                </Frame>
+
+                
+                <Frame type="Frame" name="Apply" template="ApexTemplates/ApexCheckbox">
+                    <Anchor side="Left" relative="$parent" pos="Mid" offset="0"/>
+                    <Anchor side="Right" relative="$parent" pos="Mid" offset="00"/>
+                    <Anchor side="Bottom" relative="$parent/Output" pos="Min" offset="0"/>
+                    <Width val="450"/>
+
+                    <Frame type="Label" name="Name">
+                        <Text val="Apply"/>
+                    </Frame>
+                </Frame>
+
+                <Frame type="Frame" name="Output" template="ApexTemplates/ApexInput">
+                    <Anchor side="Left" relative="$parent" pos="Mid" offset="0"/>
+                    <Anchor side="Right" relative="$parent" pos="Mid" offset="00"/>
+                    <Anchor side="Bottom" relative="$parent" pos="Max" offset="-120"/>
+                    <Width val="450"/>
+
+                    <Frame type="Label" name="Name">
+                        <Text val="Output @tint"/>
+                    </Frame>
+                </Frame>
+
+			</Frame>
+        </Frame>
+
+        <!-- Adjuster -->
+		<Frame type="Button" name="PanelAdjuster" template="MainUiTemplates/SubPanelTemplate">
+			<Frame type="Frame" name="Content">
+
+                <!-- Tab Label -->
+				<Frame type="Label" name="PanelTitle">
+					<Text val="Attachment Adjuster"/>
+				</Frame>
+
+                <!-- Inactive Text -->
+                <Frame type="Label" name="InactiveText" template="ApexTemplates/ApexRectangularButton">
+                    <Anchor side="Top" relative="$parent" pos="Mid" offset="20"/>
+                    <Anchor side="Bottom" relative="$parent" pos="Mid" offset="-20"/>
+                    <Anchor side="Left" relative="$parent" pos="Min" offset="-20"/>
+                    <Anchor side="Right" relative="$parent" pos="Max" offset="20"/>
+                    
+                    <Visible val="True"/>
+                    <Style val="apx_regular_center_mid"/>
+                    <Text val="Select a unit with an attachment to begin adjustment. Ensure you are also only selecting ONE unit."/>
+                    <Width val="380"/>
+                    <Height val="250"/>
+                    <AcceptsMouse val="False"/>
+                    <Frame type="Image" name="BackgroundColor">
+                        <Alpha val="0"/>
+                    </Frame>
+                    
+                    <Frame type="Image" name="Border">
+                        <Anchor side="Top" relative="$parent" pos="Min" offset="-10"/>
+                        <Anchor side="Left" relative="$parent" pos="Min" offset="-10"/>
+                        <Anchor side="Right" relative="$parent" pos="Max" offset="10"/>
+                        <Anchor side="Bottom" relative="$parent" pos="Max" offset="10"/>
+                        <Unclipped val="True"/>
+                    </Frame>
+                </Frame>
+
+                <StateGroup name="HidewhenHelpTextUp">
+                    <DefaultState val="Default"/>
+                
+                    <State name="1">
+                        <When type="Property" frame="$this/InactiveText" operator="Equal" Visible="True" />
+                        <Action type="SetProperty" frame="$this/Target" Visible="False" />
+                        <Action type="SetProperty" frame="$this/Actor" Visible="False" />
+                        <Action type="SetProperty" frame="$this/Attachpoint" Visible="False" />
+                        <Action type="SetProperty" frame="$this/XSlider" Visible="False" />
+                        <Action type="SetProperty" frame="$this/YSlider" Visible="False" />
+                        <Action type="SetProperty" frame="$this/ZSlider" Visible="False" />
+                        <Action type="SetProperty" frame="$this/Scaler" Visible="False" />
+                        <Action type="SetProperty" frame="$this/YawSlider" Visible="False" />
+                        <Action type="SetProperty" frame="$this/PitchSlider" Visible="False" />
+                        <Action type="SetProperty" frame="$this/RollSlider" Visible="False" />
+                        <Action type="SetProperty" frame="$this/DegreeStep" Visible="False" />
+                        <Action type="SetProperty" frame="$this/Output" Visible="False" />
+                    </State>
+                
+                    <State name="Default">
+                        <When type="Property" frame="$this/InactiveText" operator="Equal" Visible="False" />
+                        <Action type="SetProperty" frame="$this/Target" Visible="True" />
+                        <Action type="SetProperty" frame="$this/Actor" Visible="True" />
+                        <Action type="SetProperty" frame="$this/Attachpoint" Visible="True" />
+                        <Action type="SetProperty" frame="$this/XSlider" Visible="True" />
+                        <Action type="SetProperty" frame="$this/YSlider" Visible="True" />
+                        <Action type="SetProperty" frame="$this/ZSlider" Visible="True" />
+                        <Action type="SetProperty" frame="$this/Scaler" Visible="True" />
+                        <Action type="SetProperty" frame="$this/YawSlider" Visible="True" />
+                        <Action type="SetProperty" frame="$this/PitchSlider" Visible="True" />
+                        <Action type="SetProperty" frame="$this/RollSlider" Visible="True" />
+                        <Action type="SetProperty" frame="$this/DegreeStep" Visible="True" />
+                        <Action type="SetProperty" frame="$this/Output" Visible="True" />
+                    </State>
+                </StateGroup>
+                
+                <Frame type="Frame" name="Target" template="ApexTemplates/ApexInput">
+                    <Anchor side="Left" relative="$parent" pos="Mid" offset="0"/>
+                    <Anchor side="Right" relative="$parent" pos="Mid" offset="00"/>
+                    <Anchor side="Top" relative="$parent" pos="Min" offset="50"/>
+                    <Width val="450"/>
+
+                    <Frame type="Label" name="Name">
+                        <Text val="Target"/>
+                    </Frame>
+                </Frame>
+
+                <Frame type="Frame" name="Actor" template="ApexTemplates/ApexInput">
+                    <Anchor side="Left" relative="$parent" pos="Mid" offset="0"/>
+                    <Anchor side="Right" relative="$parent" pos="Mid" offset="00"/>
+                    <Anchor side="Top" relative="$parent/Target" pos="Max" offset="-20"/>
+                    <Width val="450"/>
+
+                    <Frame type="Label" name="Name">
+                        <Text val="Actor"/>
+                    </Frame>
+                </Frame>
+
+                <Frame type="Frame" name="Attachpoint" template="ApexTemplates/ApexInput">
+                    <Anchor side="Left" relative="$parent" pos="Mid" offset="0"/>
+                    <Anchor side="Right" relative="$parent" pos="Mid" offset="00"/>
+                    <Anchor side="Top" relative="$parent/Actor" pos="Max" offset="-20"/>
+                    <Width val="450"/>
+
+                    <Frame type="Label" name="Name">
+                        <Text val="Attachpoint"/>
+                    </Frame>
+                </Frame>
+
+                <Frame type="Frame" name="XSlider" template="ApexTemplates/ApexSlider">
+                    <Anchor side="Left" relative="$parent" pos="Mid" offset="0"/>
+                    <Anchor side="Right" relative="$parent" pos="Mid" offset="00"/>
+                    <Anchor side="Top" relative="$parent/Attachpoint" pos="Max" offset="-20"/>
+                    <Width val="450"/>
+                    
+                    <Frame type="Label" name="Name">
+                        <Text val="X Translation"/>
+                    </Frame>
+                </Frame>
+
+                <Frame type="Frame" name="YSlider" template="ApexTemplates/ApexSlider">
+                    <Anchor side="Left" relative="$parent" pos="Mid" offset="0"/>
+                    <Anchor side="Right" relative="$parent" pos="Mid" offset="00"/>
+                    <Anchor side="Top" relative="$parent/XSlider" pos="Max" offset="-20"/>
+                    <Width val="450"/>
+
+                    <Frame type="Label" name="Name">
+                        <Text val="Y Translation"/>
+                    </Frame>
+                </Frame>
+
+                <Frame type="Frame" name="ZSlider" template="ApexTemplates/ApexSlider">
+                    <Anchor side="Left" relative="$parent" pos="Mid" offset="0"/>
+                    <Anchor side="Right" relative="$parent" pos="Mid" offset="00"/>
+                    <Anchor side="Top" relative="$parent/YSlider" pos="Max" offset="-20"/>
+                    <Width val="450"/>
+
+                    <Frame type="Label" name="Name">
+                        <Text val="Z Translation"/>
+                    </Frame>
+                </Frame>
+                
+                <Frame type="Frame" name="Scaler" template="ApexTemplates/ApexInput">
+                    <Anchor side="Left" relative="$parent" pos="Mid" offset="0"/>
+                    <Anchor side="Right" relative="$parent" pos="Mid" offset="00"/>
+                    <Anchor side="Top" relative="$parent/ZSlider" pos="Max" offset="-20"/>
+                    <Width val="450"/>
+
+                    <Frame type="Label" name="Name">
+                        <Text val="Scaler"/>
+                    </Frame>
+                </Frame>
+
+                
+                <Frame type="Frame" name="YawSlider" template="ApexTemplates/ApexSlider">
+                    <Anchor side="Left" relative="$parent" pos="Mid" offset="0"/>
+                    <Anchor side="Right" relative="$parent" pos="Mid" offset="00"/>
+                    <Anchor side="Top" relative="$parent/Scaler" pos="Max" offset="-20"/>
+                    <Width val="450"/>
+                    
+                    <Frame type="Label" name="Name">
+                        <Text val="Yaw"/>
+                    </Frame>
+                </Frame>
+
+                <Frame type="Frame" name="PitchSlider" template="ApexTemplates/ApexSlider">
+                    <Anchor side="Left" relative="$parent" pos="Mid" offset="0"/>
+                    <Anchor side="Right" relative="$parent" pos="Mid" offset="00"/>
+                    <Anchor side="Top" relative="$parent/YawSlider" pos="Max" offset="-20"/>
+                    <Width val="450"/>
+
+                    <Frame type="Label" name="Name">
+                        <Text val="Pitch"/>
+                    </Frame>
+                </Frame>
+
+                <Frame type="Frame" name="RollSlider" template="ApexTemplates/ApexSlider">
+                    <Anchor side="Left" relative="$parent" pos="Mid" offset="0"/>
+                    <Anchor side="Right" relative="$parent" pos="Mid" offset="00"/>
+                    <Anchor side="Top" relative="$parent/PitchSlider" pos="Max" offset="-20"/>
+                    <Width val="450"/>
+
+                    <Frame type="Label" name="Name">
+                        <Text val="Roll"/>
+                    </Frame>
+                </Frame>
+
+                <Frame type="Frame" name="DegreeStep" template="ApexTemplates/ApexInput">
+                    <Anchor side="Left" relative="$parent" pos="Mid" offset="0"/>
+                    <Anchor side="Right" relative="$parent" pos="Mid" offset="00"/>
+                    <Anchor side="Top" relative="$parent/RollSlider" pos="Max" offset="-20"/>
+                    <Width val="450"/>
+
+                    <Frame type="Label" name="Name">
+                        <Text val="Degree Step"/>
+                    </Frame>
+                </Frame>
+
+
+
+
+                <!-- Output -->
+                <Frame type="Frame" name="Output" template="ApexTemplates/ApexInput">
+                    <Anchor side="Left" relative="$parent" pos="Mid" offset="0"/>
+                    <Anchor side="Right" relative="$parent" pos="Mid" offset="00"/>
+                    <Anchor side="Bottom" relative="$parent" pos="Max" offset="-120"/>
+                    <Width val="450"/>
+
+                    <Frame type="Label" name="Name">
+                        <Text val="Output"/>
+                    </Frame>
+                </Frame>
+
+
+			</Frame>
+        </Frame>
+
+        <!-- Scaler -->
+		<Frame type="Button" name="PanelScaler" template="MainUiTemplates/SubPanelTemplate">
+			<Frame type="Frame" name="Content">
+
+                <!-- Tab Label -->
+				<Frame type="Label" name="PanelTitle">
+					<Text val="Scaler"/>
+				</Frame>
+
+
+
+                <!-- Slider -->
+                <Frame type="Frame" name="XSlider" template="ApexTemplates/ApexSlider">
+                    <Anchor side="Left" relative="$parent" pos="Mid" offset="0"/>
+                    <Anchor side="Right" relative="$parent" pos="Mid" offset="0"/>
+                    <Anchor side="Top" relative="$parent" pos="Min" offset="50"/>
+                    <Width val="450"/>
+                    
+                    <Frame type="Label" name="Name">
+                        <Text val="X"/>
+                    </Frame>
+                </Frame>
+
+                <Frame type="Frame" name="YSlider" template="ApexTemplates/ApexSlider">
+                    <Anchor side="Left" relative="$parent" pos="Mid" offset="0"/>
+                    <Anchor side="Right" relative="$parent" pos="Mid" offset="0"/>
+                    <Anchor side="Top" relative="$parent/XSlider" pos="Max" offset="-20"/>
+                    <Width val="450"/>
+
+                    <Frame type="Label" name="Name">
+                        <Text val="Y"/>
+                    </Frame>
+                </Frame>
+
+                <Frame type="Frame" name="ZSlider" template="ApexTemplates/ApexSlider">
+                    <Anchor side="Left" relative="$parent" pos="Mid" offset="0"/>
+                    <Anchor side="Right" relative="$parent" pos="Mid" offset="0"/>
+                    <Anchor side="Top" relative="$parent/YSlider" pos="Max" offset="-20"/>
+                    <Width val="450"/>
+
+                    <Frame type="Label" name="Name">
+                        <Text val="Z"/>
+                    </Frame>
+                </Frame>
+
+                <Frame type="Frame" name="ScaleMultiplier" template="ApexTemplates/ApexInput">
+                    <Anchor side="Left" relative="$parent" pos="Mid" offset="0"/>
+                    <Anchor side="Right" relative="$parent" pos="Mid" offset="00"/>
+                    <Anchor side="Top" relative="$parent/ZSlider" pos="Max" offset="-20"/>
+                    <Width val="450"/>
+
+                    <Frame type="Label" name="Name">
+                        <Text val="Scale Multiplier"/>
+                    </Frame>
+                </Frame>
+
+                <Frame type="Frame" name="Apply" template="ApexTemplates/ApexCheckbox">
+                    <Anchor side="Left" relative="$parent" pos="Mid" offset="0"/>
+                    <Anchor side="Right" relative="$parent" pos="Mid" offset="00"/>
+                    <Anchor side="Bottom" relative="$parent/Output" pos="Min" offset="0"/>
+                    <Width val="450"/>
+
+                    <Frame type="Label" name="Name">
+                        <Text val="Apply"/>
+                    </Frame>
+                </Frame>
+
+                <Frame type="Frame" name="Output" template="ApexTemplates/ApexInput">
+                    <Anchor side="Left" relative="$parent" pos="Mid" offset="0"/>
+                    <Anchor side="Right" relative="$parent" pos="Mid" offset="00"/>
+                    <Anchor side="Bottom" relative="$parent" pos="Max" offset="-120"/>
+                    <Width val="450"/>
+
+                    <Frame type="Label" name="Name">
+                        <Text val="Output @scale"/>
+                    </Frame>
+                </Frame>
+
+                <!-- End of Conntent -->
+
+
+			</Frame>
+        </Frame>
+
+        <!-- Checker -->
+		<Frame type="Button" name="PanelChecker" template="MainUiTemplates/SubPanelTemplate">
+			<Frame type="Frame" name="Content">
+
+                <!-- Tab Label -->
+				<Frame type="Label" name="PanelTitle">
+					<Text val="Attach Point Checker"/>
+				</Frame>
+
+
+			</Frame>
+        </Frame>
+    </Frame>
+
+
+</Desc>

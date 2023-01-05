@@ -1,0 +1,69 @@
+fixed LibapxSliderGetInput(fixed value, fixed min, fixed max, int label, int p, int precision) {
+    //Slider is 0 - 360
+    fixed percentage = value/360;
+    fixed difference = max-min;
+    fixed output = min+difference*percentage;
+    
+    
+    DialogControlSetPropertyAsText(label, c_triggerControlPropertyText, PlayerGroupSingle(p), FixedToText(output, precision) );
+
+    return output;
+} 
+
+
+fixed LibapxUiSetSlider(fixed value, fixed min, fixed max, int panel, int label, int p, int precision) {
+    //Slider is 0 - 360
+    fixed output = ((min-value)/(min-max))*360;
+
+    
+    DialogControlSetPropertyAsFixed(panel, c_triggerControlPropertyValue, PlayerGroupSingle(p), output);
+    DialogControlSetPropertyAsText(label, c_triggerControlPropertyText, PlayerGroupSingle(p), FixedToText(value, precision) );
+
+    return output;
+} 
+
+void LibapxUiSetSliderLabel( int label, int p, fixed value, int precision) {
+    //Slider is 0 - 360
+    
+    DialogControlSetPropertyAsText(label, c_triggerControlPropertyText, PlayerGroupSingle(p), FixedToText(value, precision) );
+} 
+
+fixed LibapxGetEditBoxValueAsFixed(int box, int p, fixed defaultValue) {
+    string value = libNtve_gf_DialogItemEditValue(box, p);
+        
+    if(LibapxIsFixed(value)) {
+        return StringToFixed(value);
+    }
+    else {
+        return defaultValue;
+    }
+}
+
+
+string LibapxGetEditBoxValueAsString(int box, int p, string defaultValue) {
+    string value = libNtve_gf_DialogItemEditValue(box, p);
+        
+    if(value != "") {
+        return value;
+    }
+
+    return defaultValue;
+}
+
+int getAlphaPercentFromCreatedTime(fixed min, fixed max) {
+    //   GameTime        0
+    //   toTime         100
+    fixed value = GameGetMissionTime();
+    fixed output = (value - min) / (max - min);
+    output -= 1;
+    output *= -1;
+    output *= 255;
+
+    if(output > 255) {
+        output = 255;
+    }
+
+    output = output - 255 + output;
+
+    return RoundI(output);
+}

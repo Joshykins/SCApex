@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<Desc>
+    
+    <Frame type="Frame" name="FullScreenImage">
+        <Anchor side="Top" relative="$parent" pos="Min" offset="350"/>
+        <Anchor side="Left" relative="$parent" pos="Min" offset="350"/>
+        <Width val="300"/>
+        <Height val="200"/>
+        <Visible val="true"/>
+
+
+
+
+
+        <Frame type="Image" name="backgroundImage">
+            <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
+            <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
+            <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+            <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+            <LayerCount val="1"/>
+            <Texture val="Assets\Textures\white32.dds"/>
+            <Color val="55,55,55"/>
+            <Visible val="true"/>
+            <Alpha val="205"/>
+            <IgnoreParentAlpha val="true"/>
+            <RenderPriority val="2"/>
+            <DisabledAlpha val="0"/>
+            <RenderType val="HDR"/>
+        </Frame>
+
+
+
+        <Frame type="Frame" name="Content">
+            <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+            <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+            <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
+            <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
+            <Frame type="Label" name="MyLabel">
+                <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+                <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+                <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
+                <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
+
+                <Style val="apx_heading_center_mid"/>
+                <Text val="This should be a big label"/>
+                <Visible val="true"/>
+                <Color val="255,0,0"/>
+                <Alpha val="255"/>
+            </Frame>
+    
+
+
+        </Frame>
+
+
+    </Frame>
+</Desc>

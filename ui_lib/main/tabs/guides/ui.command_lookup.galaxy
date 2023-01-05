@@ -1,0 +1,163 @@
+
+static int gv_ContentLabel;
+static int gv_SearchBox;
+string gv_firstPageContent;
+
+
+
+void LibapxUiInitCommandLookup() {
+    string baseTemplate = "UIContainer/ConsoleUIContainer/PanelCommandLookup/Content/";
+    string adminCmds;
+    bool firstAdmin = true;
+    string generalCmds;
+    bool firstGeneral = true;
+    string unitCmds;
+    bool firstUnit = true;
+    string actorCmds;
+    bool firstActor = true;
+    string regionCmds;
+    bool firstRegion = true;
+    string statsCmds;
+    bool firstStat = true;
+    string varFuncs;
+    bool firstFunc = true;
+    int i;
+
+    gv_ContentLabel = DialogControlHookupStandard(c_triggerControlTypeLabel, baseTemplate + "ScrollableContent/ContainerFrame/Content");
+
+    gv_SearchBox = DialogControlHookupStandard(c_triggerControlTypeEditBox, baseTemplate + "CommandLookup/EditBoxPadding/Editbox");
+
+
+
+    gv_firstPageContent = "</n><s val=\"apx_regular_left_top\">";
+    //Get all commands in comma seperated list
+    for (i = 0; i < gv_CommandsGuideEntryCount; i += 1) {
+        if(gv_CommandsGuideEntries[i].type == gv_CommandsGuideEntryAdmin ) {
+            if(firstAdmin) {
+                adminCmds += gv_CommandsGuideEntries[i].name;
+                firstAdmin = false;
+            }
+            else {
+                adminCmds +=  ", " + gv_CommandsGuideEntries[i].name;
+            }
+            continue;
+        }
+        if(gv_CommandsGuideEntries[i].type == gv_CommandsGuideEntryGeneral ) {
+            if(firstGeneral) {
+                generalCmds += gv_CommandsGuideEntries[i].name;
+                firstGeneral = false;
+            }
+            else {
+                generalCmds +=  ", " + gv_CommandsGuideEntries[i].name;
+            }
+            continue;
+        }
+        if(gv_CommandsGuideEntries[i].type == gv_CommandsGuideEntryUnit ) {
+            if(firstUnit) {
+                unitCmds += gv_CommandsGuideEntries[i].name;
+                firstUnit = false;
+            }
+            else {
+                unitCmds +=  ", " + gv_CommandsGuideEntries[i].name;
+            }
+            continue;
+        }
+        if(gv_CommandsGuideEntries[i].type == gv_CommandsGuideEntryActor ) {
+            if(firstActor) {
+                actorCmds += gv_CommandsGuideEntries[i].name;
+                firstActor = false;
+            }
+            else {
+                actorCmds +=  ", " + gv_CommandsGuideEntries[i].name;
+            }
+            continue;
+        }
+        if(gv_CommandsGuideEntries[i].type == gv_CommandsGuideEntryRegion ) {
+            if(firstRegion) {
+                regionCmds += gv_CommandsGuideEntries[i].name;
+                firstRegion = false;
+            }
+            else {
+                regionCmds +=  ", " + gv_CommandsGuideEntries[i].name;
+            }
+            continue;
+        }
+        if(gv_CommandsGuideEntries[i].type == gv_CommandsGuideEntryStats ) {
+            if(firstStat) {
+                statsCmds += gv_CommandsGuideEntries[i].name;
+                firstStat = false;
+            }
+            else {
+                statsCmds +=  ", " + gv_CommandsGuideEntries[i].name;
+            }
+            continue;
+        }
+        if(gv_CommandsGuideEntries[i].type == gv_CommandsGuideEntryVariableFunctions ) {
+            if(firstFunc) {
+                varFuncs += gv_CommandsGuideEntries[i].name;
+                firstFunc = false;
+            }
+            else {
+                varFuncs +=  ", " + gv_CommandsGuideEntries[i].name;
+            }
+            continue;
+        }
+
+    }
+
+
+    gv_firstPageContent += gv_LibapxCommandsGuideColorAdmin+"Admin Commands</n><c val=\"ffffff\">"+adminCmds+"</n></n>";
+    gv_firstPageContent += gv_LibapxCommandsGuideColorGeneral+"General Commands</n><c val=\"ffffff\">"+generalCmds+"</n></n>";
+    gv_firstPageContent += gv_LibapxCommandsGuideColorUnit+"Unit Commands</n><c val=\"ffffff\">"+unitCmds+"</n></n>";
+    gv_firstPageContent += gv_LibapxCommandsGuideColorActor+"Actor Commands</n><c val=\"ffffff\">"+actorCmds+"</n></n>Actors are essentially everything you attach to a unit. Anytime you spawn a unit the unit creates the respective units actor. Usually these things are named the same (@spawn marine = @attach marine). </n> </n> That means any command under the actor cateogry doesn't apply to the entire unit. It only applies to the \"main\" actor of the unit. Aka the last actor that was attached or created. Or the actor you target with @target. This is a critical piece of understanding to becoming a good modeler. </n> </n> Extra info: </n> The first actor of a unit carries some of it's commands onto the later actors of the unit. For instance if you do </n> @spawn marine;@tint 255;@attach marine head </n> The first marine will be tinted red aswell as the second marine. That is because the second marine copied the first marine's commands.</n></n>";
+    gv_firstPageContent += gv_LibapxCommandsGuideColorRegion+"Region Commands</n><c val=\"ffffff\">"+regionCmds+"</n></n>";
+    gv_firstPageContent += gv_LibapxCommandsGuideColorStats+"Stat Commands</n><c val=\"ffffff\">"+statsCmds+"</n></n>";
+    gv_firstPageContent += gv_LibapxCommandsGuideColorVarFuncs+"Variable Functions</n><c val=\"ffffff\">"+varFuncs+"</n></n>Variables and Functions allows you to calculate mathamatical values within apex. It is united with _var, _unitvar and Variablefunctions() to allow many different results. </n></n><c val=\"255,229,201\">Examples</c> Below: </n> ${1} //Prints 1 </n> ${1+5} //Prints 6 </n> ${2^3} // Prints 8 </n> ${(2 * (5 *(3+6)) / 15 -2)} // prints 4 </n> ${ RandInt(1,10)} // Prints a random number 1 to 10 </n></n>";
+}
+
+
+static int[gv_LibapxMaxPlayers] gv_CurrentQueryTimeElapsed;
+
+void LibapxUiInitCommandLookupPlayer(int p) {
+    //Init QueryTime
+    gv_CurrentQueryTimeElapsed[p] = 0;
+
+    TriggerAddEventDialogControl(TriggerCreate("TrigCommandLookupType"), p, gv_SearchBox, c_triggerControlEventTypeTextChanged);
+
+    DialogControlSetPropertyAsText(gv_ContentLabel, c_triggerControlPropertyText, PlayerGroupSingle(p), 
+    StringToText(gv_firstPageContent)
+    );
+}
+
+bool TrigCommandLookupType(bool testConds, bool runActions) {
+    int p = EventPlayer();
+    string query = libNtve_gf_DialogItemEditValue(gv_SearchBox, p);
+    int i;
+    int found = -1;
+    gv_CurrentQueryTimeElapsed[p] += 1;
+
+    Wait(.6, c_timeGame);
+
+    if(gv_CurrentQueryTimeElapsed[p] == 1) {
+        for (i = 0; i < gv_CommandsGuideEntryCount; i += 1) {
+            if(StringFind(gv_CommandsGuideEntries[i].name, query, false) != -1) {
+                found = i;
+                break;
+            }
+        }
+
+        if(found == -1) {
+            DialogControlSetPropertyAsText(gv_ContentLabel, c_triggerControlPropertyText, PlayerGroupSingle(p), 
+                StringToText(gv_firstPageContent)
+            );
+        }
+        else {
+            DialogControlSetPropertyAsText(gv_ContentLabel, c_triggerControlPropertyText, PlayerGroupSingle(p), 
+                StringToText("</n><s val=\"apx_regular_left_top\">" +LibapxCommandsGuideGetEntryTypeColor(gv_CommandsGuideEntries[found].type)+gv_CommandsGuideEntries[found].name + "</c></n></n>"+gv_CommandsGuideEntries[found].description)
+            );
+        }
+    }
+
+    gv_CurrentQueryTimeElapsed[p] -= 1;
+    return true;
+}

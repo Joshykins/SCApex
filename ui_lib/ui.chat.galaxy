@@ -1,0 +1,132 @@
+static int gv_ChatBar;
+static int gv_ChatEditBox;
+static int gv_ChatCharCount;
+
+struct SayToastsPanelStruct {
+    int panel; //Toggle this on/off to show/hide background
+    int background; 
+    int border;
+    int msgContainer; //Toggle this on/off to show/hide text
+    int msgLabel;
+    int blur;
+};
+
+
+static SayToastsPanelStruct[gv_LibapxSayToastCount] gv_SayToasts; 
+
+void LibapxUIInitChat() {
+    int i;
+    gv_ChatEditBox = DialogControlHookupStandard(c_triggerControlTypeEditBox, "UIContainer/FullscreenUpperContainer/ChatBar/ChatEditBox");
+
+    gv_ChatCharCount = DialogControlHookupStandard(c_triggerControlTypeLabel, "UIContainer/FullscreenUpperContainer/ChatBar/CharCount");
+    for (i = 0; i < gv_LibapxSayToastCount; i += 1) {
+        gv_SayToasts[i].panel = DialogControlHookupStandard(c_triggerControlTypePanel, "UIContainer/FullscreenUpperContainer/ToastDisplay/Toast"+IntToString(i+1)+"/ToastInner");
+        gv_SayToasts[i].background = DialogControlHookupStandard(
+            c_triggerControlTypeImage, 
+            "UIContainer/FullscreenUpperContainer/ToastDisplay/Toast"+IntToString(i+1)+"/ToastInner/Background"
+        );
+        gv_SayToasts[i].border = DialogControlHookupStandard(
+            c_triggerControlTypeImage, 
+            "UIContainer/FullscreenUpperContainer/ToastDisplay/Toast"+IntToString(i+1)+"/ToastInner/Border"
+        );
+        gv_SayToasts[i].msgContainer = DialogControlHookupStandard(
+            c_triggerControlTypePanel, 
+            "UIContainer/FullscreenUpperContainer/ToastDisplay/Toast"+IntToString(i+1)+"/ToastInner/ToastContainer"
+        );
+        gv_SayToasts[i].msgLabel = DialogControlHookupStandard(
+            c_triggerControlTypeLabel, 
+            "UIContainer/FullscreenUpperContainer/ToastDisplay/Toast"+IntToString(i+1)+"/ToastInner/ToastContainer/ToastMessage"
+        );
+        
+        gv_SayToasts[i].blur =  DialogControlHookupStandard(
+            c_triggerControlTypePanel, 
+            "UIContainer/FullscreenUpperContainer/ToastDisplay/Toast"+IntToString(i+1)+"/ToastInner/Background/BlurContainer"
+        );
+    }
+
+}
+
+void LibapxUiUpdateChatPlayer(int p) {
+    int i;
+    int alphaPercent;
+
+    for (i = 0; i < gv_LibapxSayToastCount; i += 1) {
+
+        if(gv_LibapxSayLogForToasts[p][i].createdTime + 20 > GameGetMissionTime() && gv_LibapxSayLogForToasts[p][i].used) {
+            DialogControlSetPropertyAsInt(gv_SayToasts[i].msgContainer, c_triggerControlPropertyAlpha,PlayerGroupSingle(p), 255 );
+            DialogControlSetPropertyAsInt(gv_SayToasts[i].panel, c_triggerControlPropertyAlpha,PlayerGroupSingle(p), 255 );
+
+            if(gv_LibapxSayLogForToasts[p][i].hasBackground) {
+                //Background Color
+                DialogControlSetPropertyAsColor(gv_SayToasts[i].background, c_triggerControlPropertyColor,PlayerGroupSingle(p),  gv_LibapxSayLogForToasts[p][i].backgroundColor);
+               
+                //Border Color
+                DialogControlSetPropertyAsColor(gv_SayToasts[i].border, c_triggerControlPropertyColor,PlayerGroupSingle(p),  gv_LibapxSayLogForToasts[p][i].borderColor);
+          
+                //Alpha
+                DialogControlSetPropertyAsInt(gv_SayToasts[i].border, c_triggerControlPropertyAlpha,PlayerGroupSingle(p), gv_LibapxSayLogForToasts[p][i].borderAlpha );
+                DialogControlSetPropertyAsInt(gv_SayToasts[i].background, c_triggerControlPropertyAlpha,PlayerGroupSingle(p), gv_LibapxSayLogForToasts[p][i].backgroundAlpha );
+
+                //Image    
+                DialogControlSetPropertyAsBool(gv_SayToasts[i].border, c_triggerControlPropertyVisible, PlayerGroupSingle(p),  true);
+                DialogControlSetPropertyAsBool(gv_SayToasts[i].background, c_triggerControlPropertyVisible,PlayerGroupSingle(p),  true);
+                DialogControlSetPropertyAsInt(gv_SayToasts[i].blur, c_triggerControlPropertyAlpha,PlayerGroupSingle(p), 255);
+            }
+            else {
+                DialogControlSetPropertyAsInt(gv_SayToasts[i].blur, c_triggerControlPropertyAlpha,PlayerGroupSingle(p), 0);
+                DialogControlSetPropertyAsBool(gv_SayToasts[i].border, c_triggerControlPropertyVisible, PlayerGroupSingle(p),  false);
+                DialogControlSetPropertyAsBool(gv_SayToasts[i].background, c_triggerControlPropertyVisible,PlayerGroupSingle(p),  false);
+            }
+        }
+        else if (!gv_LibapxSayLogForToasts[p][i].used) {
+            DialogControlSetPropertyAsInt(gv_SayToasts[i].msgContainer, c_triggerControlPropertyAlpha,PlayerGroupSingle(p), 0);
+            DialogControlSetPropertyAsInt(gv_SayToasts[i].panel, c_triggerControlPropertyAlpha,PlayerGroupSingle(p), 0);    
+        }
+        else {
+            //Aka, after 20
+            alphaPercent = getAlphaPercentFromCreatedTime(gv_LibapxSayLogForToasts[p][i].createdTime + 20, gv_LibapxSayLogForToasts[p][i].createdTime + 25);
+
+            //Alpha Percent
+            DialogControlSetPropertyAsInt(gv_SayToasts[i].msgContainer, c_triggerControlPropertyAlpha,PlayerGroupSingle(p),  alphaPercent);
+            DialogControlSetPropertyAsInt(gv_SayToasts[i].panel, c_triggerControlPropertyAlpha,PlayerGroupSingle(p),  alphaPercent);
+        }
+        
+        DialogControlSetPropertyAsText(gv_SayToasts[i].msgLabel, c_triggerControlPropertyText,PlayerGroupSingle(p), gv_LibapxSayLogForToasts[p][i].message );
+    }
+
+}
+
+void LibapxUIInitChatPlayer(int p) {
+    int i;
+    TriggerAddEventDialogControl(
+        TriggerCreate("LibapxTrigChatTyped"), 
+        p, gv_ChatEditBox, 
+        c_triggerControlEventTypeTextChanged
+    );
+    
+    DialogControlSetPropertyAsColor(gv_ChatCharCount, c_triggerControlPropertyColor, PlayerGroupSingle(p), Color(50,50,50));
+    DialogControlSetPropertyAsText(gv_ChatCharCount, c_triggerControlPropertyText, PlayerGroupSingle(p), StringToText("0"));
+}
+
+
+bool LibapxTrigChatTyped(bool testConds, bool runActions) {
+    int p = EventPlayer();
+    string currentChatBoxInput = libNtve_gf_DialogItemEditValue(gv_ChatEditBox, p);
+    int length = StringLength(currentChatBoxInput);
+    string lengthString = IntToString(length);
+    if(length == 255) {
+        DialogControlSetPropertyAsColor(gv_ChatCharCount, c_triggerControlPropertyColor, PlayerGroupSingle(p), Color(100,0,0));
+    }
+    else if(length >  245) {
+        DialogControlSetPropertyAsColor(gv_ChatCharCount, c_triggerControlPropertyColor, PlayerGroupSingle(p), Color(100,60,0));
+    }
+    else if(length >  235) {
+        DialogControlSetPropertyAsColor(gv_ChatCharCount, c_triggerControlPropertyColor, PlayerGroupSingle(p), Color(80,80,0));
+    }
+    else {
+        DialogControlSetPropertyAsColor(gv_ChatCharCount, c_triggerControlPropertyColor, PlayerGroupSingle(p), Color(50,50,50));
+    }
+
+    DialogControlSetPropertyAsText(gv_ChatCharCount, c_triggerControlPropertyText, PlayerGroupSingle(p), StringToText(lengthString));
+    return true;
+}

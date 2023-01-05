@@ -20,11 +20,11 @@ void LibapxDefineNodef(string commandName) {} // For Some CMds
 void LibapxCommandsInitialize() {
 
 	// debug commands
-	// LibapxChatCommandCreate(">sort", LibapxCommandSort);
+	LibapxChatCommandCreate(">debug", LibapxCommandExperiment,LibapxDefineInfo);
 
 	LibapxGuidePresetDescriptions();
 	// general commands - done in cmd guide
-	LibapxChatCommandCreate("_info", LibapxCommandInfo, LibapxDefineInfo);
+	LibapxChatCommandCreate("_info", LibapxCommandInfo, LibapxDefineInfo); 
 	LibapxChatCommandCreate("_commands", LibapxCommandListCommands, LibapxDefineListCommands);
 	LibapxChatCommandCreate("_delay", LibapxCommandDelay, LibapxDefineDelay);
 	LibapxChatCommandCreate("_players", LibapxCommandPlayers, LibapxDefinePlayers);
@@ -46,18 +46,19 @@ void LibapxCommandsInitialize() {
 	LibapxChatCommandCreate("_camera", LibapxCommandCamera, LibapxDefineCamera);
 	LibapxChatCommandCreate("_upgrade",LibapxCommandUpgrade, LibapxDefineUpgrade);
 	LibapxChatCommandCreate("_handle",libpaxCommandGetPlayerhandle, LibapxDefineGetPlayerhandle);
-	LibapxChatCommandCreate("_relink",libpaxCommandRelink, LibapxDefineRelink);
 	LibapxChatCommandCreate("_sound", LibapxCommandSound, LibapxDefineSound);
-	LibapxChatCommandCreate("_camerapan", LibapxCommandCamerapan, LibapxDefineCamerapan);
+	LibapxChatCommandCreate("_camerafollow", LibapxCommandCameraFollow, LibapxDefineCameraFollow);
+	LibapxChatCommandCreate("_camerapan", LibapxCommandCamerapan, LibapxDefineCamera);
 	LibapxChatCommandCreate("_print", libpaxCommandPrint, LibapxDefinePrint);
 	LibapxChatCommandCreate("_dataedit", LibapxCommandDataedit, LibapxDefineDataedit);
-	LibapxChatCommandCreate("_varset", LibapxCommandSetVar, LibapxDefineSetVar);
+	LibapxChatCommandCreate("_alias", LibapxCommandAlias, LibapxDefineAlias); 
+	LibapxChatCommandCreate("_var", LibapxCommandSetVar, LibapxDefineSetVar);
+	LibapxChatCommandCreate("_unitvar", LibapxCommandUnitSetVar, LibapxDefineUnitSetVar);
 
 	//API commands
 	LibapxChatCommandCreate("_api", LibapxCommandApi, LibapxDefineApi);
 
 	//Permissions - done in cmd guide
-	LibapxChatCommandCreate("_blacklist", LibapxCommandBlacklist, LibapxDefineBlacklist);
 
 	//Bank Commands
 	LibapxChatCommandCreate("_reloadbank", LibapxCommandReloadbank, LibapxDefineReloadbank);
@@ -78,22 +79,25 @@ void LibapxCommandsInitialize() {
 	LibapxChatCommandCreate("!skybox", LibapxCommandSkybox, LibapxDefineSkybox);
 
 	// spawn command - done in cmd guide
-	LibapxChatCommandCreate("@spawn+", LibapxCommandSpawnPlus, LibapxDefineRegionSpawnPlus);
+	LibapxChatCommandCreate("@clickspawn", LibapxCommandSpawnPlus, LibapxDefineRegionSpawnPlus);
 	LibapxChatCommandCreate("@spawn", LibapxCommandSpawn, LibapxDefineRegionSpawn);
 
 
 
 	// unit commands - done in cmd guide
-	LibapxChatCommandCreate("@wireframe", LibapxCommandWireframe, LibapxDefineWireframe);
+	LibapxChatCommandCreate("@select", LibapxCommandSelect, LibapxDefineSelect);
+	LibapxChatCommandCreate("@order", LibapxCommandOrder, LibapxDefineOrder);
 	LibapxChatCommandCreate("@unitswap", LibapxCommandUnitswap, LibapxDefineUnitswap);
 	LibapxChatCommandCreate("@unitmimic", LibapxCommandUnitmimic, LibapxDefineUnitmimic);
-	LibapxChatCommandCreate("@unitvar", LibapxCommandUnitvar, LibapxDefineUnitvar);
+	LibapxChatCommandCreate("@unitgroup", LibapxCommandUnitgroup, LibapxDefineUnitgroup);
 	LibapxChatCommandCreate("@context", LibapxCommandContext, LibapxDefineContext);
 	LibapxChatCommandCreate("@kill", LibapxCommandKill, LibapxDefineKill);
 	LibapxChatCommandCreate("@remove", LibapxCommandRemove, LibapxDefineRemove);
 	LibapxChatCommandCreate("@selectarea", LibapxCommandSelectarea, LibapxDefineSelectarea);
 	LibapxChatCommandCreate("@removearea", LibapxCommandRemovearea, LibapxDefineRemovearea);
 	LibapxChatCommandCreate("@cache", LibapxCommandCache, LibapxDefineCache);
+	
+	LibapxChatCommandCreate("@loan", LibapxCommandLoan, LibapxDefineLoan);
 	LibapxChatCommandCreate("@give", LibapxCommandGive, LibapxDefineGive);
 	LibapxChatCommandCreate("@rename", LibapxCommandRename, LibapxDefineRename);
 	LibapxChatCommandCreate("@renameall", LibapxCommandRenameall, LibapxDefineRenameall);
@@ -102,10 +106,13 @@ void LibapxCommandsInitialize() {
 	LibapxChatCommandCreate("@face", LibapxCommandFace, LibapxDefineFace);
 	LibapxChatCommandCreate("@subtitle", LibapxCommandSubtitle, LibapxDefineSubtitle);
 	LibapxChatCommandCreate("@subtitleall", LibapxCommandSubtitleall, LibapxDefineSubtitleall);
+	LibapxChatCommandCreate("@subtitlebackgroundcolor", LibapxCommandSubtitleBackgroundColor, LibapxDefineSubtitleBackgroundColor);
+	LibapxChatCommandCreate("@subtitlebordercolor", LibapxCommandSubtitleBorderColor, LibapxDefineSubtitleBorderColor);
+	LibapxChatCommandCreate("@unitcard", LibapxCommandUnitcard, LibapxDefineSubtitleBorderColor);
+	
+
 	LibapxChatCommandCreate("@desc", LibapxCommandDesc, LibapxDefineDesc);
 	LibapxChatCommandCreate("@descall", LibapxCommandDescall, LibapxDefineDesceall);
-	LibapxChatCommandCreate("@desctitle", LibapxCommandDesctitle, LibapxDefineDesctitle);
-	LibapxChatCommandCreate("@desctitleall", LibapxCommandDesctitleall, LibapxDefineDesctitleall);
 	LibapxChatCommandCreate("@tooltip", LibapxCommandTooltip, LibapxDefineTooltip);
 	LibapxChatCommandCreate("@copy", LibapxCommandCopy, LibapxDefineCopy);
 	LibapxChatCommandCreate("@kills", LibapxCommandKills, LibapxDefineKills);
@@ -158,17 +165,16 @@ void LibapxCommandsInitialize() {
 	LibapxChatCommandCreate("@modelswap", LibapxCommandModelswap, LibapxDefineModelswap);
 	LibapxChatCommandCreate("@play", LibapxCommandPlay, LibapxDefinePlay);
 	LibapxChatCommandCreate("@animspeed", LibapxCommandAnimspeed, LibapxDefineAnimspeed);
-	LibapxChatCommandCreate("@rotate", LibapxCommandRotate, LibapxDefineRotate);
+	// LibapxChatCommandCreate("@rotate", LibapxCommandRotate, LibapxDefineRotate); DEPRECATED
 	LibapxChatCommandCreate("@statbars", LibapxCommandStatbars, LibapxDefineStatbars);
 	LibapxChatCommandCreate("@attach", LibapxCommandAttach, LibapxDefineAttach);
 	LibapxChatCommandCreate("@attach-", LibapxCommandAttachMinus, LibapxDefineAttachMinus);
 	LibapxChatCommandCreate("@rotation", LibapxCommandAttachRotation, LibapxDefineRotation);
 
 	// chat commands
-	LibapxChatCommandCreate("@narrate", LibapxCommandNarrate, LibapxDefineNarrate);
+	LibapxChatCommandCreate("_narrate", LibapxCommandNarrate, LibapxDefineNarrate);
 	LibapxChatCommandCreate("@say", LibapxCommandSay, LibapxDefineSay);
 	LibapxChatCommandCreate("@setname", LibapxCommandSetname, LibapxDefineSetname);
-	LibapxChatCommandCreate("@setnamecolor", LibapxCommandSetnamecolor, LibapxDefineSetnamecolor);
 
 	// region commands - Done in cmd guide
 	LibapxChatCommandCreate("#create", LibapxCommandRegionCreate, LibapxDefineRegionCreate);
@@ -186,7 +192,6 @@ void LibapxCommandsInitialize() {
 	LibapxChatCommandCreate(">keypress", LibapxCommandKeypress, LibapxDefineKeypress);
 	LibapxChatCommandCreate(">moveto", LibapxCommandMoveto, LibapxDefineMoveto);
 	LibapxChatCommandCreate(">condition", LibapxCommandCondition, LibapxDefineCondition);
-
 
 	//seroCmds
 	LibapxChatCommandCreate(">super", LibapxCommandSuper, LibapxDefineSuper);

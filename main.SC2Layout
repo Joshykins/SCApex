@@ -1,34 +1,132 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <Desc>
 					<!--Templates-->
-	<Include path="Apex/Layout/Templates/WireframeTemplate.SC2Layout"/>
+	<Include path="Apex/Layout/Templates/ApexTemplates.SC2Layout"/>
+
+
 
 
 					<!--Actual Layouts-->
+	<!-- Adds fullscreen layers to ui -->
+	<Include path="Apex/Layout/FullscreenEffects.SC2Layout"/>
 	<!--Hides default chat and restyles debug area for use in apex-->
 	<Include path="Apex/Layout/Chat.SC2Layout"/>
 	<!--Layout to move sc2 menu, chat, and social buttons over to LHS-->
 	<Include path="Apex/Layout/Menu.SC2Layout"/>
 	<!--Default Layout Removals-->
 	<Include path="Apex/Layout/DefaultRemovals.SC2Layout"/>
-	<!--Additional Fluff(Logo, bars on bottom)-->
-	<Include path="Apex/Layout/ApexAdditions.SC2Layout"/>
-	<!--Default Layout Edits-->
-	<Include path="Apex/Layout/DefaultEdits.SC2Layout"/>
+	<!--Minimap Layout Edits-->
+	<Include path="Apex/Layout/MinimapFix.SC2Layout"/>
 	<!--Unit Panel-->
 	<Include path="Apex/Layout/UnitPanels/UnitPanel.SC2Layout"/>
-	<!--Control Groups-->
-	<Include path="Apex/Layout/UnitPanels/ControlGroups.SC2Layout"/>
-	<!--Description-->
-	<Include path="Apex/Layout/Description.SC2Layout"/>
+	<!--Default Panel-->
+	<Include path="Apex/Layout/MainUi/MainPanel.SC2Layout"/>
+
+
+    <Frame type="Frame" name="LURL" template="ScreenCustomFeatured/CTABannerTemplate">
+        <Anchor side="Top" relative="$this" pos="Min" offset="0"/>
+        <Anchor side="Left" relative="$this" pos="Min" offset="0"/>
+
+        <Frame type="LaunchURLButton" name="WebsiteButton" template="StandardBattlenetTemplates/BattlenetMediumAlternateButtonTemplate">
+            <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+            <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+            <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
+            <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
+            <Width val="0"/>
+            <Height val="0"/>
+        </Frame>
+
+        <Frame type="Frame" name="BannerImage">
+            <DescFlags val="CreationDeferred"/>
+        </Frame>
+        <Frame type="Frame" name="BorderInner">
+            <DescFlags val="CreationDeferred"/>
+        </Frame>
+        <Frame type="Frame" name="BorderOuter">
+            <DescFlags val="CreationDeferred"/>
+        </Frame>
+        <Frame type="Frame" name="BannerVignette">
+            <DescFlags val="CreationDeferred"/>
+        </Frame>
+        <Frame type="Frame" name="DescriptionLabel">
+            <DescFlags val="CreationDeferred"/>
+        </Frame>
+        <Frame type="Frame" name="HeaderLabel">
+            <DescFlags val="CreationDeferred"/>
+        </Frame>
+        <Frame type="Frame" name="MoreInfoLabel">
+            <DescFlags val="CreationDeferred"/>
+        </Frame>
+    </Frame>
 
 
 
-	<!-- testing -->
-	
-
-	<!-- TEMPLATES -->
     <Frame type="Frame" name="GameUI/UIContainer/ConsoleUIContainer" file="GameUI">
+		<Frame type="Frame" name="TopArea">
+			<Anchor side="Top" relative="$parent" pos="Min" offset="5"/>
+			<Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+			<Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
+			<Width val="130"/>
+			<Height val="40"/>
+			<Frame type="Label" name="Version">
+				<Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+				<Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+				<Style val="apx_regular_right_mid"/>
+				<Height val="{$parent/@Height}"/>
+				<Width val="80"/>
+				<Text val="v. 3.0.0"/>
+				<Alpha val="115"/>
+
+			</Frame>
+			<Frame type="Frame" name="DiscordButton" template="ApexTemplates/ApexURL">
+                <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+                <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
+				<Width val="40"/>
+				<Height val="40"/>
+				<Color val="88,101,255"/>
+				
+
+                <Frame type="LaunchURLButton" name="WebsiteButton">
+                    <Text val=""/>
+                    <URL val="https://discord.gg/eK5bNrG"/>
+					<Frame type="Frame" name="TooltipFrame">
+						<Color val="255,255,255"/>
+					</Frame>
+					<Frame type="Label" name="Tooltip">
+						<Color val="255,255,255"/>
+						<Text val="Join us on discord!"/>
+						<Anchor side="Left" relative="$parent" pos="Mid" offset="0"/>
+						<Anchor side="Right" relative="$parent" pos="Mid" offset="0"/>
+						<Anchor side="Bottom" relative="$parent" pos="Max" offset="25"/>
+					</Frame>
+					<Frame type="Image" name="Icon">
+						<Texture val="Apex/Assets/Textures/BottomUi/btn_discord.png"/>
+					</Frame>
+					
+
+					<Animation name="Hover">
+						<Event event="OnMouseEnter" action="Reset,Play" frame="$this"/>
+						<Controller type="Fade" end="Pause" frame="$this/TooltipFrame">
+							<Key type="Curve" time="0.0" value="0"/>
+							<Key type="Curve" time="0.15" value="125"/>
+						</Controller>
+					</Animation>
+					
+					<Animation name="HoverOff">
+						<Event event="OnMouseExit" action="Reset,Play" frame="$this"/>
+						<Controller type="Fade" end="Pause" frame="$this/TooltipFrame">
+							<Key type="Curve" time="0.0" value="125"/>
+							<Key type="Curve" time="0.15" value="0"/>
+						</Controller>
+					</Animation>
+
+                </Frame>
+
+
+			</Frame>
+
+		</Frame>
+
 		<Frame type="Frame" name="ApexUiLibParent">
             <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
             <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
@@ -37,10 +135,4 @@
 		</Frame>
 	</Frame>
 	
-	<Frame type="Frame" name="GameUI/UIContainer/ConsoleUIContainer" file="GameUI">
-	
-	</Frame>
-	<Frame type="Image" name="GameButtonBaseTemplate/GameButtonBorderImage" file="GameButton">
-		<Desaturated val="true"/>
-	</Frame>
 </Desc>

@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<Desc>
+    <Frame type="Frame" name="GameUI/UIContainer/ConsoleUIContainer" file="GameUI">
+        <!-- Commands Lookup -->
+        <Frame type="Button" name="PanelCommandLookup" template="MainUiTemplates/SubPanelTemplate">
+            <Frame type="Frame" name="Content">
+
+                <!-- Tab Label -->
+                <Frame type="Label" name="PanelTitle">
+                    <Text val="Command Lookup"/>
+                </Frame>
+
+                <!-- Command Lookup -->
+                <Frame type="Frame" name="CommandLookup" template="ApexTemplates/ApexInput">
+                    <Anchor side="Left" relative="$parent" pos="Mid" offset="0"/>
+                    <Anchor side="Right" relative="$parent" pos="Mid" offset="0"/>
+                    <Anchor side="Top" relative="$parent" pos="Min" offset="30"/>
+                    <Width val="450"/>
+                    
+                    
+                    <Frame type="EditBox" name="Editbox">
+                        <HighlightOnFocus val="False"/>
+                    </Frame>
+
+                    <Frame type="Label" name="Name">
+                        <Anchor side="Right" relative="$parent" pos="Min" offset="150"/>
+                        <Text val="Command Name"/>
+                    </Frame>
+                </Frame>
+                <!-- Divier -->
+                <Frame type="Image" name="Divider">
+                    <Anchor side="Top" relative="$parent/CommandLookup" pos="Max" offset="0"/>
+                    <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
+                    <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+                    <Height val="1"/>
+                    <Alpha val="165"/>
+                    <Width val="450"/>
+                    <Texture val="Assets/Textures/white32.dds"/>
+                </Frame>
+
+                <!-- Scrollable Frame -->
+                <Frame type="ScrollableFrame" name="ScrollableContent" template="ApexTemplates/ScrollableFrame">
+                    <Anchor side="Top" relative="$parent/CommandLookup" pos="Max" offset="10"/>
+                    <Anchor side="Left" relative="$parent" pos="Min" offset="46"/>
+                    <Anchor side="Right" relative="$parent" pos="Max" offset="-46"/>
+                    <Anchor side="Bottom" relative="$parent" pos="Max" offset="-130"/>
+                    <Width val="450"/>
+                    <!-- Start of container frame -->
+                    <Frame type="Frame" name="ContainerFrame">
+                        <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+                        <!-- Ensure bottom anchor is always lowest content -->
+                        <Anchor side="Bottom" relative="$this/Content" pos="Max" offset="0"/>
+                        <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+                        <Anchor side="Right" relative="$parent" pos="Max" offset="-30"/>
+                        
+                        <!-- No Results -->
+                        <Frame type="Label" name="Content">
+                            <Anchor side="Top" relative="$parent" pos="Min" offset="10"/>
+                            <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+                            <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
+
+
+                            <Text val="Commands Content"/>
+                            <AcceptsMouse val="False"/>
+                        </Frame>
+                    </Frame>
+                    <!-- End of container frame -->
+                </Frame>
+                <!-- End of scrollable Frame -->
+            </Frame>
+            <!-- End of panel content -->
+        </Frame>
+    </Frame>
+</Desc>

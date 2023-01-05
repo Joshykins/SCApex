@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<Desc>
+    <Include path="Apex/Layout/MainUi/TabContent/DataSearch.SC2Layout"/>
+    <Include path="Apex/Layout/MainUi/TabContent/CommandLookup.SC2Layout"/>
+    <Frame type="Button" name="Tabs" template="MainUiTemplates/SubTab">
+        <StateGroup name="tab1">
+            <DefaultState val="Default"/>
+            <State name="1">
+                <When type="Property" Toggled="True" frame="$parent/$parent/MainPanelBackground/Guides/Tab1" operator="Equal"/>
+                <Action type="SetProperty" Toggled="True" frame="$parent/$parent/PanelCatalogs" />
+            </State>
+            <State name="Default">
+                <Action type="SetProperty" Toggled="False" frame="$parent/$parent/PanelCatalogs" />
+            </State>
+        </StateGroup>
+
+        <StateGroup name="tab2">
+            <DefaultState val="Default"/>
+            <State name="1">
+                <When type="Property" Toggled="True" frame="$parent/$parent/MainPanelBackground/Guides/Tab2" operator="Equal"/>
+                <Action type="SetProperty" Toggled="True" frame="$parent/$parent/PanelCommandLookup" />
+            </State>
+            <State name="Default">
+                <Action type="SetProperty" Toggled="False" frame="$parent/$parent/PanelCommandLookup" />
+            </State>
+        </StateGroup>
+
+        <!-- SubButtons -->
+        <Frame type="Button" name="Tab1" template="MainUiTemplates/SubTabButton">
+            <Frame type="Image" name="Icon">
+                <Texture val="Apex/Assets/Textures/BottomUi/btn_guides_catalog.png"/>
+                <Color val="75,148,196"/>
+            </Frame>
+
+            <Frame type="Label" name="ButtonText">
+                <Text val="Data Search"/>
+            </Frame>
+        </Frame>
+
+        <Frame type="Button" name="Tab2" template="MainUiTemplates/SubTabButton">
+            <Anchor side="Right" relative="$parent/Tab1" pos="Min" offset="-20"/>
+            <Frame type="Image" name="Icon">
+                <Texture val="Apex/Assets/Textures/BottomUi/btn_guides_commands.png"/>
+                <Color val="196,148,75"/>
+            </Frame>
+
+            <Frame type="Label" name="ButtonText">
+                <Text val="Command Lookup"/>
+            </Frame>
+        </Frame>
+    </Frame>
+
+
+    <!-- End of base -->
+
+
+</Desc>

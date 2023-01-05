@@ -1,0 +1,301 @@
+struct aliasSearchResult {
+    int panel;
+    int label;
+    int select;
+    int delete;
+    int deleteTooltip;
+    bool[gv_LibapxMaxPlayers] deleteClicked;
+    string[gv_LibapxMaxPlayers] result;
+};
+
+static const string gv_UnclickedDeleteTooltip = "Delete Alias";
+static const string gv_ClickedDeleteTooltip = "Click to confirm alias deletion.";
+
+static const int gv_LibapxTotalAliasesinPage = 10;
+
+//Result Items
+static aliasSearchResult[gv_LibapxTotalAliasesinPage] gv_AliasSearchResults;
+
+
+
+static int gv_SearchAlias;
+
+// Panels
+// No Results
+static int gv_NoResultsPanel;
+static int gv_NextPage;
+static int gv_PreviousPage;
+
+
+
+static int gv_OutputApply;
+//Edit boxes
+static int gv_Output;
+static int gv_Key;
+static int gv_Parameter;
+static int gv_Value;
+
+
+
+static void InitializeAliasResults(int i) {
+    int p;
+    int j;
+    int base = DialogControlHookupStandard(
+        c_triggerControlTypeButton,
+        "UIContainer/ConsoleUIContainer/PanelAliases/Content/ScrollableContent/ContainerFrame/SearchResults/Item"+IntToString(i+1)
+    );
+    gv_AliasSearchResults[i].panel = base;
+    gv_AliasSearchResults[i].select = DialogControlHookup( base, c_triggerControlTypeButton, "SelectAliasButton" );
+    gv_AliasSearchResults[i].delete = DialogControlHookup( base, c_triggerControlTypeButton, "DeleteAliasButton" );
+    gv_AliasSearchResults[i].deleteTooltip = DialogControlHookup( base, c_triggerControlTypeLabel, "DeleteAliasButton/Tooltip" );
+    gv_AliasSearchResults[i].label = DialogControlHookup( base, c_triggerControlTypeLabel, "ListItemContent" );
+    
+    DialogControlSetPropertyAsBool(base, c_triggerControlPropertyToggled, PlayerGroupAll(), false);
+    
+    for (j = 1; j <= PlayerGroupCount(PlayerGroupActive()); j += 1) {
+        p = PlayerGroupPlayer(PlayerGroupActive(), j);
+        gv_AliasSearchResults[i].result[p] = "";
+    }
+}
+
+void LibapxUiInitAliases() {
+    int i;
+    string baseTemplate = "UIContainer/ConsoleUIContainer/PanelAliases/Content/";
+    string baseTemplateScrollable = "UIContainer/ConsoleUIContainer/PanelAliases/Content/ScrollableContent/ContainerFrame";
+
+    //Base template
+    gv_SearchAlias = DialogControlHookupStandard(c_triggerControlTypeEditBox, baseTemplate+"AliasSearch/EditBoxPadding/Editbox");
+
+    //Scrollable Content
+    //Set no results as true to init
+    gv_NoResultsPanel = DialogControlHookupStandard(c_triggerControlTypeLabel, baseTemplateScrollable+"/SearchResults/NoResultsText");
+    DialogControlSetPropertyAsBool(gv_NoResultsPanel, c_triggerControlPropertyVisible, PlayerGroupAll(), true);
+
+    //Disable previous and next buttons
+    gv_NextPage = DialogControlHookupStandard(c_triggerControlTypeButton, baseTemplateScrollable+"/SearchResults/NextPage");
+    gv_PreviousPage = DialogControlHookupStandard(c_triggerControlTypeButton, baseTemplateScrollable+"/SearchResults/PreviousPage");
+    DialogControlSetPropertyAsBool(gv_NextPage, c_triggerControlPropertyEnabled, PlayerGroupAll(), false);
+    DialogControlSetPropertyAsBool(gv_PreviousPage, c_triggerControlPropertyEnabled, PlayerGroupAll(), false);
+    for (i = 0; i < gv_LibapxTotalAliasesinPage; i += 1) {
+        InitializeAliasResults(i);
+    }
+
+    gv_OutputApply = DialogControlHookupStandard(c_triggerControlTypeButton, baseTemplateScrollable+"/RunCommand");
+    //Edit boxes
+    gv_Output = DialogControlHookupStandard(c_triggerControlTypeEditBox, baseTemplateScrollable+"/AliasOutput/EditBoxPadding/Editbox");
+    gv_Key = DialogControlHookupStandard(c_triggerControlTypeEditBox, baseTemplateScrollable+"/AliasKey/EditBoxPadding/Editbox");
+    gv_Parameter = DialogControlHookupStandard(c_triggerControlTypeEditBox, baseTemplateScrollable+"/AliasParameters/EditBoxPadding/Editbox");
+    gv_Value = DialogControlHookupStandard(c_triggerControlTypeEditBox, baseTemplateScrollable+"/AliasValue/EditBoxPadding/Editbox");
+}
+
+
+void LibapxSearchAliasesUiSetSearchQuery(int p) {
+    int i;
+    string results = LibapxQueryAliases(
+        gv_LibapxPlayer[p].aliasSearchQuery, 
+        gv_LibapxPlayer[p].aliasSearchPage, 
+        gv_LibapxTotalAliasesinPage,
+        p
+    );
+
+        //Handling next and previous buttons
+    if(gv_LibapxPlayer[p].aliasSearchPage > 1) {
+        //Turn previous on
+        DialogControlSetPropertyAsBool(gv_PreviousPage, c_triggerControlPropertyEnabled, PlayerGroupSingle(p), true);
+    }
+    else {
+        DialogControlSetPropertyAsBool(gv_PreviousPage, c_triggerControlPropertyEnabled, PlayerGroupSingle(p), false);
+    }
+
+    if(gv_LibapxPlayer[p].aliasSearchNextPage) {
+        DialogControlSetPropertyAsBool(gv_NextPage, c_triggerControlPropertyEnabled, PlayerGroupSingle(p), true);
+    }
+    else {
+        DialogControlSetPropertyAsBool(gv_NextPage, c_triggerControlPropertyEnabled, PlayerGroupSingle(p), false);
+    }
+
+
+    for (i = 0; i < gv_LibapxTotalAliasesinPage; i += 1) {
+        //Reset delete clicked
+        gv_AliasSearchResults[i].deleteClicked[p] = false;
+        DialogControlSetPropertyAsColor(gv_AliasSearchResults[i].delete, c_triggerControlPropertyColor, PlayerGroupSingle(p), Color(100,100,100));
+        DialogControlSetPropertyAsText(gv_AliasSearchResults[i].deleteTooltip, c_triggerControlPropertyText, PlayerGroupSingle(p), StringToText(gv_UnclickedDeleteTooltip));
+    }
+
+    if(results == "") {    
+        DialogControlSetPropertyAsBool(gv_NoResultsPanel, c_triggerControlPropertyVisible, PlayerGroupSingle(p), true);
+
+        for (i = 0; i < gv_LibapxTotalAliasesinPage; i += 1) {
+            gv_AliasSearchResults[i].result[p] = "";
+            DialogControlSetPropertyAsBool(gv_AliasSearchResults[i].panel, c_triggerControlPropertyToggled, PlayerGroupSingle(p), false);
+        }
+    }
+    else {
+        DialogControlSetPropertyAsBool(gv_NoResultsPanel, c_triggerControlPropertyVisible, PlayerGroupSingle(p), false);
+        for (i = 0; i < gv_LibapxTotalAliasesinPage; i += 1) {
+            if(StringWord(results, i+1) != "") {
+                gv_AliasSearchResults[i].result[p] = StringWord(results, i+1);
+                DialogControlSetPropertyAsBool(gv_AliasSearchResults[i].panel, c_triggerControlPropertyToggled, PlayerGroupSingle(p), true);
+                DialogControlSetPropertyAsText(gv_AliasSearchResults[i].label, c_triggerControlPropertyText, PlayerGroupSingle(p), StringToText(StringWord(results, i+1)));
+            }
+            else {
+                gv_AliasSearchResults[i].result[p] = "";
+                DialogControlSetPropertyAsBool(gv_AliasSearchResults[i].panel, c_triggerControlPropertyToggled, PlayerGroupSingle(p), false);
+            }
+        }
+    }
+}
+
+
+
+static int[gv_LibapxMaxPlayers] gv_CurrentQueryTimeElapsed;
+
+static void FormOutput(int p) {
+    string aliasName = libNtve_gf_DialogItemEditValue(gv_Key, p);
+    string aliasParameters = libNtve_gf_DialogItemEditValue(gv_Parameter, p);
+    string aliasValue = libNtve_gf_DialogItemEditValue(gv_Value, p);
+
+
+    libNtve_gf_SetDialogItemEditorValue(gv_Output, "_alias create "+aliasName + " " + aliasParameters + " [" + aliasValue + "]", PlayerGroupSingle(p));
+}
+
+void LibapxUiInitAliasesPlayer(int p) {
+    int i;
+    //Init QueryTime
+    gv_CurrentQueryTimeElapsed[p] = 0;
+    gv_LibapxPlayer[p].aliasSearchPage = 1;
+    gv_LibapxPlayer[p].aliasSearchNextPage = false;
+    gv_LibapxPlayer[p].aliasSearchQuery = "";
+    TriggerAddEventDialogControl(TriggerCreate("TrigAliasQueryType"), p, gv_SearchAlias, c_triggerControlEventTypeTextChanged);
+
+    //Init Result Items
+    LibapxSearchAliasesUiSetSearchQuery(p);
+
+    TriggerAddEventDialogControl(TriggerCreate("TrigAliasNextPage"), p, gv_NextPage, c_triggerControlEventTypeClick);
+    TriggerAddEventDialogControl(TriggerCreate("TrigAliasPreviousPage"), p, gv_PreviousPage, c_triggerControlEventTypeClick);
+
+    for (i = 0; i < gv_LibapxTotalAliasesinPage; i += 1) {
+        TriggerAddEventDialogControl(TriggerCreate("TrigAliasSelectClicked"), p, gv_AliasSearchResults[i].select, c_triggerControlEventTypeClick);
+        TriggerAddEventDialogControl(TriggerCreate("TrigAliasDeleteClick"), p, gv_AliasSearchResults[i].delete, c_triggerControlEventTypeClick);
+        DialogControlSetPropertyAsText(gv_AliasSearchResults[i].deleteTooltip, c_triggerControlPropertyText, PlayerGroupSingle(p), StringToText(gv_UnclickedDeleteTooltip));
+    }
+
+    
+    TriggerAddEventDialogControl(TriggerCreate("TrigAliasType"), p, gv_Key, c_triggerControlEventTypeTextChanged);
+    TriggerAddEventDialogControl(TriggerCreate("TrigAliasType"), p, gv_Parameter, c_triggerControlEventTypeTextChanged);
+    TriggerAddEventDialogControl(TriggerCreate("TrigAliasType"), p, gv_Value, c_triggerControlEventTypeTextChanged);
+    TriggerAddEventDialogControl(TriggerCreate("TrigCreateAlias"), p, gv_OutputApply, c_triggerControlEventTypeClick);
+}
+bool TrigCreateAlias(bool testConds, bool runActions) {
+    int p = EventPlayer();
+    string aliasName = libNtve_gf_DialogItemEditValue(gv_Key, p);
+    string aliasParameters = libNtve_gf_DialogItemEditValue(gv_Parameter, p);
+    string aliasValue = libNtve_gf_DialogItemEditValue(gv_Value, p);
+
+
+    LibapxChatParseSimplified("_alias create "+aliasName + " " + aliasParameters + " [" + aliasValue + "]", p);
+    return true;
+}
+
+bool TrigAliasType(bool testConds, bool runActions) {
+    int p = EventPlayer();
+
+    FormOutput(p);
+    return true;
+}
+
+bool TrigAliasSelectClicked(bool testConds, bool runActions) {
+    int p = EventPlayer();
+    int panel = EventDialogControl();
+    int i;
+    string aliasValue;
+    string aliasParameters;
+    string aliasName;
+    
+    for (i = 0; i < gv_LibapxTotalAliasesinPage; i += 1) {
+        if(gv_AliasSearchResults[i].select == panel) {
+            break;
+        }
+    }
+    
+    aliasName =  LibapxStringTrim(gv_AliasSearchResults[i].result[p]);
+    aliasParameters = LibapxAliasGetParameters(p, aliasName);
+    aliasValue = LibapxAliasGetValue(p, aliasName);
+
+    //Set
+    libNtve_gf_SetDialogItemEditorValue(gv_Key, aliasName, PlayerGroupSingle(p));
+    libNtve_gf_SetDialogItemEditorValue(gv_Parameter, aliasParameters, PlayerGroupSingle(p));
+    libNtve_gf_SetDialogItemEditorValue(gv_Value, aliasValue, PlayerGroupSingle(p));
+
+
+    FormOutput(p);
+
+    return true;
+}
+
+bool TrigAliasDeleteClick(bool testConds, bool runActions) {
+    int p = EventPlayer();
+    int panel = EventDialogControl();
+    int i;
+    
+    for (i = 0; i < gv_LibapxTotalAliasesinPage; i += 1) {
+        if(gv_AliasSearchResults[i].delete == panel) {
+            break;
+        }
+    }
+
+    if(gv_AliasSearchResults[i].deleteClicked[p]) {
+        LibapxChatParseSimplified("_alias remove "+gv_AliasSearchResults[i].result[p], p);
+        return true;
+    }
+
+    //If not deleting alias, set tooltip
+    gv_AliasSearchResults[i].deleteClicked[p] = true;
+    DialogControlSetPropertyAsText(gv_AliasSearchResults[i].deleteTooltip, c_triggerControlPropertyText, PlayerGroupSingle(p), StringToText(gv_ClickedDeleteTooltip));
+    DialogControlSetPropertyAsColor(gv_AliasSearchResults[i].delete, c_triggerControlPropertyColor, PlayerGroupSingle(p), Color(70,20,20));
+
+
+    Wait(2, c_timeGame);
+    gv_AliasSearchResults[i].deleteClicked[p] = false;
+    DialogControlSetPropertyAsText(gv_AliasSearchResults[i].deleteTooltip, c_triggerControlPropertyText, PlayerGroupSingle(p), StringToText(gv_UnclickedDeleteTooltip));
+    DialogControlSetPropertyAsColor(gv_AliasSearchResults[i].delete, c_triggerControlPropertyColor, PlayerGroupSingle(p), Color(100,100,100));
+
+
+    return true;
+}
+
+bool TrigAliasNextPage(bool testConds, bool runActions) {
+    int p = EventPlayer();
+    gv_LibapxPlayer[p].aliasSearchPage = gv_LibapxPlayer[p].aliasSearchPage + 1;
+
+    LibapxSearchAliasesUiSetSearchQuery(p);
+
+    return true;
+}
+
+bool TrigAliasPreviousPage(bool testConds, bool runActions) {
+    int p = EventPlayer();
+    gv_LibapxPlayer[p].aliasSearchPage = gv_LibapxPlayer[p].aliasSearchPage - 1;
+
+    LibapxSearchAliasesUiSetSearchQuery(p);
+
+    return true;
+}
+
+bool TrigAliasQueryType(bool testConds, bool runActions) {
+    int p = EventPlayer();
+    string value = libNtve_gf_DialogItemEditValue(gv_SearchAlias, p);
+    gv_LibapxPlayer[p].aliasSearchQuery = value;
+    gv_LibapxPlayer[p].aliasSearchPage = 1;
+    gv_CurrentQueryTimeElapsed[p] += 1;
+    
+    Wait(.6, c_timeGame);
+        
+    if(gv_CurrentQueryTimeElapsed[p] == 1) {
+        LibapxSearchAliasesUiSetSearchQuery(p);
+    }
+
+    gv_CurrentQueryTimeElapsed[p] -= 1;
+
+    return true;
+}

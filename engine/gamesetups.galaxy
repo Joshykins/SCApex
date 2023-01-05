@@ -105,7 +105,7 @@ void LibapxGamesetupSave(int player, string gamesetupName, region rgn) {
 	//finally, save bank
 	BankSave(gv_LibapxPlayer[player].bankStorage);
 
-	LibapxPrintSuccess(player, "Game setup saved as \"" + gamesetupName + "\"");
+	LibapxLogSuccess(player, "Game setup saved as \"" + gamesetupName + "\"");
 }
 
 // LibapxGamesetupLoad
@@ -180,7 +180,7 @@ void LibapxGamesetupLoad(int player, string gamesetupName) {
 
 
 	//loading complete!
-	LibapxPrintSuccess(player, "Game setup loaded: \"" + gamesetupName + "\"");
+	LibapxLogSuccess(player, "Game setup loaded: \"" + gamesetupName + "\"");
 	gGamesetupsLoading -= 1;
 }
 
@@ -211,7 +211,6 @@ string LibapxGamesetupAliasCommands(string s) {
 	aliased = StringReplaceWord(aliased, "@state", "@se", c_stringReplaceAll, false);
 	aliased = StringReplaceWord(aliased, "@invulnerable", "@inv", c_stringReplaceAll, false);
 	aliased = StringReplaceWord(aliased, "@setname", "@snm", c_stringReplaceAll, false);
-	aliased = StringReplaceWord(aliased, "@setnamecolor", "@snc", c_stringReplaceAll, false);
 	aliased = StringReplaceWord(aliased, "@renameall", "@rn", c_stringReplaceAll, false);
 	aliased = StringReplaceWord(aliased, "@color", "@col", c_stringReplaceAll, false);
 	aliased = StringReplaceWord(aliased, "@tooltip", "@tt", c_stringReplaceAll, false);
@@ -248,7 +247,6 @@ string LibapxGamesetupAliasCommandsUnpack(string aliased) {
 	unpacked = StringReplaceWord(unpacked, "@se", "@state", c_stringReplaceAll, false);
 	unpacked = StringReplaceWord(unpacked, "@inv", "@invulnerable", c_stringReplaceAll, false);
 	unpacked = StringReplaceWord(unpacked, "@snm", "@setname", c_stringReplaceAll, false);
-	unpacked = StringReplaceWord(unpacked, "@snc", "@setnamecolor", c_stringReplaceAll, false);
 	unpacked = StringReplaceWord(unpacked, "@rn", "@renameall", c_stringReplaceAll, false);
 	unpacked = StringReplaceWord(unpacked, "@col", "@color", c_stringReplaceAll, false);
 	unpacked = StringReplaceWord(unpacked, "@tt", "@tooltip", c_stringReplaceAll, false);

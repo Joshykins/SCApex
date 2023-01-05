@@ -1,0 +1,87 @@
+static int gv_repeatToggle;
+static int gv_replaceToggle;
+static int gv_reloadBankToggle;
+static int gv_dataEditToggle;
+static int gv_gamesetupToggle;
+static int gv_loanToggle;
+
+void LibapxUiInitAdminSettings() {
+    int base = DialogControlHookupStandard(
+        c_triggerControlTypePanel,
+        "UIContainer/ConsoleUIContainer/PanelAdministration/Content"
+    );
+
+    //Get uis
+    gv_repeatToggle = DialogControlHookup(base, c_triggerControlTypeButton, "RepeatNoDelay/Checkbox");
+    gv_replaceToggle = DialogControlHookup(base, c_triggerControlTypeButton, "Replace/Checkbox");
+    gv_reloadBankToggle = DialogControlHookup(base, c_triggerControlTypeButton, "ReloadBank/Checkbox");
+    gv_dataEditToggle = DialogControlHookup(base, c_triggerControlTypeButton, "DataEdit/Checkbox");
+    gv_gamesetupToggle = DialogControlHookup(base, c_triggerControlTypeButton, "Gamesetups/Checkbox");
+    gv_loanToggle = DialogControlHookup(base, c_triggerControlTypeButton, "Loan/Checkbox");
+}
+
+void LibapxUiinitAdminSettingsPlayer(int p) {
+    bool allowRepeatNoDelay = LibapxGetAdminSetting(p, c_AdminSettingAllowRepeatNoDelay);
+	bool allowReplace = LibapxGetAdminSetting(p, c_AdminSettingAllowReplace);
+	bool allowReloadBank = LibapxGetAdminSetting(p, c_AdminSettingAllowReloadBank);
+	bool allowDataEdit = LibapxGetAdminSetting(p, c_AdminSettingAllowDataEdit);
+	bool allowGamesetup = LibapxGetAdminSetting(p, c_AdminSettingAllowGamesetup);
+	bool allowLoan = LibapxGetAdminSetting(p, c_AdminSettingAllowLoan);
+
+    DialogControlSetPropertyAsBool(gv_repeatToggle, c_triggerControlPropertyToggled, PlayerGroupSingle(p), allowRepeatNoDelay);
+    TriggerAddEventDialogControl(TriggerCreate("TrigAllowRepeat"), p, gv_repeatToggle, c_triggerControlEventTypeClick);
+    DialogControlSetPropertyAsBool(gv_replaceToggle, c_triggerControlPropertyToggled, PlayerGroupSingle(p), allowReplace);
+    TriggerAddEventDialogControl(TriggerCreate("TrigAllowReplace"), p, gv_replaceToggle, c_triggerControlEventTypeClick);
+    DialogControlSetPropertyAsBool(gv_reloadBankToggle, c_triggerControlPropertyToggled, PlayerGroupSingle(p), allowReloadBank);
+    TriggerAddEventDialogControl(TriggerCreate("TrigAllowReloadBank"), p, gv_reloadBankToggle, c_triggerControlEventTypeClick);
+    DialogControlSetPropertyAsBool(gv_dataEditToggle, c_triggerControlPropertyToggled, PlayerGroupSingle(p), allowDataEdit);
+    TriggerAddEventDialogControl(TriggerCreate("TrigAllowDataEdit"), p, gv_dataEditToggle, c_triggerControlEventTypeClick);
+    DialogControlSetPropertyAsBool(gv_gamesetupToggle, c_triggerControlPropertyToggled, PlayerGroupSingle(p), allowGamesetup);
+    TriggerAddEventDialogControl(TriggerCreate("TrigAllowGamesetup"), p, gv_gamesetupToggle, c_triggerControlEventTypeClick);
+    DialogControlSetPropertyAsBool(gv_loanToggle, c_triggerControlPropertyToggled, PlayerGroupSingle(p), allowLoan);
+    TriggerAddEventDialogControl(TriggerCreate("TrigAllowLoan"), p, gv_loanToggle, c_triggerControlEventTypeClick);
+}
+
+static void HandleToggle(int p, int panel, string setting) {
+    bool settingValue = LibapxGetAdminSetting(p, setting);
+
+    DialogControlSetPropertyAsBool(panel, c_triggerControlPropertyToggled, PlayerGroupSingle(p), !settingValue);
+    LibapxSetAdminSetting(p, setting, !settingValue);
+}
+
+bool TrigAllowRepeat(bool testConds, bool runActions) {
+    int p = EventPlayer();
+
+    HandleToggle(p, gv_repeatToggle, c_AdminSettingAllowRepeatNoDelay);
+    return true;
+}
+bool TrigAllowReplace(bool testConds, bool runActions) {
+    int p = EventPlayer();
+
+    HandleToggle(p, gv_replaceToggle, c_AdminSettingAllowReplace);
+    return true;
+}
+bool TrigAllowReloadBank(bool testConds, bool runActions) {
+    int p = EventPlayer();
+
+    HandleToggle(p, gv_reloadBankToggle, c_AdminSettingAllowReloadBank);
+    return true;
+}
+bool TrigAllowDataEdit(bool testConds, bool runActions) {
+    int p = EventPlayer();
+
+    HandleToggle(p, gv_dataEditToggle, c_AdminSettingAllowDataEdit);
+    return true;
+}
+bool TrigAllowGamesetup(bool testConds, bool runActions) {
+    int p = EventPlayer();
+
+    HandleToggle(p, gv_gamesetupToggle, c_AdminSettingAllowGamesetup);
+    return true;
+}
+bool TrigAllowLoan(bool testConds, bool runActions) {
+    int p = EventPlayer();
+
+    HandleToggle(p, gv_loanToggle, c_AdminSettingAllowLoan);
+    return true;
+}

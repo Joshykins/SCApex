@@ -1,0 +1,284 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<Desc>
+
+	<!-- Add Subpanels -->
+	<Include path="Apex/Layout/MainUi/MainUiTemplates.SC2Layout"/>
+	<Include path="Apex/Layout/MainUi/Tabs/TabSettings.SC2Layout"/>
+	<Include path="Apex/Layout/MainUi/Tabs/TabAutomation.SC2Layout"/>
+	<Include path="Apex/Layout/MainUi/Tabs/TabGuides.SC2Layout"/>
+	<Include path="Apex/Layout/MainUi/Tabs/TabUtilities.SC2Layout"/>
+
+
+
+    <Frame type="Frame" name="GameUI/UIContainer/ConsoleUIContainer" file="GameUI">
+
+		<Frame type="Button" name="MainPanelBackground" template="ApexTemplates/ApexSecondaryFrameTemplate">
+			<Anchor side="Bottom" relative="$parent" pos="Max" offset="10"/>
+			<Anchor side="Left" relative="$parent" pos="Min" offset="-10"/>
+			<Anchor side="Right" relative="$parent" pos="Max" offset="10"/>
+			<Height val="250"/>
+			<RenderPriority val="5"/>
+			<Toggled val="True"/>
+			<AcceptsMouse val="False"/>
+			
+
+			<Frame type="Frame" name="TitleBackground" template="ApexTemplates/ApexOutlineTemplate">
+				<Anchor side="Bottom" relative="$parent/PanelTitle" pos="Max" offset="0"/>
+				<Anchor side="Right" relative="$parent/PanelTitle" pos="Max" offset="0"/>
+				<Anchor side="Top" relative="$parent/PanelTitle" pos="Min" offset="0"/>
+				<Anchor side="Left" relative="$parent/PanelTitle" pos="Min" offset="0"/>
+				<RenderPriority val="15"/>
+			</Frame>
+
+			<Frame type="Label" name="PanelTitle">
+				<Text val=""/>
+				<Style val="apx_heading_center_mid"/>
+				<Anchor side="Left" relative="$parent" pos="Min" offset="400"/>
+				<Anchor side="Bottom" relative="$parent" pos="Max" offset="-100"/>
+				<RenderPriority val="25"/>
+				<Height val="100"/>
+				<Width val="350"/>
+			</Frame>
+
+
+			<Frame type="Button" name="Settings" template="TabSettings/Tabs"/>
+			<Frame type="Button" name="Automation" template="TabAutomation/Tabs"/>
+			<Frame type="Button" name="Guides" template="TabGuides/Tabs"/>
+			<Frame type="Button" name="Utilities" template="TabUtilities/Tabs"/>
+
+
+
+			<Animation name="ToggleOn">
+				<Event event="Toggled" action="Reset,Play" frame="$this"/>
+				<Controller type="Fade" end="Pause" frame="$this">
+					<Key type="Curve" time="0" value="0"/>
+					<Key type="Curve" time=".15" value="255"/>
+				</Controller>
+				<Controller type="Fade" end="Pause" frame="$this/TitleBackground/OutlineFrameBackground">
+					<Key type="Curve" time="0" value="0"/>
+					<Key type="Curve" time=".15" value="135"/>
+				</Controller>
+				<Controller type="Fade" end="Pause" frame="$this/TitleBackground/OutlineFrameBackgroundLines">
+					<Key type="Curve" time="0" value="0"/>
+					<Key type="Curve" time=".15" value="255"/>
+				</Controller>
+				<Controller type="Fade" end="Pause" frame="$this/TitleBackground/OutlineFrameBackgroundLinesSmall">
+					<Key type="Curve" time="0" value="0"/>
+					<Key type="Curve" time=".15" value="100"/>
+				</Controller>
+			</Animation>
+	
+			<Animation name="ToggleOff">
+				<Event event="Normal" action="Reset,Play" frame="$this"/>
+				<Controller type="Fade" end="Pause" frame="$this">
+					<Key type="Curve" time="0" value="255"/>
+					<Key type="Curve" time=".15" value="0"/>
+				</Controller>
+				<Controller type="Fade" end="Pause" frame="$this/TitleBackground/OutlineFrameBackground">
+					<Key type="Curve" time="0" value="135"/>
+					<Key type="Curve" time=".15" value="0"/>
+				</Controller>
+				<Controller type="Fade" end="Pause" frame="$this/TitleBackground/OutlineFrameBackgroundLines">
+					<Key type="Curve" time="0" value="255"/>
+					<Key type="Curve" time=".15" value="0"/>
+				</Controller>
+				<Controller type="Fade" end="Pause" frame="$this/TitleBackground/OutlineFrameBackgroundLinesSmall">
+					<Key type="Curve" time="0" value="100"/>
+					<Key type="Curve" time=".15" value="0"/>
+				</Controller>
+			</Animation>
+	
+
+
+			<Frame type="Image" name="Border">
+				<Alpha val="155"/>
+			</Frame>
+			<Frame type="Image" name="SecondaryBorder">
+				<TextureType val="Border"/>
+				<Texture val="Apex/Assets/Textures/GenericFrame/simple_outline_border.dds"/>
+				<Anchor side="Top" relative="$parent/Background" pos="Min" offset="7"/>
+				<Anchor side="Left" relative="$parent/Background" pos="Min" offset="0"/>
+				<Anchor side="Bottom" relative="$parent/Background" pos="Max" offset="0"/>
+				<Anchor side="Right" relative="$parent/Background" pos="Max" offset="0"/>
+				<Alpha val="100"/>
+				<RenderPriority val="13"/>
+			</Frame>
+
+
+		</Frame>
+
+		
+		<!-- Main Buttons -->
+		<Frame type="Frame" name="MainPanelContainer">
+			<Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+			<Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
+			<Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
+			<Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+
+			<RenderPriority val="7"/>
+
+			<StateGroup name="ShowHideMainBackground">
+				<DefaultState val="Default"/>
+				<State name="Settings">
+					<When type="Property" frame="$this/MainButton1" Toggled="True" operator="Equal" />
+					<Action type="SetProperty" Toggled="True" frame="$parent/MainPanelBackground" />
+					<Action type="SetProperty" Text="Settings" frame="$parent/MainPanelBackground/PanelTitle" />
+					
+					<!-- Set Tab To True -->
+					<Action type="SetProperty" Visible="True" frame="$parent/MainPanelBackground/Settings" />
+					<!-- Sett others to False -->
+					<Action type="SetProperty" Visible="False" frame="$parent/MainPanelBackground/Automation" />
+					<Action type="SetProperty" Visible="False" frame="$parent/MainPanelBackground/Guides" />
+					<Action type="SetProperty" Visible="False" frame="$parent/MainPanelBackground/Utilities" />
+
+				</State>
+				<State name="Automation">
+					<When type="Property" frame="$this/MainButton2" Toggled="True" operator="Equal" />
+					<Action type="SetProperty" Toggled="True" frame="$parent/MainPanelBackground" />
+					<Action type="SetProperty" Text="Automation" frame="$parent/MainPanelBackground/PanelTitle" />
+					
+					<!-- Set Tab To True -->
+					<Action type="SetProperty" Visible="True" frame="$parent/MainPanelBackground/Automation" />
+					<!-- Sett others to False -->
+					<Action type="SetProperty" Visible="False" frame="$parent/MainPanelBackground/Settings" />
+					<Action type="SetProperty" Visible="False" frame="$parent/MainPanelBackground/Guides" />
+					<Action type="SetProperty" Visible="False" frame="$parent/MainPanelBackground/Utilities" />
+				</State>
+				<State name="Guides">
+					<When type="Property" frame="$this/MainButton3" Toggled="True" operator="Equal" />
+					<Action type="SetProperty" Toggled="True" frame="$parent/MainPanelBackground" />
+					<Action type="SetProperty" Text="Guides" frame="$parent/MainPanelBackground/PanelTitle" />
+					
+					<!-- Set Tab To True -->
+					<Action type="SetProperty" Visible="True" frame="$parent/MainPanelBackground/Guides" />
+					<!-- Sett others to False -->
+					<Action type="SetProperty" Visible="False" frame="$parent/MainPanelBackground/Automation" />
+					<Action type="SetProperty" Visible="False" frame="$parent/MainPanelBackground/Settings" />
+					<Action type="SetProperty" Visible="False" frame="$parent/MainPanelBackground/Utilities" />
+				</State>
+				<State name="Utilities">
+					<When type="Property" frame="$this/MainButton4" Toggled="True" operator="Equal" />
+					<Action type="SetProperty" Toggled="True" frame="$parent/MainPanelBackground" />
+					<Action type="SetProperty" Text="Utilities" frame="$parent/MainPanelBackground/PanelTitle" />
+					
+					<!-- Set Tab To True -->
+					<Action type="SetProperty" Visible="True" frame="$parent/MainPanelBackground/Utilities" />
+					<!-- Sett others to False -->
+					<Action type="SetProperty" Visible="False" frame="$parent/MainPanelBackground/Automation" />
+					<Action type="SetProperty" Visible="False" frame="$parent/MainPanelBackground/Guides" />
+					<Action type="SetProperty" Visible="False" frame="$parent/MainPanelBackground/Settings" />
+				</State>
+				<State name="Default">
+					<Action type="SetProperty" Toggled="False" frame="$parent/MainPanelBackground" />
+					<!-- Set Tabs To False -->
+					<Action type="SetProperty" Visible="False" frame="$parent/MainPanelBackground/Settings" />
+					<Action type="SetProperty" Visible="False" frame="$parent/MainPanelBackground/Automation" />
+					<Action type="SetProperty" Visible="False" frame="$parent/MainPanelBackground/Guides" />
+					<Action type="SetProperty" Visible="False" frame="$parent/MainPanelBackground/Utilities" />
+					
+				</State>
+			</StateGroup>
+
+			<Frame type="Button" name="MainButton1" template="MainUiTemplates/MainButtonTemplate">
+				<Anchor side="Left" relative="$parent" pos="Mid" offset="-345"/>
+				<Frame type="Image" name="Icon">
+					<Texture val="Apex/Assets/Textures/BottomUi/btn_setting.png"/>
+				</Frame>
+				<Frame type="Frame" name="TooltipFrame" template="ApexTemplates/ApexSecondaryFrameTemplate">
+					<Frame type="Label" name="TooltipText">
+						<Text val="Settings"/>
+					</Frame>
+				</Frame>
+			</Frame>
+			<Frame type="Button" name="MainButton2" template="MainUiTemplates/MainButtonTemplate">
+				<Anchor side="Left" relative="$parent" pos="Mid" offset="-115"/>
+				<Frame type="Image" name="Icon">
+					<Texture val="Apex/Assets/Textures/BottomUi/btn_automation.png"/>
+				</Frame>
+				<Frame type="Frame" name="TooltipFrame" template="ApexTemplates/ApexSecondaryFrameTemplate">
+					<Frame type="Label" name="TooltipText">
+						<Text val="Automation"/>
+					</Frame>
+				</Frame>
+			</Frame>
+			<Frame type="Button" name="MainButton3" template="MainUiTemplates/MainButtonTemplate">
+				<Anchor side="Right" relative="$parent" pos="Mid" offset="115"/>
+				<Frame type="Image" name="Icon">
+					<Texture val="Apex/Assets/Textures/BottomUi/btn_guides.png"/>
+				</Frame>
+				<Frame type="Frame" name="TooltipFrame" template="ApexTemplates/ApexSecondaryFrameTemplate">
+					<Frame type="Label" name="TooltipText">
+						<Text val="Guides"/>
+					</Frame>
+				</Frame>
+			</Frame>
+			<Frame type="Button" name="MainButton4" template="MainUiTemplates/MainButtonTemplate">
+				<Anchor side="Right" relative="$parent" pos="Mid" offset="345"/>
+				<Frame type="Image" name="Icon">
+					<Texture val="Apex/Assets/Textures/BottomUi/btn_utils.png"/>
+				</Frame>
+				<Frame type="Frame" name="TooltipFrame" template="ApexTemplates/ApexSecondaryFrameTemplate">
+					<Frame type="Label" name="TooltipText">
+						<Text val="Utilities"/>
+					</Frame>
+				</Frame>
+			</Frame>
+		</Frame>
+
+		<!-- Bottom Line -->
+		<Frame type="Frame" name="ApexBottomLine">
+			<Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+			<Anchor side="Bottom" relative="$parent" pos="Max" offset="-50"/>
+			<Height val="50"/>
+			<Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
+			<Frame type="Image" name="LeftLine">
+				<Anchor side="Left" relative="$parent/$parent/MinimapPanel" pos="Max" offset="0"/>
+				<Anchor side="Right" relative="$parent/Midline" pos="Min" offset="2"/>
+				<Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
+				<Texture val="Apex/Assets/Textures/BottomUi/line-Left.png"/>
+			</Frame>
+			<Frame type="Image" name="RightLine">
+				<Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
+				<Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
+				<Anchor side="Left" relative="$parent/Midline" pos="Max" offset="-7"/>
+				<Texture val="Apex/Assets/Textures/BottomUi/line-right.png"/>
+			</Frame>
+			<Frame type="Image" name="Midline">
+				<Anchor side="Left" relative="$parent" pos="Mid" offset="0"/>
+				<Anchor side="Right" relative="$parent" pos="Mid" offset="0"/>
+				<Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
+				<Texture val="Apex/Assets/Textures/BottomUi/line-mid.png"/>
+			</Frame>
+		</Frame>
+
+		<!-- Bottom Icon + Perm Level -->
+		<Frame type="Image" name="BottomIcon">
+			<Anchor side="Left" relative="$parent" pos="Mid" offset="0"/>
+			<Anchor side="Right" relative="$parent" pos="Mid" offset="0"/>
+			<Anchor side="Bottom" relative="$parent" pos="Max" offset="20"/>
+			<Texture val="Apex/Assets/Textures/BottomUi/permission-icon.png"/>
+			<Alpha val="220"/>
+			<Frame type="Button" name="FrameDescription">
+				<AcceptsMouse val="True"/>
+				<Width val="44"/>
+				<Height val="44"/>
+				<TooltipAnchorPosition val="TopCenter"/>
+				<Tooltip val="Your Current Permission Level"/>
+				<Anchor side="Left" relative="$parent" pos="Mid" offset="0"/>
+				<Anchor side="Right" relative="$parent" pos="Mid" offset="0"/>
+				<Anchor side="Bottom" relative="$parent" pos="Max" offset="-70"/>
+			</Frame>
+		</Frame>
+		<Frame type="Label" name="PermissionLevel">
+		
+			<Anchor side="Left" relative="$parent" pos="Mid" offset="0"/>
+			<Anchor side="Right" relative="$parent" pos="Mid" offset="0"/>
+			<Anchor side="Bottom" relative="$parent" pos="Max" offset="-30"/>
+			<Style val="apx_subtitle"/>
+			<Text val="Moderator"/>
+			<Alpha val="200"/>
+		</Frame>
+
+	<!-- End Of file -->
+    </Frame>
+</Desc>

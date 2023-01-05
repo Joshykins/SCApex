@@ -20,7 +20,7 @@ bool gv_LibapxPlayerbankHasloaded(int p) {
 		return true;
 	}
 	else {
-		LibapxPrintError(p,"Banks not loaded, wait until banks are loaded to use this command");
+		LibapxLogError(p,"Banks not loaded, wait until banks are loaded to use this command");
 		return false;
 	}
 }

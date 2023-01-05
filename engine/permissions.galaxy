@@ -43,7 +43,7 @@ bool LibapxFindSuperadmin(string playerHandle) {
 	}
 	if(playerHandle == "") {
 		matched = true;
-		LibapxPrint(PlayerGroupAll(), "Local player detected, advanced admin permissions granted.");
+		LibapxLogPlayerGroup(PlayerGroupAll(), "Local player detected, advanced admin permissions granted.");
 	}
 	return matched;
 }
@@ -62,7 +62,7 @@ unitgroup LibapxEnforceUnitPermissions(unitgroup g, int player) {
 		if( (	// general permissions for unit owner:
 				// unit owner must be yourself, or someone with lesser
 				// status than you (e.g. admin > mod > user > computers)
-				UnitGetOwner(u) != player &&
+				UnitGetOwner(u) != player && // TODO remove
 				PlayerType(UnitGetOwner(u)) != c_playerTypeNone &&
 				PlayerType(UnitGetOwner(u)) != c_playerTypeComputer &&
 				PlayerType(UnitGetOwner(u)) != c_playerTypeHostile &&
@@ -78,10 +78,35 @@ unitgroup LibapxEnforceUnitPermissions(unitgroup g, int player) {
 				PlayerType(UnitGetOwner(u)) == c_playerTypeNeutral
 			)
 		) {
-			UnitGroupRemove(g, u);
+			if(
+				FixedToInt(UnitGetCustomValue(u, gv_LibapxUnitIndexFlagLoaner)) != player
+			)
+			{
+				UnitGroupRemove(g, u);
+			}
 		}
 		count -= 1;
 	}
 
 	return g;
+}
+
+
+int LibapxEnforceLoanPlayer(unitgroup ug, int p) {
+	int i;
+	//This is really only for keypresses, so reminder, can only be used one ONE unit at a time realistically
+	unit u = UnitGroupUnit(ug,1);
+
+	if(UnitGroupCount(ug, c_unitCountAlive) < 1) {
+		return p;
+	}
+	if(	
+		FixedToInt(UnitGetCustomValue(u, gv_LibapxUnitIndexFlagLoaner)) != p
+	) {
+		//Loaner is not you
+		return p; 
+	}
+	else {
+		return FixedToInt(UnitGetCustomValue(u, gv_LibapxUnitIndexFlagLoaner));
+	}
 }

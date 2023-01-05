@@ -1,0 +1,429 @@
+include "apex/ui_lib/unit/ui.unit.stat.galaxy";
+
+static int gv_UnitPanel;
+static int gv_UnitPanelName;
+//Subtitle
+static const color gv_UnitPanelSubtitleDefaultBgColor = Color(15,15,15);
+static const color gv_UnitPanelSubtitleDefaultBorderColor = Color(30,30,30);
+static const string gv_UnitPanelSubtitleDefaultColor = "<c val=\"175,175,175\">";
+static int gv_UnitPanelSubtitleBg;
+static int gv_UnitPanelSubtitleBorder;
+static int gv_UnitPanelSubtitleLabel;
+static int gv_UnitPanelDescriptionLabel;
+
+struct UnitTab {
+    int panel;
+    int button;
+    bool selected;
+    bool enabled;
+};
+
+static UnitTab gv_UnitTabControl;
+static int gv_UnitTabControlAdditionalPanel1;
+static int gv_UnitTabControlAdditionalPanel2;
+static UnitTab gv_UnitTabDescription;
+static UnitTab gv_UnitTabLog;
+static int gv_UnitTabLogLabel;
+static UnitTab gv_UnitTabProperties;
+
+void LibapxUIInitUnit() {
+    LibapxUIInitStat();
+
+    gv_UnitPanel = DialogControlHookupStandard(
+        c_triggerControlTypeButton, 
+        "UIContainer/ConsoleUIContainer/ApexUnitPanel"
+    );
+
+    gv_UnitPanelName = DialogControlHookup(
+        gv_UnitPanel,
+        c_triggerControlTypeLabel,
+        "Content/UnitName"
+    );
+
+    //Subtitle
+    //Used for coloring, label used for setting subtitle text when unit selected
+    gv_UnitPanelSubtitleBg = DialogControlHookup(
+        gv_UnitPanel,
+        c_triggerControlTypeImage,
+        "Content/SubtitleBackground/BackgroundColor"
+    );
+    gv_UnitPanelSubtitleBorder = DialogControlHookup(
+        gv_UnitPanel,
+        c_triggerControlTypeImage,
+        "Content/SubtitleBackground/Border"
+    );
+    gv_UnitPanelSubtitleLabel = DialogControlHookup(
+        gv_UnitPanel,
+        c_triggerControlTypeLabel,
+        "Content/UnitSubtitle"
+    );
+    //Description
+    gv_UnitPanelDescriptionLabel = DialogControlHookup(
+        gv_UnitPanel,
+        c_triggerControlTypeLabel,
+        "Content/UnitOptionDescriptionPanel/ContainerFrame/Description"
+    );
+
+
+    //Unit Tabs
+    ///----------------------
+    //Control
+    gv_UnitTabControl.button = DialogControlHookup(
+        gv_UnitPanel,
+        c_triggerControlTypeButton,
+        "Content/UnitOptions/UnitOptionControl"
+    );
+    gv_UnitTabControl.panel = DialogControlHookupStandard(
+        c_triggerControlTypePanel,
+        "UIContainer/ConsoleUIContainer/CommandPanel"
+    );
+    gv_UnitTabControlAdditionalPanel1 = DialogControlHookupStandard(
+        c_triggerControlTypePanel,
+        "UIContainer/ConsoleUIContainer/InfoPanel"
+    );
+
+    //Description (is default, so)
+    gv_UnitTabDescription.selected = true;
+    gv_UnitTabDescription.button = DialogControlHookup(
+        gv_UnitPanel,
+        c_triggerControlTypeButton,
+        "Content/UnitOptions/UnitOptionDescription"
+    );
+    gv_UnitTabDescription.panel = DialogControlHookup(
+        gv_UnitPanel,
+        c_triggerControlTypePanel,
+        "Content/UnitOptionDescriptionPanel"
+    );
+    //Log
+    gv_UnitTabLog.button = DialogControlHookup(
+        gv_UnitPanel,
+        c_triggerControlTypeButton,
+        "Content/UnitOptions/UnitOptionLog"
+    );
+    gv_UnitTabLog.panel = DialogControlHookup(
+        gv_UnitPanel,
+        c_triggerControlTypePanel,
+        "Content/UnitOptionLogPanel"
+    );
+    gv_UnitTabLogLabel = DialogControlHookup(
+        gv_UnitPanel,
+        c_triggerControlTypeLabel,
+        "Content/UnitOptionLogPanel/ContainerFrame/Log"
+    );
+
+    //Properties
+    gv_UnitTabProperties.button = DialogControlHookup(
+        gv_UnitPanel,
+        c_triggerControlTypeButton,
+        "Content/UnitOptions/UnitOptionProperties"
+    );
+}
+
+static void UpdateTabs(int p, unit u) {
+    //If you own unit, turn all tabs on
+    //Else, turn only on description/log/properties
+    
+    if(p == UnitGetOwner(u)) {
+        gv_UnitTabControl.enabled = true;
+        gv_UnitTabDescription.enabled = true;
+        gv_UnitTabLog.enabled = true;
+        gv_UnitTabProperties.enabled = true;
+    }
+    else {
+        gv_UnitTabControl.enabled = true;
+        gv_UnitTabDescription.enabled = true;
+        gv_UnitTabLog.enabled = true;
+        gv_UnitTabProperties.enabled = false;
+    }
+}
+
+static void ManageSelected(int p,int button, int panel, bool isSelected, bool enabled) {
+
+
+    if(enabled) {
+        if(isSelected) {
+            DialogControlSetPropertyAsBool(button, c_triggerControlPropertyAcceptMouseTarget, PlayerGroupSingle(p), false);
+        }
+        else {
+            DialogControlSetPropertyAsBool(button, c_triggerControlPropertyAcceptMouseTarget, PlayerGroupSingle(p), true);
+        }
+    }
+    else {
+        if(isSelected) {
+            //Invalid Selection Occured, someone clicked a new unit
+            //Set Default Tab to Description, as it is going to be used on every unit regardless of who owns it
+            gv_UnitTabControl.selected = false;
+            gv_UnitTabDescription.selected = true;
+            gv_UnitTabLog.selected = false;
+            gv_UnitTabProperties.selected = false;
+
+        }
+    }
+}
+
+static void RenderTabs(int p) {
+    // Manage Enabled/Disabled
+    DialogControlSetPropertyAsBool(gv_UnitTabControl.button, c_triggerControlPropertyEnabled, PlayerGroupSingle(p), gv_UnitTabControl.enabled);
+    DialogControlSetPropertyAsBool(gv_UnitTabDescription.button, c_triggerControlPropertyEnabled, PlayerGroupSingle(p), gv_UnitTabDescription.enabled);
+    DialogControlSetPropertyAsBool(gv_UnitTabLog.button, c_triggerControlPropertyEnabled, PlayerGroupSingle(p), gv_UnitTabLog.enabled);
+    DialogControlSetPropertyAsBool(gv_UnitTabProperties.button, c_triggerControlPropertyEnabled, PlayerGroupSingle(p), gv_UnitTabProperties.enabled);
+
+    //Manage Currently Selected
+    ManageSelected(p,gv_UnitTabControl.button, gv_UnitTabControl.panel, gv_UnitTabControl.selected, gv_UnitTabControl.enabled);
+    ManageSelected(p,gv_UnitTabDescription.button, gv_UnitTabDescription.panel, gv_UnitTabDescription.selected, gv_UnitTabDescription.enabled);
+    ManageSelected(p,gv_UnitTabLog.button, gv_UnitTabLog.panel, gv_UnitTabLog.selected, gv_UnitTabLog.enabled);
+    // ManageSelected(p,gv_UnitTabProperties.button, gv_UnitTabProperties.panel, gv_UnitTabProperties.selected, gv_UnitTabProperties.enabled);
+
+    DialogControlSetPropertyAsBool(gv_UnitTabControl.button, c_triggerControlPropertyToggled, PlayerGroupSingle(p), gv_UnitTabControl.selected);
+    DialogControlSetPropertyAsBool(gv_UnitTabDescription.button, c_triggerControlPropertyToggled, PlayerGroupSingle(p), gv_UnitTabDescription.selected);
+    DialogControlSetPropertyAsBool(gv_UnitTabLog.button, c_triggerControlPropertyToggled, PlayerGroupSingle(p), gv_UnitTabLog.selected);
+    DialogControlSetPropertyAsBool(gv_UnitTabProperties.button, c_triggerControlPropertyToggled, PlayerGroupSingle(p), gv_UnitTabProperties.selected);
+
+    //Control panel needs to still be visible, so set offset
+    if(gv_UnitTabControl.selected) {
+        DialogControlSetPropertyAsInt(gv_UnitTabControl.panel, c_triggerControlPropertyAlpha, PlayerGroupSingle(p), 255);
+        DialogControlSetPropertyAsInt(gv_UnitTabControlAdditionalPanel1, c_triggerControlPropertyAlpha, PlayerGroupSingle(p), 255);
+        DialogControlSetPropertyAsInt(gv_UnitTabControlAdditionalPanel1, c_triggerControlPropertyAlpha, PlayerGroupSingle(p), 255);
+        DialogControlSetPropertyAsInt(gv_UnitTabControl.panel, c_triggerControlPropertyRenderPriority, PlayerGroupSingle(p), 10);
+        DialogControlSetPropertyAsInt(gv_UnitTabControlAdditionalPanel1, c_triggerControlPropertyRenderPriority, PlayerGroupSingle(p), 10);
+        DialogControlSetPropertyAsInt(gv_UnitTabControlAdditionalPanel1, c_triggerControlPropertyRenderPriority, PlayerGroupSingle(p), 10);
+    }
+    else {
+        DialogControlSetPropertyAsInt(gv_UnitTabControl.panel, c_triggerControlPropertyAlpha, PlayerGroupSingle(p), 0);
+        DialogControlSetPropertyAsInt(gv_UnitTabControlAdditionalPanel1, c_triggerControlPropertyAlpha, PlayerGroupSingle(p), 0);
+        DialogControlSetPropertyAsInt(gv_UnitTabControlAdditionalPanel1, c_triggerControlPropertyAlpha, PlayerGroupSingle(p), 0);
+
+        DialogControlSetPropertyAsInt(gv_UnitTabControl.panel, c_triggerControlPropertyRenderPriority, PlayerGroupSingle(p), 1);
+        DialogControlSetPropertyAsInt(gv_UnitTabControlAdditionalPanel1, c_triggerControlPropertyRenderPriority, PlayerGroupSingle(p), 1);
+        DialogControlSetPropertyAsInt(gv_UnitTabControlAdditionalPanel1, c_triggerControlPropertyRenderPriority, PlayerGroupSingle(p), 1);
+    }
+
+    DialogControlSetPropertyAsBool(gv_UnitTabDescription.panel, c_triggerControlPropertyVisible, PlayerGroupSingle(p), gv_UnitTabDescription.selected);
+    DialogControlSetPropertyAsBool(gv_UnitTabLog.panel, c_triggerControlPropertyVisible, PlayerGroupSingle(p), gv_UnitTabLog.selected);
+    // DialogControlSetPropertyAsBool(gv_UnitTabProperties.panel, c_triggerControlPropertyVisible, PlayerGroupSingle(p), gv_UnitTabProperties.selected);
+
+}
+
+
+void LibapxUIUpdateUnitPlayer(int p) {
+    unitgroup selected = UnitGroupSelected(p);
+    bool displayUnitFrame = false;
+    string name;
+    string subtitle;
+    string description;
+    color subtitleBgColor;
+    int subtitleBgAlpha;
+    color subtitleBorderColor;
+    int subtitleBorderAlpha;
+    text log;
+    playergroup ug = PlayerGroupSingle(p);
+
+    if(UnitGroupCount(selected, c_unitCountAll) > 0 ) {
+        displayUnitFrame = true;
+    }
+
+
+    if (displayUnitFrame) {
+        //Panel
+        DialogControlSetPropertyAsBool(
+            gv_UnitPanel,
+            c_triggerControlPropertyToggled,
+            ug,
+            true
+        );
+        //Name
+        name = LibapxUnitnameGet(UnitGroupUnit(selected, 1));
+        DialogControlSetPropertyAsText(
+            gv_UnitPanelName,
+            c_triggerControlPropertyText,
+            ug,
+            StringToText("</n><s val=\"apx_heading_center_mid\"><c val=\"255,255,255\">" + name + "</n></s>")
+        );
+
+        //Subtitle
+        subtitle = LibapxUnitsubtitleGet(UnitGroupUnit(selected, 1));
+
+        if(LibapxUnitHasSubtitleColor(UnitGroupUnit(selected, 1))) {
+            subtitleBgColor = LibapxUnitSubtitleColorGetEntry(UnitGroupUnit(selected, 1));
+            subtitleBgAlpha = FixedToInt(
+                ColorGetComponent(subtitleBgColor, c_colorComponentAlpha)*2.55
+            );
+        }
+        else {
+            subtitleBgColor = gv_UnitPanelSubtitleDefaultBgColor;
+            subtitleBgAlpha = 255;
+        }
+
+        
+        if(LibapxUnitHasSubtitleBorderColor(UnitGroupUnit(selected, 1))) {
+            subtitleBorderColor = LibapxUnitSubtitleBorderColorGetEntry(UnitGroupUnit(selected, 1));
+            subtitleBorderAlpha =  FixedToInt(
+                ColorGetComponent(subtitleBorderColor, c_colorComponentAlpha)*2.55
+            );
+        }
+        else {
+            subtitleBorderColor = gv_UnitPanelSubtitleDefaultBorderColor;
+            subtitleBorderAlpha = 255;
+        }
+
+        DialogControlSetPropertyAsColor(
+            gv_UnitPanelSubtitleBg,
+            c_triggerControlPropertyColor,
+            ug,
+            subtitleBgColor
+        );
+        DialogControlSetPropertyAsColor(
+            gv_UnitPanelSubtitleBorder,
+            c_triggerControlPropertyColor,
+            ug,
+            subtitleBorderColor
+        );
+        
+
+
+        if(subtitle != "") {
+            DialogControlSetPropertyAsText(
+                gv_UnitPanelSubtitleLabel,
+                c_triggerControlPropertyText,
+                ug,
+                StringToText("<s val=\"apx_subtitle\">" + gv_UnitPanelSubtitleDefaultColor + subtitle)
+            );
+
+            DialogControlSetPropertyAsInt(
+                gv_UnitPanelSubtitleBg,
+                c_triggerControlPropertyAlpha,
+                ug,
+                subtitleBgAlpha
+            );
+            DialogControlSetPropertyAsInt(
+                gv_UnitPanelSubtitleBorder,
+                c_triggerControlPropertyAlpha,
+                ug,
+                subtitleBorderAlpha
+            );
+        }
+        else {
+            DialogControlSetPropertyAsText(
+                gv_UnitPanelSubtitleLabel,
+                c_triggerControlPropertyText,
+                ug,
+                StringToText("")
+            );
+            DialogControlSetPropertyAsInt(
+                gv_UnitPanelSubtitleBg,
+                c_triggerControlPropertyAlpha,
+                ug,
+                0
+            );
+            DialogControlSetPropertyAsInt(
+                gv_UnitPanelSubtitleBorder,
+                c_triggerControlPropertyAlpha,
+                ug,
+                0
+            );
+        }
+
+        //description
+        description = LibapxUnitdescGet(UnitGroupUnit(selected, 1));
+        if(description == "") {
+            description = "No Description for unit";
+        }
+        DialogControlSetPropertyAsText(
+            gv_UnitPanelDescriptionLabel,
+            c_triggerControlPropertyText,
+            ug,
+            StringToText("<s val=\"apx_regular_left_top\">"+description)
+        );
+
+        //Log
+        log = LibapxUnitLogGetEntry(UnitGroupUnit(selected, 1));
+        if(log == StringToText("")) {
+            DialogControlSetPropertyAsText(
+                gv_UnitTabLogLabel,
+                c_triggerControlPropertyText,
+                ug,
+                StringToText("This unit has yet to say anything!")
+            );
+        }
+        else {
+            DialogControlSetPropertyAsText(
+                gv_UnitTabLogLabel,
+                c_triggerControlPropertyText,
+                ug,
+                log
+            );
+        }
+    }
+    else {
+        DialogControlSetPropertyAsBool(
+            gv_UnitPanel,
+            c_triggerControlPropertyToggled,
+            ug,
+            false
+        );
+    }
+
+    UpdateTabs(p, UnitGroupUnit(selected, 1));
+    RenderTabs(p);
+    LibapxUIStatUpdate(p);
+}
+
+void LibapxUIInitUnitPlayer(int p) {
+    
+    //Init Button Triggers
+    TriggerAddEventDialogControl(TriggerCreate("LibapxTrigUnitTabControlClicked"), p, gv_UnitTabControl.button, c_triggerControlEventTypeClick);
+    TriggerAddEventDialogControl(TriggerCreate("LibapxTrigUnitTabDescriptionClicked"), p, gv_UnitTabDescription.button, c_triggerControlEventTypeClick);
+    TriggerAddEventDialogControl(TriggerCreate("LibapxTrigUnitTabLogClicked"), p, gv_UnitTabLog.button, c_triggerControlEventTypeClick);
+    TriggerAddEventDialogControl(TriggerCreate("LibapxTrigUnitTabPropertiesClicked"), p, gv_UnitTabProperties.button, c_triggerControlEventTypeClick);
+
+}
+
+
+bool LibapxTrigUnitTabControlClicked(bool testConds, bool runActions) {
+    gv_UnitTabDescription.selected = false;
+    gv_UnitTabLog.selected = false;
+    gv_UnitTabProperties.selected = false;
+    
+    if(gv_UnitTabControl.enabled) {
+        gv_UnitTabControl.selected = true;
+    }
+
+
+    return true;
+}
+
+
+bool LibapxTrigUnitTabDescriptionClicked(bool testConds, bool runActions) {
+    gv_UnitTabControl.selected = false;
+    gv_UnitTabLog.selected = false;
+    gv_UnitTabProperties.selected = false;
+    
+    if(gv_UnitTabDescription.enabled) {
+        gv_UnitTabDescription.selected = true;
+    }
+
+    return true;
+}
+
+bool LibapxTrigUnitTabLogClicked(bool testConds, bool runActions) {
+    gv_UnitTabControl.selected = false;
+    gv_UnitTabDescription.selected = false;
+    gv_UnitTabProperties.selected = false;
+    
+    if(gv_UnitTabLog.enabled) {
+        gv_UnitTabLog.selected = true;
+    }
+
+    return true;
+}
+bool LibapxTrigUnitTabPropertiesClicked(bool testConds, bool runActions) {
+    gv_UnitTabControl.selected = false;
+    gv_UnitTabDescription.selected = false;
+    gv_UnitTabLog.selected = false;
+    
+    if(gv_UnitTabProperties.enabled) {
+        gv_UnitTabProperties.selected = true;
+    }
+
+    return true;
+}

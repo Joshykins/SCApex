@@ -23,7 +23,7 @@ void LibapxDefineKill(string commandName) {
 	LibapxCommandsGuideEntrySet(
 		gv_CommandsGuideEntryUnit, 
 		commandName, 
-		" This command kills a unit, meaning all it's actors play their death animations. <br> @kill <br> Examples: <br> @kill "
+		" This command kills a unit, meaning all it's actors play their death animations. </n> @kill </n></n><c val=\"255,229,201\">Examples</c>: </n> @kill "
 	);
 }
 
@@ -43,49 +43,173 @@ void LibapxDefineRemove(string commandName) {
 	LibapxCommandsGuideEntrySet(
 		gv_CommandsGuideEntryUnit, 
 		commandName, 
-		" This command removess a unit, this means it and all it's actors are immediately removed. <br> @remove <br> Examples: <br> @remove "
+		" This command removes a unit, this means it and all it's actors are immediately removed. </n> @remove </n></n><c val=\"255,229,201\">Examples</c>: </n> @remove "
+	);
+}
+
+//  @spawn marine;@select;@spawn marauder;@select
+
+// LibapxCommandSelect
+// ====================
+// Selects player's current unitgroup
+void LibapxCommandSelect(int user, unitgroup u, string argv, int spawningCount, string bracketText) {
+	bool modAdd = false;
+	//Remove, and check for, modifiers.
+	if( StringFind(argv, "-add", c_stringNoCase) != -1 ) {
+		modAdd = true;
+		argv = StringReplaceWord(argv, "-add",  "", 1, c_stringNoCase);
+	} 
+	
+	if(modAdd) {
+		UnitGroupSelect(u, user, true);
+	}
+	else {
+		UnitGroupSelect(UnitGroupSelected(user), user, false);
+		UnitGroupSelect(u, user, true);
+	}
+	
+	Wait(.0005, c_timeGame);
+}
+
+
+void LibapxDefineSelect(string commandName) {
+	LibapxCommandsGuideEntrySet(
+		gv_CommandsGuideEntryUnit, 
+		commandName, 
+		" This command selects whatever is the current context of commands. </n> @select -add(add is optional, it adds to current selection) </n></n><c val=\"255,229,201\">Examples</c>: </n> @spawn marine;@select </n> @spawn marine;@select -add "
+	);
+}
+
+
+// @spawn marine;@unitgroup 1;_delay 2;@spawn marauder;@attack 1
+
+// LibapxCommandOrder
+// ====================
+// Sets one unitgroup to attack another unitgroup
+void LibapxCommandOrder(int user, unitgroup u, string argv, int spawningCount, string bracketText) {
+	string unitvar;
+	string unitgroupPrefix = "unitgroup_"+IntToString(user)+"_";
+	unitgroup target;
+	unit targetUnit;
+	point targetPoint;
+	bool useTargetUnit;
+	bool useTargetPoint;
+	string abilityName = StringWord(argv, 2);
+	int abilityIndex;
+
+	if(StringWord(argv, 2) == "") {
+		LibapxLogError(user, "Must provide ability name");
+		return;
+	}
+
+	if(StringWord(argv, 3) != "") {
+		abilityIndex = StringToInt(StringWord(argv, 3));
+	}
+	else {
+		abilityIndex = 0;
+	}
+
+
+	//Remove, and check for, modifiers
+	if( StringFind(argv, "-unit", c_stringNoCase) != -1 ) {
+		useTargetUnit = true;
+		argv = StringReplaceWord(argv, "-unit",  "", 1, c_stringNoCase);
+		unitvar = StringWord(argv, 4);
+
+	} 
+	
+	if( StringFind(argv, "-point", c_stringNoCase) != -1 ) {
+		useTargetPoint = true;
+		argv = StringReplaceWord(argv, "-point",  "", 1, c_stringNoCase);
+		if(StringWord(argv, 4) == "") {
+			targetPoint = gv_LibapxPlayer[user].mousePosition;
+		}
+		else {
+			targetPoint = Point(StringToFixed(StringWord(argv, 4)), StringToFixed(StringWord(argv, 5)));
+		}
+	} 
+	// @order move  1 -point 25 25  
+
+	if(useTargetUnit) {
+		target = DataTableGetUnitGroup(true, unitgroupPrefix + unitvar);
+		targetUnit = UnitGroupUnit(target, 1);
+
+		UnitGroupIssueOrder(
+			u, 
+			OrderTargetingUnit(AbilityCommand(abilityName, abilityIndex), targetUnit),
+			c_orderQueueReplace
+		);
+	}
+	else if(useTargetPoint) {
+		UnitGroupIssueOrder(
+			u,
+			OrderTargetingPoint(AbilityCommand(abilityName, abilityIndex), targetPoint),
+			c_orderQueueReplace
+		);
+	}
+	else {
+		UnitGroupIssueOrder(
+			u,
+			Order(AbilityCommand(abilityName, abilityIndex)),
+			c_orderQueueReplace
+		);
+	}	
+}
+
+//TODO: update description
+void LibapxDefineOrder(string commandName) {
+	LibapxCommandsGuideEntrySet(
+		gv_CommandsGuideEntryUnit, 
+		commandName, 
+		" This command sends orders to a selected units </n> @order [ability] [abilityIndex] [OPTIONAL MODIFIERS are -unit [unitgroup]/-point [x] [y]] </n></n><c val=\"255,229,201\">Examples</c>: </n></n>Below will order the marine to use stimpack</n>_upgrade stimpack on;@spawn marine;@order Stimpack 0</n></n>Below will order the marauder to attack the marine</n>@spawn marine;@unitgroup unitgroupName;@spawn marauder;@order attack 0 -unit unitgroupName</n></n>Below will order unit to have attack-move to point 25,25 on the map.</n>@spawn marine;@order attack 0 -point 25 25"
 	);
 }
 
 
 
 
+// @spawn marine 3;@tint 255;@unitgroup test;@spawn marine 2;@unitgroup -add test;@scale 2 
+
 // LibapxCommandUnitvar
 // ============================
 // Swaps the unit of selected units.
-void LibapxCommandUnitvar(int user, unitgroup u, string argv, int spawningCount, string bracketText) {
-	string unitvarprefix = "unitvar_";
+void LibapxCommandUnitgroup(int user, unitgroup u, string argv, int spawningCount, string bracketText) {
+	string unitgroupPrefix = "unitgroup_"+IntToString(user)+"_";
 	unitgroup newUG;
-	bool addTF = false;
-	if ((StringEqual(StringWord(argv,3), "-add", c_stringNoCase) || StringEqual(StringWord(argv,3), "+add", c_stringNoCase) )  ) {
-			addTF = true;
-	}
-	if (!(addTF)) {
+	bool modAdd = false;
+
+	//Remove, and check for, modifiers.
+	if( StringFind(argv, "-add", c_stringNoCase) != -1 ) {
+		modAdd = true;
+		argv = StringReplaceWord(argv, "-add",  "", 1, c_stringNoCase);
+	} 
+	
+	if (!(modAdd)) {
 
 		if (StringWord(argv,2) != "") {
-			DataTableValueRemove(true, unitvarprefix + StringWord(argv, 2));
-			DataTableSetUnitGroup(true, unitvarprefix + StringWord(argv, 2) , u);
+			DataTableValueRemove(true, unitgroupPrefix + StringWord(argv, 2));
+			DataTableSetUnitGroup(true, unitgroupPrefix + StringWord(argv, 2) , u);
 		} else {
-			LibapxPrintOutput(user, "Provide a name for the unitgroup");
+			LibapxLogInfo(user, "Provide a name for the unitgroup");
 		}
 
 	}
 	else {
 		if (StringWord(argv,2) != "") {
-			newUG = DataTableGetUnitGroup(true, unitvarprefix + StringWord(argv, 2));
-			UnitGroupAddUnitGroup(u, newUG);
-			DataTableSetUnitGroup(true, unitvarprefix + StringWord(argv, 2) , u);
+			newUG = DataTableGetUnitGroup(true, unitgroupPrefix + StringWord(argv, 2));
+			UnitGroupAddUnitGroup(newUG, u);
+			DataTableSetUnitGroup(true, unitgroupPrefix + StringWord(argv, 2) , newUG);
 		} else {
-			LibapxPrintOutput(user, "Provide a name for the unitgroup");
+			LibapxLogInfo(user, "Provide a name for the unitgroup");
 		}
 	}
 
 }
-void LibapxDefineUnitvar(string commandName) {
+void LibapxDefineUnitgroup(string commandName) {
 	LibapxCommandsGuideEntrySet(
 		gv_CommandsGuideEntryUnit, 
 		commandName, 
-		" This command makes the unit(s) have a name to be refered to later with @context. It does very little on it's own. <br> @unitvar [modifier] [name] <br> The modifier for this command is -add, this modifier changes the commands default behavior of replacing the variable with the new one you set, and instead adds it to the new one. <br> Examples: <br> @unitvar bob <br> @unitvar -add bobross <br> @spawn marauder;@unitvar bobross;@spawn marine;@context bobross;@scale 3  "
+		" This command makes the unit(s) have a name to be refered to later with @context. It does very little on it's own. </n> @unitgroup [modifier] [name] </n> The modifier for this command is -add, this modifier changes the commands default behavior of replacing the variable with the new one you set, and instead adds it to the new one. </n></n><c val=\"255,229,201\">Examples</c>: </n> @unitgroup bob </n> @unitgroup -add bobross </n> @spawn marauder;@unitgroup bobross;@spawn marine;@context bobross;@scale 3  "
 	);
 }
 
@@ -94,8 +218,14 @@ void LibapxDefineUnitvar(string commandName) {
 	// ============================
 	// Switches the context of this parsing thread.
 void LibapxCommandContext(int user, unitgroup u, string argv, int spawningCount, string bracketText) {
-	string unitvarprefix = "unitvar_";
-	unitgroup target = DataTableGetUnitGroup(true, unitvarprefix + StringWord(argv,2));
+	string unitgroupPrefix = "unitgroup_"+IntToString(user)+"_";
+	unitgroup target = DataTableGetUnitGroup(true, unitgroupPrefix + StringWord(argv,2));
+	bool modSelect = false;
+	if( StringFind(argv, "-select", c_stringNoCase) != -1 ) {
+		modSelect = true;
+		argv = StringReplaceWord(argv, "-select",  "", 1, c_stringNoCase);
+		target = UnitGroupSelected(user);
+	} 
 
 	LibapxSetTarget(user, target, spawningCount);
 	// LibapxSetTarget(int player, unitgroup target, int spawningCount)
@@ -104,35 +234,43 @@ void LibapxDefineContext(string commandName) {
 	LibapxCommandsGuideEntrySet(
 		gv_CommandsGuideEntryUnit, 
 		commandName, 
-		" This command changes what unit commands apply to by refering to the names set by @unitvar. It does very little on it's own. <br> @context [unitvariable] <br> Examples: <br> @context trevor <br> @spawn marauder;@unitvar bobross;@spawn marine;@context bobross;@scale 3 <br>   "
+		" This command changes what unit commands apply to by refering to the names set by @unitgroup. It does very little on it's own. Optional modifier of -select, this will switch context to whatever is currently selected. </n> @context [-select] [unitvariable] </n></n><c val=\"255,229,201\">Examples</c>: </n> @context trevor </n> @spawn marauder;@unitgroup bobross;@spawn marine;@context bobross;@scale 3 </n>   "
 	);
 }
 
 
-// LibapxCommandWireframe
+// LibapxCommandUnitcard
 // ============================
 // Swaps the unit of selected units.
-void LibapxCommandWireframe(int user, unitgroup u, string argv, int spawningCount, string bracketText) {
+void LibapxCommandUnitcard(int user, unitgroup u, string argv, int spawningCount, string bracketText) {
 	int i;
 	unit tmpUnit;
-	string name = StringWord(argv, 2);
+	string layerName = StringWord(argv, 2);
 	int p = user;
-	if(!BankSectionExists(gv_LibapxPlayer[p].bankStorage, "WF_" + name)) {
-		LibapxPrintError(p, " The wireframe " + name + " does not exist.");
+	if(StringWord(argv,2) == "" || StringSub(StringWord(argv,2),1,1) == "-") {
+		LibapxLogError(user, "Must provide a name for the unitcard image.");
 		return;
-    }
+	}
 
-	for (i = 1; i <= UnitGroupCount(u, c_unitCountAll); i += 1) {
-		tmpUnit = UnitGroupUnit(u, i);
-		LibapxWireframeSetEntry(tmpUnit, name);
-		LibapxUnitCacheUpdate(tmpUnit, "@wireframe", argv);
+	if(UnitGroupCount(u, c_unitCountAll) < 1) {
+		LibapxLogError(user, "Must have at least one unit selected to modify unitcard.");
+		return;
+	}
+
+	if( StringFind(argv, "-path", c_stringNoCase) != -1 ) {
+		argv = StringReplaceWord(argv, "-path",  "", 1, c_stringNoCase);
+		//this is path
+		for (i = 1; i <= UnitGroupCount(u, c_unitCountAll); i += 1) {
+			tmpUnit = UnitGroupUnit(u, i);
+			LibapxSetUnitCardPath(tmpUnit, layerName, StringWord(argv, 3));
+		}
 	}
 }
-void LibapxDefineWireframe(string commandName) {
+void LibapxDefineUnitcard(string commandName) {
 	LibapxCommandsGuideEntrySet(
 		gv_CommandsGuideEntryUnit, 
 		commandName, 
-		" This command changes the wireframe of a unit. The wireframe specified must have been created in the wireframe editor in the UI on the left. <br> @wireframe [wireframe] <br> Examples: <br> @wireframe <br> @wireframe mywireframe <br> "
+		" This command changes the wireframe of a unit. The wireframe specified must have been created in the wireframe editor in the UI on the left. </n> @wireframe [wireframe] </n></n><c val=\"255,229,201\">Examples</c>: </n> @wireframe </n> @wireframe mywireframe </n> "
 	);
 }
 
@@ -154,7 +292,7 @@ void LibapxCommandUnitswap(int user, unitgroup u, string argv, int spawningCount
 		targetUnit = UnitTypeFromString(targetUnit);
 		//type = librtprCatalogGet( c_gameCatalogUnit, type );
 		if (targetUnit == "" || !CatalogEntryIsValid(c_gameCatalogUnit, targetUnit) || UnitTypeTestFlag(targetUnit, c_unitFlagMissile) ) {
-			LibapxPrintOutput(user, "Unit not found, defaulting to BeaconNova");
+			LibapxLogInfo(user, "Unit not found, defaulting to BeaconNova");
 			return;
 		}
 
@@ -194,7 +332,7 @@ void LibapxDefineUnitswap(string commandName) {
 	LibapxCommandsGuideEntrySet(
 		gv_CommandsGuideEntryUnit, 
 		commandName, 
-		" This command swaps out the selected units with a new unit. By default the unit it swaps with is BeaconNova. <br> @unitswap [unitname] <br> Examples: <br> @unitswap <br> @unitswap marauder <br> @spawn marine 25;Delay 3;@unitswap;@modelswap dynamicgrass "
+		" This command swaps out the selected units with a new unit. By default the unit it swaps with is BeaconNova. </n> @unitswap [unitname] </n></n><c val=\"255,229,201\">Examples</c>: </n> @unitswap </n> @unitswap marauder </n> @spawn marine 25;Delay 3;@unitswap;@modelswap dynamicgrass "
 	);
 }
 
@@ -222,13 +360,13 @@ void LibapxCommandUnitmimic (int user, unitgroup u, string argv, int spawningCou
 		targetUnit = UnitTypeFromString(targetUnit);
 		//type = librtprCatalogGet( c_gameCatalogUnit, type );
 		if (targetUnit == "" || !CatalogEntryIsValid(c_gameCatalogUnit, targetUnit) || UnitTypeTestFlag(targetUnit, c_unitFlagMissile) ) {
-			LibapxPrintOutput(user, "Unit not found, defaulting to BeaconNova");
+			LibapxLogInfo(user, "Unit not found, defaulting to Beacon_Nova");
 			return;
 		}
 
 	}
 	else {
-		targetUnit = "BeaconNova";
+		targetUnit = "Beacon_Nova";
 	}
 	gv_LibapxPlayerParser[user][spawningCount].context = UnitGroupEmpty();
 	//Loops through unitgroup,
@@ -259,7 +397,7 @@ void LibapxDefineUnitmimic(string commandName) {
 	LibapxCommandsGuideEntrySet(
 		gv_CommandsGuideEntryUnit, 
 		commandName, 
-		" This command spawns a new unit at the same position of the selected unit, by default this new unit is BeaconNova. <br> @unitmimic [unitname] <br> Examples: <br> @spawn marine;@unitmimic <br> @unitmimic marauder  "
+		" This command spawns a new unit at the same position of the selected unit, by default this new unit is BeaconNova. </n> @unitmimic [unitname] </n></n><c val=\"255,229,201\">Examples</c>: </n> @spawn marine;@unitmimic </n> @unitmimic marauder  "
 	);
 }
 
@@ -319,7 +457,7 @@ void LibapxDefineMove(string commandName) {
 	LibapxCommandsGuideEntrySet(
 		gv_CommandsGuideEntryUnit, 
 		commandName, 
-		" This command moves units to your mousepoint. It has a modifier called -all which selects all units on the map to be moved. <br> @move [modifiers] <br> Examples: <br> @spawn marine 25;Delay 2;@move <br> @move -all <br> (@move -all will move all units on the map, be careful.) "
+		" This command moves units to your mousepoint. It has a modifier called -all which selects all units on the map to be moved. </n> @move [modifiers] </n></n><c val=\"255,229,201\">Examples</c>: </n> @spawn marine 25;Delay 2;@move </n> @move -all </n> (@move -all will move all units on the map, be careful.) "
 	);
 	
 }
@@ -358,7 +496,7 @@ void LibapxCommandPosition (int user, unitgroup u, string argv, int spawningCoun
 		UnitGroupLoopBegin(g);
 		while(!UnitGroupLoopDone())
 		{
-			LibapxPrintOutput(p, UnitGetType(UnitGroupLoopCurrent()) + " (" + FixedToString(PointGetX(UnitGetPosition(UnitGroupLoopCurrent())),2) + "," + FixedToString(PointGetY(UnitGetPosition(UnitGroupLoopCurrent())),2)  + ")");
+			LibapxLogInfo(p, UnitGetType(UnitGroupLoopCurrent()) + " (" + FixedToString(PointGetX(UnitGetPosition(UnitGroupLoopCurrent())),2) + "," + FixedToString(PointGetY(UnitGetPosition(UnitGroupLoopCurrent())),2)  + ")");
 			UnitGroupLoopStep();
 		}
 		UnitGroupLoopEnd();
@@ -366,7 +504,7 @@ void LibapxCommandPosition (int user, unitgroup u, string argv, int spawningCoun
 	}
 
 	if(StringWord( argv, 3) == "") {
-		LibapxPrintError(p,"@pos requires both an X and Y coordinate to move a unit to (X,Y)");
+		LibapxLogError(p,"@pos requires both an X and Y coordinate to move a unit to (X,Y)");
 		return;
 	}
 	//:TODO Arithmatic in Position
@@ -503,7 +641,7 @@ void LibapxDefinePosition(string commandName) {
 	LibapxCommandsGuideEntrySet(
 		gv_CommandsGuideEntryUnit, 
 		commandName, 
-		" This command sets the position of a unit. It has a modifier called -rel which positions the units relative to where the unit is facing. <br> @position [modifiers] [x] [y] <br> Examples: <br> @position 125 125 <br> @position +0 +4 <br> @position -rel +0 -3 "
+		" This command sets the position of a unit. It has a modifier called -rel which positions the units relative to where the unit is facing. </n> @position [modifiers] [x] [y] </n></n><c val=\"255,229,201\">Examples</c>: </n> @position 125 125 </n> @position +0 +4 </n> @position -rel +0 -3 "
 	);
 }
 
@@ -533,7 +671,7 @@ void LibapxDefineRemovearea(string commandName) {
 	LibapxCommandsGuideEntrySet(
 		gv_CommandsGuideEntryUnit, 
 		commandName, 
-		" This command removes all units in a given radius. It only removes units that you own, or units owned by a player of an inferior permission level(admin>mod>user) <br> @removearea [radius] <br> Examples: <br> @removearea 3 "
+		" This command removes all units in a given radius. It only removes units that you own, or units owned by a player of an inferior permission level(admin>mod>user) </n> @removearea [radius] </n></n><c val=\"255,229,201\">Examples</c>: </n> @removearea 3 "
 	);
 }
 
@@ -559,7 +697,7 @@ void LibapxDefineSelectarea(string commandName) {
 	LibapxCommandsGuideEntrySet(
 		gv_CommandsGuideEntryUnit, 
 		commandName, 
-		" This command selects all units you own in a given radius. <br> @selectarea [radius] <br> Examples: <br> @selectarea 3 "
+		" This command selects all units you own in a given radius. </n> @selectarea [radius] </n></n><c val=\"255,229,201\">Examples</c>: </n> @selectarea 3 "
 	);
 }
 
@@ -606,11 +744,11 @@ void LibapxCommandCache(int user, unitgroup u, string argv, int spawningCount, s
 			else {
 				unitCaches = FixedToString(UnitGetCustomValue(UnitGroupLoopCurrent(), gv_LibapxUnitIndexCacheCount), 0);
 			}
-			LibapxPrintOutput(user, "Unit " + UnitGetType(UnitGroupLoopCurrent()) + " has " + unitCaches + " command caches (type \"@cache #\" to view a cache)");
+			LibapxLogInfo(user, "Unit " + UnitGetType(UnitGroupLoopCurrent()) + " has " + unitCaches + " command caches (type \"@cache #\" to view a cache)");
 		}
 		else {
 			if(DataTableValueExists(true, FixedToString(UnitGetCustomValue(UnitGroupLoopCurrent(), gv_LibapxUnitIndexId), 0) + "." + cache)) {
-				LibapxPrintOutput(user, "Unit " + UnitGetType(UnitGroupLoopCurrent()) + " cache " + cache + ":<n/>" + DataTableGetString(true, FixedToString(UnitGetCustomValue(UnitGroupLoopCurrent(), gv_LibapxUnitIndexId), 0) + "." + cache));
+				LibapxLogInfo(user, "Unit " + UnitGetType(UnitGroupLoopCurrent()) + " cache " + cache + ":<n/>" + DataTableGetString(true, FixedToString(UnitGetCustomValue(UnitGroupLoopCurrent(), gv_LibapxUnitIndexId), 0) + "." + cache));
 			}
 		}
 		UnitGroupLoopStep();
@@ -622,7 +760,7 @@ void LibapxDefineCache(string commandName) {
 	LibapxCommandsGuideEntrySet(
 		gv_CommandsGuideEntryUnit, 
 		commandName, 
-		" This command prints out the number of caches the unit has or the content within those caches. It can also set the caches of, or add caches to a unit. <br> @cache [cachenumber] <br> @cache -set/-add [anything you want]  <br> Examples: <br> @cache (lists command cache amount) <br> @cache 1 (displays first cache) <br> @cache -add [Replace unit marine marauder] <br> @cache -set [myUnitAlias] "
+		" This command prints out the number of caches the unit has or the content within those caches. It can also set the caches of, or add caches to a unit. </n> @cache [cachenumber] </n> @cache -set/-add [anything you want]  </n></n><c val=\"255,229,201\">Examples</c>: </n> @cache (lists command cache amount) </n> @cache 1 (displays first cache) </n> @cache -add [Replace unit marine marauder] </n> @cache -set [myUnitAlias] "
 	);
 }
 
@@ -641,6 +779,8 @@ void LibapxCommandGive(int user, unitgroup u, string argv, int spawningCount, st
 	UnitGroupLoopBegin(g);
 	while(!UnitGroupLoopDone()) {
 		UnitSetOwner( UnitGroupLoopCurrent(), newOwner, true );
+
+		LibapxUnitSetLoaner(UnitGroupLoopCurrent(), newOwner);
 		UnitGroupLoopStep();
 	}
 	UnitGroupLoopEnd();
@@ -652,9 +792,50 @@ void LibapxDefineGive(string commandName) {
 	LibapxCommandsGuideEntrySet(
 		gv_CommandsGuideEntryUnit, 
 		commandName, 
-		" This command gives selected units to the target player. <br> @give [TargetPlayerColor] <br> Examples: <br> @give purple "
+		" This command gives selected units to the target player. </n> @give [TargetPlayerColor] </n></n><c val=\"255,229,201\">Examples</c>: </n> @give purple "
 	);
 }
+
+
+// LibapxCommandLoan
+// =================
+// 'loans' another player units, preventing them from running commands on them, and only allowing loaner to run commands.
+void LibapxCommandLoan(int user, unitgroup u, string argv, int spawningCount, string bracketText) {
+	unitgroup g = u;
+	int newOwner = LibapxColorToPlayer( StringCase( StringWord(argv, 2), false ), user );
+
+
+	if(LibapxAdminSettingIsPlayerEnforceable(user)) {
+		if(!gv_LibapxSettings.allowLoan) {
+			LibapxLogError(user, "@loan disabled due to admin settings.");
+			return;
+		}
+	}
+
+	if(newOwner == -1) { // invalid entry by user
+		return;
+	}
+
+	UnitGroupLoopBegin(g);
+	while(!UnitGroupLoopDone()) {
+		LibapxUnitSetLoaner(UnitGroupLoopCurrent(), user);
+		UnitSetOwner( UnitGroupLoopCurrent(), newOwner, true );
+
+		UnitGroupLoopStep();
+	}
+	UnitGroupLoopEnd();
+
+
+	return;
+}
+void LibapxDefineLoan(string commandName) {
+	LibapxCommandsGuideEntrySet(
+		gv_CommandsGuideEntryUnit, 
+		commandName, 
+		" This command loans selected units to the target player. This means the loaner will be able to run commands on it, and the loaned unit will be controlled, but not able to be modified by the new 'owner'. Also, keypresses will run as if they were ran by the loaner. </n> @loan [TargetPlayerColor] </n></n><c val=\"255,229,201\">Examples</c>: </n> @loan purple "
+	);
+}
+
 
 
 //LibapxCommandRename
@@ -679,7 +860,7 @@ void LibapxDefineRename(string commandName) {
 	LibapxCommandsGuideEntrySet(
 		gv_CommandsGuideEntryUnit, 
 		commandName, 
-		" This command renames a unit to the desired name. <br> @rename [desired name.. <br> Examples: <br> @rename Bob R "
+		" This command renames a unit to the desired name. </n> @rename [desired name.. </n></n><c val=\"255,229,201\">Examples</c>: </n> @rename Bob R "
 	);
 }
 
@@ -706,7 +887,7 @@ void LibapxDefineRenameall(string commandName) {
 	LibapxCommandsGuideEntrySet(
 		gv_CommandsGuideEntryUnit, 
 		commandName, 
-		" This command renames an entire unit-types name to the target name. <br> @renameall [desired name.. <br> Examples: <br> @renameall Bob R "
+		" This command renames an entire unit-types name to the target name. </n> @renameall [desired name.. </n></n><c val=\"255,229,201\">Examples</c>: </n> @renameall Bob R "
 	);
 }
 
@@ -720,18 +901,18 @@ void LibapxCommandBehaviors(int user, unitgroup u, string argv, int spawningCoun
 	UnitGroupLoopBegin(u);
 	while(!UnitGroupLoopDone()) {
 		// print unit name and ID
-		LibapxPrintText(PlayerGroupSingle(user), StringToText("> Unit [ID: " + LibapxUnitId(UnitGroupLoopCurrent()) + "] ") + LibapxUnitGetName(UnitGroupLoopCurrent()) + StringToText(" behaviors:"));
+		LibapxLogPlayerGroupText(PlayerGroupSingle(user), StringToText("> Unit [ID: " + LibapxUnitId(UnitGroupLoopCurrent()) + "] ") + LibapxUnitGetName(UnitGroupLoopCurrent()) + StringToText(" behaviors:"));
 
 		count = UnitBehaviorCountAll(UnitGroupLoopCurrent());
 		if( count > 0 ) {
 			while( count > 0 ) {
 				behavior = UnitBehaviorGet(UnitGroupLoopCurrent(), count);
-				LibapxPrintOutput(user, behavior + " (" + IntToString( UnitBehaviorCount(UnitGroupLoopCurrent(), behavior) ) + ")");
+				LibapxLogInfo(user, behavior + " (" + IntToString( UnitBehaviorCount(UnitGroupLoopCurrent(), behavior) ) + ")");
 				count -= 1;
 			}
 		}
 		else { // count == 0, no behaviors
-			LibapxPrintOutput(user, "No behaviors");
+			LibapxLogInfo(user, "No behaviors");
 		}
 		UnitGroupLoopStep();
 	}
@@ -743,7 +924,7 @@ void LibapxDefineBehaviors(string commandName) {
 	LibapxCommandsGuideEntrySet(
 		gv_CommandsGuideEntryUnit, 
 		commandName, 
-		" This command prints out a list of all of a unit's behaviors and their respective stack count.(behaviors can stack) <br> @behaviors (there are no parameters) <br> Examples: <br> @behaviors "
+		" This command prints out a list of all of a unit's behaviors and their respective stack count.(behaviors can stack) </n> @behaviors (there are no parameters) </n></n><c val=\"255,229,201\">Examples</c>: </n> @behaviors "
 	);
 }
 
@@ -756,7 +937,7 @@ void LibapxCommandAddbehavior(int user, unitgroup u, string argv, int spawningCo
 	// get full behavior name from catalog
 	val = LibapxCatalogGet(c_gameCatalogBehavior, val);
 	if(val == null) {
-		LibapxPrintError(user, "<c val=\"ff0000\">Unable to add behavior</c>: No such behavior exists.");
+		LibapxLogError(user, "<c val=\"ff0000\">Unable to add behavior</c>: No such behavior exists.");
 		return;
 	}
 
@@ -774,7 +955,7 @@ void LibapxDefineAddbehavior(string commandName) {
 	LibapxCommandsGuideEntrySet(
 		gv_CommandsGuideEntryUnit, 
 		commandName, 
-		" This command adds a behavior to the selected unit. <br> @addbehavior [behaviorname] <br> Examples: <br> @addbehavior DamageTakenNone <br> @addbehavior DamageDealtNone <br> @addbehavior BlankNameSpace "
+		" This command adds a behavior to the selected unit. </n> @addbehavior [behaviorname] </n></n><c val=\"255,229,201\">Examples</c>: </n> @addbehavior DamageTakenNone </n> @addbehavior DamageDealtNone </n> @addbehavior BlankNameSpace "
 	);
 }
 
@@ -787,7 +968,7 @@ void LibapxCommandRemovebehavior(int user, unitgroup u, string argv, int spawnin
 	// get catalog entry from user input
 	val = LibapxCatalogGet(c_gameCatalogBehavior, val);
 	if(val == null) {
-		LibapxPrintError(user, "<c val=\"ff0000\">Unable to remove behavior</c>: No such behavior exists.");
+		LibapxLogError(user, "<c val=\"ff0000\">Unable to remove behavior</c>: No such behavior exists.");
 		return;
 	}
 
@@ -805,7 +986,7 @@ void LibapxDefineRemovebehavior(string commandName) {
 	LibapxCommandsGuideEntrySet(
 		gv_CommandsGuideEntryUnit, 
 		commandName, 
-		" This command removes a behavior to the selected unit. <br> @removebehavior [behaviorname] <br> Examples: <br> @removebehavior DamageTakenNone <br> @removebehavior DamageDealtNone <br> @removebehavior BlankNameSpace "
+		" This command removes a behavior to the selected unit. </n> @removebehavior [behaviorname] </n></n><c val=\"255,229,201\">Examples</c>: </n> @removebehavior DamageTakenNone </n> @removebehavior DamageDealtNone </n> @removebehavior BlankNameSpace "
 	);
 }
 
@@ -818,17 +999,17 @@ void LibapxCommandWeapons(int user, unitgroup u, string argv, int spawningCount,
 	UnitGroupLoopBegin(u);
 	while(!UnitGroupLoopDone()) {
 		// print unit name and ID
-		LibapxPrintText(PlayerGroupSingle(user), StringToText("> Unit [ID: " + LibapxUnitId(UnitGroupLoopCurrent()) + "] ") + LibapxUnitGetName(UnitGroupLoopCurrent()) + StringToText(" weapons:"));
+		LibapxLogPlayerGroupText(PlayerGroupSingle(user), StringToText("> Unit [ID: " + LibapxUnitId(UnitGroupLoopCurrent()) + "] ") + LibapxUnitGetName(UnitGroupLoopCurrent()) + StringToText(" weapons:"));
 
 		count = UnitWeaponCount(UnitGroupLoopCurrent());
 		if( count > 0 ) {
 			while( count > 0 ) {
-				LibapxPrintOutput(user, UnitWeaponGet(UnitGroupLoopCurrent(), count));
+				LibapxLogInfo(user, UnitWeaponGet(UnitGroupLoopCurrent(), count));
 				count -= 1;
 			}
 		}
 		else { // count == 0, no behaviors
-			LibapxPrintOutput(user, "No weapons");
+			LibapxLogInfo(user, "No weapons");
 		}
 		UnitGroupLoopStep();
 	}
@@ -839,7 +1020,7 @@ void LibapxDefineWeapons(string commandName) {
 	LibapxCommandsGuideEntrySet(
 		gv_CommandsGuideEntryUnit, 
 		commandName, 
-		" This command prints out a list of all of a unit's weapons. <br> @weapons (there are no parameters) <br> Examples: <br> @weapons "
+		" This command prints out a list of all of a unit's weapons. </n> @weapons (there are no parameters) </n></n><c val=\"255,229,201\">Examples</c>: </n> @weapons "
 	);
 }
 
@@ -858,7 +1039,7 @@ void LibapxCommandAddweapon(int user, unitgroup u, string argv, int spawningCoun
 
 	weapon = LibapxCatalogGet(c_gameCatalogWeapon, weapon);
 	if( weapon == null || CatalogEntryScope(c_gameCatalogWeapon, weapon) == weapon) {
-		LibapxPrintError(user, "<c val=\"ff0000\">Unable to add weapon</c>: No such weapon exists.");
+		LibapxLogError(user, "<c val=\"ff0000\">Unable to add weapon</c>: No such weapon exists.");
 		return;
 	}
 
@@ -866,7 +1047,7 @@ void LibapxCommandAddweapon(int user, unitgroup u, string argv, int spawningCoun
 	if( turret != "CTurret") {
 		turret = LibapxCatalogGet(c_gameCatalogTurret, turret);
 		if( turret == null ) {
-			LibapxPrintError(user, "<c val=\"ff0000\">Unable to add weapon</c>: No such turret exists.");
+			LibapxLogError(user, "<c val=\"ff0000\">Unable to add weapon</c>: No such turret exists.");
 			return;
 		}
 	}
@@ -885,7 +1066,7 @@ void LibapxDefineAddweapon(string commandName) {
 	LibapxCommandsGuideEntrySet(
 		gv_CommandsGuideEntryUnit, 
 		commandName, 
-		" This command adds a weapon to a unit. You can specify which turret to give the weapon to with the second parameter though it is not needed. <br> @addweapon [weapon] [turret] <br> Examples: <br> @addweapon GuassRifle <br> @spawn SiegeTank;@addweapon GaussRifle SiegeTank(using the siegetank turret makes the turret rotate when it attacks) "
+		" This command adds a weapon to a unit. You can specify which turret to give the weapon to with the second parameter though it is not needed. </n> @addweapon [weapon] [turret] </n></n><c val=\"255,229,201\">Examples</c>: </n> @addweapon GuassRifle </n> @spawn SiegeTank;@addweapon GaussRifle SiegeTank(using the siegetank turret makes the turret rotate when it attacks) "
 	);
 }
 
@@ -899,7 +1080,7 @@ void LibapxCommandRemoveweapon(int user, unitgroup u, string argv, int spawningC
 	if( !(weapon == "-all")) {
 		weapon = LibapxCatalogGet(c_gameCatalogWeapon, weapon);
 		if ( weapon == null || CatalogEntryScope(c_gameCatalogWeapon, weapon) == weapon) {
-			LibapxPrintError(user, "<c val=\"ff0000\">Unable to remove weapon</c>: No such weapon exists.");
+			LibapxLogError(user, "<c val=\"ff0000\">Unable to remove weapon</c>: No such weapon exists.");
 			return;
 		}
 	}
@@ -929,7 +1110,7 @@ void LibapxDefineRemoveweapon(string commandName) {
 	LibapxCommandsGuideEntrySet(
 		gv_CommandsGuideEntryUnit, 
 		commandName, 
-		" This command removes a weapon from a unit. It has a modifier called -all which removes all weapons from the targeted unit <br> @removeweapon [modifier] [name] <br> Examples: <br> @removeweapon GuassRifle <br> @removeweapon -all "
+		" This command removes a weapon from a unit. It has a modifier called -all which removes all weapons from the targeted unit </n> @removeweapon [modifier] [name] </n></n><c val=\"255,229,201\">Examples</c>: </n> @removeweapon GuassRifle </n> @removeweapon -all "
 	);
 }
 // LibapxCommandLife
@@ -986,7 +1167,7 @@ void LibapxDefineLife(string commandName) {
 	LibapxCommandsGuideEntrySet(
 		gv_CommandsGuideEntryStats, 
 		commandName, 
-		" This commands sets a unit's life, not it's max amount of life. <br> @life [amount] <br> Examples: <br> @life 30 <br> @life 10% <br> @life +10 <br> @life +10% "
+		" This commands sets a unit's life, not it's max amount of life. </n> @life [amount] </n></n><c val=\"255,229,201\">Examples</c>: </n> @life 30 </n> @life 10% </n> @life +10 </n> @life +10% "
 	);
 }
 
@@ -1039,7 +1220,7 @@ void LibapxDefineShields(string commandName) {
 	LibapxCommandsGuideEntrySet(
 		gv_CommandsGuideEntryStats, 
 		commandName, 
-		" This commands sets a unit's shields, not it's max amount of shields. <br> @shields [amount] <br> Examples: <br> @shields 30 <br> @shields 10% <br> @shields +10 <br> @shields +10% "
+		" This commands sets a unit's shields, not it's max amount of shields. </n> @shields [amount] </n></n><c val=\"255,229,201\">Examples</c>: </n> @shields 30 </n> @shields 10% </n> @shields +10 </n> @shields +10% "
 	);
 }
 
@@ -1091,7 +1272,7 @@ void LibapxDefineEnergy(string commandName) {
 	LibapxCommandsGuideEntrySet(
 		gv_CommandsGuideEntryStats, 
 		commandName, 
-		" This commands sets a unit's energy, not it's max amount of energy. <br> @energy [amount] <br> Examples: <br> @energy 30 <br> @energy 10% <br> @energy +10 <br> @energy +10% "
+		" This commands sets a unit's energy, not it's max amount of energy. </n> @energy [amount] </n></n><c val=\"255,229,201\">Examples</c>: </n> @energy 30 </n> @energy 10% </n> @energy +10 </n> @energy +10% "
 	);
 }
 // LibapxCommandMaxlife
@@ -1152,7 +1333,7 @@ void LibapxDefineMaxlife(string commandName) {
 	LibapxCommandsGuideEntrySet(
 		gv_CommandsGuideEntryStats, 
 		commandName, 
-		" This commands sets a unit's max life. <br> @maxlife [amount] <br> Examples: <br> @maxlife 30 <br> @maxlife 10% <br> @maxlife +10 <br> @maxlife +10% "
+		" This commands sets a unit's max life. </n> @maxlife [amount] </n></n><c val=\"255,229,201\">Examples</c>: </n> @maxlife 30 </n> @maxlife 10% </n> @maxlife +10 </n> @maxlife +10% "
 	);
 }
 
@@ -1207,7 +1388,7 @@ void LibapxDefineMaxshields(string commandName) {
 	LibapxCommandsGuideEntrySet(
 		gv_CommandsGuideEntryStats, 
 		commandName, 
-		" This commands sets a unit's max shields. <br> @maxshields [amount] <br> Examples: <br> @maxshields 30 <br> @maxshields 10% <br> @maxshields +10 <br> @maxshields +10% "
+		" This commands sets a unit's max shields. </n> @maxshields [amount] </n></n><c val=\"255,229,201\">Examples</c>: </n> @maxshields 30 </n> @maxshields 10% </n> @maxshields +10 </n> @maxshields +10% "
 	);
 }
 void LibapxCommandMaxenergy(int user, unitgroup u, string argv, int spawningCount, string bracketText) {
@@ -1261,7 +1442,7 @@ void LibapxDefineMaxenergy(string commandName) {
 	LibapxCommandsGuideEntrySet(
 		gv_CommandsGuideEntryStats, 
 		commandName, 
-		" This commands sets a unit's max energy. <br> @maxenergy [amount] <br> Examples: <br> @maxenergy 30 <br> @maxenergy 10% <br> @maxenergy +10 <br> @maxenergy +10% "
+		" This commands sets a unit's max energy. </n> @maxenergy [amount] </n></n><c val=\"255,229,201\">Examples</c>: </n> @maxenergy 30 </n> @maxenergy 10% </n> @maxenergy +10 </n> @maxenergy +10% "
 	);
 }
 // LibapxCommandLiferegen
@@ -1302,7 +1483,7 @@ void LibapxDefineLiferegen(string commandName) {
 	LibapxCommandsGuideEntrySet(
 		gv_CommandsGuideEntryStats, 
 		commandName, 
-		" This commands sets a unit's life regen. <br> @liferegen [amount] <br> Examples: <br> @liferegen 30 <br> @liferegen 10% "
+		" This commands sets a unit's life regen. </n> @liferegen [amount] </n></n><c val=\"255,229,201\">Examples</c>: </n> @liferegen 30 </n> @liferegen 10% "
 	);
 }
 
@@ -1338,7 +1519,7 @@ void LibapxDefineShieldsregen(string commandName) {
 	LibapxCommandsGuideEntrySet(
 		gv_CommandsGuideEntryStats, 
 		commandName, 
-		" This commands sets a unit's shields regen. <br> @shieldsregen [amount] <br> Examples: <br> @shieldsregen 30 <br> @shieldsregen 10% "
+		" This commands sets a unit's shields regen. </n> @shieldsregen [amount] </n></n><c val=\"255,229,201\">Examples</c>: </n> @shieldsregen 30 </n> @shieldsregen 10% "
 	);
 }
 
@@ -1373,7 +1554,7 @@ void LibapxDefineEnergyregen(string commandName) {
 	LibapxCommandsGuideEntrySet(
 		gv_CommandsGuideEntryStats, 
 		commandName, 
-		" This commands sets a unit's energy regen. <br> @energyregen [amount] <br> Examples: <br> @energyregen 30 <br> @energyregen 10% "
+		" This commands sets a unit's energy regen. </n> @energyregen [amount] </n></n><c val=\"255,229,201\">Examples</c>: </n> @energyregen 30 </n> @energyregen 10% "
 	);
 }
 
@@ -1438,7 +1619,7 @@ void LibapxDefineSpeed(string commandName) {
 	LibapxCommandsGuideEntrySet(
 		gv_CommandsGuideEntryStats, 
 		commandName, 
-		" This command sets a unit's speed. It has a modifier, -all which changes the speed for all units of the same type. <br> @speed [modifier] [speed] <br> Examples: <br> @speed 1 <br> @speed -all 3 "
+		" This command sets a unit's speed. It has a modifier, -all which changes the speed for all units of the same type. </n> @speed [modifier] [speed] </n></n><c val=\"255,229,201\">Examples</c>: </n> @speed 1 </n> @speed -all 3 "
 	);
 }
 
@@ -1448,23 +1629,44 @@ void LibapxDefineSpeed(string commandName) {
 void LibapxCommandHeight(int user, unitgroup u, string argv, int spawningCount, string bracketText) {
 	fixed height;
 	fixed time;
-	string param;
 	unitgroup g = u;
 	bool addition;
 	bool subtraction;
 	fixed currentHeight;
-	param = StringWord( argv, 2 );
-	height = StringToFixed( param );
-	param = StringWord( argv, 3 );
-	time = StringToFixed( param );
+
+	if(StringWord(argv, 2) == "") {
+		LibapxLogError(user, "Must provide height");
+		return;
+	}
+
+	if( StringFind(argv, "-rel" ,c_stringNoCase) != -1 ) {
+		argv =  StringReplaceWord(argv, "-rel", "", 1, c_stringNoCase);
+		if(StringContains(argv, "+", c_stringAnywhere, false)) {
+			addition = true;
+			argv =  StringReplaceWord(argv, "+", "", 1, c_stringNoCase);
+		} 
+		else if(StringContains(argv, "-", c_stringAnywhere, false)) {
+			subtraction = true;
+			argv =  StringReplaceWord(argv, "-", "", 1, c_stringNoCase);
+		}
+	}
+
+	height = StringToFixed(StringWord(argv, 2));
+
+	if(StringWord(argv, 3) == "") {
+		time = 0.0;
+	}
+	else {
+		time = StringToFixed( StringWord(argv, 3) );
+	}
+	
 	if(StringContains(argv, "+", c_stringAnywhere, false)) {
 		addition = true;
-		argv = StringReplace(argv, "+", 1, StringLength(argv));
-	} 
-	else if(StringContains(argv, "-", c_stringAnywhere, false)) {
-		subtraction = true;
-		argv = StringReplace(argv, "-", 1, StringLength(argv));
+		argv =  StringReplaceWord(argv, "+", "-rel +", 1, c_stringNoCase);
+		LibapxLogError(user, "Use @height -rel for relative height addition (and SUBTRACTION!). Height addition without -rel is deprecated.");
 	}
+
+
 
 	UnitGroupLoopBegin(g);
 	while( !UnitGroupLoopDone() ) {
@@ -1481,7 +1683,7 @@ void LibapxCommandHeight(int user, unitgroup u, string argv, int spawningCount, 
 			UnitSetHeight( UnitGroupLoopCurrent(), height+currentHeight, time);
 		}
 		else if(subtraction) {
-			UnitSetHeight( UnitGroupLoopCurrent(), height-currentHeight, time);
+			UnitSetHeight( UnitGroupLoopCurrent(), currentHeight-height, time);
 		}
 		LibapxUnitCacheUpdate(UnitGroupLoopCurrent(), "@height", argv);
 		UnitGroupLoopStep();
@@ -1494,7 +1696,7 @@ void LibapxDefineHeight(string commandName) {
 	LibapxCommandsGuideEntrySet(
 		gv_CommandsGuideEntryUnit, 
 		commandName, 
-		" This command sets a unit's height. <br> @height [desiredHeight] [durationToGetToHeight] <br> Examples: <br> @height 3 <br> @height 5 7 <br> @height +3 5 <br> @height -3 5 "
+		" This command sets a unit's height. It supports the modifier -rel to allow addition/subtraction of heights </n> @height [modifiers] [desiredHeight] [durationToGetToHeight] </n></n><c val=\"255,229,201\">Examples</c>: </n> @height 3 </n> @height 5 7 </n> @height -rel +3 5 </n> @height -rel -3 "
 	);
 }
 
@@ -1524,7 +1726,7 @@ void LibapxDefineColor(string commandName) {
 	LibapxCommandsGuideEntrySet(
 		gv_CommandsGuideEntryUnit, 
 		commandName, 
-		" This command sets the team-color of a unit. <br> @color [colorName] <br> Example: <br> @color red <br> @color violet  "
+		" This command sets the team-color of a unit. </n> @color [colorName] </n> Example: </n> @color red </n> @color violet  "
 	);
 }
 
@@ -1546,7 +1748,7 @@ void LibapxDefineInvulnerable(string commandName) {
 	LibapxCommandsGuideEntrySet(
 		gv_CommandsGuideEntryUnit, 
 		commandName, 
-		" This command makes a unit invulnerable. <br> @invulnerable(noparms) <br> Example: <br> @invulnerable  "
+		" This command makes a unit invulnerable. </n> @invulnerable(noparms) </n> Example: </n> @invulnerable  "
 	);
 }
 void LibapxCommandVulnerable(int user, unitgroup u, string argv, int spawningCount, string bracketText) {
@@ -1563,7 +1765,7 @@ void LibapxDefineVulnerable(string commandName) {
 	LibapxCommandsGuideEntrySet(
 		gv_CommandsGuideEntryUnit, 
 		commandName, 
-		" This command makes a unit vulnerable. <br> @vulnerable(noparms) <br> Example: <br> @vulnerable  "
+		" This command makes a unit vulnerable. </n> @vulnerable(noparms) </n> Example: </n> @vulnerable  "
 	);
 }
 // LibapxCommandFace
@@ -1584,14 +1786,44 @@ void LibapxCommandFace(int user, unitgroup u, string argv, int spawningCount, st
 	point averagePt;
 	point tmpPoint;
 	fixed tmpAngle;
+	bool xy;
+	fixed targetPointX;
+	fixed targetPointY;
 	if(StringContains(argv, "-rel", c_stringAnywhere, false)) {
 		argv = StringReplaceWord(argv, "-rel", "", 1, c_stringNoCase);
 		duration = StringToFixed(StringWord ( argv,3 ));
 		relative = true;
 	}
+
+
+	if( StringFind(argv, "-xy", c_stringNoCase) != -1 ) {
+		targetPointX = StringToFixed(StringWord(StringSub(argv, StringFind(argv, "-xy", c_stringNoCase), StringLength(argv)), 2));
+		argv = StringReplaceWord(argv, StringWord(StringSub(argv, StringFind(argv, "-xy", c_stringNoCase), StringLength(argv)), 2),  "", 1, c_stringNoCase);
+		targetPointY = StringToFixed(StringWord(StringSub(argv, StringFind(argv, "-xy", c_stringNoCase), StringLength(argv)), 2));
+		argv = StringReplaceWord(argv, StringWord(StringSub(argv, StringFind(argv, "-xy", c_stringNoCase), StringLength(argv)), 2),  "", 1, c_stringNoCase);
+		argv = StringReplaceWord(argv, "-xy",  "", 1, c_stringNoCase);
+		
+		if (StringWord(argv, 2) == "") {
+			duration = 0.0;
+		}
+		else {
+			duration = StringToFixed(StringWord(argv, 2));
+		}
+
+		for (i = 1; i <= UnitGroupCount(u, c_unitCountAll); i += 1) {
+			tmpUnit = UnitGroupUnit(u, i);
+			UnitSetFacing(tmpUnit, AngleBetweenPoints(UnitGetPosition(tmpUnit), Point(targetPointX, targetPointY)), duration);
+		}
+
+		return;
+	} 
+
+
 	if (StringWord(argv, 3) == "") {
 		duration = 0.0;
 	}
+
+
 
 	param = StringWord( argv, 2 );
 	if( param != "" ) {
@@ -1625,7 +1857,7 @@ void LibapxCommandFace(int user, unitgroup u, string argv, int spawningCount, st
 		tmpUnit = UnitGroupLoopCurrent();
 		if(relative) {
 			if( param == "" || param == "x" ) {
-				LibapxPrintError(user, "-rel in @position cannon't use mouse facing. It must use +/-");
+				LibapxLogError(user, "-rel in @position cannon't use mouse facing. It must use +/-");
 				return; 
 			}
 			else {
@@ -1642,6 +1874,9 @@ void LibapxCommandFace(int user, unitgroup u, string argv, int spawningCount, st
 				UnitSetPosition(tmpUnit,tmpPoint,false);
 				UnitSetFacing(tmpUnit, tmpAngle, .3);
 			}
+		}
+		else if(xy) {
+
 		}
 		else {
 			if( param == "" || param == "x" ) { // face mouse
@@ -1666,7 +1901,7 @@ void LibapxDefineFace(string commandName) {
 	LibapxCommandsGuideEntrySet(
 		gv_CommandsGuideEntryUnit, 
 		commandName, 
-		" This command faces a unit to a given point. It has a modifier called -rel which faces units relative to the other units you have selected. <br> @face [modifiers] [facing] [duration] <br> Examples: <br> @face (by itself just faces to mouse) <br> @face 360 <br> @face -131 <br> @face +255 <br> @face +90 3 <br> @face x 2 (X is stand in, this faces to mouse point) <br> @spawn marine 25 ; Delay 1 ; @face -rel 25 "
+		" This command faces a unit to a given point. It has a modifiers, -rel which faces units relative to the other units you have selected and -xy which lets you input coordinates to face to. </n> @face [modifiers] [facing] [duration] </n></n><c val=\"255,229,201\">Examples</c>: </n> @face (by itself just faces to mouse) </n> @face 360 </n> @face -131 </n> @face +255 </n> @face +90 3 </n> @face x 2 (X is stand in, this faces to mouse point) </n> @spawn marine 25 ; Delay 1 ; @face -rel 25 </n> @face -xy 125 125 3 (will face to position 125 125 on the map over 3 seconds) "
 	);
 }
 
@@ -1748,14 +1983,14 @@ void LibapxDefineAdddamage(string commandName) {
 	LibapxCommandsGuideEntrySet(
 		gv_CommandsGuideEntryStats, 
 		commandName, 
-		" This command adds damage to a unit. <br> @adddamage [damage] <br> Examples: <br> @adddamage 25 "
+		" This command adds damage to a unit. </n> @adddamage [damage] </n></n><c val=\"255,229,201\">Examples</c>: </n> @adddamage 25 "
 	);
 }
 void LibapxDefineRemovedamage(string commandName) {
 	LibapxCommandsGuideEntrySet(
 		gv_CommandsGuideEntryStats, 
 		commandName, 
-		" This command removes damage to a unit. <br> @removedamage [damage] <br> Examples: <br> @removedamage 25 "
+		" This command removes damage to a unit. </n> @removedamage [damage] </n></n><c val=\"255,229,201\">Examples</c>: </n> @removedamage 25 "
 	);
 }
 
@@ -1808,14 +2043,14 @@ void LibapxDefineAddrange(string commandName) {
 	LibapxCommandsGuideEntrySet(
 		gv_CommandsGuideEntryStats, 
 		commandName, 
-		" This command adds range to a unit. <br> @addrange [range] <br> Examples: <br> @addrange 25 "
+		" This command adds range to a unit. </n> @addrange [range] </n></n><c val=\"255,229,201\">Examples</c>: </n> @addrange 25 "
 	);
 }
 void LibapxDefineRemoverange(string commandName) {
 	LibapxCommandsGuideEntrySet(
 		gv_CommandsGuideEntryStats, 
 		commandName, 
-		" This command removes range to a unit. <br> @removerange [range] <br> Examples: <br> @removerange 25 "
+		" This command removes range to a unit. </n> @removerange [range] </n></n><c val=\"255,229,201\">Examples</c>: </n> @removerange 25 "
 	);
 }
 // LibapxCommandArmor
@@ -1916,14 +2151,14 @@ void LibapxDefineArmor(string commandName) {
 	LibapxCommandsGuideEntrySet(
 		gv_CommandsGuideEntryStats, 
 		commandName, 
-		" This command sets the armor of a unit. <br> @armor [amount] <br> Examples: <br> @armor 25 "
+		" This command sets the armor of a unit. </n> @armor [amount] </n></n><c val=\"255,229,201\">Examples</c>: </n> @armor 25 "
 	);
 }
 void LibapxDefineShieldsarmor(string commandName) {
 	LibapxCommandsGuideEntrySet(
 		gv_CommandsGuideEntryStats, 
 		commandName, 
-		" This command sets the shield's armor of a unit. <br> @shieldsarmor [amount] <br> Examples: <br> @shieldsarmor 25 "
+		" This command sets the shield's armor of a unit. </n> @shieldsarmor [amount] </n></n><c val=\"255,229,201\">Examples</c>: </n> @shieldsarmor 25 "
 	);
 }
 // LibapxCommandWeaponspeed
@@ -1994,7 +2229,7 @@ void LibapxDefineWeaponspeed(string commandName) {
 	LibapxCommandsGuideEntrySet(
 		gv_CommandsGuideEntryStats, 
 		commandName, 
-		" This command sets the weaponspeed of a unit. <br> @weaponspeed [speed] <br> Examples: <br> @weaponspeed .25 <br> @weaponspeed .1 "
+		" This command sets the weaponspeed of a unit. </n> @weaponspeed [speed] </n></n><c val=\"255,229,201\">Examples</c>: </n> @weaponspeed .25 </n> @weaponspeed .1 "
 	);
 }
 
@@ -2041,14 +2276,14 @@ void LibapxDefineWeaponspeedall(string commandName) {
 	LibapxCommandsGuideEntrySet(
 		gv_CommandsGuideEntryStats, 
 		commandName, 
-		" This command sets the weaponspeed of a unit type. <br> @weaponspeedall [speed] <br> Examples: <br> @weaponspeedall .25 <br> @weaponspeedall .1 "
+		" This command sets the weaponspeed of a unit type. </n> @weaponspeedall [speed] </n></n><c val=\"255,229,201\">Examples</c>: </n> @weaponspeedall .25 </n> @weaponspeedall .1 "
 	);
 }
 
 
-//LibapxCommandRename
+//LibapxCommandSubtitle
 //===================
-//Renames a unit (Setting datatable entry)
+//Subtitles a unit (Setting datatable entry)
 void LibapxCommandSubtitle(int user, unitgroup u, string argv, int spawningCount, string bracketText) {
 	string val;
 	unitgroup g = u;
@@ -2081,15 +2316,81 @@ void LibapxDefineSubtitle(string commandName) {
 	LibapxCommandsGuideEntrySet(
 		gv_CommandsGuideEntryUnit, 
 		commandName, 
-		" This command sets the subtitle of a unit. It takes the modifier -add, which adds onto the current subtitle. <br> @subtitle [desired desc.. <br> Examples: <br> @subtitle Bob R <br> @subtitle -add was a very cool man. "
+		" This command sets the subtitle of a unit. It takes the modifier -add, which adds onto the current subtitle. </n> @subtitle [desired desc.. </n></n><c val=\"255,229,201\">Examples</c>: </n> @subtitle Bob R </n> @subtitle -add was a very cool man. "
 	);
 }
 
 
 
-// LibapxCommandSubtitle
+//LibapxCommandSubtitleBackgroundColor
+//===================
+//Set Subtitle Background Color
+void LibapxCommandSubtitleBackgroundColor(int user, unitgroup u, string argv, int spawningCount, string bracketText) {
+	int r = FixedToInt(LibapxUtil255To100(StringToFixed(StringWord(argv, 2))));
+	int g = FixedToInt(LibapxUtil255To100(StringToFixed(StringWord(argv, 3))));
+	int b = FixedToInt(LibapxUtil255To100(StringToFixed(StringWord(argv, 4))));
+	int a = FixedToInt(StringToFixed(StringWord(argv, 5))*100);
+	unit tmpUnit;
+	int i;
+
+	if(StringWord(argv, 4) == "") {
+		a = 100;
+	}
+
+	for (i = 1; i <= UnitGroupCount(u, c_unitCountAll); i += 1) {
+		tmpUnit = UnitGroupUnit(u, i);
+		
+		LibapxUnitSubtitleColorSetEntry(tmpUnit, ColorWithAlpha(r,g,b,a));
+		LibapxUnitCacheUpdate(tmpUnit, "@subtitlebackgroundcolor", argv);
+
+	}
+}
+void LibapxDefineSubtitleBackgroundColor(string commandName) {
+	LibapxCommandsGuideEntrySet(
+		gv_CommandsGuideEntryUnit, 
+		commandName, 
+		" This command sets the subtitle background color of a unit. </n> @subtitlebackgroundcolor r0-255 g0-255 b0-255 a0-1  </n></n><c val=\"255,229,201\">Examples</c>: </n> @subtitlebackgroundcolor 255 55 0 1"
+	);
+}
+
+
+//LibapxCommandSubtitleBorderColor
+//===================
+//Set Subtitle Border Color
+void LibapxCommandSubtitleBorderColor(int user, unitgroup u, string argv, int spawningCount, string bracketText) {
+	int r = FixedToInt(LibapxUtil255To100(StringToFixed(StringWord(argv, 2))));
+	int g = FixedToInt(LibapxUtil255To100(StringToFixed(StringWord(argv, 3))));
+	int b = FixedToInt(LibapxUtil255To100(StringToFixed(StringWord(argv, 4))));
+	int a = FixedToInt(StringToFixed(StringWord(argv, 5))*100);
+	unit tmpUnit;
+	int i;
+
+	if(StringWord(argv, 4) == "") {
+		a = 100;
+	}
+	
+
+	for (i = 1; i <= UnitGroupCount(u, c_unitCountAll); i += 1) {
+		tmpUnit = UnitGroupUnit(u, i);
+		
+		LibapxUnitSubtitleBorderColorSetEntry(tmpUnit, ColorWithAlpha(r,g,b,a));
+		LibapxUnitCacheUpdate(tmpUnit, "@subtitlebordercolor", argv);
+
+	}
+}
+void LibapxDefineSubtitleBorderColor(string commandName) {
+	LibapxCommandsGuideEntrySet(
+		gv_CommandsGuideEntryUnit, 
+		commandName, 
+		" This command sets the subtitle border color of a unit. </n> @subtitlebordercolor r0-255 g0-255 b0-255 a0-1  </n></n><c val=\"255,229,201\">Examples</c>: </n> @subtitlebordercolor 255 255 0 1"
+	);
+}
+
+
+
+// LibapxCommandSubtitleAll
 // =================
-// sets a unit's subtitle (underneath a unit name)
+// sets a all of a unit's type to a particular subtitle (underneath a unit name)
 void LibapxCommandSubtitleall(int user, unitgroup u, string argv, int spawningCount, string bracketText) {
 	string val = argv;
 	unitgroup g = u;
@@ -2123,7 +2424,7 @@ void LibapxDefineSubtitleall(string commandName) {
 	LibapxCommandsGuideEntrySet(
 		gv_CommandsGuideEntryUnit, 
 		commandName, 
-		" This command sets the sbutitle of a unit-type(the text under the units name). It has a modifier called -add which, instead of overwriting the subtitle, adds to the subtitle. <br> @subtitle [modifier] [subtitle.. <br> Examples: <br> @subtitle Bob ross is a cool guy <br> @subtitle -add and most agree that he is that cool. "
+		" This command sets the sbutitle of a unit-type(the text under the units name). It has a modifier called -add which, instead of overwriting the subtitle, adds to the subtitle. </n> @subtitle [modifier] [subtitle.. </n></n><c val=\"255,229,201\">Examples</c>: </n> @subtitle Bob ross is a cool guy </n> @subtitle -add and most agree that he is that cool. "
 	);
 }
 
@@ -2165,7 +2466,7 @@ void LibapxDefineDesc(string commandName) {
 	LibapxCommandsGuideEntrySet(
 		gv_CommandsGuideEntryUnit, 
 		commandName, 
-		" This command sets the description of a unit. It takes the modifier -add, which adds onto the current subtitle. <br> @subtitle [desired desc.. <br> Examples: <br> @subtitle Bob R <br> @subtitle -add was a very cool man. "
+		" This command sets the description of a unit. It takes the modifier -add, which adds onto the current subtitle. </n> @subtitle [desired desc.. </n></n><c val=\"255,229,201\">Examples</c>: </n> @subtitle Bob R </n> @subtitle -add was a very cool man. "
 	);
 }
 
@@ -2206,89 +2507,7 @@ void LibapxDefineDesceall(string commandName) {
 	LibapxCommandsGuideEntrySet(
 		gv_CommandsGuideEntryUnit, 
 		commandName, 
-		" This command sets the description of a unit-type(the text under the units name). It has a modifier called -add which, instead of overwriting the subtitle, adds to the subtitle. <br> @subtitle [modifier] [subtitle.. <br> Examples: <br> @subtitle Bob ross is a cool guy <br> @subtitle -add and most agree that he is that cool. "
-	);
-}
-
-
-
-//LibapxCommandDesc
-//===================
-//Renames a unit (Setting datatable entry)
-void LibapxCommandDesctitle(int user, unitgroup u, string argv, int spawningCount, string bracketText) {
-	string val;
-	unitgroup g = u;
-	unit tmpUnit;
-	int i;
-	bool add;
-
-	val = argv;
-	val = StringSub( val, StringFind(val, " ", c_stringCase)+1, StringLength(val)); // The remainder of the chat message.
-	
-	if (StringWord(argv, 2) == "+add" || StringWord(argv, 2) == "-add" ) {
-		val = StringSub( val, StringFind(val, " ", c_stringCase)+1, StringLength(val));
-		add = true;
-	}
-
-	for (i = 1; i <= UnitGroupCount(g, c_unitCountAll); i += 1) {
-		tmpUnit = UnitGroupUnit(g, i);
-		if(add) {
-			LibapxUnitdesctitleSetEntry(tmpUnit,LibapxUnitdesctitleGetEntry(tmpUnit) + " " + val);
-			LibapxUnitCacheUpdate(tmpUnit, "@desctitle", argv);
-		} 
-		else {
-			LibapxUnitdesctitleSetEntry(tmpUnit, val);
-			LibapxUnitCacheUpdate(tmpUnit, "@desctitle", argv);
-		}
-
-	}
-}
-void LibapxDefineDesctitle(string commandName) {
-	LibapxCommandsGuideEntrySet(
-		gv_CommandsGuideEntryUnit, 
-		commandName, 
-		" This command sets the description title of a unit. It takes the modifier -add, which adds onto the current subtitle. <br> @subtitle [desired desc.. <br> Examples: <br> @subtitle Bob R <br> @subtitle -add was a very cool man. "
-	);
-}
-
-
-// LibapxCommandSubtitle
-// =================
-// sets a unit's subtitle (underneath a unit name)
-void LibapxCommandDesctitleall(int user, unitgroup u, string argv, int spawningCount, string bracketText) {
-	string val;
-	unitgroup g = u;
-	unit tmpUnit;
-	int i;
-	bool add;
-
-	val = argv;
-	val = StringSub( val, StringFind(val, " ", c_stringCase)+1, StringLength(val)); // The remainder of the chat message.
-	
-	if (StringWord(argv, 2) == "+add" || StringWord(argv, 2) == "-add" ) {
-		val = StringSub( val, StringFind(val, " ", c_stringCase)+1, StringLength(val));
-		add = true;
-	}
-
-	for (i = 1; i <= UnitGroupCount(g, c_unitCountAll); i += 1) {
-		tmpUnit = UnitGroupUnit(g, i);
-		if(add) {
-			LibapxUnitdesctitleallSetEntry(tmpUnit,LibapxUnitdesctitleallGetEntry(tmpUnit) + " " + val);
-			LibapxUnitCacheUpdate(tmpUnit, "@desctitleall", argv);
-		} 
-		else {
-			LibapxUnitdesctitleallSetEntry(tmpUnit, val);
-			LibapxUnitCacheUpdate(tmpUnit, "@desctitleall", argv);
-		}
-
-	}
-
-}
-void LibapxDefineDesctitleall(string commandName) {
-	LibapxCommandsGuideEntrySet(
-		gv_CommandsGuideEntryUnit, 
-		commandName, 
-		" This command sets the description title of a unit-type(the text under the units name). It has a modifier called -add which, instead of overwriting the subtitle, adds to the subtitle. <br> @subtitle [modifier] [subtitle.. <br> Examples: <br> @subtitle Bob ross is a cool guy <br> @subtitle -add and most agree that he is that cool. "
+		" This command sets the description of a unit-type(the text under the units name). It has a modifier called -add which, instead of overwriting the subtitle, adds to the subtitle. </n> @subtitle [modifier] [subtitle.. </n></n><c val=\"255,229,201\">Examples</c>: </n> @subtitle Bob ross is a cool guy </n> @subtitle -add and most agree that he is that cool. "
 	);
 }
 
@@ -2335,18 +2554,10 @@ void LibapxDefineTooltip(string commandName) {
 	LibapxCommandsGuideEntrySet(
 		gv_CommandsGuideEntryUnit, 
 		commandName, 
-		" This command sets the tooltip of a unit. This is the text that displays when another player hovers over your unit. <br> @tooltip [name] <br> Examples: <br> @tooltip BobRoss is Serobliss <br> @state tooltips on;@tooltip test (This will allow you to see your own tooltip)  "
+		" This command sets the tooltip of a unit. This is the text that displays when another player hovers over your unit. </n> @tooltip [name] </n></n><c val=\"255,229,201\">Examples</c>: </n> @tooltip BobRoss is Serobliss </n> @state tooltips on;@tooltip test (This will allow you to see your own tooltip)  "
 	);
 }
 
-int undoFindLastIndex(string cache) {
-	int index = 0;
-	while( StringFind(cache, ";",c_stringNoCase) != -1) {
-		index += StringFind(cache, ";",c_stringNoCase);
-		cache = StringReplace(cache, "", 1, StringFind(cache, ";",c_stringNoCase));
-	}
-	return index;
-};
 
 int undoFindLastActor(string cache) {
 	int attachMIndex = 0;
@@ -2417,7 +2628,7 @@ void LibapxCommandUndo(int user, unitgroup u, string argv, int spawningCount, st
 		}		
 		//Lets remake the cache and destroy actors that were killed in undos
 		for (i = 1; i <= undos ; i += 1) {
-			indexOfLastCommand = undoFindLastIndex(cacheValue);
+			indexOfLastCommand = LibapxFindLastCommandIndex(cacheValue);
 			currentUndo = StringSub(cacheValue, indexOfLastCommand, StringLength(cacheValue));
 			cacheValue = StringReplace(cacheValue, "", indexOfLastCommand, StringLength(cacheValue));
 
@@ -2470,7 +2681,7 @@ void LibapxCommandUndo(int user, unitgroup u, string argv, int spawningCount, st
 			}
 		}
 		else {
-			LibapxPrintOutput(user, " Undo without a reference attachpoint doesn't work yet.  Attach something.");
+			LibapxLogInfo(user, " Undo without a reference attachpoint doesn't work yet.  Attach something.");
 			return;
 		}
 
@@ -2625,8 +2836,12 @@ void LibapxCommandCopy(int user, unitgroup u, string argv, int spawningCount, st
 				}
 				cache += 1;
 			}
+
+			LibapxLogInfo(user, "@Copy +visual can only be used with one unit");
+
 			cache = 1;
 			LibapxChatParse(cacheValue, user, targets, spawningCount);
+			return;
 		}
 	}
 
@@ -2640,7 +2855,7 @@ void LibapxDefineCopy(string commandName) {
 	LibapxCommandsGuideEntrySet(
 		gv_CommandsGuideEntryUnit, 
 		commandName, 
-		" This command copies a unit. It can optionally copy the caches of a unit too with the modifier -visual. <br> @copy [modifiers] <br> Examples: <br> @copy <br> @copy -visual"
+		" This command copies a unit. It can optionally copy the caches of a unit too with the modifier -visual. </n> @copy [modifiers] </n></n><c val=\"255,229,201\">Examples</c>: </n> @copy </n> @copy -visual"
 	);
 }
 
@@ -2654,7 +2869,7 @@ void LibapxCommandEffect(int user, unitgroup u, string argv, int spawningCount, 
 
     effect = LibapxCatalogGet(c_gameCatalogEffect, effect);
     if(effect == null) {
-        LibapxPrintError(user, "<c val=\"ff0000\">Unable to create effect</c>: No such effect exists.");
+        LibapxLogError(user, "<c val=\"ff0000\">Unable to create effect</c>: No such effect exists.");
         return;
     }
     if(StringFind(argv, "-point" ,c_stringNoCase) != -1 ) {
@@ -2671,7 +2886,7 @@ void LibapxCommandEffect(int user, unitgroup u, string argv, int spawningCount, 
                     LibapxUnitCacheUpdate(UnitGroupLoopCurrent(), "@effect -point", argv);
                 }
                 else {
-                    LibapxPrintError(user, "<c val=\"ff0000\">Unable to create the effect.</c>");
+                    LibapxLogError(user, "<c val=\"ff0000\">Unable to create the effect.</c>");
                 }
                 UnitGroupLoopStep();
             }
@@ -2688,7 +2903,7 @@ void LibapxCommandEffect(int user, unitgroup u, string argv, int spawningCount, 
                     LibapxUnitCacheUpdate(UnitGroupLoopCurrent(), "@effect", argv);
                 }
                 else {
-                    LibapxPrintError(user, "<c val=\"ff0000\">Unable to create the effect.</c>");
+                    LibapxLogError(user, "<c val=\"ff0000\">Unable to create the effect.</c>");
                 }
                 UnitGroupLoopStep();
             }
@@ -2699,7 +2914,7 @@ void LibapxCommandEffect(int user, unitgroup u, string argv, int spawningCount, 
                 PlayerCreateEffectPoint(user, effect, gv_LibapxPlayer[user].mousePosition);
             }
             else {
-                LibapxPrintError(user, "<c val=\"ff0000\">Unable to create the effect.</c>");
+                LibapxLogError(user, "<c val=\"ff0000\">Unable to create the effect.</c>");
             }
         }
     }
@@ -2710,7 +2925,7 @@ void LibapxDefineEffect(string commandName) {
     LibapxCommandsGuideEntrySet(
         gv_CommandsGuideEntryUnit, 
         commandName, 
-        " This command creates an effect at a units position. <br> @effect [effectname] <br> Examples: <br> @effect MercenaryShield"
+        " This command creates an effect at a units position. </n> @effect [effectname] </n></n><c val=\"255,229,201\">Examples</c>: </n> @effect MercenaryShield"
     );
 }
 
@@ -2739,7 +2954,7 @@ void LibapxDefineKills(string commandName) {
 	LibapxCommandsGuideEntrySet(
 		gv_CommandsGuideEntryStats, 
 		commandName, 
-		" This command sets the kill-count of a unit, it's useful for changing a units kill rank. <br> @kills [amount] <br> Examples: <br> @kills 15 "
+		" This command sets the kill-count of a unit, it's useful for changing a units kill rank. </n> @kills [amount] </n></n><c val=\"255,229,201\">Examples</c>: </n> @kills 15 "
 	);
 }
 
@@ -2779,7 +2994,7 @@ void LibapxDefineLevel(string commandName) {
 	LibapxCommandsGuideEntrySet(
 		gv_CommandsGuideEntryStats, 
 		commandName, 
-		" This command sets a unit's level. <br> @level [levelnumber] <br> Examples: <br> @level 15 "
+		" This command sets a unit's level. </n> @level [levelnumber] </n></n><c val=\"255,229,201\">Examples</c>: </n> @level 15 "
 	);
 }
 
@@ -2795,7 +3010,7 @@ void LibapxCommandLabel(int user, unitgroup u, string argv, int spawningCount, s
 	label = StringSub( label, StringFind(label, " ", c_stringCase) + 1, StringLength(label)); // The remainder of the chat message.
 
 	if( StringLength(label) > 512 ) {
-		LibapxPrintError(user, "Your label length is too long.");
+		LibapxLogError(user, "Your label length is too long.");
 		return;
 	}
 
@@ -2812,10 +3027,15 @@ void LibapxCommandLabel(int user, unitgroup u, string argv, int spawningCount, s
 		}
 
 		if( !removeTag ) {
-			tagId = TextTagCreate( TextWithColor( StringToText(label), ColorFromIndex( PlayerGetColorIndex(user, false), c_teamColorDiffuse ) ),
-									40, UnitGetPosition(UnitGroupLoopCurrent()), 1.0, true, true, PlayerGroupAll() );
+			tagId = TextTagCreate( 
+				TextWithColor( 
+					StringToText("<s val=\"apx_chat\">"+label), 
+					Color(90,90,90)
+				),	
+				20, UnitGetPosition(UnitGroupLoopCurrent()), 1.0, true, true, PlayerGroupAll() );
+
 			TextTagSetTextShadow(tagId, true);
-			TextTagAttachToUnit(tagId, UnitGroupLoopCurrent(), 1.0);
+			TextTagAttachToUnit(tagId, UnitGroupLoopCurrent(), 1.4);
 			UnitSetCustomValue(UnitGroupLoopCurrent(), gv_LibapxUnitIndexTextTag, IntToFixed(tagId));
 		}
 		UnitGroupLoopStep();
@@ -2828,7 +3048,7 @@ void LibapxDefineLabel(string commandName) {
 	LibapxCommandsGuideEntrySet(
 		gv_CommandsGuideEntryUnit, 
 		commandName, 
-		" This command attaches a label to a unit that is constantly displayed to everyone. <br> @label [label name.. <br> Examples: <br> @label I am a cool unit! "
+		" This command attaches a label to a unit that is constantly displayed to everyone. </n> @label [label name.. </n></n><c val=\"255,229,201\">Examples</c>: </n> @label I am a cool unit! "
 	);
 }
 
@@ -2843,7 +3063,7 @@ void LibapxCommandRadius(int user, unitgroup u, string argv, int spawningCount, 
 	unit tmpu;
 
 	if(val == "") {
-		LibapxPrintError(user, "Usage: @radius collisionRadius[%]");
+		LibapxLogError(user, "Usage: @radius collisionRadius[%]");
 	}
 	else if(StringContains(val, "%", c_stringEnd, c_stringCase)) {
 		radius = StringToFixed(StringSub(val, 1, StringLength(val) - 1));
@@ -2878,7 +3098,7 @@ void LibapxDefineRadius(string commandName) {
 	LibapxCommandsGuideEntrySet(
 		gv_CommandsGuideEntryStats, 
 		commandName, 
-		" This command sets a unit's radius. <br> @radius [radius] <br> Examples: <br> @radius 1 <br> @radius 3 <br> @radius .03%    "
+		" This command sets a unit's radius. </n> @radius [radius] </n></n><c val=\"255,229,201\">Examples</c>: </n> @radius 1 </n> @radius 3 </n> @radius .03%    "
 	);
 }
 
@@ -2927,7 +3147,7 @@ void LibapxCommandState(int user, unitgroup u, string argv, int spawningCount, s
 	} else if( param == "usessupply" ) {
 		state = c_unitStateUsingSupply;
 	} else {
-		LibapxPrintError(user, "Usage: @state [state] [on/off]\n" +
+		LibapxLogError(user, "Usage: @state [state] [on/off]\n" +
 							"States: fidget, highlightable, highlighted, ignoreterrainheight, invulnerable, hidden, paused, selectable, statusbar, targetable, tooltips, cursor, movable, turnable, usessupply");
 		return;
 	}
@@ -2938,7 +3158,7 @@ void LibapxCommandState(int user, unitgroup u, string argv, int spawningCount, s
 	}
 
 	if(gv_LibapxPlayer[user].helpMessages) { 
-		LibapxPrint(PlayerGroupSingle(user), "Setting state " + param + ": " + libNtve_gf_ConvertBooleanToString(status));
+		LibapxLogPlayerGroup(PlayerGroupSingle(user), "Setting state " + param + ": " + libNtve_gf_ConvertBooleanToString(status));
 	}
 
 	UnitGroupLoopBegin(g);
@@ -2956,6 +3176,6 @@ void LibapxDefineState(string commandName) {
 	LibapxCommandsGuideEntrySet(
 		gv_CommandsGuideEntryUnit, 
 		commandName, 
-		" This command sets a unit's state. You can find a list of states with just typing @state. Or refer to.. <br> States: fidget, highlightable, highlighted, ignoreterrainheight, invulnerable, hidden, paused, selectable, statusbar, targetable, tooltips, cursor, movable, turnable, usessupply <br> @state [state] [on/off] <br> Examples <br> @state fidget off <br> @state ignoreterrainheight on "
+		" This command sets a unit's state. You can find a list of states with just typing @state. Or refer to.. </n> States: fidget, highlightable, highlighted, ignoreterrainheight, invulnerable, hidden, paused, selectable, statusbar, targetable, tooltips, cursor, movable, turnable, usessupply </n> @state [state] [on/off] </n></n><c val=\"255,229,201\">Examples</c> </n> @state fidget off </n> @state ignoreterrainheight on "
 	);
 }

@@ -1,0 +1,167 @@
+
+//Getters
+string LibapxGetUnitCardRed(bool defaultValue, unit u, string identifier) {
+    string id = LibapxUnitId(u);
+    string properties;
+    if(defaultValue) {
+        return "Apex/Assets/Texutres/info.png";
+    }
+    properties = DataTableGetString(true, gv_UnitCardImageLayerIdentifier+id+"_"+identifier);
+    //Space Seperate
+    while(StringFind(properties, ",", c_stringNoCase) != -1) {
+        properties = StringReplace(properties, ",", " ",1, StringLength(properties));
+    }
+    
+    return StringWord(properties, 2); // 2 is Red
+}
+
+string LibapxGetUnitCardGreen(bool defaultValue, unit u, string identifier) {
+    string id = LibapxUnitId(u);
+    string properties;
+    if(defaultValue) {
+        return "Apex/Assets/Texutres/info.png";
+    }
+    properties = DataTableGetString(true, gv_UnitCardImageLayerIdentifier+id+"_"+identifier);
+    //Space Seperate
+    while(StringFind(properties, ",", c_stringNoCase) != -1) {
+        properties = StringReplace(properties, ",", " ",1, StringLength(properties));
+    }
+    
+    return StringWord(properties, 3); // 2 is Green
+}
+
+string LibapxGetUnitCardBlue(bool defaultValue, unit u, string identifier) {
+    string id = LibapxUnitId(u);
+    string properties;
+    if(defaultValue) {
+        return "Apex/Assets/Texutres/info.png";
+    }
+    properties = DataTableGetString(true, gv_UnitCardImageLayerIdentifier+id+"_"+identifier);
+    //Space Seperate
+    while(StringFind(properties, ",", c_stringNoCase) != -1) {
+        properties = StringReplace(properties, ",", " ",1, StringLength(properties));
+    }
+    
+    return StringWord(properties, 4); // 4 is Blue
+}
+
+string LibapxGetUnitCardSaturation(bool defaultValue, unit u, string identifier) {
+    string id = LibapxUnitId(u);
+    string properties;
+    if(defaultValue) {
+        return "Apex/Assets/Texutres/info.png";
+    }
+    properties = DataTableGetString(true, gv_UnitCardImageLayerIdentifier+id+"_"+identifier);
+    //Space Seperate
+    while(StringFind(properties, ",", c_stringNoCase) != -1) {
+        properties = StringReplace(properties, ",", " ",1, StringLength(properties));
+    }
+    
+    return StringWord(properties, 5); // 5 is Saturation
+}
+
+string LibapxGetUnitCardRenderPriority(bool defaultValue, unit u, string identifier) {
+    string id = LibapxUnitId(u);
+    string properties;
+    if(defaultValue) {
+        return "Apex/Assets/Texutres/info.png";
+    }
+    properties = DataTableGetString(true, gv_UnitCardImageLayerIdentifier+id+"_"+identifier);
+    //Space Seperate
+    while(StringFind(properties, ",", c_stringNoCase) != -1) {
+        properties = StringReplace(properties, ",", " ",1, StringLength(properties));
+    }
+    
+    return StringWord(properties, 6); //  6 is Priority
+}
+
+string LibapxGetUnitCardOffsetX(bool defaultValue, unit u, string identifier) {
+    string id = LibapxUnitId(u);
+    string properties;
+    if(defaultValue) {
+        return "Apex/Assets/Texutres/info.png";
+    }
+    properties = DataTableGetString(true, gv_UnitCardImageLayerIdentifier+id+"_"+identifier);
+    //Space Seperate
+    while(StringFind(properties, ",", c_stringNoCase) != -1) {
+        properties = StringReplace(properties, ",", " ",1, StringLength(properties));
+    }
+    
+    return StringWord(properties, 7); //  7 is offset X
+}
+
+string LibapxGetUnitCardOffsetY(bool defaultValue, unit u, string identifier) {
+    string id = LibapxUnitId(u);
+    string properties;
+    if(defaultValue) {
+        return "Apex/Assets/Texutres/info.png";
+    }
+    properties = DataTableGetString(true, gv_UnitCardImageLayerIdentifier+id+"_"+identifier);
+    //Space Seperate
+    while(StringFind(properties, ",", c_stringNoCase) != -1) {
+        properties = StringReplace(properties, ",", " ",1, StringLength(properties));
+    }
+    
+    return StringWord(properties, 8); //  8 is offset Y
+}
+
+string LibapxGetUnitCardWidth(bool defaultValue, unit u, string identifier) {
+    string id = LibapxUnitId(u);
+    string properties;
+    if(defaultValue) {
+        return "Apex/Assets/Texutres/info.png";
+    }
+    properties = DataTableGetString(true, gv_UnitCardImageLayerIdentifier+id+"_"+identifier);
+    //Space Seperate
+    while(StringFind(properties, ",", c_stringNoCase) != -1) {
+        properties = StringReplace(properties, ",", " ",1, StringLength(properties));
+    }
+    
+    return StringWord(properties, 9); //  9 is width
+}
+
+string LibapxGetUnitCardHeight(bool defaultValue, unit u, string identifier) {
+    string id = LibapxUnitId(u);
+    string properties;
+    if(defaultValue) {
+        return "Apex/Assets/Texutres/info.png";
+    }
+    properties = DataTableGetString(true, gv_UnitCardImageLayerIdentifier+id+"_"+identifier);
+    //Space Seperate
+    while(StringFind(properties, ",", c_stringNoCase) != -1) {
+        properties = StringReplace(properties, ",", " ",1, StringLength(properties));
+    }
+    
+    return StringWord(properties, 10); //  10 is Height
+}
+
+string LibapxGetUnitCardRotation(bool defaultValue, unit u, string identifier) {
+    string id = LibapxUnitId(u);
+    string properties;
+    if(defaultValue) {
+        return "Apex/Assets/Texutres/info.png";
+    }
+    properties = DataTableGetString(true, gv_UnitCardImageLayerIdentifier+id+"_"+identifier);
+    //Space Seperate
+    while(StringFind(properties, ",", c_stringNoCase) != -1) {
+        properties = StringReplace(properties, ",", " ",1, StringLength(properties));
+    }
+    
+    return StringWord(properties, 11); //  11 is Rotation
+}
+
+string LibapxGetUnitCardAlpha(bool defaultValue, unit u, string identifier) {
+    string id = LibapxUnitId(u);
+    string properties;
+    if(defaultValue) {
+        return "Apex/Assets/Texutres/info.png";
+    }
+    properties = DataTableGetString(true, gv_UnitCardImageLayerIdentifier+id+"_"+identifier);
+    //Space Seperate
+    while(StringFind(properties, ",", c_stringNoCase) != -1) {
+        properties = StringReplace(properties, ",", " ",1, StringLength(properties));
+    }
+    
+    return StringWord(properties, 12); //  12 is Alpha
+}
+

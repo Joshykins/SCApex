@@ -1,0 +1,249 @@
+//=========================================================
+//		Apex Roleplaying Engine
+//		Copyright (c) 2022, Apex Group
+//=========================================================
+// This software is distributed under the MIT License:
+// <http://opensource.org/licenses/MIT>
+//=========================================================
+
+
+static const string gvBoxBackground = "Assets\\Textures\\white32.dds";
+static const string gvBlankBackground = "Assets\\Textures\\blank.dds";
+
+
+
+struct gvStBox {
+    int boxPanel;
+    int boxWidth;
+    int boxHeight;
+    int paddingPanel;
+    int paddingImage;
+    int paddingTop;
+    int paddingLeft;
+    int paddingRight;
+    int paddingBottom;
+    int marginPanel;
+    int marginTop;
+    int marginLeft;
+    int marginRight;
+    int marginBottom;
+    int totalWidth;
+    int totalHeight;
+};
+
+static const int MAXBOXES = 2000;
+static int gv_LastUsedBox = 0;
+
+static const bool gvDebugMode = true; 
+static const color gvMarginColor = Color(
+    LibapxUtil255To100(115),
+    LibapxUtil255To100(118),
+    LibapxUtil255To100(74)
+); 
+static const color gvPaddingColor = Color(
+    LibapxUtil255To100(102),
+    LibapxUtil255To100(87),
+    LibapxUtil255To100(166)
+);
+static const color gvBoxColor = Color(
+    LibapxUtil255To100(64),
+    LibapxUtil255To100(122),
+    LibapxUtil255To100(164)
+);
+gvStBox[MAXBOXES] gvBoxes;
+
+
+
+static int createUiBackgroundFor(
+    int width,
+    int height,
+    color c,
+    int panel
+);
+
+static int createUiBox(
+    int width, 
+    int height,
+    int paddingTop,
+    int paddingLeft,
+    int paddingBottom,
+    int paddingRight,
+    int marginTop,
+    int marginLeft,
+    int marginBottom,
+    int marginRight,
+    int basePanel
+);
+
+
+int LibapxInitilizeUiLib() {
+    int box;
+    LibapxLogPlayerGroup(PlayerGroupAll(), "Library Inited");
+
+    box = createUiBox(
+        500, 500, //Width Height
+        15,15,15,15, //Padding
+        15,15,15,15, //Margin
+        gv_LibapxUilibFullscreen
+    );    
+    
+    box = createUiBox(
+        200, 150, //Width Height
+        15,50,0,50, //Padding
+        0,0,500,0, //Margin
+       gvBoxes[box].boxPanel
+    );    
+}
+
+int createUiBox(    
+    int width, 
+    int height,
+    int paddingTop,
+    int paddingLeft,
+    int paddingBottom,
+    int paddingRight,
+    int marginTop,
+    int marginLeft,
+    int marginBottom,
+    int marginRight,
+    int basePanel) {
+    int currentBox = gv_LastUsedBox;
+    int tmp;
+
+    gvBoxes[currentBox].boxWidth = width;
+    gvBoxes[currentBox].boxHeight = height;
+    gvBoxes[currentBox].paddingTop = paddingTop;
+    gvBoxes[currentBox].paddingLeft = paddingLeft;
+    gvBoxes[currentBox].paddingBottom = paddingBottom;
+    gvBoxes[currentBox].paddingRight = paddingRight;
+    gvBoxes[currentBox].marginTop = marginTop;
+    gvBoxes[currentBox].marginLeft = marginLeft;
+    gvBoxes[currentBox].marginBottom = marginBottom;
+    gvBoxes[currentBox].marginRight = marginRight;
+    gvBoxes[currentBox].totalWidth = width+gvBoxes[currentBox].marginLeft+ gvBoxes[currentBox].marginRight+ gvBoxes[currentBox].paddingLeft+ gvBoxes[currentBox].paddingRight;
+    gvBoxes[currentBox].totalHeight = height+gvBoxes[currentBox].marginTop+ gvBoxes[currentBox].marginBottom+ gvBoxes[currentBox].paddingTop+ gvBoxes[currentBox].paddingBottom;
+
+
+    //Margin
+    gvBoxes[currentBox].marginPanel = DialogControlCreateInPanel(
+        basePanel,
+        c_triggerControlTypePanel
+    );
+    DialogControlSetSize(
+        gvBoxes[currentBox].marginPanel, 
+        PlayerGroupAll(), 
+        gvBoxes[currentBox].totalWidth, 
+        gvBoxes[currentBox].totalHeight
+    );
+    DialogControlSetPositionRelative(
+        gvBoxes[currentBox].marginPanel,
+        PlayerGroupAll(),
+        c_anchorTopLeft,
+        basePanel,
+        c_anchorTopLeft,
+        0,
+        0
+    );
+    if(gvDebugMode) {
+        tmp = createUiBackgroundFor(
+            gvBoxes[currentBox].totalWidth,
+            gvBoxes[currentBox].totalHeight,
+            gvMarginColor,
+            gvBoxes[currentBox].marginPanel
+        );
+    }
+
+
+    //Padding
+    gvBoxes[currentBox].paddingPanel = DialogControlCreateInPanel(
+        gvBoxes[currentBox].marginPanel,
+        c_triggerControlTypePanel
+    );
+    DialogControlSetSize(
+        gvBoxes[currentBox].paddingPanel, 
+        PlayerGroupAll(), 
+        gvBoxes[currentBox].totalWidth-gvBoxes[currentBox].marginLeft-gvBoxes[currentBox].marginRight, 
+        gvBoxes[currentBox].totalHeight-gvBoxes[currentBox].marginTop-gvBoxes[currentBox].marginBottom
+    );
+    DialogControlSetPositionRelative(
+        gvBoxes[currentBox].paddingPanel,
+        PlayerGroupAll(),
+        c_anchorTopLeft,
+        gvBoxes[currentBox].marginPanel,
+        c_anchorTopLeft,
+        gvBoxes[currentBox].marginLeft,
+        gvBoxes[currentBox].marginTop
+    );
+    
+    gvBoxes[currentBox].paddingImage = createUiBackgroundFor(
+        gvBoxes[currentBox].totalWidth-gvBoxes[currentBox].marginLeft-gvBoxes[currentBox].marginRight,
+        gvBoxes[currentBox].totalHeight-gvBoxes[currentBox].marginTop-gvBoxes[currentBox].marginBottom,
+        gvPaddingColor,
+        gvBoxes[currentBox].paddingPanel
+    );
+
+    
+
+    
+    //Box
+    gvBoxes[currentBox].boxPanel = DialogControlCreateInPanel(
+        gvBoxes[currentBox].paddingPanel,
+        c_triggerControlTypePanel
+    );
+
+    DialogControlSetSize(
+        gvBoxes[currentBox].boxPanel, 
+        PlayerGroupAll(), 
+        gvBoxes[currentBox].boxWidth, 
+        gvBoxes[currentBox].boxHeight
+    );
+
+    DialogControlSetPositionRelative(
+        gvBoxes[currentBox].boxPanel,
+        PlayerGroupAll(),
+        c_anchorTopLeft,
+        gvBoxes[currentBox].paddingPanel,
+        c_anchorTopLeft,
+        gvBoxes[currentBox].paddingLeft,
+        gvBoxes[currentBox].paddingTop
+    );
+
+    if(gvDebugMode) {
+        tmp = createUiBackgroundFor(
+            gvBoxes[currentBox].boxWidth,
+            gvBoxes[currentBox].boxHeight,
+            Color(100,100,100),
+            gvBoxes[currentBox].boxPanel
+        );
+    }
+
+
+
+
+
+    gv_LastUsedBox = gv_LastUsedBox + 1;
+    return currentBox;
+}
+
+
+int createUiBackgroundFor(int width, int height, color c, int panel) {
+    int image;
+    image = DialogControlCreateInPanel(
+        panel, 
+        c_triggerControlTypeImage
+    );
+    DialogControlSetSize(
+        image, 
+        PlayerGroupAll(), 
+        width, 
+        height
+    );
+
+    
+    DialogControlSetPropertyAsString(image, c_triggerControlPropertyImage, PlayerGroupAll(), gvBoxBackground);
+    DialogControlSetPropertyAsColor(image, c_triggerControlPropertyColor, PlayerGroupAll(), c);
+
+    DialogControlSetPropertyAsFixed(image, c_triggerControlPropertyAlpha, PlayerGroupAll(), .3);
+    return image;
+}
+
