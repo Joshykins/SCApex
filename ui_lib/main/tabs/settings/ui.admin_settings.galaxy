@@ -4,6 +4,8 @@ static int gv_reloadBankToggle;
 static int gv_dataEditToggle;
 static int gv_gamesetupToggle;
 static int gv_loanToggle;
+static int gv_eventToggle;
+static int gv_setToggle;
 
 void LibapxUiInitAdminSettings() {
     int base = DialogControlHookupStandard(
@@ -18,6 +20,9 @@ void LibapxUiInitAdminSettings() {
     gv_dataEditToggle = DialogControlHookup(base, c_triggerControlTypeButton, "DataEdit/Checkbox");
     gv_gamesetupToggle = DialogControlHookup(base, c_triggerControlTypeButton, "Gamesetups/Checkbox");
     gv_loanToggle = DialogControlHookup(base, c_triggerControlTypeButton, "Loan/Checkbox");
+    gv_eventToggle = DialogControlHookup(base, c_triggerControlTypeButton, "Event/Checkbox");
+    gv_setToggle = DialogControlHookup(base, c_triggerControlTypeButton, "Set/Checkbox");
+
 }
 
 void LibapxUiinitAdminSettingsPlayer(int p) {
@@ -27,6 +32,9 @@ void LibapxUiinitAdminSettingsPlayer(int p) {
 	bool allowDataEdit = LibapxGetAdminSetting(p, c_AdminSettingAllowDataEdit);
 	bool allowGamesetup = LibapxGetAdminSetting(p, c_AdminSettingAllowGamesetup);
 	bool allowLoan = LibapxGetAdminSetting(p, c_AdminSettingAllowLoan);
+    bool allowEvent = LibapxGetAdminSetting(p, c_AdminSettingAllowEvent);
+	bool allowSet = LibapxGetAdminSetting(p, c_AdminSettingAllowSet);
+
 
     DialogControlSetPropertyAsBool(gv_repeatToggle, c_triggerControlPropertyToggled, PlayerGroupSingle(p), allowRepeatNoDelay);
     TriggerAddEventDialogControl(TriggerCreate("TrigAllowRepeat"), p, gv_repeatToggle, c_triggerControlEventTypeClick);
@@ -40,6 +48,12 @@ void LibapxUiinitAdminSettingsPlayer(int p) {
     TriggerAddEventDialogControl(TriggerCreate("TrigAllowGamesetup"), p, gv_gamesetupToggle, c_triggerControlEventTypeClick);
     DialogControlSetPropertyAsBool(gv_loanToggle, c_triggerControlPropertyToggled, PlayerGroupSingle(p), allowLoan);
     TriggerAddEventDialogControl(TriggerCreate("TrigAllowLoan"), p, gv_loanToggle, c_triggerControlEventTypeClick);
+
+    DialogControlSetPropertyAsBool(gv_eventToggle, c_triggerControlPropertyToggled, PlayerGroupSingle(p), allowEvent);
+    TriggerAddEventDialogControl(TriggerCreate("TrigAllowEvent"), p, gv_eventToggle, c_triggerControlEventTypeClick);
+
+    DialogControlSetPropertyAsBool(gv_setToggle, c_triggerControlPropertyToggled, PlayerGroupSingle(p), allowSet);
+    TriggerAddEventDialogControl(TriggerCreate("TrigAllowSet"), p, gv_setToggle, c_triggerControlEventTypeClick);
 }
 
 static void HandleToggle(int p, int panel, string setting) {
@@ -83,5 +97,17 @@ bool TrigAllowLoan(bool testConds, bool runActions) {
     int p = EventPlayer();
 
     HandleToggle(p, gv_loanToggle, c_AdminSettingAllowLoan);
+    return true;
+}
+bool TrigAllowEvent(bool testConds, bool runActions) {
+    int p = EventPlayer();
+
+    HandleToggle(p, gv_eventToggle, c_AdminSettingAllowEvent);
+    return true;
+}
+bool TrigAllowSet(bool testConds, bool runActions) {
+    int p = EventPlayer();
+
+    HandleToggle(p, gv_setToggle, c_AdminSettingAllowSet);
     return true;
 }

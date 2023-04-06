@@ -74,7 +74,7 @@ void LibapxCreateWaygateDialog(string rgnName) {
 		anchor = DataTableGetUnit(true, gv_LibapxRegionAnchorMapPrefix + " " + rgnName);
 		if( anchor != null && UnitIsAlive(anchor) ) { // attach waygate dialog to region's unit anchor
 			UnitSetCustomValue(anchor, gv_LibapxUnitIndexWaygateDialog, IntToFixed(dialog));
-			DialogSetPositionRelativeToUnit(dialog, anchor, "RefOrigin", -60, 0);
+			DialogSetPositionRelativeToUnit(dialog, anchor, "Ref_Origin", -60, 0);
 			DialogSetVisible(dialog, PlayerGroupAll(), true);
 			return;
 		}
@@ -86,13 +86,13 @@ void LibapxCreateWaygateDialog(string rgnName) {
 	UnitCreate(1, LibapxWaygateDialogAnchorUnit, c_unitCreateIgnorePlacement, 0, p, 270.0);
 	//ActorSend(libNtve_gf_MainActorofUnit(UnitLastCreated()), "SetOpacity {0.1}"); // set opacity to hide
 	// hide the beacons for all players
-	for( i = 1; i < gv_LibapxMaxPlayers; i += 1 ) {
-		ActorSend(libNtve_gf_MainActorofUnit(UnitLastCreated()), "SetFilterPlayers " + IntToString(i));
-	}
+	 for( i = 1; i < gv_LibapxMaxPlayers; i += 1 ) {
+	 	ActorSend(libNtve_gf_MainActorofUnit(UnitLastCreated()), "SetFilterPlayers " + IntToString(i));
+	 }
 	UnitSetCustomValue(UnitLastCreated(), gv_LibapxUnitIndexWaygateAnchor, 1.0);
 	DataTableSetUnit(true, gv_LibapxWaygateAnchorDataTableIdentifier + " " + rgnName, UnitLastCreated());
 
-	DialogSetPositionRelativeToUnit(dialog, UnitLastCreated(), "RefOverhead", -60, 0);
+	DialogSetPositionRelativeToUnit(dialog, UnitLastCreated(), "Ref_Origin", -60, 0);
 	//DialogSetVisible(dialog, PlayerGroupAll(), true);
 }
 

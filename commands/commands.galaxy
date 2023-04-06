@@ -190,6 +190,8 @@ void LibapxCommandsInitialize() {
 	LibapxChatCommandCreate(">chance", LibapxCommandChance, LibapxDefineChance);
 	LibapxChatCommandCreate(">random", LibapxCommandRandom, LibapxDefineRandom);
 	LibapxChatCommandCreate(">keypress", LibapxCommandKeypress, LibapxDefineKeypress);
+	LibapxChatCommandCreate(">event", LibapxCommandEvent, LibapxDefineEvent);
+	LibapxChatCommandCreate(">set", LibapxCommandSet, LibapxDefineSet);
 	LibapxChatCommandCreate(">moveto", LibapxCommandMoveto, LibapxDefineMoveto);
 	LibapxChatCommandCreate(">condition", LibapxCommandCondition, LibapxDefineCondition);
 

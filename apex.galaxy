@@ -82,7 +82,7 @@ static string[7] InspirationalQuotes;
 // DONE: @unitvar to @unitgroup
 // TODO: @Unitgroup -g
 // DONE: Assigning keypress prints help msg
-// FIXME: Keypress nums broken
+// DONE: Keypress nums fixed
 // TODO: ui: unit properties (unitgroups(vars), keypresses, position(with copy), face (with copy), list of behaviors)
 // TODO: ui: unitcard
 // TODO: ui: turn off

@@ -22,7 +22,7 @@ void LibapxCommandRegionCreate(int user, unitgroup u, string argv, int spawningC
 	}
 
 	radius = StringToFixed(StringWord(argv, 3));
-	if( radius == 0.0 ) {
+	if( radius <= 0.0 ) {
 		radius = 2;
 	}
 

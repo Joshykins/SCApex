@@ -34,6 +34,7 @@ void LibapxEventsInitialize() {
 
 	// unit initialization events (functions found in unit.galaxy)
 	TriggerAddEventUnitCreated(TriggerCreate("LibapxUnitInitialize"), null, null, null);
+	TriggerAddEventUnitRegion(TriggerCreate("LibapxUnitSetParse"), null, RegionEntireMap(), true);
 	TriggerAddEventUnitRemoved(TriggerCreate("LibapxUnitDeathCleanup"), null);
 	TriggerAddEventUnitDied(TriggerCreate("LibapxUnitDeathCleanup"), null);
 
@@ -44,6 +45,39 @@ void LibapxEventsInitialize() {
 
 	//The only thing that needs an active runtime.
 	TriggerAddEventTimePeriodic(TriggerCreate("LibapxTrigTicker"), .01, c_timeGame);
+	
+	//Event firing triggers for >event cmd. (bool triggers found in unit_events.galaxy)
+	TriggerAddEventUnitStartedAttack(TriggerCreate("LibapxUnitAttacking"),null);
+	TriggerAddEventUnitClick(TriggerCreate("LibapxUnitClicked"),null,c_playerAny);
+	TriggerAddEventUnitAttacked(TriggerCreate("LibapxUnitAttacked"),null);
+	TriggerAddEventUnitDied(TriggerCreate("LibapxUnitDied"), null);
+	TriggerAddEventUnitAbility(TriggerCreate("LibapxUnitMoved"), null, AbilityCommand("move", 0),c_unitAbilStageExecute,true);
+	TriggerAddEventUnitAbility(TriggerCreate("LibapxUnitMoveCancel"), null, AbilityCommand("move", 0),c_unitAbilStageCancel,true);
+	TriggerAddEventUnitAbility(TriggerCreate("LibapxUnitMoveComplete"), null, AbilityCommand("move", 0),c_unitAbilStageComplete,true);
+	TriggerAddEventUnitAbility(TriggerCreate("LibapxUnitPatrolExecute"), null, AbilityCommand("move", 1),c_unitAbilStageExecute,true);
+	TriggerAddEventUnitAbility(TriggerCreate("LibapxUnitPatrolCancel"), null, AbilityCommand("move", 1),c_unitAbilStageCancel,true);
+	TriggerAddEventUnitAbility(TriggerCreate("LibapxUnitPatrolAll"), null, AbilityCommand("move", 1),c_unitAbilStageAll,true);
+	TriggerAddEventUnitAbility(TriggerCreate("LibapxUnitHoldPos"), null, AbilityCommand("move", 2),c_unitAbilStageExecute,true);
+	TriggerAddEventUnitAbility(TriggerCreate("LibapxUnitHoldPosCancel"), null, AbilityCommand("move", 2),c_unitAbilStageCancel,true);
+	TriggerAddEventUnitAbility(TriggerCreate("LibapxUnitHoldPosComplete"), null, AbilityCommand("move", 2),c_unitAbilStageComplete,true);
+	TriggerAddEventUnitAbility(TriggerCreate("LibapxUnitScanMove"), null, AbilityCommand("move", 3),c_unitAbilStageExecute,true);
+	TriggerAddEventUnitAbility(TriggerCreate("LibapxUnitScanMoveCancel"), null, AbilityCommand("move", 3),c_unitAbilStageCancel,true);
+	TriggerAddEventUnitAbility(TriggerCreate("LibapxUnitScanMoveComplete"), null, AbilityCommand("move", 3),c_unitAbilStageComplete,true);
+	TriggerAddEventUnitAbility(TriggerCreate("LibapxUnitTurn"), null, AbilityCommand("move", 4),c_unitAbilStageExecute,true);
+	TriggerAddEventUnitAbility(TriggerCreate("LibapxUnitTurnCancel"), null, AbilityCommand("move", 4),c_unitAbilStageCancel,true);
+	TriggerAddEventUnitAbility(TriggerCreate("LibapxUnitTurnComplete"), null, AbilityCommand("move", 4),c_unitAbilStageComplete,true);
+	TriggerAddEventUnitAbility(TriggerCreate("LibapxUnitAttackMove"), null, AbilityCommand("attack", 0),c_unitAbilStageExecute,true);
+	TriggerAddEventUnitAbility(TriggerCreate("LibapxUnitAttackMoveCancel"), null, AbilityCommand("attack", 0),c_unitAbilStageCancel,true);
+	TriggerAddEventUnitAbility(TriggerCreate("LibapxUnitAttackMoveComplete"), null, AbilityCommand("attack", 0),c_unitAbilStageComplete,true);
+	TriggerAddEventUnitSelected(TriggerCreate("LibapxUnitSelected"), null, c_playerAny, true);
+	TriggerAddEventUnitAbility(TriggerCreate("LibapxUnitStop"), null, AbilityCommand("stop", 0),c_unitAbilStageExecute,true);
+	TriggerAddEventUnitAcquiredTarget(TriggerCreate("LibapxUnitAcquire"), null);
+	TriggerAddEventUnitProperty(TriggerCreate("LibapxUnitLifePropertyChanges"), null, c_unitPropLife);
+	TriggerAddEventUnitProperty(TriggerCreate("LibapxUnitShieldsPropertyChanges"), null, c_unitPropShields);
+	TriggerAddEventUnitProperty(TriggerCreate("LibapxUnitEnergyPropertyChanges"), null, c_unitPropEnergy);
+	TriggerAddEventUnitProperty(TriggerCreate("LibapxUnitKillsChange"), null, c_unitPropKills);
+	TriggerAddEventUnitProperty(TriggerCreate("LibapxUnitXPChange"), null, c_unitPropXP);
+	TriggerAddEventUnitProperty(TriggerCreate("LibapxUnitHeightChange"), null, c_unitPropHeight);
 
 
 }

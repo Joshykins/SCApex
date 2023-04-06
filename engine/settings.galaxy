@@ -30,6 +30,9 @@ const string c_AdminSettingAllowReloadBank = "allowREBank";
 const string c_AdminSettingAllowDataEdit = "allowDE";
 const string c_AdminSettingAllowGamesetup = "allowGS";
 const string c_AdminSettingAllowLoan = "allowLoan";
+const string c_AdminSettingAllowEvent = "allowEvent";
+const string c_AdminSettingAllowSet = "allowSet";
+
 
 //This command is called whenever an admin is promoted or game is initialized with admin
 void LibapxPopulateSettingsFromPlayer(int p) {
@@ -38,7 +41,7 @@ void LibapxPopulateSettingsFromPlayer(int p) {
 	gv_LibapxSettings.allowReloadBank = false;
 	gv_LibapxSettings.allowDataEdit = false;
 	gv_LibapxSettings.allowGamesetup = false;
-	gv_LibapxSettings.allowGamesetup = false;
+	gv_LibapxSettings.allowEvent = false;
 	gv_LibapxSettings.allowLoan = false;
 
 	
@@ -60,6 +63,12 @@ void LibapxPopulateSettingsFromPlayer(int p) {
 	}
 	if(BankKeyExists(gv_LibapxPlayer[p].bankStorage, "AdminSettings", c_AdminSettingAllowLoan)) {
 		gv_LibapxSettings.allowLoan = true;
+	}
+	if(BankKeyExists(gv_LibapxPlayer[p].bankStorage, "AdminSettings", c_AdminSettingAllowEvent)) {
+		gv_LibapxSettings.allowEvent = true;
+	}
+	if(BankKeyExists(gv_LibapxPlayer[p].bankStorage, "AdminSettings", c_AdminSettingAllowSet)) {
+		gv_LibapxSettings.allowSet = true;
 	}
 }
 

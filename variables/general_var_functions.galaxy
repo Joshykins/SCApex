@@ -104,7 +104,20 @@ string LibapxVariableFunctionUnitAttribute(int p, unitgroup u, string argv) {
         if(attributeString == "21") {
             attribute = c_unitPropRadius;
         }
+        if(attributeString == "22") {
+            attribute = c_unitPropXP;
+        }
+        if(attributeString == "23") {
+            attribute = c_unitPropLifePercent;
+        }
+        if(attributeString == "24") {
+            attribute = c_unitPropEnergyPercent;
+        }
+        if(attributeString == "25") {
+            attribute = c_unitPropShieldsPercent;
+        }
     }
+
 
     
     if (attribute == -1) {
@@ -247,3 +260,7 @@ string LibapxVariableFunctionRandomInt(int p, unitgroup u, string argv) {
 
     return IntToString(RandomInt(in1, in2));
 }
+
+
+
+

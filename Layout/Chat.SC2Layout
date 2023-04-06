@@ -1,6 +1,17 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <Desc>
 	
+	<!-- Increases Chat Limit to 1000 characters-->
+	<Frame type="GameUI" name="GameUI" file="GameUI">
+  <Animation name="ChatBar_Chars">
+    <Event event="OnShown" action="Play"/>
+
+      <Controller type="Property" property="MaxCharacters" end="Pause" frame="$GameUI_ChatBar/ChatEditBox">
+        <Key type="Property" time="0" value="1000"/>
+      </Controller>
+  </Animation>
+</Frame>
+
 	<!-- Hide default Blizzard chat area, since we use it for commands -->
 	<Frame type="MessageDisplay" name="GameUI/UIContainer/FullscreenUpperContainer/ChatDisplay" file="GameUI">
 		<Visible val="false"/>
@@ -317,4 +328,8 @@
 			<Tiled val="true"/>
 		</Frame-->
 	</Frame>
+
+
+
+	
 </Desc>

@@ -12,7 +12,7 @@ include "apex/engine/chat/chat.alias.galaxy"
 include "apex/engine/chat/macro.galaxy"
 
 const string gv_LibapxChatcommandPrefix = "LibapxCommand_";
-static const string BracketCommands = "_alias _var _unitvar @cache _delay _api >condition >repeat >chance >random >keypress >moveto";
+static const string BracketCommands = "_alias _var _unitvar @cache _delay _api >condition >repeat >chance >random >keypress >moveto >event >set";
 
 
 // LibapxArg

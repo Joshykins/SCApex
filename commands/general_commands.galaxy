@@ -1958,6 +1958,7 @@ void LibapxCommandHelpmessages(int user, unitgroup u, string argv, int spawningC
 	}
 }
 
+
 void LibapxDefineHelpmessages(string commandName) {
 	LibapxCommandsGuideEntrySet(
 		gv_CommandsGuideEntryGeneral, 
@@ -2208,3 +2209,4 @@ void LibapxDefineUnitSetVar(string commandName) {
 		commandName, 
 		"This command sets a variable to a number, that variable is only accessible when context is on a unit. It has the modifier -remove, to remove a variable. Reference variable functions for more. </n> _unitvar name value </n></n><c val=\"255,229,201\">Examples</c>: </n> @spawn marine;_unitvar myVariable ${2+6}</n></n>Select that same marine, and do </n> _unitvar -remove myVariable");
 }
+
