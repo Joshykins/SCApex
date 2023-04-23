@@ -45,7 +45,7 @@
                 <TextureType val="Normal"/>
                 <Color val="255,255,255"/>
                 <Visible val="true"/>
-                <Alpha val="165"/>>
+                <Alpha val="165"/>
                 
             </Frame>
 

@@ -1456,7 +1456,7 @@ void LibapxCommandReplace(int user, unitgroup u, string argv, int spawningCount,
 		LibapxLogInfo(user, "Usage: Replace [ability|actor|behavior|weapon|validator|upgrade|unit|turret|light|footprint|model|decal] [SOURCE] [REPLACEMENT]");
 		return;
 	}
-
+	
 	// get source and replace actual data names
 	source = LibapxCatalogGet(catalog, source);
 	replace = LibapxCatalogGet(catalog, replace);
@@ -1969,12 +1969,17 @@ void LibapxDefineHelpmessages(string commandName) {
 // LibapxCommandDataedit
 //  ===================
 // changes field values in data catalog entries
+// Special thanks to FireSlime and the rest of the EU cortex development team.
 void LibapxCommandDataedit(int user, unitgroup u, string argv, int spawningCount, string bracketText) {
-    string msg1= StringWord(argv,3);
-    string msg2= StringWord(argv,4);
-    string msg3= StringWord(argv,5);
+    string catalogEntry= StringWord(argv,3);
+    string catalogField= StringWord(argv,4);
+    string fieldValue= StringWord(argv,5);
+	string errorMsg =  "Command syntax: <c val=\"1abc9c\">_dataedit</c> [CatalogType] [CatalogEntry] [EntryField] [FieldValue]";
 	unit tmpUnit;
 	int replaceUser = user;
+	int catalogType;
+	bool actualEntry;
+	bool actualField;
 
 	if(LibapxAdminSettingIsPlayerEnforceable(user)) {
 		if(!gv_LibapxSettings.allowDataEdit) {
@@ -1989,76 +1994,80 @@ void LibapxCommandDataedit(int user, unitgroup u, string argv, int spawningCount
 	}
 	//Because CatalogFieldValueSet was being uncooperative with strings, I had to improvise with repetitive lists.
 	if(StringWord(argv, 2) == "unit" || StringWord(argv, 2) == "Unit") {
-		CatalogFieldValueSet(c_gameCatalogUnit, msg1, msg2, replaceUser, msg3);
+		catalogType = c_gameCatalogUnit;
 	}
 	else if(StringWord(argv, 2) == "effect" || StringWord(argv, 2) == "Effect") {
-		CatalogFieldValueSet(c_gameCatalogEffect, msg1, msg2, replaceUser, msg3);
+		catalogType = c_gameCatalogEffect;
 	}
 	else if(StringWord(argv, 2) == "behavior" || StringWord(argv, 2) == "Behavior") {
-		CatalogFieldValueSet(c_gameCatalogBehavior, msg1, msg2, replaceUser, msg3);
+		catalogType = c_gameCatalogBehavior;
 	}
 	else if(StringWord(argv, 2) == "ability" || StringWord(argv, 2) == "Ability") {
-		CatalogFieldValueSet(c_gameCatalogAbil, msg1, msg2, replaceUser, msg3);
+		catalogType = c_gameCatalogAbil;
 	}
 	else if(StringWord(argv, 2) == "actor" || StringWord(argv, 2) == "Actor") {
-		CatalogFieldValueSet(c_gameCatalogActor, msg1, msg2, replaceUser, msg3);
+		catalogType = c_gameCatalogActor;
 	}
 	else if(StringWord(argv, 2) == "button" || StringWord(argv, 2) == "Button") {
-		CatalogFieldValueSet(c_gameCatalogButton, msg1, msg2, replaceUser, msg3);
+		catalogType = c_gameCatalogButton;
 	}
 	else if(StringWord(argv, 2) == "upgrade" || StringWord(argv, 2) == "Upgrade") {
-		CatalogFieldValueSet(c_gameCatalogUpgrade, msg1, msg2, replaceUser, msg3);
+		catalogType = c_gameCatalogUpgrade;
 	}
 	else if(StringWord(argv, 2) == "weapon" || StringWord(argv, 2) == "Weapon") {
-		CatalogFieldValueSet(c_gameCatalogWeapon, msg1, msg2, replaceUser, msg3);
+		catalogType = c_gameCatalogWeapon;
 	}
 	else if(StringWord(argv, 2) == "model" || StringWord(argv, 2) == "Model") {
-		CatalogFieldValueSet(c_gameCatalogModel, msg1, msg2, replaceUser, msg3);
+		catalogType = c_gameCatalogModel;
 	}
 	else if(StringWord(argv, 2) == "validator" || StringWord(argv, 2) == "Validator") {
-		CatalogFieldValueSet(c_gameCatalogValidator, msg1, msg2, replaceUser, msg3);
+		catalogType = c_gameCatalogValidator;
 	}
 	else if(StringWord(argv, 2) == "accumulator" || StringWord(argv, 2) == "Accumulator") {
-		CatalogFieldValueSet(c_gameCatalogAccumulator, msg1, msg2, replaceUser, msg3);
+		catalogType = c_gameCatalogAccumulator;
 	}
 	else if(StringWord(argv, 2) == "sound" || StringWord(argv, 2) == "Sound") {
-		CatalogFieldValueSet(c_gameCatalogSound, msg1, msg2, replaceUser, msg3);
+		catalogType = c_gameCatalogSound;
 	}
 	else if(StringWord(argv, 2) == "turret" || StringWord(argv, 2) == "Turret") {
-		CatalogFieldValueSet(c_gameCatalogTurret, msg1, msg2, replaceUser, msg3);
+		catalogType = c_gameCatalogTurret;
 	}
 	else if(StringWord(argv, 2) == "texture" || StringWord(argv, 2) == "Texture") {
-		CatalogFieldValueSet(c_gameCatalogTexture, msg1, msg2, replaceUser, msg3);
+		catalogType = c_gameCatalogTexture;
 	}
 	else if(StringWord(argv, 2) == "sort" || StringWord(argv, 2) == "Sort") {
-		CatalogFieldValueSet(c_gameCatalogTargetSort, msg1, msg2, replaceUser, msg3);
+		catalogType = c_gameCatalogTargetSort;
 	}
 	else if(StringWord(argv, 2) == "footprint" || StringWord(argv, 2) == "Footprint") {
-		CatalogFieldValueSet(c_gameCatalogFootprint, msg1, msg2, replaceUser, msg3);
+		catalogType = c_gameCatalogFootprint;
 	}
+	else if(StringToInt(StringWord(argv, 2)) > -1 ) {//Functionally able to access any existing catalog
+		catalogType = StringToInt(StringWord(argv, 2));
+	}
+	//Checks to see if entry or field is valid
+	catalogEntry = LibapxCatalogGet(catalogType, catalogEntry);
+	actualEntry = CatalogEntryIsValid(catalogType, catalogEntry);
+	actualField = CatalogFieldExists(CatalogEntryScope(catalogType, catalogEntry), catalogField);
+
 
 
 	if(gv_LibapxPlayer[user].helpMessages) {//Will not print if Helpmessages are on
-		if( StringWord(argv,2) == "" || StringWord(argv,3) == "" || StringWord(argv,4) == "" || StringWord(argv,5) == "") { // no input params
-
-			LibapxLogInfo(user, "Command syntax: <c val=\"1abc9c\">Dataedit</c> [catalog] [CatalogEntry] [EntryField] [FieldValue]"); // returns correct syntax
+		if( StringWord(argv,2) == "" || StringWord(argv,2) == "" || StringWord(argv,4) == "" || StringWord(argv,5) == "" || actualField == false) { // no input params
+			if(actualEntry == false && StringWord(argv,3) != ""){
+				errorMsg = errorMsg + "<c val=\"ff0000\"></n>\""+ StringWord(argv,3) +"</c>\" is an invalid entry input.";
+			}
+			if(actualField == false && StringWord(argv,4) != "" ){
+				errorMsg = errorMsg + "<c val=\"ff0000\"></n>\""+ StringWord(argv,4) +"</c>\" is an invalid field input.";
+			}
+			LibapxLogError(user, errorMsg); // returns correct syntax and issues found.
 		}
-		else {//If you fill all entries, you'll get this. Disclaimer: just because it prints, may not mean that it actually worked.
-		LibapxLogInfo(user, "<c val=\"1abc9c\">Editing Data </c>><c val=\"1abc9c\"> catalog:</c>" +StringWord(argv,2)+" > <c val=\"1abc9c\">Catalog Entry:</c>"+StringWord(argv,3)+" > <c val=\"1abc9c\">Entry Field:</c>"+StringWord(argv,4)+ " > <c val=\"1abc9c\">New Field Value:</c>" +StringWord(argv,5));
+		else {// Disclaimer: just because it prints, it still may not mean that it actually worked.
+		CatalogFieldValueSet(catalogType, catalogEntry, catalogField, user, fieldValue);
+		LibapxLogInfo(user, "<c val=\"1abc9c\">Editing Data </c>><c val=\"1abc9c\"> Catalog Type:</c>" +StringWord(argv, 2)+" > <c val=\"1abc9c\">Catalog Entry:</c>"+catalogEntry+" > <c val=\"1abc9c\">Entry Field:</c>"+catalogField+ " > <c val=\"1abc9c\">New Field Value:</c>" +fieldValue);
 		}
 	}
 	return;
 	
-
-	if(gv_LibapxPlayer[user].helpMessages) {//Will not print if Helpmessages are on
-		if( StringWord(argv,2) == "" || StringWord(argv,3) == "" || StringWord(argv,4) == "" || StringWord(argv,5) == "") { // no input params
-			LibapxLogInfo(user, "Command syntax: <c val=\"1abc9c\">Dataedit</c> [catalog] [CatalogEntry] [EntryField] [FieldValue]"); // returns correct syntax
-		}
-		else {//If you fill all entries, you'll get this. Disclaimer: just because it prints, may not mean that it actually worked.
-			LibapxLogInfo(user, "<c val=\"1abc9c\">Editing Data </c>><c val=\"1abc9c\"> catalog:</c>" +StringWord(argv,2)+" > <c val=\"1abc9c\">Catalog Entry:</c>"+StringWord(argv,3)+" > <c val=\"1abc9c\">Entry Field:</c>"+StringWord(argv,4)+ " > <c val=\"1abc9c\">New Field Value:</c>" +StringWord(argv,5));
-		}
-	}
-	return;
 }
 
 void LibapxDefineDataedit(string commandName) {

@@ -28,8 +28,7 @@ string LibapxVariableFunctionWorldHeight(int p, unitgroup u, string argv) {
     return FixedToString( WorldHeight(heightType, target), 6 );
 }
 
-const string gv_LibapxAvailableUnitProps = "MovementSpeed(1), Armor(2), Life(3), LifeRegen(4), MaxLife(5), Shields(6), ShieldsArmor(7), ShieldsRegen(8), MaxShields(9), Energy(10), EnergyRegen(11), MaxEnergy(12), Height(13), Kills(14), KillsXp(15), Level(16), Speed(17), CurrentSpeed(18), Acceleration(19), Turnrate(20), Radius(21)";
-
+const string gv_LibapxAvailableUnitProps = "MovementSpeed(1), Armor(2), Life(3), LifeRegen(4), MaxLife(5), Shields(6), ShieldsArmor(7), ShieldsRegen(8), MaxShields(9), Energy(10), EnergyRegen(11), MaxEnergy(12), Height(13), Kills(14), KillsXp(15), Level(16), Speed(17), CurrentSpeed(18), Acceleration(19), Turnrate(20), Radius(21) Experience(22) LifePercent(23) EnergyPercent (24) ShieldsPercent (25)";
 //Gets UnitAttribute
 string LibapxVariableFunctionUnitAttribute(int p, unitgroup u, string argv) {
     int attribute = -1;

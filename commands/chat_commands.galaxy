@@ -204,8 +204,7 @@ void LibapxCommandSet(int user, unitgroup u, string argv, int spawningCount, str
 		eventStringActual =  StringReplaceWord(eventString, "@attach", "@attach -nodelay", 0, c_stringNoCase);
 	}
 
-
-    //In event of ">set"
+    //In event of just typing ">set"
     if (CopyCaches == true && StringWord(argv,2) == "") {
     UnitGroupLoopBegin(u);
 	    if (UnitGroupCount(u, c_unitCountAlive) > 1) {//This function can only be used for one unit at a time.
@@ -224,8 +223,7 @@ void LibapxCommandSet(int user, unitgroup u, string argv, int spawningCount, str
     else {
         UnitGroupLoopBegin(u);
         while(!UnitGroupLoopDone()) {
-            //In the event of ">set unitType [inputString] "
-            //Reminder: add an error when Get unit type is: null
+            //In the event of typing ">set unitType [inputString] "
             if (StringWord(argv,2) != "" ) {
                 if (UnitGroupCount(u, c_unitCountAlive) > 1 && CopyCaches == true || LibapxCatalogGet(c_gameCatalogUnit, StringWord(argv,2)) == null) {//This function can only be used for one unit at a time.
                     LibapxLogError(user, "Invalid function.");
@@ -236,7 +234,7 @@ void LibapxCommandSet(int user, unitgroup u, string argv, int spawningCount, str
                     LibapxLogInfo(user, "When a<c val=\"d63031\"> \"" + LibapxCatalogGet(c_gameCatalogUnit, StringWord(argv,2)) + "\" </c> created, these commands will be ran: \n <c val=\"00cec9\">"+eventString+"</c>");
                 }
             }
-            //In the event of ">set [inputString] "
+            //In the event of typing ">set [inputString] "
             else {
                 DataTableSetString(true, IntToString(UnitGetOwner(UnitGroupUnit(u, 1))) + UnitGetType(UnitGroupLoopCurrent()) + "_birth", eventStringActual);
                 if(gv_LibapxPlayer[user].helpMessages) {
@@ -264,48 +262,76 @@ void LibapxDefineSet(string commandName) {
 // LibapxCommandEvent
 // =======================
 // Assigns a string to a certain event for the selected unit
-// When that event occurs on that unit, the string parses.
+// Whenever that event occurs on the unit, assigned string will parse.
 // :)
 void LibapxCommandEvent(int user, unitgroup u, string argv, int spawningCount, string bracketText) {
-    string eventString;
+    string eventString;// assigned input
+    string TheEvent = StringWord(argv, 2);// what to assign input to
+    string Change;// behavior changes are integers from -1 to 6
+    string abilStage;// ability stages are integers from -8 to -1
+    bool isEvent = false;// param for AllEvents
+    bool isAbility = false;// param for Abil catalog
+    bool isBehavior = false;// param for Behavior catalog
+    bool isEffect = false;// param for Effect catalog
+    bool isValid = false;
     int i = 1;
-    bool isEvent = false;
     eventString = LibapxBracketTextGrab(bracketText, 1);
 
-    //Enforce admin setting
+    // enforces admin setting
 	if(LibapxAdminSettingIsPlayerEnforceable(user)) {
 		if(!gv_LibapxSettings.allowEvent) {
 			LibapxLogError(user, ">event disabled due to admin settings.");
 			return;
 		}
 	}
-
+    // help list
     if (StringCase(StringWord(argv, 2), c_stringNoCase) == "help") {
         LibapxLogInfo(user, "The current events available are \" <c val=\"00ff00\">" + gv_LibapxAllEvents + " \"</c> </n> The format for the command is >event eventname [commandshere] ");
         return;
     }
-
+    // requires atleast 1 unit selected
     if(UnitGroupCount(u, c_unitCountAll) < 1) {
 		LibapxLogError(user, "Must have at least one unit selected to apply event commands to.");
 		return;
 	}
 
+    // for ability/behavior/effect params
+    if (StringCase(StringWord(argv, 2), c_stringNoCase) == "ability" && LibapxCatalogGet(c_gameCatalogAbil, StringCase(StringWord(argv, 3), c_stringNoCase)) != null && StringWord(argv, 3) != ""&& StringWord(argv, 4) != ""&& StringWord(argv, 5) != "" ) {
+        isAbility = true;
+        TheEvent = LibapxCatalogGet(c_gameCatalogAbil, StringCase(StringWord(argv, 3), c_stringNoCase)) + StringWord(argv, 4) + StringWord(argv, 5);
+        isValid = true;
+        // Ex: ">event ability move 0 -3 [@say On my way!]"
+    }
+    if (StringCase(StringWord(argv, 2), c_stringNoCase) == "behavior"  && LibapxCatalogGet(c_gameCatalogBehavior, StringCase(StringWord(argv, 3), c_stringNoCase)) != null && StringWord(argv, 3) != "" && StringWord(argv, 4) != "") {
+        isBehavior = true;
+        TheEvent = LibapxCatalogGet(c_gameCatalogBehavior, StringCase(StringWord(argv, 3), c_stringNoCase)) + StringWord(argv, 4);
+        isValid = true;
+        // Ex: ">event behavior Stimpack 0 [@say I'M JUICED UP, SON]"
+    }
+    if (StringCase(StringWord(argv, 2), c_stringNoCase) == "effect"  && LibapxCatalogGet(c_gameCatalogEffect, StringCase(StringWord(argv, 3), c_stringNoCase)) != null ) {
+        isEffect = true;
+        TheEvent = LibapxCatalogGet(c_gameCatalogEffect, StringCase(StringWord(argv, 3), c_stringNoCase));
+        isValid = true;
+        // Ex: ">event effect GuassRifle [@say EAT LEAD, YOU ANIMALS]"
+    }
+    // see if event exists.
     while(StringWord(gv_LibapxAllEvents, i) != "") {
-
         if (StringWord(argv, 2) == StringWord(gv_LibapxAllEvents, i)) {
             isEvent = true;
+            isValid = true;
             break;
         }
-
         i = i + 1;
     }
-    if(isEvent) {
+
+
+    //Finally, assign the bracket commands to the given inputs.
+    if(isValid) {
         UnitGroupLoopBegin(u);
         while(!UnitGroupLoopDone()) {
-
-            LibapxUnitSetValEvent(UnitGroupLoopCurrent(), StringWord(argv, 2), eventString);
+            DataTableSetString(true, FixedToString(UnitGetCustomValue(UnitGroupLoopCurrent(), gv_LibapxUnitIndexId), 0) + "_" + TheEvent, eventString);
             if(gv_LibapxPlayer[user].helpMessages) {
-                LibapxLogInfo(user, "Set event <c val=\"d63031\">\"" + StringWord(argv, 2) + "\"</c> on unit to this text: \n <c val=\"00cec9\">"+eventString+"</c>");
+                LibapxLogInfo(user, "Set event <c val=\"d63031\">\"" + TheEvent + "\"</c> on unit to this text: \n <c val=\"00cec9\">"+eventString+"</c>");
             }
             UnitGroupLoopStep();
         }
@@ -315,16 +341,16 @@ void LibapxCommandEvent(int user, unitgroup u, string argv, int spawningCount, s
         LibapxLogError(user, "Invalid event inputted, type </c>\" >event help \"<c val=\"ff0000\"> to list all assignable events.");
     }
 
-    return;
 
+
+    return;
 }
 void LibapxDefineEvent(string commandName) {
     LibapxCommandsGuideEntrySet(
         gv_CommandsGuideEntryGeneral, 
         commandName, 
-        " This command assigns commands which will fire when unit fires an event. </n> >event [eventname] [[commands]] </n> Possible events are "+gv_LibapxAllEvents+" </n></n><c val=\"255,229,201\">Examples</c>: </n> >event attack [@position -rel +0 +3] </n> >event move [@move;>moveto -arc 2 [boom]]; "
-    );
-}
+        " This command assigns commands which will fire when unit fires an event. </n></n>>event [eventname] [[commands]]</n></n>>event ability [abilityID] [index] [stage] [[commands]] </n></n>>event behavior [BehaviorID] [BehaviorChange]</n></n>>event effect [EffectID] [[commands]]</n></n>Events available are:</n><c val=\"0,255,100\">"+gv_LibapxAllEvents+"</c> </n></n>Possible parameters are: <c val=\"255,255,0\">Ability, Behavior, Effect</c><n></n><c val=\"255,229,201\">Examples</c>: </n>>event attack [@position -rel +0 +3] </n>>event move [@move;>moveto -arc 2 [boom]]; </n>>event ability move 0 -3 [@say I moved.]</n>>event behavior Stimpack 0 [@say I'M PUMPED UP]</n>>event effect GuassRifle [@say EAT LEAD]<n><n><n><c val=\"255,229,201\">Ability Stages</c><n>-8 = c_unitAbilStageUnpause<n>-7 = c_unitAbilStagePause<n>-6 = c_unitAbilStageComplete<n>-5 = c_unitAbilStagePreempt<n>-4 = c_unitAbilStageCancel<n>-3 = c_unitAbilStageExecute<n>-2 = c_unitAbilStageQueue<n>-1 = c_unitAbilStageAll<n><n><c val=\"255,229,201\">Behavior Changes</c><n> 0 = c_unitBehaviorChangeCreate<n> 1 = c_unitBehaviorChangeDestroy<n> 2 = c_unitBehaviorChangeRefresh<n> 3 = c_unitBehaviorChangeIncrease<n> 4 = c_unitBehaviorChangeDecrease<n> 5 = c_unitBehaviorChangeActivate<n> 6 = c_unitBehaviorChangeDeactivate"    );
+        }
 
 
 

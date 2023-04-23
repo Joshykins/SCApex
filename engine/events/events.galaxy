@@ -70,6 +70,7 @@ void LibapxEventsInitialize() {
 	TriggerAddEventUnitAbility(TriggerCreate("LibapxUnitAttackMoveCancel"), null, AbilityCommand("attack", 0),c_unitAbilStageCancel,true);
 	TriggerAddEventUnitAbility(TriggerCreate("LibapxUnitAttackMoveComplete"), null, AbilityCommand("attack", 0),c_unitAbilStageComplete,true);
 	TriggerAddEventUnitSelected(TriggerCreate("LibapxUnitSelected"), null, c_playerAny, true);
+	TriggerAddEventUnitSelected(TriggerCreate("LibapxUnitUnselected"), null, c_playerAny, false);
 	TriggerAddEventUnitAbility(TriggerCreate("LibapxUnitStop"), null, AbilityCommand("stop", 0),c_unitAbilStageExecute,true);
 	TriggerAddEventUnitAcquiredTarget(TriggerCreate("LibapxUnitAcquire"), null);
 	TriggerAddEventUnitProperty(TriggerCreate("LibapxUnitLifePropertyChanges"), null, c_unitPropLife);
@@ -78,9 +79,18 @@ void LibapxEventsInitialize() {
 	TriggerAddEventUnitProperty(TriggerCreate("LibapxUnitKillsChange"), null, c_unitPropKills);
 	TriggerAddEventUnitProperty(TriggerCreate("LibapxUnitXPChange"), null, c_unitPropXP);
 	TriggerAddEventUnitProperty(TriggerCreate("LibapxUnitHeightChange"), null, c_unitPropHeight);
+	TriggerAddEventUnitProperty(TriggerCreate("LibapxUnitLevelChange"), null, c_unitPropLevel);
+	TriggerAddEventUnitProperty(TriggerCreate("LibapxUnitCurrentSpeedChange"), null, c_unitPropMovementSpeedCurrent);
+	TriggerAddEventUnitAbility(TriggerCreate("LibapxUnitAbilityWasUsed"), null, null,c_unitAbilStageAll,true);
+	TriggerAddEventUnitBehaviorChange(TriggerCreate("LibapxUnitBehaviorWasChanged"), null, null, c_unitBehaviorChangeAny);
+	TriggerAddEventPlayerEffectUsed(TriggerCreate("LibapxUnitEffectUsed"), c_playerAny, null);
+	TriggerAddEventUnitHighlight(TriggerCreate("LibapxUnitHighlightOn"), null, c_playerAny, true);
+	TriggerAddEventUnitHighlight(TriggerCreate("LibapxUnitHighlightOff"), null, c_playerAny, false);
 
 
 }
+
+
 
 // LibapxPLayerEventsInitiallize
 // ==========================
