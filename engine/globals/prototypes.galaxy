@@ -78,6 +78,8 @@ struct gv_LibapxSettingsDefinition {
 	bool allowDataEdit;
 	bool allowGamesetup;
 	bool allowLoan;
+	bool allowEvent;
+	bool allowSet;
 };
 
 // create instance of settings:

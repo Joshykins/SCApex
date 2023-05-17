@@ -464,6 +464,7 @@ void LibapxDefineDecal(string commandName) {
 void LibapxCommandModelswap(int user, unitgroup u, string argv, int spawningCount, string bracketText) {
 	string model;
 	string variation;
+	string nosplice;
 	string amsg;
 	int paramOffset = 0;
 	string target = LibapxACTORREFMAIN;
@@ -507,6 +508,10 @@ void LibapxCommandModelswap(int user, unitgroup u, string argv, int spawningCoun
 	variation = StringWord(argv, 3 + paramOffset);
 	if( variation != "" && StringToInt(variation) >= 0 ) {
 		amsg += " {" + variation + "}";
+	}
+	nosplice = StringWord(argv, 4 + paramOffset);
+	if( nosplice == "-nosplice" ) {
+		amsg += " { PreventAllDynamicTextureTransfers }";
 	}
 
 	ApplyActormsg(u, target, argv, "@modelswap", amsg);

@@ -5,7 +5,6 @@
 // This software is distributed under the MIT License:
 // <http://opensource.org/licenses/MIT>
 //=========================================================
-
 // LibapxUnitDeathCleanup
 // =======================
 // whenever unit is killed or is removed, must cleanup unit information:
@@ -14,6 +13,12 @@
 //    along with custom name/name color
 // -> if unit has region waygate dialog attached, must anchor the waygate
 //    dialog to position where unit died
+// LibapxUnitEvents 
+// =======================
+// whenever a unit meets the event requirements:
+// -> triggers: gets the value of the data tables assigned to a unit/unit type.
+//	  (data values assigned by >event or >set in chat_commands.galaxy)
+//	  created as a way to assign apex commands to dynamic events ingame.
 // TODO: ALL new Unit info
 //Desc, name, subtitle, subtitle border/bg colors, setname, unitcard, log, keypress
 bool LibapxUnitDeathCleanup(bool testConds, bool runActions) {
@@ -40,6 +45,7 @@ bool LibapxUnitDeathCleanup(bool testConds, bool runActions) {
 		// anchor dialog to position where unit died with a new unit
 		UnitCreate(1, LibapxWaygateDialogAnchorUnit, c_unitCreateIgnorePlacement, 0, UnitGetPosition(u), 270.0);
 		DataTableSetUnit(true, gv_LibapxWaygateAnchorDataTableIdentifier + " " + rgnName, UnitLastCreated());
+		
 
 		//ActorSend(libNtve_gf_MainActorofUnit(UnitLastCreated()), "SetOpacity {0.1}"); // set opacity to hide
 		// hide the beacons for all players
@@ -50,6 +56,447 @@ bool LibapxUnitDeathCleanup(bool testConds, bool runActions) {
 
 		DialogSetPositionRelativeToUnit(waygateDialog, UnitLastCreated(), "RefOverhead", -60, 0);
 	}
+	return true;
+}
+bool LibapxUnitAttacking(bool testConds, bool runActions) {
+	unit u = EventUnit(); 
+	int owner = UnitGetOwner(u);
+	string input;	
+	unitgroup g = libNtve_gf_ConvertUnitToUnitGroup(EventUnit());	
+	input = LibapxUnitGetValEvent(u, "attack");
 
+	LibapxChatParse(input, UnitGetOwner(EventUnit()), g, gv_LibapxPlayer[owner].spawningCount);
+
+	return true;
+}
+bool LibapxUnitClicked(bool testConds, bool runActions) {
+	unit u = EventUnit(); 
+	int owner = UnitGetOwner(u);
+	string input;
+	unitgroup g = libNtve_gf_ConvertUnitToUnitGroup(EventUnit());
+
+	input = LibapxUnitGetValEvent(u, "click");
+
+	LibapxChatParse(input, UnitGetOwner(EventUnit()), g, gv_LibapxPlayer[owner].spawningCount);
+	return true;
+}
+bool LibapxUnitHighlightOn(bool testConds, bool runActions) {	unit u = EventUnit(); 
+	int owner = UnitGetOwner(u);
+	int player = EventPlayer();
+	string input;	
+	unitgroup g = libNtve_gf_ConvertUnitToUnitGroup(EventUnit());	
+	input = LibapxUnitGetValEvent(u, "highlightOn");
+
+	LibapxChatParse(input, UnitGetOwner(EventUnit()), g, gv_LibapxPlayer[owner].spawningCount);
+	return true;
+}
+bool LibapxUnitHighlightOff(bool testConds, bool runActions) {	unit u = EventUnit(); 
+	int owner = UnitGetOwner(u);
+	int player = EventPlayer();
+	string input;	
+	unitgroup g = libNtve_gf_ConvertUnitToUnitGroup(EventUnit());	
+	input = LibapxUnitGetValEvent(u, "highlightOff");
+
+	LibapxChatParse(input, UnitGetOwner(EventUnit()), g, gv_LibapxPlayer[owner].spawningCount);
+	return true;
+}
+bool LibapxUnitAttacked(bool testConds, bool runActions) {
+	unit u = EventUnit(); 
+	int owner = UnitGetOwner(u);
+	string input;
+	unitgroup g = libNtve_gf_ConvertUnitToUnitGroup(EventUnit());
+	input = LibapxUnitGetValEvent(u, "attacked");
+
+	LibapxChatParse(input, UnitGetOwner(EventUnit()), g, gv_LibapxPlayer[owner].spawningCount);
+	return true;
+}
+
+bool LibapxUnitDied(bool testConds, bool runActions) {
+	unit u = EventUnit(); 
+	int owner = UnitGetOwner(u);
+	string input;
+	unitgroup g = libNtve_gf_ConvertUnitToUnitGroup(EventUnit());
+	input = LibapxUnitGetValEvent(u, "death");
+
+	LibapxChatParse(input, UnitGetOwner(EventUnit()), g, gv_LibapxPlayer[owner].spawningCount);
+	return true;
+}
+
+bool LibapxUnitSelected(bool testConds, bool runActions) {
+	unit u = EventUnit(); 
+	int owner = UnitGetOwner(u);
+	string input;
+	unitgroup g = libNtve_gf_ConvertUnitToUnitGroup(EventUnit());
+	input = LibapxUnitGetValEvent(u, "select");
+
+	LibapxChatParse(input, UnitGetOwner(EventUnit()), g, gv_LibapxPlayer[owner].spawningCount);
+	return true;
+}
+bool LibapxUnitUnselected(bool testConds, bool runActions) {
+	unit u = EventUnit(); 
+	int owner = UnitGetOwner(u);
+	string input;
+	unitgroup g = libNtve_gf_ConvertUnitToUnitGroup(EventUnit());
+	input = LibapxUnitGetValEvent(u, "unselect");
+
+	LibapxChatParse(input, UnitGetOwner(EventUnit()), g, gv_LibapxPlayer[owner].spawningCount);
+	return true;
+}
+
+bool LibapxUnitAcquire(bool testConds, bool runActions) {
+	unit u = EventUnit(); 
+	int owner = UnitGetOwner(u);
+	string input;
+	unitgroup g = libNtve_gf_ConvertUnitToUnitGroup(EventUnit());
+	input = LibapxUnitGetValEvent(u, "acquire");
+
+	LibapxChatParse(input, UnitGetOwner(EventUnit()), g, gv_LibapxPlayer[owner].spawningCount);
+	return true;
+}
+
+bool LibapxUnitIdle(bool testConds, bool runActions) {
+	unit u = EventUnit(); 
+	int owner = UnitGetOwner(u);
+	string input;
+	unitgroup g = libNtve_gf_ConvertUnitToUnitGroup(EventUnit());
+	input = LibapxUnitGetValEvent(u, "idle");
+
+	LibapxChatParse(input, UnitGetOwner(EventUnit()), g, gv_LibapxPlayer[owner].spawningCount);
+	return true;
+}
+
+bool LibapxUnitSetParse(bool testConds, bool runActions) {
+	unit u = EventUnit(); 
+	int owner = UnitGetOwner(u);
+	string input;	
+	unitgroup g = libNtve_gf_ConvertUnitToUnitGroup(u);
+	input = DataTableGetString(true, IntToString(UnitGetOwner(u)) + UnitGetType(u) + "_birth" );
+
+	LibapxChatParse(input, UnitGetOwner(EventUnit()), g, gv_LibapxPlayer[owner].spawningCount);
+
+	return true;
+}
+
+bool LibapxUnitMoved(bool testConds, bool runActions) {
+	unit u = EventUnit(); 
+	int owner = UnitGetOwner(u);
+	string input;	
+	unitgroup g = libNtve_gf_ConvertUnitToUnitGroup(EventUnit());
+	input = LibapxUnitGetValEvent(u, "move");
+
+	LibapxChatParse(input, UnitGetOwner(EventUnit()), g, gv_LibapxPlayer[owner].spawningCount);
+
+	return true;
+}
+bool LibapxUnitMoveComplete(bool testConds, bool runActions) {
+	unit u = EventUnit(); 
+	int owner = UnitGetOwner(u);
+	string input;	
+	unitgroup g = libNtve_gf_ConvertUnitToUnitGroup(EventUnit());
+	input = LibapxUnitGetValEvent(u, "moveFinish");
+
+	LibapxChatParse(input, UnitGetOwner(EventUnit()), g, gv_LibapxPlayer[owner].spawningCount);
+	return true;
+}
+bool LibapxUnitMoveCancel(bool testConds, bool runActions) {
+	unit u = EventUnit(); 
+	int owner = UnitGetOwner(u);
+	string input;	
+	unitgroup g = libNtve_gf_ConvertUnitToUnitGroup(EventUnit());
+	input = LibapxUnitGetValEvent(u, "moveCancel");
+
+	LibapxChatParse(input, UnitGetOwner(EventUnit()), g, gv_LibapxPlayer[owner].spawningCount);
+	return true;
+}
+
+bool LibapxUnitAttackMove(bool testConds, bool runActions) {
+	unit u = EventUnit(); 
+	int owner = UnitGetOwner(u);
+	string input;	
+	unitgroup g = libNtve_gf_ConvertUnitToUnitGroup(EventUnit());
+	input = LibapxUnitGetValEvent(u, "attackmove");
+
+	LibapxChatParse(input, UnitGetOwner(EventUnit()), g, gv_LibapxPlayer[owner].spawningCount);
+
+	return true;
+}
+bool LibapxUnitAttackMoveComplete(bool testConds, bool runActions) {
+
+	unit u = EventUnit(); 
+	int owner = UnitGetOwner(u);
+	string input;	
+	unitgroup g = libNtve_gf_ConvertUnitToUnitGroup(EventUnit());
+	input = LibapxUnitGetValEvent(u, "attackmoveFinish");
+
+	LibapxChatParse(input, UnitGetOwner(EventUnit()), g, gv_LibapxPlayer[owner].spawningCount);
+	return true;
+}
+bool LibapxUnitAttackMoveCancel(bool testConds, bool runActions) {
+	unit u = EventUnit(); 
+	int owner = UnitGetOwner(u);
+	string input;	
+	unitgroup g = libNtve_gf_ConvertUnitToUnitGroup(EventUnit());
+	input = LibapxUnitGetValEvent(u, "attackmoveCancel");
+
+	LibapxChatParse(input, UnitGetOwner(EventUnit()), g, gv_LibapxPlayer[owner].spawningCount);
+	return true;
+}
+
+bool LibapxUnitPatrolExecute(bool testConds, bool runActions) {
+	unit u = EventUnit(); 
+	int owner = UnitGetOwner(u);
+	string input;	
+	unitgroup g = libNtve_gf_ConvertUnitToUnitGroup(EventUnit());
+	input = LibapxUnitGetValEvent(u, "patrol");
+
+	LibapxChatParse(input, UnitGetOwner(EventUnit()), g, gv_LibapxPlayer[owner].spawningCount);
+
+	return true;
+}
+bool LibapxUnitPatrolAll(bool testConds, bool runActions) {
+	unit u = EventUnit(); 
+	int owner = UnitGetOwner(u);
+	string input;	
+	unitgroup g = libNtve_gf_ConvertUnitToUnitGroup(EventUnit());
+	input = LibapxUnitGetValEvent(u, "patrolAllStages");
+
+	LibapxChatParse(input, UnitGetOwner(EventUnit()), g, gv_LibapxPlayer[owner].spawningCount);
+	return true;
+}
+bool LibapxUnitPatrolCancel(bool testConds, bool runActions) {
+	unit u = EventUnit(); 
+	int owner = UnitGetOwner(u);
+	string input;	
+	unitgroup g = libNtve_gf_ConvertUnitToUnitGroup(EventUnit());
+	input = LibapxUnitGetValEvent(u, "patrolCancel");
+
+	LibapxChatParse(input, UnitGetOwner(EventUnit()), g, gv_LibapxPlayer[owner].spawningCount);
+	return true;
+}
+
+bool LibapxUnitHoldPos(bool testConds, bool runActions) {
+	unit u = EventUnit(); 
+	int owner = UnitGetOwner(u);
+	string input;	
+	unitgroup g = libNtve_gf_ConvertUnitToUnitGroup(EventUnit());
+	input = LibapxUnitGetValEvent(u, "hold");
+
+	LibapxChatParse(input, UnitGetOwner(EventUnit()), g, gv_LibapxPlayer[owner].spawningCount);
+
+	return true;
+}
+bool LibapxUnitHoldPosComplete(bool testConds, bool runActions) {
+	unit u = EventUnit(); 
+	int owner = UnitGetOwner(u);
+	string input;	
+	unitgroup g = libNtve_gf_ConvertUnitToUnitGroup(EventUnit());
+	input = LibapxUnitGetValEvent(u, "holdFinish");
+
+	LibapxChatParse(input, UnitGetOwner(EventUnit()), g, gv_LibapxPlayer[owner].spawningCount);
+	return true;
+}
+bool LibapxUnitHoldPosCancel(bool testConds, bool runActions) {
+	unit u = EventUnit(); 
+	int owner = UnitGetOwner(u);
+	string input;	
+	unitgroup g = libNtve_gf_ConvertUnitToUnitGroup(EventUnit());
+	input = LibapxUnitGetValEvent(u, "holdCancel");
+
+	LibapxChatParse(input, UnitGetOwner(EventUnit()), g, gv_LibapxPlayer[owner].spawningCount);
+	return true;
+}
+
+bool LibapxUnitScanMove(bool testConds, bool runActions) {
+	unit u = EventUnit(); 
+	int owner = UnitGetOwner(u);
+	string input;	
+	unitgroup g = libNtve_gf_ConvertUnitToUnitGroup(EventUnit());
+	input = LibapxUnitGetValEvent(u, "scanmove");
+
+	LibapxChatParse(input, UnitGetOwner(EventUnit()), g, gv_LibapxPlayer[owner].spawningCount);
+
+	return true;
+}
+bool LibapxUnitScanMoveComplete(bool testConds, bool runActions) {
+	unit u = EventUnit(); 
+	int owner = UnitGetOwner(u);
+	string input;	
+	unitgroup g = libNtve_gf_ConvertUnitToUnitGroup(EventUnit());
+	input = LibapxUnitGetValEvent(u, "scanmoveComplete");
+
+	LibapxChatParse(input, UnitGetOwner(EventUnit()), g, gv_LibapxPlayer[owner].spawningCount);
+	return true;
+}
+bool LibapxUnitScanMoveCancel(bool testConds, bool runActions) {
+	unit u = EventUnit(); 
+	int owner = UnitGetOwner(u);
+	string input;	
+	unitgroup g = libNtve_gf_ConvertUnitToUnitGroup(EventUnit());
+	input = LibapxUnitGetValEvent(u, "scanmoveCancel");
+
+	LibapxChatParse(input, UnitGetOwner(EventUnit()), g, gv_LibapxPlayer[owner].spawningCount);
+	return true;
+}
+
+bool LibapxUnitTurn(bool testConds, bool runActions) {
+	unit u = EventUnit(); 
+	int owner = UnitGetOwner(u);
+	string input;	
+	unitgroup g = libNtve_gf_ConvertUnitToUnitGroup(EventUnit());
+	input = LibapxUnitGetValEvent(u, "turn");
+
+	LibapxChatParse(input, UnitGetOwner(EventUnit()), g, gv_LibapxPlayer[owner].spawningCount);
+
+	return true;
+}
+bool LibapxUnitTurnComplete(bool testConds, bool runActions) {
+	unit u = EventUnit(); 
+	int owner = UnitGetOwner(u);
+	string input;	
+	unitgroup g = libNtve_gf_ConvertUnitToUnitGroup(EventUnit());
+	input = LibapxUnitGetValEvent(u, "turnFinish");
+
+	LibapxChatParse(input, UnitGetOwner(EventUnit()), g, gv_LibapxPlayer[owner].spawningCount);
+	return true;
+}
+bool LibapxUnitTurnCancel(bool testConds, bool runActions) {
+	unit u = EventUnit(); 
+	int owner = UnitGetOwner(u);
+	string input;	
+	unitgroup g = libNtve_gf_ConvertUnitToUnitGroup(EventUnit());
+	input = LibapxUnitGetValEvent(u, "turnCancel");
+
+	LibapxChatParse(input, UnitGetOwner(EventUnit()), g, gv_LibapxPlayer[owner].spawningCount);
+	return true;
+}
+
+bool LibapxUnitStop(bool testConds, bool runActions) {
+	unit u = EventUnit(); 
+	int owner = UnitGetOwner(u);
+	string input;	
+	unitgroup g = libNtve_gf_ConvertUnitToUnitGroup(EventUnit());
+	input = LibapxUnitGetValEvent(u, "stop");
+
+	LibapxChatParse(input, UnitGetOwner(EventUnit()), g, gv_LibapxPlayer[owner].spawningCount);
+	return true;
+}
+
+//Unit property change events eg. Life, Shields, Energy, etc
+//Possibly split triggers into Increase/Decrease
+bool LibapxUnitLifePropertyChanges(bool testConds, bool runActions) {
+	unit u = EventUnit(); 
+	int owner = UnitGetOwner(u);
+	string input;	
+	unitgroup g = libNtve_gf_ConvertUnitToUnitGroup(EventUnit());
+	input = LibapxUnitGetValEvent(u, "life");
+
+	LibapxChatParse(input, UnitGetOwner(EventUnit()), g, gv_LibapxPlayer[owner].spawningCount);
+	return true;
+}
+bool LibapxUnitShieldsPropertyChanges(bool testConds, bool runActions) {
+	unit u = EventUnit(); 
+	int owner = UnitGetOwner(u);
+	string input;	
+	unitgroup g = libNtve_gf_ConvertUnitToUnitGroup(EventUnit());
+	input = LibapxUnitGetValEvent(u, "shields");
+
+	LibapxChatParse(input, UnitGetOwner(EventUnit()), g, gv_LibapxPlayer[owner].spawningCount);
+	return true;
+}
+bool LibapxUnitEnergyPropertyChanges(bool testConds, bool runActions) {
+	unit u = EventUnit(); 
+	int owner = UnitGetOwner(u);
+	string input;	
+	unitgroup g = libNtve_gf_ConvertUnitToUnitGroup(EventUnit());
+	input = LibapxUnitGetValEvent(u, "energy");
+
+	LibapxChatParse(input, UnitGetOwner(EventUnit()), g, gv_LibapxPlayer[owner].spawningCount);
+	return true;
+}
+bool LibapxUnitKillsChange(bool testConds, bool runActions) {
+	unit u = EventUnit(); 
+	int owner = UnitGetOwner(u);
+	string input;	
+	unitgroup g = libNtve_gf_ConvertUnitToUnitGroup(EventUnit());
+	input = LibapxUnitGetValEvent(u, "kill");
+
+	LibapxChatParse(input, UnitGetOwner(EventUnit()), g, gv_LibapxPlayer[owner].spawningCount);
+	return true;
+}
+bool LibapxUnitXPChange(bool testConds, bool runActions) {
+	unit u = EventUnit(); 
+	int owner = UnitGetOwner(u);
+	string input;	
+	unitgroup g = libNtve_gf_ConvertUnitToUnitGroup(EventUnit());
+	input = LibapxUnitGetValEvent(u, "exp");
+
+	LibapxChatParse(input, UnitGetOwner(EventUnit()), g, gv_LibapxPlayer[owner].spawningCount);
+	return true;
+}
+bool LibapxUnitHeightChange(bool testConds, bool runActions) {
+	unit u = EventUnit(); 
+	int owner = UnitGetOwner(u);
+	string input;	
+	unitgroup g = libNtve_gf_ConvertUnitToUnitGroup(EventUnit());
+	input = LibapxUnitGetValEvent(u, "height");
+
+	LibapxChatParse(input, UnitGetOwner(EventUnit()), g, gv_LibapxPlayer[owner].spawningCount);
+	return true;
+}
+bool LibapxUnitLevelChange(bool testConds, bool runActions) {
+	unit u = EventUnit(); 
+	int owner = UnitGetOwner(u);
+	string input;	
+	unitgroup g = libNtve_gf_ConvertUnitToUnitGroup(EventUnit());
+	input = LibapxUnitGetValEvent(u, "level");
+
+	LibapxChatParse(input, UnitGetOwner(EventUnit()), g, gv_LibapxPlayer[owner].spawningCount);
+	return true;
+}
+bool LibapxUnitCurrentSpeedChange(bool testConds, bool runActions) {
+	unit u = EventUnit(); 
+	int owner = UnitGetOwner(u);
+	string input;	
+	unitgroup g = libNtve_gf_ConvertUnitToUnitGroup(EventUnit());
+	input = LibapxUnitGetValEvent(u, "movement");
+
+	LibapxChatParse(input, UnitGetOwner(EventUnit()), g, gv_LibapxPlayer[owner].spawningCount);
+	return true;
+}
+
+// Much more configurable triggers
+bool LibapxUnitEffectUsed(bool testConds, bool runActions) {
+	unit u = EventPlayerEffectUsedUnit(c_effectUnitCaster); 
+	int owner = UnitGetOwner(u);
+	string input;	unitgroup g = libNtve_gf_ConvertUnitToUnitGroup(u);
+	string effect = EventPlayerEffectUsed();
+	input = LibapxUnitGetValEvent(u, effect);
+
+	LibapxChatParse(input, UnitGetOwner(u), g, gv_LibapxPlayer[owner].spawningCount);
+	return true;
+}
+bool LibapxUnitBehaviorWasChanged(bool testConds, bool runActions) {	
+	unit u = EventUnit(); 
+	int owner = UnitGetOwner(u);
+	string input;	
+	unitgroup g = libNtve_gf_ConvertUnitToUnitGroup(EventUnit());
+	string behavior = EventUnitBehavior();
+	int behaviorChange = EventUnitBehaviorChange();
+	input = LibapxUnitGetValEvent(u, behavior + IntToString(behaviorChange));
+
+	LibapxChatParse(input, UnitGetOwner(EventUnit()), g, gv_LibapxPlayer[owner].spawningCount);
+	return true;
+}
+bool LibapxUnitAbilityWasUsed(bool testConds, bool runActions) {
+	unit u = EventUnit(); 
+	int owner = UnitGetOwner(u);
+	string input;	
+	unitgroup g = libNtve_gf_ConvertUnitToUnitGroup(EventUnit());
+	string abilityCommand = AbilityCommandGetAbility(EventUnitAbility());
+	string abilityIndex = IntToString(AbilityCommandGetCommand(EventUnitAbility()));
+	int abilityStage = EventUnitAbilityStage();
+	input = LibapxUnitGetValEvent(u, abilityCommand + abilityIndex + IntToString(abilityStage));
+	
+	LibapxChatParse(input, UnitGetOwner(EventUnit()), g, gv_LibapxPlayer[owner].spawningCount);
 	return true;
 }

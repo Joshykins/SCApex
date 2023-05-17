@@ -53,7 +53,7 @@ const string LibapxTalkSound = "";
 
 // unit used as the default region waygate dialog anchor
 // (see regions.galaxy)
-const string LibapxWaygateDialogAnchorUnit = "BeaconZerg";
+const string LibapxWaygateDialogAnchorUnit = "Beacon_Zerg";
 
 // librtprCatalogGet
 // ====================

@@ -114,13 +114,13 @@ bool LibapxTrigChatTyped(bool testConds, bool runActions) {
     string currentChatBoxInput = libNtve_gf_DialogItemEditValue(gv_ChatEditBox, p);
     int length = StringLength(currentChatBoxInput);
     string lengthString = IntToString(length);
-    if(length == 255) {
+    if(length == 1000) {
         DialogControlSetPropertyAsColor(gv_ChatCharCount, c_triggerControlPropertyColor, PlayerGroupSingle(p), Color(100,0,0));
     }
-    else if(length >  245) {
+    else if(length >  960) {
         DialogControlSetPropertyAsColor(gv_ChatCharCount, c_triggerControlPropertyColor, PlayerGroupSingle(p), Color(100,60,0));
     }
-    else if(length >  235) {
+    else if(length >  920) {
         DialogControlSetPropertyAsColor(gv_ChatCharCount, c_triggerControlPropertyColor, PlayerGroupSingle(p), Color(80,80,0));
     }
     else {

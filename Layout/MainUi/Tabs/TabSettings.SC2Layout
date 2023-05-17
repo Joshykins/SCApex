@@ -125,6 +125,34 @@
                     </Frame>
                 </Frame>
 
+                <Frame type="Frame" name="Event" template="ApexTemplates/ApexCheckbox">
+                    <Anchor side="Left" relative="$parent" pos="Mid" offset="0"/>
+                    <Anchor side="Right" relative="$parent" pos="Mid" offset="0"/>
+                    <Anchor side="Top" relative="$parent/Loan" pos="Max" offset="-25"/>
+                    <Width val="450"/>
+                    <Frame type="Button" name="Checkbox">
+                        <Anchor side="Left" relative="$parent" pos="Min" offset="360"/>
+                    </Frame>
+                    <Frame type="Label" name="Name">
+                        <Anchor side="Right" relative="$parent" pos="Min" offset="350"/>
+                        <Text val="Allow >event"/>
+                    </Frame>
+                </Frame>
+
+                <Frame type="Frame" name="Set" template="ApexTemplates/ApexCheckbox">
+                    <Anchor side="Left" relative="$parent" pos="Mid" offset="0"/>
+                    <Anchor side="Right" relative="$parent" pos="Mid" offset="0"/>
+                    <Anchor side="Top" relative="$parent/Event" pos="Max" offset="-25"/>
+                    <Width val="450"/>
+                    <Frame type="Button" name="Checkbox">
+                        <Anchor side="Left" relative="$parent" pos="Min" offset="360"/>
+                    </Frame>
+                    <Frame type="Label" name="Name">
+                        <Anchor side="Right" relative="$parent" pos="Min" offset="350"/>
+                        <Text val="Allow >set"/>
+                    </Frame>
+                </Frame>
+
                 <Frame type="Label" name="Disclaimer">
                     <Height val="50"/>
                     <Width val="450"/>

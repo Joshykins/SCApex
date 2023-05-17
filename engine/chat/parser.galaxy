@@ -12,7 +12,7 @@ include "apex/engine/chat/chat.alias.galaxy"
 include "apex/engine/chat/macro.galaxy"
 
 const string gv_LibapxChatcommandPrefix = "LibapxCommand_";
-static const string BracketCommands = "_alias _var _unitvar @cache _delay _api >condition >repeat >chance >random >keypress >moveto";
+static const string BracketCommands = "_alias _var _unitvar @cache _delay _api >condition >repeat >chance >random >keypress >moveto >event >set";
 
 
 // LibapxArg
@@ -52,7 +52,7 @@ typedef funcref<LibapxCommandGuideSignature> LibapxCommandGuide;
 //
 // Array length hardcoded such that num of commands registered should never
 // reach command table size. If it does, increase this array size.
-LibapxCommandType[250] gv_LibapxCommandTable;
+LibapxCommandType[994] gv_LibapxCommandTable;
 
 // Counter for the next free array entry in the gv_LibapxCommandTable array
 int gv_gv_LibapxCommandTableCounter = 0;

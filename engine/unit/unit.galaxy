@@ -26,8 +26,8 @@ const int gv_LibapxUnitIndexFlagAnimspeed = 6;	// flag for @animspeed has been u
 const int gv_LibapxUnitIndexFlagPlay = 7;			// flag for @play has been used
 const int gv_LibapxUnitIndexFlagStatbars = 8;		// flag for @statbars has been used
 const int gv_LibapxUnitIndexFlagRotate = 9;		// flag for @rotate has been used
-const int gv_LibapxUnitIndexFlagDecal = 10;		// flag for @rotate has been used 
-const int gv_LibapxUnitIndexFlagLoaner = 11;		// flag for @rotate has been used 
+const int gv_LibapxUnitIndexFlagDecal = 10;		// flag for @decal has been used 
+const int gv_LibapxUnitIndexFlagLoaner = 11;		// flag for @loan has been used 
 
 const int gv_LibapxUnitIndexWaygate = 15;			// region ID for waygates
 const int gv_LibapxUnitIndexWaygateDialog = 16;	// attached waygate dialog ID
@@ -36,6 +36,9 @@ const int gv_LibapxUnitIndexWaygateAnchor = 17;	// flag for unit is waygate anch
 const int gv_LibapxUnitIndexTextTag = 20;		// flag for text tag set
 
 const int gv_LibapxUnitIndexSplatOwner = 25;	   // Player number of spawn splat owner
+
+const int gv_LibapxUnitTypeIndexId = 26;				// index for Unit Type ID for >set
+
 
 // Each unit given a unique id. Each time unit created, counter increments
 int gv_LibapxUnitIdCounter = 1;
@@ -89,7 +92,20 @@ string LibapxUnitGetVal(unit u, string valuename) {
 
 }
 
-const string gv_LibapxAllKeys = "key_0 key_1 key_2 key_3 key_4 key_5 key_6 key_7 key_8 key_9 key_a key_b key_c key_d key_e key_f key_g key_h key_i key_j key_k key_l key_m key_n key_o key_p key_q key_r key_s key_t key_u key_v key_w key_x key_y key_z key_up key_down key_left key_right key_pgup key_pgdown key_numpad0 key_numpad1 key_numpad2 key_numpad3 key_numpad4 key_numbpad5 key_numbpad6 key_numbpad7 key_numbpad8 key_numbpad9 key_numbpadplus key_numbpadminus key_numpadmultiply key_numpaddivide key_numpaddecimal key_grave";
+// LibapxUnitGetValEvent
+// ===========================
+// Gets a custom value stored to the unit from >event. Used for unit_events.galaxy
+string LibapxUnitGetValEvent(unit u, string valuename) {
+	string unitId;
+	string event;
+	unitId = FixedToString(UnitGetCustomValue(u, gv_LibapxUnitIndexId), 0);
+	event = unitId + "_" + valuename;
+	return DataTableGetString(true, event);
+
+}
+
+const string gv_LibapxAllKeys = "key_0 key_1 key_2 key_3 key_4 key_5 key_6 key_7 key_8 key_9 key_a key_b key_c key_d key_e key_f key_g key_h key_i key_j key_k key_l key_m key_n key_o key_p key_q key_r key_s key_t key_u key_v key_w key_x key_y key_z key_up key_down key_left key_right key_pgup key_pgdown key_numpad0 key_numpad1 key_numpad2 key_numpad3 key_numpad4 key_numpad5 key_numpad6 key_numpad7 key_numpad8 key_numpad9 key_numpadplus key_numpadminus key_numpadmultiply key_numpaddivide key_numpaddecimal key_grave";
+const string gv_LibapxAllEvents = "attack attacked attackmove attackmoveFinish attackmoveCancel highlightOn highlightOff hold holdFinish holdCancel scanmove scanmoveComplete scanmoveCancel turn turnFinish turnCancel death move moveCancel moveFinish patrol patrolAllStages patrolCancel click select unselect acquire idle stop life shields energy kill exp height level movement";
 
 // LibapxUnitSetVal
 // ===========================
@@ -109,6 +125,27 @@ void LibapxUnitSetVal(unit u, string valuename, string value) {
 		i+=1;
 	}
 	DataTableSetString(true, key, value);
+	return;
+}
+
+// LibapxUnitSetValEvent
+// ===========================
+// Gets a custom value stored to the unit. For >event
+void LibapxUnitSetValEvent(unit u, string valuename, string value) {
+	string unitId;
+	string event;
+	int i;
+	string comparison;
+	unitId = FixedToString(UnitGetCustomValue(u, gv_LibapxUnitIndexId), 0);
+	i = 1;
+	while(StringWord(gv_LibapxAllEvents, i) != "") {
+		comparison = StringWord(gv_LibapxAllEvents, i);
+		if(comparison == valuename) {
+			event =  unitId + "_" + comparison;
+		}
+		i+=1;
+	}
+	DataTableSetString(true, event, value);
 	return;
 }
 
@@ -135,6 +172,7 @@ bool LibapxUnitInitialize(bool testConds, bool runActions) {
 	LibapxUnitSetId(EventUnitCreatedUnit());
 	UnitSetCustomValue(EventUnitCreatedUnit(), gv_LibapxUnitIndexCacheCount, 1);
 	return true;
+
 }
 
 // LibapxUnitCreate
@@ -872,9 +910,9 @@ void LibapxUnitCacheUpdate(unit subject, string command, string userCommand) {
 		}
 	}
 	else if(command == "@decal") {
-		if(UnitGetCustomValue(subject, gv_LibapxUnitIndexFlagRotate) != 1) {
+		if(UnitGetCustomValue(subject, gv_LibapxUnitIndexFlagRotate) != 5) {
 			LibapxUnitCacheUpdateAdd(subject, unitId, userCommand);
-			UnitSetCustomValue(subject, gv_LibapxUnitIndexFlagRotate, 1);
+			UnitSetCustomValue(subject, gv_LibapxUnitIndexFlagRotate, UnitGetCustomValue(subject, gv_LibapxUnitIndexFlagRotate) + 1);
 			return;
 		}
 		else {
@@ -1143,8 +1181,43 @@ int LibapxGetCommandActorCount(string argv) {
 
 
 
+// Wait did I make this?
+// I think this was my prototype for >events
+void LibapxUnitAttackCheck(){
+	int i;
+	unitgroup target;
+	unitgroup g;
+	unit u;
+	int player;
+	string input;
+	player = EventPlayer();
+	target = UnitGroupSelected(player);
+	g = target;
+
+	UnitGroupLoopBegin(g);
+	while(!UnitGroupLoopDone()) {
+		i = i + 1;
+		u = UnitGroupLoopCurrent();
 
 
+		UnitGroupLoopStep();
+	}
+	UnitGroupLoopEnd();
+	if(i > 1) {
+		return;
+	}
+	if(	player != UnitGetOwner(u) ) {
+		return;
+	}
+	if(gv_LibapxPlayer[player].key_0 == true ) {
+		LibapxChatParse(input, player, g, gv_LibapxPlayer[player].spawningCount);	
+	}
+	return;
+
+	
+
+
+}
 
 void LibapxUnitKeypressCheck() {
 	int i;
@@ -1239,7 +1312,7 @@ void LibapxUnitKeypressCheck() {
 		input = LibapxUnitGetVal(u, "key_e");
 		LibapxChatParse(input, player, g, gv_LibapxPlayer[player].spawningCount);
 	}
-	if(gv_LibapxPlayer[player].keyE == true ) {
+	if(gv_LibapxPlayer[player].keyF == true ) {
 		input = LibapxUnitGetVal(u, "key_f");
 		LibapxChatParse(input, player, g, gv_LibapxPlayer[player].spawningCount);
 	}

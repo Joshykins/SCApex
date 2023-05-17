@@ -221,11 +221,18 @@ void LibapxCommandContext(int user, unitgroup u, string argv, int spawningCount,
 	string unitgroupPrefix = "unitgroup_"+IntToString(user)+"_";
 	unitgroup target = DataTableGetUnitGroup(true, unitgroupPrefix + StringWord(argv,2));
 	bool modSelect = false;
+	bool modAcquire = false;
 	if( StringFind(argv, "-select", c_stringNoCase) != -1 ) {
 		modSelect = true;
 		argv = StringReplaceWord(argv, "-select",  "", 1, c_stringNoCase);
 		target = UnitGroupSelected(user);
 	} 
+	if( StringFind(argv, "-acquired", c_stringNoCase) != -1 ) { // Sets the context to be a unit that's being targeted/acquired by the selected unit in the specific instance it is acquiring/targeting (eg attacking).
+		modAcquire = true;
+		argv = StringReplaceWord(argv, "-acquired",  "", 1, c_stringNoCase);
+		target = libNtve_gf_ConvertUnitToUnitGroup(libNtve_gf_AcquiredTarget());
+	} 
+	
 
 	LibapxSetTarget(user, target, spawningCount);
 	// LibapxSetTarget(int player, unitgroup target, int spawningCount)
@@ -2866,6 +2873,10 @@ void LibapxCommandEffect(int user, unitgroup u, string argv, int spawningCount, 
     unitgroup g = u;
     string effect = StringWord( argv, 2 );
     bool usingCursor;
+	bool usingCoords;
+	bool usingAcquired;
+	unit target = libNtve_gf_AcquiredTarget();
+	
 
     effect = LibapxCatalogGet(c_gameCatalogEffect, effect);
     if(effect == null) {
@@ -2875,6 +2886,46 @@ void LibapxCommandEffect(int user, unitgroup u, string argv, int spawningCount, 
     if(StringFind(argv, "-point" ,c_stringNoCase) != -1 ) {
         argv =  StringReplaceWord(argv, "-point", "", 1, c_stringNoCase);
         usingCursor = true;
+    }
+	if(StringFind(argv, "-acquired" ,c_stringNoCase) != -1 ) {
+        argv =  StringReplaceWord(argv, "-acquired", "", 1, c_stringNoCase);
+        usingAcquired = true;
+    }
+	if(StringFind(argv, "-coord" ,c_stringNoCase) != -1 ) {
+        argv =  StringReplaceWord(argv, "-coord", "", 1, c_stringNoCase);
+        usingCoords = true;
+    }
+
+	if(usingCoords){
+        if( UnitGroupCount(g, c_unitCountAll) != 0 ) {
+            UnitGroupLoopBegin(g);
+            while(!UnitGroupLoopDone()) {
+                if( libNtve_gf_PlayerCanCreateEffectAtPoint(user, effect, Point(StringToFixed(StringWord(argv, 3)), StringToFixed(StringWord(argv, 4)))) ) {
+                    UnitCreateEffectPoint(UnitGroupLoopCurrent(), effect, Point(StringToFixed(StringWord(argv, 3)), StringToFixed(StringWord(argv, 4))));
+                }
+                else {
+                    LibapxLogError(user, "<c val=\"ff0000\">Unable to create the effect.</c>");
+                }
+                UnitGroupLoopStep();
+            }
+            UnitGroupLoopEnd();
+        }
+    }
+
+	if(usingAcquired == true){
+        if( UnitGroupCount(g, c_unitCountAll) != 0 ) {
+            UnitGroupLoopBegin(g);
+            while(!UnitGroupLoopDone()) {
+                if( libNtve_gf_UnitCanCreateEffectOnUnit(UnitGroupLoopCurrent(), effect, libNtve_gf_AcquiredTarget()) ) {
+                    UnitCreateEffectUnit(UnitGroupLoopCurrent(), effect, libNtve_gf_AcquiredTarget());
+                }
+                else {
+                    LibapxLogError(user, "<c val=\"ff0000\">Unable to create the effect.</c>");
+                }
+                UnitGroupLoopStep();
+            }
+            UnitGroupLoopEnd();
+        }
     }
 
     if(usingCursor == true){
@@ -2894,7 +2945,7 @@ void LibapxCommandEffect(int user, unitgroup u, string argv, int spawningCount, 
         }
     }
 
-    if(usingCursor == false){
+    if(usingCursor == false && usingAcquired == false && usingCoords == false){
         if( UnitGroupCount(g, c_unitCountAll) != 0 ) {
             UnitGroupLoopBegin(g);
             while(!UnitGroupLoopDone()) {
