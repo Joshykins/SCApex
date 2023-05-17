@@ -285,7 +285,7 @@ void LibapxCommandEvent(int user, unitgroup u, string argv, int spawningCount, s
 		}
 	}
     // help list
-    if (StringCase(StringWord(argv, 2), c_stringNoCase) == "help") {
+    if (StringCase(TheEvent, c_stringNoCase) == "help" || StringCase(TheEvent, c_stringNoCase) == "list") {
         LibapxLogInfo(user, "The current events available are \" <c val=\"00ff00\">" + gv_LibapxAllEvents + " \"</c> </n> The format for the command is >event eventname [commandshere] ");
         return;
     }

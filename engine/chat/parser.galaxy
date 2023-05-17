@@ -52,7 +52,7 @@ typedef funcref<LibapxCommandGuideSignature> LibapxCommandGuide;
 //
 // Array length hardcoded such that num of commands registered should never
 // reach command table size. If it does, increase this array size.
-LibapxCommandType[250] gv_LibapxCommandTable;
+LibapxCommandType[994] gv_LibapxCommandTable;
 
 // Counter for the next free array entry in the gv_LibapxCommandTable array
 int gv_gv_LibapxCommandTableCounter = 0;

@@ -21,6 +21,8 @@ void gv_LibapxSettingsInitialize() {
 	gv_LibapxSettings.allowReloadBank = false;
 	gv_LibapxSettings.allowDataEdit = false;
 	gv_LibapxSettings.allowGamesetup = false;
+	gv_LibapxSettings.allowEvent = false;
+	gv_LibapxSettings.allowSet = false;
 	gv_LibapxSettings.allowLoan = false;
 }
 
@@ -42,6 +44,7 @@ void LibapxPopulateSettingsFromPlayer(int p) {
 	gv_LibapxSettings.allowDataEdit = false;
 	gv_LibapxSettings.allowGamesetup = false;
 	gv_LibapxSettings.allowEvent = false;
+	gv_LibapxSettings.allowSet = false;
 	gv_LibapxSettings.allowLoan = false;
 
 	

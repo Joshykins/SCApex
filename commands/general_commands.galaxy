@@ -1980,6 +1980,7 @@ void LibapxCommandDataedit(int user, unitgroup u, string argv, int spawningCount
 	int catalogType;
 	bool actualEntry;
 	bool actualField;
+	bool actualArray;
 
 	if(LibapxAdminSettingIsPlayerEnforceable(user)) {
 		if(!gv_LibapxSettings.allowDataEdit) {
@@ -2047,7 +2048,19 @@ void LibapxCommandDataedit(int user, unitgroup u, string argv, int spawningCount
 	//Checks to see if entry or field is valid
 	catalogEntry = LibapxCatalogGet(catalogType, catalogEntry);
 	actualEntry = CatalogEntryIsValid(catalogType, catalogEntry);
-	actualField = CatalogFieldExists(CatalogEntryScope(catalogType, catalogEntry), catalogField);
+
+	if(StringContains(catalogField, "[", c_stringAnywhere, false) == true){
+		actualField = true;
+	}
+	else {
+		actualField = CatalogFieldExists(CatalogEntryScope(catalogType, catalogEntry), catalogField);
+	}
+
+	actualField = true;
+	
+
+
+
 
 
 

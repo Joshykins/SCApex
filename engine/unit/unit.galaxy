@@ -26,8 +26,8 @@ const int gv_LibapxUnitIndexFlagAnimspeed = 6;	// flag for @animspeed has been u
 const int gv_LibapxUnitIndexFlagPlay = 7;			// flag for @play has been used
 const int gv_LibapxUnitIndexFlagStatbars = 8;		// flag for @statbars has been used
 const int gv_LibapxUnitIndexFlagRotate = 9;		// flag for @rotate has been used
-const int gv_LibapxUnitIndexFlagDecal = 10;		// flag for @rotate has been used 
-const int gv_LibapxUnitIndexFlagLoaner = 11;		// flag for @rotate has been used 
+const int gv_LibapxUnitIndexFlagDecal = 10;		// flag for @decal has been used 
+const int gv_LibapxUnitIndexFlagLoaner = 11;		// flag for @loan has been used 
 
 const int gv_LibapxUnitIndexWaygate = 15;			// region ID for waygates
 const int gv_LibapxUnitIndexWaygateDialog = 16;	// attached waygate dialog ID
@@ -105,7 +105,7 @@ string LibapxUnitGetValEvent(unit u, string valuename) {
 }
 
 const string gv_LibapxAllKeys = "key_0 key_1 key_2 key_3 key_4 key_5 key_6 key_7 key_8 key_9 key_a key_b key_c key_d key_e key_f key_g key_h key_i key_j key_k key_l key_m key_n key_o key_p key_q key_r key_s key_t key_u key_v key_w key_x key_y key_z key_up key_down key_left key_right key_pgup key_pgdown key_numpad0 key_numpad1 key_numpad2 key_numpad3 key_numpad4 key_numpad5 key_numpad6 key_numpad7 key_numpad8 key_numpad9 key_numpadplus key_numpadminus key_numpadmultiply key_numpaddivide key_numpaddecimal key_grave";
-const string gv_LibapxAllEvents = "attack attacked attackmove attackmoveFinish attackmoveCancel highlightOn highlightOff hold holdFinish holdCancel scanmove scanmoveComplete scanmoveCancel turn turnFinish turnCancel death move moveCancel moveFinish patrol patrolAllStages patrolCancel click select unselect acquire idle stop life shields energy kill exp height movement";
+const string gv_LibapxAllEvents = "attack attacked attackmove attackmoveFinish attackmoveCancel highlightOn highlightOff hold holdFinish holdCancel scanmove scanmoveComplete scanmoveCancel turn turnFinish turnCancel death move moveCancel moveFinish patrol patrolAllStages patrolCancel click select unselect acquire idle stop life shields energy kill exp height level movement";
 
 // LibapxUnitSetVal
 // ===========================
@@ -1181,7 +1181,8 @@ int LibapxGetCommandActorCount(string argv) {
 
 
 
-
+// Wait did I make this?
+// I think this was my prototype for >events
 void LibapxUnitAttackCheck(){
 	int i;
 	unitgroup target;

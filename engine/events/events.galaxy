@@ -34,7 +34,6 @@ void LibapxEventsInitialize() {
 
 	// unit initialization events (functions found in unit.galaxy)
 	TriggerAddEventUnitCreated(TriggerCreate("LibapxUnitInitialize"), null, null, null);
-	TriggerAddEventUnitRegion(TriggerCreate("LibapxUnitSetParse"), null, RegionEntireMap(), true);
 	TriggerAddEventUnitRemoved(TriggerCreate("LibapxUnitDeathCleanup"), null);
 	TriggerAddEventUnitDied(TriggerCreate("LibapxUnitDeathCleanup"), null);
 
@@ -45,6 +44,10 @@ void LibapxEventsInitialize() {
 
 	//The only thing that needs an active runtime.
 	TriggerAddEventTimePeriodic(TriggerCreate("LibapxTrigTicker"), .01, c_timeGame);
+
+	//trigger event for >set (TriggerAddEventUnitCreated did not fire properly)
+	TriggerAddEventUnitRegion(TriggerCreate("LibapxUnitSetParse"), null, RegionEntireMap(), true);
+
 	
 	//Event firing triggers for >event cmd. (bool triggers found in unit_events.galaxy)
 	TriggerAddEventUnitStartedAttack(TriggerCreate("LibapxUnitAttacking"),null);

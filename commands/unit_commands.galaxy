@@ -221,11 +221,18 @@ void LibapxCommandContext(int user, unitgroup u, string argv, int spawningCount,
 	string unitgroupPrefix = "unitgroup_"+IntToString(user)+"_";
 	unitgroup target = DataTableGetUnitGroup(true, unitgroupPrefix + StringWord(argv,2));
 	bool modSelect = false;
+	bool modAcquire = false;
 	if( StringFind(argv, "-select", c_stringNoCase) != -1 ) {
 		modSelect = true;
 		argv = StringReplaceWord(argv, "-select",  "", 1, c_stringNoCase);
 		target = UnitGroupSelected(user);
 	} 
+	if( StringFind(argv, "-acquired", c_stringNoCase) != -1 ) { // Sets the context to be a unit that's being targeted/acquired by the selected unit in the specific instance it is acquiring/targeting (eg attacking).
+		modAcquire = true;
+		argv = StringReplaceWord(argv, "-acquired",  "", 1, c_stringNoCase);
+		target = libNtve_gf_ConvertUnitToUnitGroup(libNtve_gf_AcquiredTarget());
+	} 
+	
 
 	LibapxSetTarget(user, target, spawningCount);
 	// LibapxSetTarget(int player, unitgroup target, int spawningCount)

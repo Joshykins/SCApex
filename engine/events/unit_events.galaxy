@@ -60,7 +60,6 @@ bool LibapxUnitDeathCleanup(bool testConds, bool runActions) {
 }
 bool LibapxUnitAttacking(bool testConds, bool runActions) {
 	unit u = EventUnit(); 
-	string unitId = FixedToString(UnitGetCustomValue(u, 0), 0); // 0 is index for unit id
 	int owner = UnitGetOwner(u);
 	string input;	
 	unitgroup g = libNtve_gf_ConvertUnitToUnitGroup(EventUnit());	
@@ -72,7 +71,6 @@ bool LibapxUnitAttacking(bool testConds, bool runActions) {
 }
 bool LibapxUnitClicked(bool testConds, bool runActions) {
 	unit u = EventUnit(); 
-	string unitId = FixedToString(UnitGetCustomValue(u, 0), 0); // 0 is index for unit id
 	int owner = UnitGetOwner(u);
 	string input;
 	unitgroup g = libNtve_gf_ConvertUnitToUnitGroup(EventUnit());
@@ -83,7 +81,6 @@ bool LibapxUnitClicked(bool testConds, bool runActions) {
 	return true;
 }
 bool LibapxUnitHighlightOn(bool testConds, bool runActions) {	unit u = EventUnit(); 
-	string unitId = FixedToString(UnitGetCustomValue(u, 0), 0); // 0 is index for unit id
 	int owner = UnitGetOwner(u);
 	int player = EventPlayer();
 	string input;	
@@ -94,7 +91,6 @@ bool LibapxUnitHighlightOn(bool testConds, bool runActions) {	unit u = EventUnit
 	return true;
 }
 bool LibapxUnitHighlightOff(bool testConds, bool runActions) {	unit u = EventUnit(); 
-	string unitId = FixedToString(UnitGetCustomValue(u, 0), 0); // 0 is index for unit id
 	int owner = UnitGetOwner(u);
 	int player = EventPlayer();
 	string input;	
@@ -106,7 +102,6 @@ bool LibapxUnitHighlightOff(bool testConds, bool runActions) {	unit u = EventUni
 }
 bool LibapxUnitAttacked(bool testConds, bool runActions) {
 	unit u = EventUnit(); 
-	string unitId = FixedToString(UnitGetCustomValue(u, 0), 0); // 0 is index for unit id
 	int owner = UnitGetOwner(u);
 	string input;
 	unitgroup g = libNtve_gf_ConvertUnitToUnitGroup(EventUnit());
@@ -118,7 +113,6 @@ bool LibapxUnitAttacked(bool testConds, bool runActions) {
 
 bool LibapxUnitDied(bool testConds, bool runActions) {
 	unit u = EventUnit(); 
-	string unitId = FixedToString(UnitGetCustomValue(u, 0), 0); // 0 is index for unit id
 	int owner = UnitGetOwner(u);
 	string input;
 	unitgroup g = libNtve_gf_ConvertUnitToUnitGroup(EventUnit());
@@ -130,30 +124,27 @@ bool LibapxUnitDied(bool testConds, bool runActions) {
 
 bool LibapxUnitSelected(bool testConds, bool runActions) {
 	unit u = EventUnit(); 
-	string unitId = FixedToString(UnitGetCustomValue(u, 0), 0); // 0 is index for unit id
 	int owner = UnitGetOwner(u);
 	string input;
 	unitgroup g = libNtve_gf_ConvertUnitToUnitGroup(EventUnit());
 	input = LibapxUnitGetValEvent(u, "select");
 
-	LibapxChatParse(input, UnitGetOwner(EventUnit()), g, 1);
+	LibapxChatParse(input, UnitGetOwner(EventUnit()), g, gv_LibapxPlayer[owner].spawningCount);
 	return true;
 }
 bool LibapxUnitUnselected(bool testConds, bool runActions) {
 	unit u = EventUnit(); 
-	string unitId = FixedToString(UnitGetCustomValue(u, 0), 0); // 0 is index for unit id
 	int owner = UnitGetOwner(u);
 	string input;
 	unitgroup g = libNtve_gf_ConvertUnitToUnitGroup(EventUnit());
 	input = LibapxUnitGetValEvent(u, "unselect");
 
-	LibapxChatParse(input, UnitGetOwner(EventUnit()), g, 1);
+	LibapxChatParse(input, UnitGetOwner(EventUnit()), g, gv_LibapxPlayer[owner].spawningCount);
 	return true;
 }
 
 bool LibapxUnitAcquire(bool testConds, bool runActions) {
 	unit u = EventUnit(); 
-	string unitId = FixedToString(UnitGetCustomValue(u, 0), 0); // 0 is index for unit id
 	int owner = UnitGetOwner(u);
 	string input;
 	unitgroup g = libNtve_gf_ConvertUnitToUnitGroup(EventUnit());
@@ -165,7 +156,6 @@ bool LibapxUnitAcquire(bool testConds, bool runActions) {
 
 bool LibapxUnitIdle(bool testConds, bool runActions) {
 	unit u = EventUnit(); 
-	string unitId = FixedToString(UnitGetCustomValue(u, 0), 0); // 0 is index for unit id
 	int owner = UnitGetOwner(u);
 	string input;
 	unitgroup g = libNtve_gf_ConvertUnitToUnitGroup(EventUnit());
@@ -178,10 +168,10 @@ bool LibapxUnitIdle(bool testConds, bool runActions) {
 bool LibapxUnitSetParse(bool testConds, bool runActions) {
 	unit u = EventUnit(); 
 	int owner = UnitGetOwner(u);
-	string input;	unitgroup g = libNtve_gf_ConvertUnitToUnitGroup(u);
-
+	string input;	
+	unitgroup g = libNtve_gf_ConvertUnitToUnitGroup(u);
 	input = DataTableGetString(true, IntToString(UnitGetOwner(u)) + UnitGetType(u) + "_birth" );
-	//issue getting it to parse correctly when more than 1 unit is spawned per instance. Temporarily resolving the issue by adding -nodelay in >set DataTableSetValue.
+
 	LibapxChatParse(input, UnitGetOwner(EventUnit()), g, gv_LibapxPlayer[owner].spawningCount);
 
 	return true;
