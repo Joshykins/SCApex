@@ -68,10 +68,16 @@ static void patchNotesFormatDescription(int dialog, playergroup pg, string descr
 
 
 }
-
+// sorry to burst your bubble here sero but you could probably just make this one big string with """ and iterate over it's new lines instead of this monstrosity.
+//TODO: Cleanup function, a bit hard to read imo
 void LibapxUiPatchnotesInitPlayer(int player) { 
     int i;
     int j = 0;
+
+    i = 0;
+    patchNotes[player][j].version = "2.4.0";
+    patchNotes[player][j].patches[i] = "<c val=\"3498db\">CMD: >keypress</c> numpad and f key fixed, also added warning to keys 1 - 9/0";
+    //i+=1;patchNotes[player][j].patches[i] = "<c val=\"3498db\">CMD: _varset</c> added";
 
     i = 0;
     patchNotes[player][j].version = "2.3.0";
@@ -225,7 +231,6 @@ void LibapxUiPatchnotesInitPlayer(int player) {
     i+=1;patchNotes[player][j].patches[i] = "<c val=\"3498db\">CMD: Info</c> added.";
     i+=1;patchNotes[player][j].patches[i] = "<c val=\"3498db\">CMD: Upgrade</c> added.";
     for (i = 0; i < patchCount; i += 1) {
-        // TODO:
         DialogControlAddItem(PatchnotesList, PlayerGroupSingle(player), StringToText("<c val=\"ff0000\">Apex Patch </c> - "+patchNotes[player][i].version));
         j = 0;
         while(patchNotes[player][i].patches[j] != "") {

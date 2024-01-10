@@ -17,7 +17,6 @@ include "apex/toolkit/toolkit.galaxy"
 static string[7] InspirationalQuotes;
 
 //TODO: Add a function to make units not save with gamesetup
-//TODO: 3
 
 //THIS HAS TO BE SNAKE, TRIGGER TIES INTO THIS
 //DO NOT CHANGE, EVER
