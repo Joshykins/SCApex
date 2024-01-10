@@ -202,8 +202,8 @@ void LibapxCommandKeypress(int user, unitgroup u, string argv, int spawningCount
 void LibapxDefineKeypress(string commandName) {
 	LibapxCommandsGuideEntrySet(
 		gv_CommandsGuideEntryGeneral, 
-		commandName, 
-		" This command assigns commands to a key on a unit. <br> >keypress [keyname] [[commands]] <br> Possible keys are "+gv_LibapxAllKeys+" <br> Examples: <br> >keypress keyW [@position -rel +0 +3] <br> >keypress keyQ [@move;>moveto -arc 2 [boom]]; "
+		commandName,  //                                                                                                                                                                                                                                                        vvv the c val here works but still counts toward the line length so it makes an abrupt newline, might not be worth the red text but it does make the warning much more obvious. remove if you want but I felt its better than nothing.
+		" This command assigns commands to a key on a unit. <br> >keypress [keyname] [[commands]] <br> Possible keys are "+gv_LibapxAllKeys+" <br> Examples: <br> >keypress key_w [@position -rel +0 +3] <br> >keypress key_numpad5 [@move;>moveto -arc 2 [boom]] <br> <c val=\"200\">Note:</c> Probably a bad idea to use key_1 - key_0 as it still triggers control groups, but for those that want to do witchcraft, it's still available."
 	);
 }
 

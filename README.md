@@ -25,7 +25,7 @@ After logging in to Battle.net, change the "Source" of files to
 **Apex RP Engine** mod published by Serobliss. Select this mod and hit OK.  
 
 More preferably I recommend getting the **Serobliss Group Dependency**, this dependency comes with all the dependencies most
-modern maps use including the engine itself. Therefore it is the only dependency you need. Also be sure to check **"latest"** on the top left so you get automated updates. :) 
+modern maps use, including the engine itself. Therefore, it is the only dependency you need. Also be sure to check **"latest"** on the top left so you get automated updates. :) 
 
 This mod should now be added to your "Document dependencies" list. Move this
 mod file to the top of the list by pressing the up arrow button in the
@@ -56,27 +56,28 @@ Run apex_trig (Check Conditions, Don't Wait until it finishes)
 You are now good to go! Run the map and see if the Apex engine works!
 
 ## Manual Installation
-Manual installation presumes you have a full understanding of the SC2 Editor.
+Manual installation presumes you have a decent understanding of the SC2 Editor, but most of this is straight forward.
 
 ### Import Scripts and Chat UI
-Download the [Apex repo](https://github.com/Joshykins/Apex-rp). In the
+Download the [Apex repo](https://github.com/Joshykins/SCApex). In the
 SC2 Editor, go to the map **Imports** (F9). Import the Apex engine repo
 files **under a Apex directory.** That is, the **Apex.galaxy** file should
 be found under the import path **Apex/Apex.galaxy**.  
 
 ### Data
-Inside the **data/data.galaxy** file, there will be a list of const strings
+Inside the **data/data.galaxy** file, there will be a list of **const string**s
 prefixed by **LibapxBehavior**. These are all behaviors that must be
 created in the SC2Editor for a map that uses Apex. Go to the **Data Editor**
 (F7) and create all these behaviors with the names defined by the constants.
 **If the names do not match, certain commands will not work ingame.**
 
 ### Adding Chat UI
-Included in the repo imported should also be the **chat_frame.SC2Layout** file
-under **Apex/chat_frame.SC2Layout**. Go back to the **Data Editor** (F7)
+Included in the repo imported should also be the **main.SC2Layout** file. Go back to the **Data Editor** (F7)
 and go to the **Game UI Data** tab. In the **Default SC2 UI Settings** entry,
 go to the **(Basic) UI: Custom Layout Files+** field and add the
-**Apex/chat_frame.SC2Layout**.
+**Apex/main.SC2Layout**.
+You also need to create a font style called **ChatDisplayApex** in the **Text  Editor** (F8), the font and styling doesn't matter.
+*If you're unsure, use [this](https://i.imgur.com/bCGVKjn.png)* example.
 
 ### Player banks
 Now initialize player banks. In the top bar of the SC2 Editor, navigate to  
@@ -100,12 +101,18 @@ libapx_initialize();
 ```
 
 Now test the map and see if the Apex engine works!
+If you get any errors, they're probably related to the UI, all of which you *should* be able to ignore and have Apex engine run fine. They won't show in an actual lobby and don't affect performance.
 
 
 # Contact
-**Github repo:** https://github.com/Joshykins/SCApex
+**Github repo:** https://github.com/Joshykins/SCApex  
+
+**Apex Engine Discord:** https://discord.gg/eK5bNrG  
+
 **Lead developer:** @Joshykins / Serobliss (serobliss2@gmail.com)  
+
 **SC2 Handle:** Serobliss  
+
 
 
 # Acknowledgements
@@ -113,8 +120,8 @@ Apex has its roots in the original StarCraft II roleplaying engine
 [Cortex](https://github.com/FabianPonce/CortexEngine) by lead developer
 Fabian Ponce. Much of the Apex engine design philosophy and user commands are
 inherited from this engine (though there have been many divergences).
-Thus I would like to give a huge personal thanks to Ponce and the rest of the
+Thus, I would like to give a huge personal thanks to Ponce and the rest of the
 original Cortex team for their early work on making a roleplaying environment
 for StarCraft II.
 
-Also, a big thank you to Xethyr for all of the work that he did making the Wyvern Engine.
+Also, a big thank you to Xethyr for all the work that he did making the Wyvern Engine.

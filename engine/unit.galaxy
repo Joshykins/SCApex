@@ -86,7 +86,7 @@ string LibapxUnitGetVal(unit u, string valuename) {
 
 }
 
-const string gv_LibapxAllKeys = "key_0 key_1 key_2 key_3 key_4 key_5 key_6 key_7 key_8 key_9 key_a key_b key_c key_d key_e key_f key_g key_h key_i key_j key_k key_l key_m key_n key_o key_p key_q key_r key_s key_t key_u key_v key_w key_x key_y key_z key_up key_down key_left key_right key_pgup key_pgdown key_numpad0 key_numpad1 key_numpad2 key_numpad3 key_numpad4 key_numbpad5 key_numbpad6 key_numbpad7 key_numbpad8 key_numbpad9 key_numbpadplus key_numbpadminus key_numpadmultiply key_numpaddivide key_numpaddecimal key_grave";
+const string gv_LibapxAllKeys = "key_0 key_1 key_2 key_3 key_4 key_5 key_6 key_7 key_8 key_9 key_a key_b key_c key_d key_e key_f key_g key_h key_i key_j key_k key_l key_m key_n key_o key_p key_q key_r key_s key_t key_u key_v key_w key_x key_y key_z key_up key_down key_left key_right key_pgup key_pgdown key_numpad0 key_numpad1 key_numpad2 key_numpad3 key_numpad4 key_numpad5 key_numpad6 key_numpad7 key_numpad8 key_numpad9 key_numpadplus key_numpadminus key_numpadmultiply key_numpaddivide key_numpaddecimal key_grave";
 
 // LibapxUnitSetVal
 // ===========================
@@ -1152,7 +1152,7 @@ void LibapxUnitKeypressCheck() {
 		input = LibapxUnitGetVal(u, "key_e");
 		LibapxChatParse(input, player, g, gv_LibapxPlayer[player].spawningCount);
 	}
-	if(gv_LibapxPlayer[player].keyE == true ) {
+	if(gv_LibapxPlayer[player].keyF == true ) {
 		input = LibapxUnitGetVal(u, "key_f");
 		LibapxChatParse(input, player, g, gv_LibapxPlayer[player].spawningCount);
 	}
