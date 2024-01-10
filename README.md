@@ -72,7 +72,7 @@ created in the SC2Editor for a map that uses Apex. Go to the **Data Editor**
 **If the names do not match, certain commands will not work ingame.**
 
 ### Adding Chat UI
-Included in the repo imported should also be the **main.SC2Layout** file. Go back to the **Data Editor** (F7)
+Included in the repo imported should also be the **main.SC2Layou** file. Go back to the **Data Editor** (F7)
 and go to the **Game UI Data** tab. In the **Default SC2 UI Settings** entry,
 go to the **(Basic) UI: Custom Layout Files+** field and add the
 **Apex/main.SC2Layout**.
