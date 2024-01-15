@@ -39,6 +39,19 @@ void libapx_initialize() {
 	InspirationalQuotes[5] = " If you're new be public about it. Come join us on discord and we'll make your time in Apex easier. ";
 	InspirationalQuotes[6] = " Help the new players. A good and welcoming community is only possible if most will it. Don't drag everyone down. ";
 
+	InspirationalQuotes[7] = " Embrace the art of improvisation in your roleplay. Sometimes the best stories are born from unexpected twists and turns. ";
+	InspirationalQuotes[8] = " Be the catalyst for positive interactions. Your character's actions can inspire others to bring out the best in their own roles. ";
+	InspirationalQuotes[9] = " Craft intricate backstories for your characters. The richness of your narrative enhances the tapestry of the entire roleplay. ";
+	InspirationalQuotes[10] = " Radiate creativity. Break free from the ordinary and inject elements of surprise into the unfolding story. ";
+	InspirationalQuotes[11] = " Master the delicate balance of leading and following. A great roleplayer knows when to take charge and when to support the collaborative flow. ";
+	InspirationalQuotes[12] = " Build bridges, not walls. Forge connections with fellow roleplayers, fostering a community of shared imagination and camaraderie. ";
+	InspirationalQuotes[13] = " Dive into the unknown. Don't shy away from challenges; embrace them as opportunities for character growth and plot development. ";
+	InspirationalQuotes[14] = " Infuse your characters with authenticity. Let their emotions, flaws, and strengths reflect the depth of human experience. ";
+	InspirationalQuotes[15] = " Cherish the diversity of perspectives. Every roleplayer brings a unique flavor to the narrative, making it a tapestry of countless voices. ";
+	InspirationalQuotes[16] = " Illuminate the shadows. Shine a light on the overlooked aspects of the story, adding layers of complexity and intrigue. ";
+	InspirationalQuotes[17] = " Cultivate patience. Like a master storyteller, let the plot unfold at its own pace, savoring every moment of the journey. ";
+	InspirationalQuotes[18] = " Be a beacon of positivity. Radiate kindness and encouragement, uplifting the spirits of those around you in the roleplay. ";
+	InspirationalQuotes[19] = " Celebrate collaboration. The true magic of roleplaying lies in the synergy of minds, creating a collective masterpiece of imagination. ";
 
 	if(RandomInt(0,1000) != 666) {
 		LibapxPrint(PlayerGroupAll(), "Welcome to the <c val=\"ff0000\"> Apex Roleplaying Engine</c> created by Serobliss. " + InspirationalQuotes[i]);
