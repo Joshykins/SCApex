@@ -269,9 +269,6 @@ void LibapxChatParse(string msg, int player, unitgroup target, int spawningCount
 			}
 			continue; // skip OOC printing
 		}
-		else if ( StringEqual( StringWord(current, 1), "var", c_stringNoCase) ) {
-			// TODO: ADD VARIABLE SYSTEM
-		}
 
 		// replace aliases (returns true if aliases):
 		// if aliases subbed, affix to front of msg and reparse
@@ -294,9 +291,6 @@ void LibapxChatParse(string msg, int player, unitgroup target, int spawningCount
 			count += 1;
 			continue;
 		}
-
-		// TODO: replace variables
-
 
 		// run command (if exists and permissions for player valid)
 		cmdKey = gv_LibapxChatcommandPrefix + StringCase(StringWord(current, 1), false);

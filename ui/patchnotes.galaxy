@@ -23,7 +23,7 @@ struct patchNotesDesign {
     string version;
     string[200] patches; //Max patches
 };
-static const int patchCount = 10;
+static const int patchCount = 11;
 static patchNotesDesign[17][patchCount] patchNotes;
 
 
@@ -68,12 +68,18 @@ static void patchNotesFormatDescription(int dialog, playergroup pg, string descr
 
 
 }
-
+// sorry to burst your bubble here sero but you could probably just make this one big string with """ and iterate over it's new lines instead of this monstrosity.
+//TODO: Cleanup function, a bit hard to read imo
 void LibapxUiPatchnotesInitPlayer(int player) { 
     int i;
     int j = 0;
 
     i = 0;
+    patchNotes[player][j].version = "2.4.0";
+    patchNotes[player][j].patches[i] = "<c val=\"3498db\">CMD: >keypress</c> numpad and f key fixed.";
+
+    i = 0;
+    j = j + 1;
     patchNotes[player][j].version = "2.3.0";
     patchNotes[player][j].patches[i] = "<c val=\"9b59b6\">ENG: Parser ${}</c> Variable Functions added.";
     i+=1;patchNotes[player][j].patches[i] = "<c val=\"3498db\">CMD: _varset</c> added";
@@ -100,12 +106,13 @@ void LibapxUiPatchnotesInitPlayer(int player) {
     i+=1;patchNotes[player][j].patches[i] = "<c val=\"2ecc71\">UI: Ui </c> Updated Ping/Terrain/Color Icons ";
     i+=1;patchNotes[player][j].patches[i] = "<c val=\"2ecc71\">UI: Ui </c> Added Permission Level Viewer ";
     i+=1;patchNotes[player][j].patches[i] = "<c val=\"2ecc71\">UI: Ui </c> Fixed Behavior Tooltip ";
+
     i = 0;
     j = j + 1;
     patchNotes[player][j].version = "2.2.0";
     patchNotes[player][j].patches[i] = "<c val=\"3498db\">CMD: DataEdit</c> added";
     i+=1;patchNotes[player][j].patches[i] = "<c val=\"2ecc71\">UI: Ui </c> Made Things Square, smaller, AKA its a bit more modern:tm: ";
-    //Populate with types
+
     i = 0;
     j = j + 1;
     patchNotes[player][j].version = "2.1.20";
@@ -170,7 +177,6 @@ void LibapxUiPatchnotesInitPlayer(int player) {
     i+=1;patchNotes[player][j].patches[i] = "<c val=\"2ecc71\">UI: References </c> added. ";
     i+=1;patchNotes[player][j].patches[i] = "<c val=\"2ecc71\">UI: General </c> an exit button has been added to all UIs. ";
     i+=1;patchNotes[player][j].patches[i] = "<c val=\"2ecc71\">UI: Info </c> added a redirect to the getting started references. ";
-    //<
     
     i = 0;
     j = j + 1;
@@ -225,7 +231,6 @@ void LibapxUiPatchnotesInitPlayer(int player) {
     i+=1;patchNotes[player][j].patches[i] = "<c val=\"3498db\">CMD: Info</c> added.";
     i+=1;patchNotes[player][j].patches[i] = "<c val=\"3498db\">CMD: Upgrade</c> added.";
     for (i = 0; i < patchCount; i += 1) {
-        // TODO:
         DialogControlAddItem(PatchnotesList, PlayerGroupSingle(player), StringToText("<c val=\"ff0000\">Apex Patch </c> - "+patchNotes[player][i].version));
         j = 0;
         while(patchNotes[player][i].patches[j] != "") {
