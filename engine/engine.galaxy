@@ -136,7 +136,7 @@ include "apex/engine/debug.galaxy"
 
 // engine version
 const int gv_LibapxBuildVersion = 2;
-const int gv_LibapxBuildSubVersion = 3;
+const int gv_LibapxBuildSubVersion = 4;
 const string gv_LibapxBuildVersionModifier = ".0";
 
 void LibapxEngineInitialize() {

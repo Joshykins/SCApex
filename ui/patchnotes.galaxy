@@ -23,7 +23,7 @@ struct patchNotesDesign {
     string version;
     string[200] patches; //Max patches
 };
-static const int patchCount = 10;
+static const int patchCount = 11;
 static patchNotesDesign[17][patchCount] patchNotes;
 
 
@@ -76,7 +76,7 @@ void LibapxUiPatchnotesInitPlayer(int player) {
 
     i = 0;
     patchNotes[player][j].version = "2.4.0";
-    patchNotes[player][j].patches[i] = "<c val=\"3498db\">CMD: >keypress</c> numpad and f key fixed, also added warning to keys 1 - 9/0";
+    patchNotes[player][j].patches[i] = "<c val=\"3498db\">CMD: >keypress</c> numpad and f key fixed.";
 
     i = 0;
     j = j + 1;
@@ -106,12 +106,13 @@ void LibapxUiPatchnotesInitPlayer(int player) {
     i+=1;patchNotes[player][j].patches[i] = "<c val=\"2ecc71\">UI: Ui </c> Updated Ping/Terrain/Color Icons ";
     i+=1;patchNotes[player][j].patches[i] = "<c val=\"2ecc71\">UI: Ui </c> Added Permission Level Viewer ";
     i+=1;patchNotes[player][j].patches[i] = "<c val=\"2ecc71\">UI: Ui </c> Fixed Behavior Tooltip ";
+
     i = 0;
     j = j + 1;
     patchNotes[player][j].version = "2.2.0";
     patchNotes[player][j].patches[i] = "<c val=\"3498db\">CMD: DataEdit</c> added";
     i+=1;patchNotes[player][j].patches[i] = "<c val=\"2ecc71\">UI: Ui </c> Made Things Square, smaller, AKA its a bit more modern:tm: ";
-    //Populate with types
+
     i = 0;
     j = j + 1;
     patchNotes[player][j].version = "2.1.20";
@@ -176,7 +177,6 @@ void LibapxUiPatchnotesInitPlayer(int player) {
     i+=1;patchNotes[player][j].patches[i] = "<c val=\"2ecc71\">UI: References </c> added. ";
     i+=1;patchNotes[player][j].patches[i] = "<c val=\"2ecc71\">UI: General </c> an exit button has been added to all UIs. ";
     i+=1;patchNotes[player][j].patches[i] = "<c val=\"2ecc71\">UI: Info </c> added a redirect to the getting started references. ";
-    //<
     
     i = 0;
     j = j + 1;
