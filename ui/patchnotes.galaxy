@@ -77,9 +77,9 @@ void LibapxUiPatchnotesInitPlayer(int player) {
     i = 0;
     patchNotes[player][j].version = "2.4.0";
     patchNotes[player][j].patches[i] = "<c val=\"3498db\">CMD: >keypress</c> numpad and f key fixed, also added warning to keys 1 - 9/0";
-    //i+=1;patchNotes[player][j].patches[i] = "<c val=\"3498db\">CMD: _varset</c> added";
 
     i = 0;
+    j = j + 1;
     patchNotes[player][j].version = "2.3.0";
     patchNotes[player][j].patches[i] = "<c val=\"9b59b6\">ENG: Parser ${}</c> Variable Functions added.";
     i+=1;patchNotes[player][j].patches[i] = "<c val=\"3498db\">CMD: _varset</c> added";
